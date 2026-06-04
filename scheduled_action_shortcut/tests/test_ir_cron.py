@@ -60,5 +60,6 @@ class TestIrCronSystray(TransactionCase):
 
     def test_run_scheduled_actions(self):
         """Verify that calling run_scheduled_actions method triggers the cron."""
-        # Call the action to ensure it completes successfully without raising error
-        self.cron.run_scheduled_actions()
+        # Use enter_registry_test_mode so the test transaction is shared with the new cursor/connection
+        with self.enter_registry_test_mode():
+            self.cron.run_scheduled_actions()

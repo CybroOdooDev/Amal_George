@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Dynamic report template-->
+<templates>
+    <t t-name="bank_book_temp" owl="1">
+        <div class="container mt-5">
+            <div class="text-center">
+                <h1 class="mb-4">
+                    BANK BOOK REPORT
+                </h1>
+            </div>
+            <div class="report-content" style="width: 100%; max-height: 500px; overflow: auto;">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th/>
+                            <th>Date</th>
+                            <th>Journal</th>
+                            <th>Partner</th>
+                            <th>Reference</th>
+                            <th>Move</th>
+                            <th>Entry label</th>
+                            <th class="text-right">Debit</th>
+                            <th class="text-right">Credit</th>
+                            <th class="text-right">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody class="categ" style="width: 100%;">
+                        <t t-if="this.props.action.params.account_res"
+                           t-foreach="this.props.action.params.account_res"
+                           t-as="l" t-key="l.name">
+                            <ParentLine data="l"/>
+                            <t t-if="l.move_lines">
+                                <t t-foreach="l.move_lines" t-as="line" t-key="line_index">
+                                    <tr class='bankbook_dynamic_row' t-on-click="() => this.line_click(line['m_id'])" t-att-id="line['lid']">
+                                           <td/>
+                                           <td><t t-esc="line['ldate']"/></td>
+                                            <td><t t-esc="line['lcode']"/></td>
+                                            <td><t t-esc="line['partner_name']"/></td>
+                                            <td><t t-esc="line['lref']"/></td>
+                                            <td><t t-esc="line['move_name']"/></td>
+                                            <td><t t-esc="line['lname']"/></td>
+                                            <td class="text-right"><t t-esc="line['debit'].toFixed(2)"/></td>
+                                            <td class="text-right"><t t-esc="line['credit'].toFixed(2)"/></td>
+                                            <td class="text-right"><t t-esc="(line['debit'] - line['credit']).toFixed(2)"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+</templates>

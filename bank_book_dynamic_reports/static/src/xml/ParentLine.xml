@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--ParentLine template-->
+<templates>
+    <t t-name="ParentLine" owl="1">
+        <tr class='parent_line' style='height:38px;'
+            t-on-click="()=>this.state.is_expanded = !this.state.is_expanded">
+            <t t-set="temp_name"
+               t-value="this.props.data.code +' '+this.props.data.name"/>
+            <td style='border-bottom: 1px solid #e6e6e6;width:12%;'>
+                <t t-esc="temp_name"/>
+            </td>
+            <td style='border-bottom: 1px solid #e6e6e6;'/>
+            <td style='border-bottom: 1px solid #e6e6e6;'/>
+            <td style='border-bottom: 1px solid #e6e6e6;'/>
+            <td style='border-bottom: 1px solid #e6e6e6;'/>
+            <td style='border-bottom: 1px solid #e6e6e6;'/>
+            <td style='border-bottom: 1px solid #e6e6e6;'/>
+            <td style='border-bottom: 1px solid #e6e6e6;text-align:right;'>
+                <t t-esc="this.props.data.debit.toFixed(2)+this.env.currency[0]"/>
+            </td>
+            <td style='border-bottom: 1px solid #e6e6e6;text-align:right;'>
+                <t t-esc="this.props.data.credit.toFixed(2)+this.env.currency[0]"/>
+            </td>
+            <td style='border-bottom: 1px solid #e6e6e6;text-align:right;'>
+                <t t-esc="this.props.data.balance.toFixed(2)+this.env.currency[0]"/>
+            </td>
+        </tr>
+    </t>
+</templates>

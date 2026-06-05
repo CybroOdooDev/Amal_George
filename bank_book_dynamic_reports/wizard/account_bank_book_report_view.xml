@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<!--    Form view of the account day book report-->
+    <record id="account_bank_book_form_view" model="ir.ui.view">
+        <field name="name">account.bank.book.form.view.inherit.bank.book.dynamic.reports</field>
+        <field name="model">account.bank.book.report</field>
+        <field name="inherit_id" ref="account_bank_book.account_bank_book_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='check_report']" position="after">
+                <button string="Dynamic View" name="view_report" type="object" class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

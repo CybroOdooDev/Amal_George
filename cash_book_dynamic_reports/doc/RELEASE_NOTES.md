@@ -1,0 +1,6 @@
+## Module <cash_book_dynamic_reports>
+
+#### 11.08.2025
+#### Version 18.0.1.0.0
+##### ADD
+- Initial commit for Dynamic Cash Book Reports

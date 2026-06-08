@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+<!--    cash book dynamic report template-->
+    <t t-name="cash_book_temp">
+        <div class="main_report" t-ref="root-cash-book">
+            <div class="report_header">
+                <h1>
+                    CASH BOOK REPORT
+                </h1>
+            </div>
+            <div class="report-content" style="width:100%;">
+                <table style="width:inherit;">
+                    <thead class="thead">
+                        <tr>
+                            <th></th>
+                            <th>Date</th>
+                            <th>Journal</th>
+                            <th>Partner</th>
+                            <th>Reference</th>
+                            <th>Move</th>
+                            <th>Entry label</th>
+                            <th class="text-right" style="padding-right:6px;">Debit</th>
+                            <th class="text-right" style="padding-right:6px;">Credit</th>
+                            <th class="text-right" style="padding-right:6px;">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody class="categ" style="width:100%;">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+
+
+</templates>

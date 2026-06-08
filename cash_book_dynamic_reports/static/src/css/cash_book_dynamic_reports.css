@@ -1,0 +1,78 @@
+.thead {
+    border-bottom: 2px solid #bfbfbf;
+}
+
+.thead tr {
+    height: 38px;
+    width: 100%;
+}
+
+.thead tr th {
+    border-bottom: 1px solid #e6e6e6;
+    font-weight:bold;
+    font-size:15px;
+    width:10%;
+}
+
+.child_col1{
+    width:10%;
+}
+.child_col2{
+    width:10%;
+}
+.child_col3{
+    width:10%;
+}
+.child_col4{
+    width:10%;
+}.child_col5{
+    width:10%;
+}
+.child_col6{
+    width:10%;
+}
+.child_col7{
+    width:10%;
+    text-align: right;
+}
+.child_col8{
+    width:10%;
+    text-align: right;
+}
+.child_col9{
+    width:10%;
+    text-align: right;
+}
+.main_report {
+    border: 1px solid #efefef;
+    margin: 50px;
+    border-radius: 17px;
+    background: #fff;
+    padding: 2% 0 5%;
+}
+.categ td {
+    padding: 7px !important;
+}
+.filter_options{
+    border-bottom:1px solid;
+    border-radius:10px;
+}
+
+.report_header{
+    text-align: center;
+    border-bottom: 1px solid #efefef;
+}
+
+.child_class td {
+    font-size:14px !important;
+    border-bottom: 1px solid black;
+}
+
+.parent_line td {
+    font-weight:bold;
+    font-size:15px;
+}
+.main_report{
+    padding-right:10px !important;
+    padding-left:10px !important;
+}

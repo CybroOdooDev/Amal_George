@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<!--    Inheriting account_cash_book form view to add Dynamic view button-->
+    <record id="account_cash_book_form_view_dynamic" model="ir.ui.view">
+        <field name="name">account.cash.book.report.view.form.inherit.cash.book.dynamic.reports</field>
+        <field name="model">account.cash.book.report</field>
+        <field name="inherit_id" ref="account_cash_book.account_cash_book_report_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_report_xlsx']" position="after">
+                <button string="Dynamic View" name="action_view_report" type="object" class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List View ─────────────────────────────────────────────────────────── -->
+    <record id="pharma_oos_investigation_view_list" model="ir.ui.view">
+        <field name="name">pharma.oos.investigation.list</field>
+        <field name="model">pharma.oos.investigation</field>
+        <field name="arch" type="xml">
+            <list string="OOS Investigations">
+                <field name="name"/>
+                <field name="result_line_id"/>
+                <field name="phase"/>
+                <field name="lab_error_found"/>
+                <field name="disposition"/>
+                <field name="investigated_by" widget="many2one_avatar_user"/>
+                <field name="closed_on"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form View ─────────────────────────────────────────────────────────── -->
+    <record id="pharma_oos_investigation_view_form" model="ir.ui.view">
+        <field name="name">pharma.oos.investigation.form</field>
+        <field name="model">pharma.oos.investigation</field>
+        <field name="arch" type="xml">
+            <form string="OOS Investigation">
+                <header>
+                    <field name="phase" widget="statusbar" statusbar_visible="phase_1,phase_2" options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Trigger Details">
+                            <field name="result_line_id"/>
+                            <field name="lab_error_found"/>
+                        </group>
+                        <group string="QA Review">
+                            <field name="investigated_by" widget="many2one_avatar_user"/>
+                            <field name="closed_on"/>
+                            <field name="disposition"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="conclusion_tab" string="Investigation Details">
+                            <group>
+                                <field name="conclusion" placeholder="Provide details, analysis, and final conclusion..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Chatter -->
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Search View ───────────────────────────────────────────────────────── -->
+    <record id="pharma_oos_investigation_view_search" model="ir.ui.view">
+        <field name="name">pharma.oos.investigation.search</field>
+        <field name="model">pharma.oos.investigation</field>
+        <field name="arch" type="xml">
+            <search string="Search OOS Investigations">
+                <field name="name"/>
+                <field name="result_line_id"/>
+                <filter string="Phase I" name="filter_phase_1" domain="[('phase', '=', 'phase_1')]"/>
+                <filter string="Phase II" name="filter_phase_2" domain="[('phase', '=', 'phase_2')]"/>
+                <separator/>
+                <filter string="Lab Error Found" name="filter_lab_error" domain="[('lab_error_found', '=', True)]"/>
+                <filter string="Closed" name="filter_closed" domain="[('closed_on', '!=', False)]"/>
+                <group>
+                    <filter string="Phase" name="group_by_phase" domain="[]" context="{'group_by': 'phase'}"/>
+                    <filter string="Disposition" name="group_by_disposition" domain="[]" context="{'group_by': 'disposition'}"/>
+                    <filter string="Investigator" name="group_by_investigator" domain="[]" context="{'group_by': 'investigated_by'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Action ────────────────────────────────────────────────────────────── -->
+    <record id="pharma_oos_investigation_action" model="ir.actions.act_window">
+        <field name="name">OOS Investigations</field>
+        <field name="res_model">pharma.oos.investigation</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="pharma_oos_investigation_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No OOS Investigations recorded.
+            </p>
+            <p>
+                Investigations are automatically triggered when a test result is marked Out Of Specification (OOS).
+            </p>
+        </field>
+    </record>
+
+</odoo>

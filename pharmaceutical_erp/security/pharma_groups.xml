@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        PHARMACEUTICAL ERP — Security Groups
+        NOTE (Odoo 19): res.groups no longer has category_id or comment fields.
+        Groups are defined with name and implied_ids only.
+        The group hierarchy is: user → operator → qc_analyst → qa_manager → qa_director
+    -->
+
+    <!-- Base user — read-only access to pharma menus -->
+    <record id="group_pharma_user" model="res.groups">
+        <field name="name">Pharma / User</field>
+    </record>
+
+    <!-- Operator — executes BMR steps, raises manual deviations, reads lots -->
+    <record id="group_pharma_operator" model="res.groups">
+        <field name="name">Pharma / Operator</field>
+        <field name="implied_ids" eval="[(4, ref('group_pharma_user'))]"/>
+    </record>
+
+    <!-- QC Analyst — manages QC test orders and lot status (Quarantine → Approved/Rejected) -->
+    <record id="group_pharma_qc_analyst" model="res.groups">
+        <field name="name">Pharma / QC Analyst</field>
+        <field name="implied_ids" eval="[(4, ref('group_pharma_operator'))]"/>
+    </record>
+
+    <!-- QA Manager — approves formulas, specs, changes lot status, releases batches -->
+    <record id="group_pharma_qa_manager" model="res.groups">
+        <field name="name">Pharma / QA Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_pharma_qc_analyst'))]"/>
+    </record>
+
+    <!-- QA Director — full QA authority, closes CAPAs, accepts disposition risk -->
+    <record id="group_pharma_qa_director" model="res.groups">
+        <field name="name">Pharma / QA Director</field>
+        <field name="implied_ids" eval="[(4, ref('group_pharma_qa_manager'))]"/>
+    </record>
+
+    <!-- Procurement — manages POs and AVL records -->
+    <record id="group_pharma_procurement" model="res.groups">
+        <field name="name">Pharma / Procurement</field>
+        <field name="implied_ids" eval="[(4, ref('group_pharma_user'))]"/>
+    </record>
+
+    <!-- Admin — full access across all groups -->
+    <record id="group_pharma_admin" model="res.groups">
+        <field name="name">Pharma / Administrator</field>
+        <field name="implied_ids" eval="[(4, ref('group_pharma_qa_director')), (4, ref('group_pharma_procurement'))]"/>
+    </record>
+
+    <!-- Vendor Qualification Feature Group -->
+    <record id="group_vendor_qualification" model="res.groups">
+        <field name="name">Pharma / Vendor Qualification Feature</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PHARMACEUTICAL ERP — Top-level App Menu
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <menuitem
+        id="menu_pharma_root"
+        name="Pharmaceutical ERP"
+        sequence="50"
+        groups="base.group_user"
+        web_icon="pharmaceutical_erp,static/description/icon.png"
+    />
+
+    <!-- ── Master Data ──────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_pharma_master"
+        name="Master Data"
+        parent="menu_pharma_root"
+        groups="base.group_user"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_pharma_products"
+        name="Products"
+        parent="menu_pharma_master"
+        action="product.product_template_action_all"
+        groups="base.group_user"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_pharma_bom"
+        name="Formulas / BOM"
+        parent="menu_pharma_master"
+        action="mrp.mrp_bom_form_action"
+        groups="base.group_user"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_pharma_qc_specs"
+        name="QC Specifications"
+        parent="menu_pharma_master"
+        action="pharmaceutical_erp.pharma_qc_spec_action"
+        groups="base.group_user"
+        sequence="30"
+    />
+
+    <!-- ── Procurement ───────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_pharma_procurement"
+        name="Procurement"
+        parent="menu_pharma_root"
+        groups="base.group_user"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_pharma_avl"
+        name="Approved Vendor List"
+        parent="menu_pharma_procurement"
+        action="pharmaceutical_erp.pharma_avl_action"
+        groups="base.group_user"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_pharma_vendor_qualification"
+        name="Vendor Qualification"
+        parent="menu_pharma_procurement"
+        action="pharmaceutical_erp.pharma_vendor_qualification_action"
+        groups="pharmaceutical_erp.group_vendor_qualification"
+        sequence="15"
+    />
+
+    <menuitem
+        id="menu_pharma_po"
+        name="Purchase Orders"
+        parent="menu_pharma_procurement"
+        action="purchase.purchase_rfq"
+        groups="base.group_user"
+        sequence="20"
+    />
+
+    <!-- ── Inventory & Lots ─────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_pharma_inventory"
+        name="Inventory &amp; Lots"
+        parent="menu_pharma_root"
+        groups="base.group_user"
+        sequence="30"
+    />
+
+    <menuitem
+        id="menu_pharma_lot_control"
+        name="Lot / Batch Control"
+        parent="menu_pharma_inventory"
+        action="pharmaceutical_erp.pharma_lot_control_action"
+        groups="base.group_user"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_pharma_quarantine"
+        name="Quarantine Queue"
+        parent="menu_pharma_inventory"
+        action="pharmaceutical_erp.pharma_quarantine_queue_action"
+        groups="base.group_user"
+        sequence="20"
+    />
+
+    <!-- ── Manufacturing ─────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_pharma_manufacturing"
+        name="Manufacturing"
+        parent="menu_pharma_root"
+        groups="base.group_user"
+        sequence="40"
+    />
+
+    <menuitem
+        id="menu_pharma_production_orders"
+        name="Production Orders"
+        parent="menu_pharma_manufacturing"
+        action="mrp.mrp_production_action"
+        groups="base.group_user"
+        sequence="10"
+    />
+
+    <!-- ── Quality Control ─────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_pharma_quality_control"
+        name="Quality Control"
+        parent="menu_pharma_root"
+        groups="base.group_system"
+        sequence="50"
+    />
+
+    <menuitem
+        id="menu_pharma_qc_test_order"
+        name="Test Order"
+        parent="menu_pharma_quality_control"
+        action="pharmaceutical_erp.pharma_qc_test_order"
+        groups="base.group_system"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_pharma_oos_investigation"
+        name="OOS Investigations"
+        parent="menu_pharma_quality_control"
+        action="pharmaceutical_erp.pharma_oos_investigation_action"
+        groups="base.group_system"
+        sequence="20"
+    />
+
+    <!-- ── Configuration ─────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_pharma_configuration"
+        name="Configuration"
+        parent="menu_pharma_root"
+        groups="base.group_system"
+        sequence="100"
+    />
+
+    <menuitem
+        id="menu_pharma_settings"
+        name="Settings"
+        parent="menu_pharma_configuration"
+        action="pharmaceutical_erp.pharma_config_settings_action"
+        groups="base.group_system"
+        sequence="10"
+    />
+
+</odoo>

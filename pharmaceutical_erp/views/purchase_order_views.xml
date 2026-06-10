@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ─── purchase.order — inherit form to add pharma fields ───────────── -->
+    <record id="purchase_order_form_pharma" model="ir.ui.view">
+        <field name="name">purchase.order.form.pharma</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- QA Approve / Reject buttons -->
+            <xpath expr="//header/button[@name='button_confirm']" position="before">
+                <button name="action_pharma_approve" type="object"
+                        string="QA Approve" class="btn-primary"
+                        invisible="pharma_approval_state != 'pending'"
+                        groups="pharmaceutical_erp.group_pharma_qa_manager"/>
+                <button name="action_pharma_reject" type="object"
+                        string="QA Reject"
+                        invisible="pharma_approval_state != 'pending'"
+                        groups="pharmaceutical_erp.group_pharma_qa_manager"/>
+            </xpath>
+
+            <!-- Pharma approval info below partner info -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="pharma_approval_state" widget="badge"
+                       decoration-success="pharma_approval_state == 'approved'"
+                       decoration-warning="pharma_approval_state == 'pending'"
+                       decoration-danger="pharma_approval_state == 'rejected'"
+                       invisible="not pharma_approval_state"/>
+                <field name="pharma_approved_by"
+                       invisible="pharma_approval_state != 'approved'"/>
+                <field name="pharma_approval_date"
+                       invisible="pharma_approval_state != 'approved'"/>
+            </xpath>
+
+            <!-- Pharma notes tab -->
+            <xpath expr="//notebook" position="inside">
+                <page name="pharma_po" string="Pharma / QA">
+                    <group>
+                        <group>
+                            <field name="pharma_approval_state"/>
+                            <field name="pharma_approved_by"/>
+                            <field name="pharma_approval_date"/>
+                        </group>
+                    </group>
+                    <group string="QA Notes">
+                        <field name="pharma_notes" nolabel="1"
+                               placeholder="QA remarks, special conditions, or AVL waiver justification…"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ─── purchase.order — list view addition ──────────────────────────── -->
+    <record id="purchase_order_list_pharma" model="ir.ui.view">
+        <field name="name">purchase.order.list.pharma</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="pharma_approval_state" widget="badge"
+                       decoration-success="pharma_approval_state == 'approved'"
+                       decoration-warning="pharma_approval_state == 'pending'"
+                       decoration-danger="pharma_approval_state == 'rejected'"
+                       optional="show"
+                       string="Pharma Approval"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

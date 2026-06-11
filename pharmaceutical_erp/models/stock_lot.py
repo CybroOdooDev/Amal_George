@@ -61,6 +61,27 @@ class StockLot(models.Model):
         help='Date by which this lot must be re-tested for continued use.',
     )
 
+    # ── Smart Button for QC Tests ──────────────────────────────────────────────
+    qc_test_count = fields.Integer(
+        string='QC Tests',
+        compute='_compute_qc_test_count'
+    )
+
+    def _compute_qc_test_count(self):
+        for lot in self:
+            lot.qc_test_count = self.env['pharma.qc.test.order'].search_count([('lot_id', '=', lot.id)])
+
+    def action_view_qc_tests(self):
+        self.ensure_one()
+        return {
+            'name': 'QC Test Orders',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'list,form',
+            'res_model': 'pharma.qc.test.order',
+            'domain': [('lot_id', '=', self.id)],
+            'context': {'default_lot_id': self.id},
+        }
+
     # ── Vendor CoA ─────────────────────────────────────────────────────────────
     vendor_coa = fields.Binary(
         string="Vendor CoA",

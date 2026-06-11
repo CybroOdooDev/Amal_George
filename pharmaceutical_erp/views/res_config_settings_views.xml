@@ -14,6 +14,11 @@
                             <field name="vendor_qualification"/>
                         </setting>
                     </block>
+                    <block title="Audit" name="audit_setting_container">
+                        <setting string="Audit Trail" help="Enable audit trail to track changes in critical records.">
+                            <field name="audit_trail"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>

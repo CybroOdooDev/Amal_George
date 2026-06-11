@@ -28,6 +28,14 @@
                 </header>
             </xpath>
 
+            <!-- Smart button for QC Tests -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_qc_tests" type="object"
+                        class="oe_stat_button" icon="fa-flask">
+                    <field name="qc_test_count" widget="statinfo" string="QC Tests"/>
+                </button>
+            </xpath>
+
             <!-- Pharma fields injected after the lot reference field -->
             <xpath expr="//field[@name='ref']" position="after">
                 <field name="manufacture_date"/>

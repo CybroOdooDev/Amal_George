@@ -141,7 +141,7 @@
 
     <menuitem
         id="menu_pharma_qc_test_order"
-        name="Test Order"
+        name="QC Test Order"
         parent="menu_pharma_quality_control"
         action="pharmaceutical_erp.pharma_qc_test_order"
         groups="base.group_system"
@@ -171,6 +171,23 @@
         name="Settings"
         parent="menu_pharma_configuration"
         action="pharmaceutical_erp.pharma_config_settings_action"
+        groups="base.group_system"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_pharma_vendor_config"
+        name="Vendor Management"
+        parent="menu_pharma_configuration"
+        groups="base.group_system"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_pharma_questionnaire_template"
+        name="Questionnaire Templates"
+        parent="menu_pharma_vendor_config"
+        action="pharmaceutical_erp.pharma_questionnaire_template_action"
         groups="base.group_system"
         sequence="10"
     />

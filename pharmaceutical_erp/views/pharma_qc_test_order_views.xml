@@ -27,9 +27,19 @@
         <field name="arch" type="xml">
             <form string="QC Test Order">
                 <header>
-                    <field name="status" widget="statusbar" statusbar_visible="draft,in_progress,under_investigation,passed,failed" options="{'clickable': '1'}"/>
+                    <button name="action_start_test" string="Start Test" type="object" class="oe_highlight" invisible="status != 'draft'" groups="pharmaceutical_erp.group_pharma_qc_analyst"/>
+                    <button name="action_approve" string="Approve &amp; Sign-Off" type="object" class="oe_highlight" invisible="status not in ('in_progress', 'under_investigation')" groups="pharmaceutical_erp.group_pharma_qc_analyst"/>
+                    <button name="action_reject" string="Reject &amp; Fail" type="object" invisible="status not in ('in_progress', 'under_investigation')" groups="pharmaceutical_erp.group_pharma_qc_analyst"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,in_progress,passed"/>
                 </header>
                 <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_view_oos_investigations" type="object"
+                                class="oe_stat_button" icon="fa-search"
+                                invisible="oos_investigation_count == 0">
+                            <field name="oos_investigation_count" widget="statinfo" string="Investigations"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
@@ -37,23 +47,26 @@
                     </div>
                     <group>
                         <group string="Material Details">
-                            <field name="product_id"/>
-                            <field name="lot_id" domain="[('product_id', '=', product_id)]"/>
+                            <field name="product_id" readonly="status != 'draft'"/>
+                            <field name="lot_id" domain="[('product_id', '=', product_id)]" readonly="status != 'draft'"/>
                         </group>
                         <group string="QC Parameters">
-                            <field name="stage"/>
-                            <field name="spec_id" domain="[('product_id', '=', product_id), ('stage', '=', stage), ('state', '=', 'approved')]"/>
+                            <field name="stage" readonly="status != 'draft'"/>
+                            <field name="spec_id" domain="[('product_id', '=', product_id), ('stage', '=', stage), ('state', '=', 'approved')]" readonly="status != 'draft'"/>
                         </group>
                         <group string="Sign-Off">
-                            <field name="entered_by" widget="many2one_avatar_user"/>
-                            <field name="reviewed_by" widget="many2one_avatar_user"/>
+                            <field name="entered_by" widget="many2one_avatar_user" readonly="status != 'draft'"/>
+                            <field name="reviewed_by" widget="many2one_avatar_user" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page name="results" string="Test Results">
-                            <field name="result_line_ids">
-                                <list editable="bottom">
-                                    <field name="parameter" readonly="1"/>
+                            <field name="result_line_ids" readonly="status not in ('draft', 'in_progress')">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="result_entered" column_invisible="True"/>
+                                    <field name="has_min" column_invisible="True"/>
+                                    <field name="has_max" column_invisible="True"/>
+                                    <field name="parameter"/>
                                     <field name="expected_min" readonly="1"/>
                                     <field name="expected_max" readonly="1"/>
                                     <field name="actual_value"/>

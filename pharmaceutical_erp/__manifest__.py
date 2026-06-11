@@ -24,6 +24,7 @@
         'quality_control',
         'account',
         'hr',
+        'portal',
     ],
 
     'data': [
@@ -33,6 +34,7 @@
 
         # Sequence data
         'data/pharma_sequences.xml',
+        'data/mail_template_data.xml',
 
         # Views — Master Data
         'views/product_template_views.xml',
@@ -51,6 +53,8 @@
         # Views — Settings
         'views/res_config_settings_views.xml',
         'views/pharma_vendor_qualification_views.xml',
+        'views/pharma_questionnaire_views.xml',
+        'views/pharma_portal_templates.xml',
 
         # Views — Menu (always last)
         'views/pharma_menus.xml',

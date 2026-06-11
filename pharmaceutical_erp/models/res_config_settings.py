@@ -9,7 +9,15 @@ class ResConfigSettings(models.TransientModel):
     vendor_qualification = fields.Boolean(
         string="Vendor Qualification",
         config_parameter='pharmaceutical_erp.vendor_qualification',
-        help="Enable vendor qualification checks."
+        help="Enable vendor qualification checks.",
+        default="False",
+    )
+
+    audit_trail = fields.Boolean(
+        string="Audit Trail",
+        config_parameter='pharmaceutical_erp.audit_trail',
+        help="Enable audit trail to track changes in critical records.",
+        default=False,
     )
 
     def set_values(self):

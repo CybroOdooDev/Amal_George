@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import uuid
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 from odoo.tools.translate import _
 
 
@@ -88,6 +90,41 @@ class PharmaVendorQualification(models.Model):
         help='AVL entry auto-created when vendor is approved.'
     )
 
+    template_id = fields.Many2one(
+        comodel_name='pharma.questionnaire.template',
+        string='Questionnaire Template',
+        tracking=True,
+        help='Select a template to auto-populate the questionnaire.'
+    )
+
+    response_ids = fields.One2many(
+        comodel_name='pharma.vendor.qualification.response',
+        inverse_name='qualification_id',
+        string='Responses',
+        copy=True
+    )
+
+    access_token = fields.Char(string='Access Token', copy=False)
+    submission_date = fields.Datetime(
+        string='Submission Date',
+        readonly=True,
+        copy=False,
+        help='Date and time when the vendor submitted the questionnaire via the portal.'
+    )
+
+    @api.onchange('template_id')
+    def _onchange_template_id(self):
+        if self.template_id:
+            # Clear existing responses
+            self.response_ids = [(5, 0, 0)]
+            # Auto-populate based on template questions
+            lines = []
+            for question in self.template_id.question_ids:
+                lines.append((0, 0, {
+                    'question_id': question.id,
+                }))
+            self.response_ids = lines
+
     display_name = fields.Char(
         string='Display Name',
         compute='_compute_display_name',
@@ -151,6 +188,30 @@ class PharmaVendorQualification(models.Model):
     def action_send_questionnaire(self):
         for rec in self:
             if rec.status == 'draft':
+                if not rec.template_id:
+                    raise UserError(_("Please select a Questionnaire Template before sending."))
+                if not rec.vendor_id.email:
+                    raise UserError(_("The selected vendor does not have an email address configured."))
+
+                # Generate responses to ensure they match the template perfectly at send time
+                commands = [(5, 0, 0)]
+                for question in rec.template_id.question_ids:
+                    commands.append((0, 0, {'question_id': question.id}))
+                rec.write({'response_ids': commands})
+
+                # Ensure access token
+                if not rec.access_token:
+                    rec.access_token = uuid.uuid4().hex
+
+                # Send Email
+                template = self.env.ref('pharmaceutical_erp.email_template_vendor_questionnaire', raise_if_not_found=False)
+                if template:
+                    template.send_mail(rec.id, force_send=True)
+
+                # Log chatter
+                rec.message_post(body=_("Questionnaire sent to %s", rec.vendor_id.email))
+
+                # Update Status
                 rec.status = 'questionnaire_sent'
 
     def action_receive_documents(self):

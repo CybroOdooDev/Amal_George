@@ -102,6 +102,83 @@ class PharmaQcTestOrder(models.Model):
         copy=True
     )
 
+    oos_investigation_count = fields.Integer(
+        string='OOS Investigations',
+        compute='_compute_oos_investigation_count'
+    )
+
+    def _compute_oos_investigation_count(self):
+        for order in self:
+            order.oos_investigation_count = self.env['pharma.oos.investigation'].search_count([
+                ('result_line_id.test_order_id', '=', order.id)
+            ])
+
+    def action_view_oos_investigations(self):
+        self.ensure_one()
+        return {
+            'name': 'OOS Investigations',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'list,form',
+            'res_model': 'pharma.oos.investigation',
+            'domain': [('result_line_id.test_order_id', '=', self.id)],
+            'context': {},
+        }
+
+    def action_start_test(self):
+        for rec in self:
+            if rec.status != 'draft':
+                raise ValidationError(_("Only draft test orders can be started."))
+            vals = {'status': 'in_progress'}
+            if not rec.entered_by:
+                vals['entered_by'] = self.env.user.id
+            rec.write(vals)
+
+    def action_approve(self):
+        for rec in self:
+            if rec.status not in ('in_progress', 'under_investigation'):
+                raise ValidationError(_("Only test orders in 'In Progress' or 'Under Investigation' status can be approved."))
+            if rec.entered_by and rec.entered_by == self.env.user:
+                raise ValidationError(_("The reviewer must be a different person than the analyst who entered the results."))
+
+            # Check OOS investigations — all must be closed before approving
+            investigations = self.env['pharma.oos.investigation'].search([
+                ('result_line_id', 'in', rec.result_line_ids.ids)
+            ])
+            if any(not inv.closed_on for inv in investigations):
+                raise ValidationError(_("Cannot approve a test order with open OOS investigations."))
+
+            for line in rec.result_line_ids:
+                if line.is_oos:
+                    line_invs = sorted(
+                        investigations.filtered(lambda i, l=line: i.result_line_id == l),
+                        key=lambda i: i.id,
+                    )
+                    if not line_invs:
+                        raise ValidationError(_("OOS result has no investigation record. Cannot approve."))
+                    latest = line_invs[-1]
+                    # Bug 4 fix: lab_error_found=True means the result was invalidated
+                    # and re-tested — that path does NOT need a 'release' disposition.
+                    # Only block if the root cause was NOT a lab error AND there is no
+                    # 'release' disposition on the latest investigation.
+                    if not latest.lab_error_found and latest.disposition != 'release':
+                        raise ValidationError(_("Cannot approve: OOS result has no 'Release' disposition and was not resolved as a lab error."))
+
+            rec.write({
+                'reviewed_by': self.env.user.id,
+                'status': 'passed',
+            })
+
+    def action_reject(self):
+        for rec in self:
+            if rec.status not in ('in_progress', 'under_investigation'):
+                raise ValidationError(_("Only test orders in 'In Progress' or 'Under Investigation' status can be rejected."))
+            if rec.entered_by and rec.entered_by == self.env.user:
+                raise ValidationError(_("The reviewer must be a different person than the analyst who entered the results."))
+            rec.write({
+                'reviewed_by': self.env.user.id,
+                'status': 'failed',
+            })
+
     @api.constrains('entered_by', 'reviewed_by')
     def _check_reviewer(self):
         for rec in self:
@@ -134,7 +211,9 @@ class PharmaQcTestOrder(models.Model):
                 lines.append((0, 0, {
                     'parameter': line.parameter_name,
                     'expected_min': line.min_value,
+                    'has_min': line.min_value != 0.0 or getattr(line, 'has_min', True),
                     'expected_max': line.max_value,
+                    'has_max': line.max_value != 0.0 or getattr(line, 'has_max', True),
                     'uom': line.uom_id.name or '',
                     'actual_value': 0.0,
                 }))
@@ -164,12 +243,32 @@ class PharmaQcTestOrder(models.Model):
                     lines.append((0, 0, {
                         'parameter': line.parameter_name,
                         'expected_min': line.min_value,
+                        'has_min': line.min_value != 0.0 or getattr(line, 'has_min', True),
                         'expected_max': line.max_value,
+                        'has_max': line.max_value != 0.0 or getattr(line, 'has_max', True),
                         'uom': line.uom_id.name or '',
                         'actual_value': 0.0,
                     }))
                 vals['result_line_ids'] = lines
         return super().create(vals_list)
+
+    def write(self, vals):
+        # Bug 3 fix: Selection/Char fields have no .id — compare raw values;
+        # only Many2one fields expose .id.
+        _many2one = {'product_id', 'lot_id', 'spec_id'}
+        _selection = {'stage'}
+        locked = _many2one | _selection
+        for rec in self:
+            if rec.status != 'draft':
+                for field in locked:
+                    if field not in vals:
+                        continue
+                    current = rec[field].id if field in _many2one else rec[field]
+                    if vals[field] != current:
+                        raise ValidationError(
+                            _("Cannot modify material or parameter details once the test has started.")
+                        )
+        return super().write(vals)
 
 
 class PharmaQcResultLine(models.Model):
@@ -178,6 +277,7 @@ class PharmaQcResultLine(models.Model):
     """
     _name = 'pharma.qc.result.line'
     _description = 'QC Result Line'
+    _rec_name = 'parameter'
 
     test_order_id = fields.Many2one(
         comodel_name='pharma.qc.test.order',
@@ -189,28 +289,50 @@ class PharmaQcResultLine(models.Model):
 
     parameter = fields.Char(
         string='Parameter',
-        required=True,
         help='Test parameter name copied from spec.'
     )
 
     expected_min = fields.Float(
         string='Expected Min',
+        digits=(16, 4),
         help='Minimum copied from spec for reference during entry.'
+    )
+
+    has_min = fields.Boolean(
+        string='Has Min Limit',
+        default=True,
+        help='When True the expected_min is enforced, even if it is 0.0. '
+             'Set to False for parameters that have no lower bound.'
     )
 
     expected_max = fields.Float(
         string='Expected Max',
+        digits=(16, 4),
         help='Maximum copied from spec for reference during entry.'
+    )
+
+    has_max = fields.Boolean(
+        string='Has Max Limit',
+        default=True,
+        help='When True the expected_max is enforced, even if it is 0.0. '
+             'Set to False for parameters that have no upper bound.'
     )
 
     actual_value = fields.Float(
         string='Actual Value',
+        digits=(16, 4),
         help='Result entered by the analyst after running the test.'
     )
 
     uom = fields.Char(
         string='UoM',
         help='Unit of measurement for this result.'
+    )
+
+    result_entered = fields.Boolean(
+        string='Result Entered',
+        default=False,
+        help='Indicates if the actual test result has been entered.'
     )
 
     is_oos = fields.Boolean(
@@ -223,28 +345,43 @@ class PharmaQcResultLine(models.Model):
     status = fields.Selection(
         selection=[
             ('pass', 'Pass'),
-            ('fail', 'Fail'),
             ('oos', 'OOS'),
         ],
-        string='Status',
+        string='Result Status',
         compute='_compute_status',
         store=True,
-        help='Computed based on actual vs expected range.'
+        help='Pass — value within the accepted min/max range (or not yet entered). OOS — value entered and outside the accepted limits.',
+        default=False,
     )
 
-    @api.depends('actual_value', 'expected_min', 'expected_max')
+    @api.depends(
+        'actual_value', 'expected_min', 'has_min',
+        'expected_max', 'has_max', 'result_entered',
+    )
     def _compute_status(self):
         for rec in self:
             is_oos = False
-            if rec.expected_min and rec.actual_value < rec.expected_min:
-                is_oos = True
-            if rec.expected_max and rec.actual_value > rec.expected_max:
-                is_oos = True
+            if rec.result_entered:
+                # Gate each comparison on the explicit flag so that a limit of
+                # 0.0 is still enforced (float 0.0 is falsy in Python).
+                if rec.has_min and rec.actual_value < rec.expected_min:
+                    is_oos = True
+                if rec.has_max and rec.actual_value > rec.expected_max:
+                    is_oos = True
             rec.is_oos = is_oos
             rec.status = 'oos' if is_oos else 'pass'
 
+    @api.onchange('actual_value')
+    def _onchange_actual_value(self):
+        # Bug 5 fix: @api.onchange always operates on a single pseudo-record;
+        # the loop is redundant and misleading — use self directly.
+        self.result_entered = True
+
     @api.model_create_multi
     def create(self, vals_list):
+        for vals in vals_list:
+            if 'actual_value' in vals and vals.get('actual_value') != 0.0:
+                vals['result_entered'] = True
         records = super().create(vals_list)
         for rec in records:
             if rec.is_oos:
@@ -252,11 +389,30 @@ class PharmaQcResultLine(models.Model):
         return records
 
     def write(self, vals):
+        if 'actual_value' in vals and 'result_entered' not in vals:
+            vals['result_entered'] = True
+        # Bug 6 fix: block actual_value edits when the parent order is not open.
+        # Exception: the invalidation-reset signature (actual_value=0.0 AND
+        # result_entered=False) is written by action_invalidate_retest BEFORE it
+        # transitions the order back to in_progress, so we must let it through.
+        _is_invalidation_reset = (
+            vals.get('actual_value') == 0.0
+            and vals.get('result_entered') is False
+        )
+        if 'actual_value' in vals and not _is_invalidation_reset:
+            for rec in self:
+                if rec.test_order_id.status not in ('draft', 'in_progress'):
+                    raise ValidationError(
+                        _('Results cannot be modified because the test order is not in progress.')
+                    )
         pre_oos = {rec.id: rec.is_oos for rec in self}
         res = super().write(vals)
         for rec in self:
             if rec.is_oos and not pre_oos.get(rec.id):
-                existing = self.env['pharma.oos.investigation'].search([('result_line_id', '=', rec.id)], limit=1)
+                existing = self.env['pharma.oos.investigation'].search([
+                    ('result_line_id', '=', rec.id),
+                    ('closed_on', '=', False)
+                ], limit=1)
                 if not existing:
                     rec._create_oos_investigation()
         return res
@@ -267,3 +423,9 @@ class PharmaQcResultLine(models.Model):
             'result_line_id': self.id,
             'phase': 'phase_1',
         })
+        # Bug 8 fix: direct field assignment bypasses write() hooks/validation.
+        # Use write() so that tracking, constraints and any overrides are invoked.
+        if self.test_order_id and self.test_order_id.status != 'under_investigation':
+            self.test_order_id.write({'status': 'under_investigation'})
+
+

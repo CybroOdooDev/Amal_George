@@ -268,7 +268,30 @@ class PharmaQcTestOrder(models.Model):
                         raise ValidationError(
                             _("Cannot modify material or parameter details once the test has started.")
                         )
-        return super().write(vals)
+        # If spec_id is updated on draft test orders and result_line_ids is not passed,
+        # regenerate the result lines.
+        if 'spec_id' in vals and not vals.get('result_line_ids'):
+            spec = self.env['pharma.qc.spec'].browse(vals['spec_id']) if vals['spec_id'] else False
+            lines = [(5, 0, 0)]
+            if spec:
+                for line in spec.parameter_ids:
+                    lines.append((0, 0, {
+                        'parameter': line.parameter_name,
+                        'expected_min': line.min_value,
+                        'has_min': line.min_value != 0.0 or getattr(line, 'has_min', True),
+                        'expected_max': line.max_value,
+                        'has_max': line.max_value != 0.0 or getattr(line, 'has_max', True),
+                        'uom': line.uom_id.name or '',
+                        'actual_value': 0.0,
+                    }))
+            vals['result_line_ids'] = lines
+
+        res = super().write(vals)
+        if 'status' in vals and vals['status'] == 'passed':
+            for rec in self:
+                if rec.lot_id:
+                    rec.lot_id.action_approve_lot()
+        return res
 
 
 class PharmaQcResultLine(models.Model):

@@ -206,7 +206,7 @@ class PharmaVendorQualification(models.Model):
                 # Send Email
                 template = self.env.ref('pharmaceutical_erp.email_template_vendor_questionnaire', raise_if_not_found=False)
                 if template:
-                    template.send_mail(rec.id, force_send=True)
+                    template.send_mail(rec.id, force_send=False)
 
                 # Log chatter
                 rec.message_post(body=_("Questionnaire sent to %s", rec.vendor_id.email))
@@ -222,6 +222,10 @@ class PharmaVendorQualification(models.Model):
     def action_schedule_audit(self):
         for rec in self:
             if rec.status == 'documents_received':
+                if not rec.audit_date:
+                    raise UserError(_("Please specify an Audit Date before scheduling the audit."))
+                if rec.audit_date < fields.Date.today():
+                    raise UserError(_("The Audit Date cannot be in the past."))
                 rec.status = 'audit_scheduled'
 
     def action_approve(self):

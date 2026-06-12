@@ -65,7 +65,7 @@ class PharmaVendorPortal(http.Controller):
         if qual_sudo.create_uid and qual_sudo.create_uid.email:
             template = request.env.ref('pharmaceutical_erp.email_template_vendor_submission_notification', raise_if_not_found=False)
             if template:
-                template.sudo().send_mail(qual_sudo.id, force_send=True)
+                template.sudo().send_mail(qual_sudo.id, force_send=False)
 
         return request.render('pharmaceutical_erp.portal_vendor_questionnaire_success', {
             'qualification': qual_sudo

@@ -40,7 +40,7 @@
             <field name="model_id" ref="pharmaceutical_erp.model_pharma_vendor_qualification"/>
             <field name="subject">Questionnaire Submitted: {{ object.vendor_id.name }}</field>
             <field name="email_from">{{ (object.env.company.catchall_formatted or object.env.user.email_formatted) }}</field>
-            <field name="email_to">{{ object.create_uid.email_formatted }}</field>
+            <field name="email_to">{{ object.vendor_id.email }}</field>
             <field name="description">Sent to QA when a vendor submits their questionnaire</field>
             <field name="body_html" type="html">
 <div style="margin: 0px; padding: 0px;">

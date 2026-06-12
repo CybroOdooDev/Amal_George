@@ -111,21 +111,17 @@ class StockLot(models.Model):
             if vals.get('lot_status'):
                 vals['status_changed_by'] = self.env.user.id
                 vals['status_changed_on'] = fields.Datetime.now()
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        for record in records:
+            record._create_qc_test_order()
+        return records
 
     def write(self, vals):
-        lots_to_trigger = self.env['stock.lot']
-        if 'lot_status' in vals and vals['lot_status'] == 'approved':
-            lots_to_trigger = self.filtered(lambda l: l.lot_status == 'quarantine')
-
         if 'lot_status' in vals:
             vals['status_changed_by'] = self.env.user.id
             vals['status_changed_on'] = fields.Datetime.now()
 
         res = super().write(vals)
-
-        for lot in lots_to_trigger:
-            lot._create_qc_test_order()
 
         return res
 

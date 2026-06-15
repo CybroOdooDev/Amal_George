@@ -69,6 +69,7 @@
             <form string="Vendor Qualification">
                 <header>
                     <button name="action_send_questionnaire" string="Send Questionnaire" type="object" class="oe_highlight" invisible="status != 'draft'"/>
+                    <button name="action_resend_questionnaire" string="Resend Questionnaire" type="object" class="btn-secondary" invisible="status != 'questionnaire_sent'" confirm="This will invalidate the old link and send a fresh questionnaire email to the vendor. Continue?"/>
                     <button name="action_schedule_audit" string="Schedule Audit" type="object" class="oe_highlight" invisible="status != 'documents_received'"/>
                     <button name="action_approve" string="Approve" type="object" class="oe_highlight" invisible="status != 'audit_scheduled'"/>
                     <button name="action_reject" string="Reject" type="object" class="btn-secondary" invisible="status != 'audit_scheduled'"/>

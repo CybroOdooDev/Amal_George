@@ -1,12 +1,44 @@
 from odoo import http, fields, _
 from odoo.http import request
+import logging
+import werkzeug.utils
+
+_logger = logging.getLogger(__name__)
 
 
 class PharmaVendorPortal(http.Controller):
 
+    def _ensure_db(self):
+        """
+        Switches the active database to the one specified in the `db` query
+        parameter, if it differs from the current session database.
+        Returns True if a redirect was issued (caller must return the redirect),
+        False otherwise.
+        """
+        db_param = request.params.get('db', '').strip()
+        if not db_param:
+            return False
+
+        from odoo.http import db_filter
+        # Validate the db param is a real, reachable database
+        if not db_filter([db_param]):
+            _logger.warning('pharma portal: requested db %r not in db_filter', db_param)
+            return False
+
+        if request.session.db == db_param:
+            # Already on the right database — nothing to do
+            return False
+
+        # Switch the session to the requested database and redirect so that
+        # Odoo's normal database-aware dispatcher picks up the new session.
+        request.session.db = db_param
+        return True
+
     def _check_access(self, qualification_id, access_token):
         """Validates the qualification record and token securely."""
         if not qualification_id or not access_token:
+            return None
+        if 'pharma.vendor.qualification' not in request.env:
             return None
         # Must use sudo() to bypass record rules for the public user, relying strictly on the token
         qual_sudo = request.env['pharma.vendor.qualification'].sudo().browse(qualification_id)
@@ -16,8 +48,15 @@ class PharmaVendorPortal(http.Controller):
 
     @http.route(['/pharma/vendor/questionnaire/<int:qualification_id>'], type='http', auth="public", website=True)
     def vendor_questionnaire(self, qualification_id, access_token=None, **kwargs):
+        if self._ensure_db():
+            return request.redirect(request.httprequest.url)
+
         qual_sudo = self._check_access(qualification_id, access_token)
         if not qual_sudo:
+            _logger.warning(
+                'pharma portal: 403 for qualification_id=%s, token=%s, session_db=%s',
+                qualification_id, access_token, request.session.db,
+            )
             return request.render('http_routing.403')
 
         values = {
@@ -37,8 +76,8 @@ class PharmaVendorPortal(http.Controller):
             answer_type = response.question_id.answer_type
             if answer_type == 'yes_no':
                 val = post.get(f'answer_yes_no_{response.id}')
-                if val in ['True', 'False']:
-                    response.answer_yes_no = val == 'True'
+                if val in ['True', 'False', 'yes', 'no']:
+                    response.answer_yes_no = 'yes' if val in ('True', 'yes') else 'no'
             elif answer_type == 'text':
                 val = post.get(f'answer_text_{response.id}')
                 if val is not None:
@@ -65,7 +104,7 @@ class PharmaVendorPortal(http.Controller):
         if qual_sudo.create_uid and qual_sudo.create_uid.email:
             template = request.env.ref('pharmaceutical_erp.email_template_vendor_submission_notification', raise_if_not_found=False)
             if template:
-                template.sudo().send_mail(qual_sudo.id, force_send=False)
+                template.sudo().send_mail(qual_sudo.id, force_send=True)
 
         return request.render('pharmaceutical_erp.portal_vendor_questionnaire_success', {
             'qualification': qual_sudo

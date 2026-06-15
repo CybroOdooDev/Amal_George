@@ -206,7 +206,7 @@ class PharmaVendorQualification(models.Model):
                 # Send Email
                 template = self.env.ref('pharmaceutical_erp.email_template_vendor_questionnaire', raise_if_not_found=False)
                 if template:
-                    template.send_mail(rec.id, force_send=False)
+                    template.send_mail(rec.id, force_send=True)
 
                 # Log chatter
                 rec.message_post(body=_("Questionnaire sent to %s", rec.vendor_id.email))
@@ -245,3 +245,37 @@ class PharmaVendorQualification(models.Model):
     def action_reset_draft(self):
         for rec in self:
             rec.status = 'draft'
+
+    def action_resend_questionnaire(self):
+        """Resend the questionnaire email to the vendor with a fresh access token.
+        Can be called from any status to re-deliver a valid link.
+        """
+        for rec in self:
+            if not rec.template_id:
+                raise UserError(_("Please select a Questionnaire Template before sending."))
+            if not rec.vendor_id.email:
+                raise UserError(_("The selected vendor does not have an email address configured."))
+
+            # Regenerate the access token so stale/old email links are invalidated
+            rec.access_token = uuid.uuid4().hex
+
+            # Rebuild responses from template
+            commands = [(5, 0, 0)]
+            for question in rec.template_id.question_ids:
+                commands.append((0, 0, {'question_id': question.id}))
+            rec.write({'response_ids': commands})
+
+            # Send Email with new token + db parameter in URL
+            template = self.env.ref(
+                'pharmaceutical_erp.email_template_vendor_questionnaire',
+                raise_if_not_found=False,
+            )
+            if template:
+                template.send_mail(rec.id, force_send=True)
+
+            # Log chatter
+            rec.message_post(body=_("Questionnaire re-sent to %s", rec.vendor_id.email))
+
+            # Ensure status is questionnaire_sent
+            if rec.status == 'draft':
+                rec.status = 'questionnaire_sent'

@@ -188,8 +188,6 @@ class PharmaOosInvestigation(models.Model):
 
     @api.constrains('closed_on', 'disposition')
     def _check_close(self):
-        """Bug 7: enforce that a disposition is always recorded when an
-        investigation is closed, so the record is never in a half-closed state."""
         for rec in self:
             if rec.closed_on and not rec.disposition:
                 # Phase I lab-error closures (action_invalidate_retest) do not

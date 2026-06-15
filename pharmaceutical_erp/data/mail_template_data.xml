@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data>
         <record id="email_template_vendor_questionnaire" model="mail.template">
             <field name="name">Vendor Qualification: Questionnaire</field>
             <field name="model_id" ref="pharmaceutical_erp.model_pharma_vendor_qualification"/>
             <field name="subject">Vendor Qualification Questionnaire - {{ object.vendor_id.name }}</field>
-            <field name="email_from">{{ (object.env.user.email_formatted or object.env.company.catchall_formatted) }}</field>
+            <field name="email_from">{{ (object.env.company.catchall_formatted or object.env.user.email_formatted) }}</field>
             <field name="email_to">{{ object.vendor_id.email }}</field>
+            <field name="use_default_to" eval="False"/>
             <field name="description">Sent to vendors to fill out their qualification questionnaire</field>
             <field name="body_html" type="html">
 <div style="margin: 0px; padding: 0px;">
@@ -18,7 +19,7 @@
         Please click the button below to access the questionnaire portal:
         <br/><br/>
         <div style="margin: 16px 0px 16px 0px; text-align: center;">
-            <a t-attf-href="/pharma/vendor/questionnaire/{{ object.id }}?access_token={{ object.access_token }}"
+            <a t-attf-href="/pharma/vendor/questionnaire/{{ object.id }}?access_token={{ object.access_token }}&amp;db={{ object.env.cr.dbname }}"
                 style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
                 Start Questionnaire
             </a>
@@ -40,7 +41,8 @@
             <field name="model_id" ref="pharmaceutical_erp.model_pharma_vendor_qualification"/>
             <field name="subject">Questionnaire Submitted: {{ object.vendor_id.name }}</field>
             <field name="email_from">{{ (object.env.company.catchall_formatted or object.env.user.email_formatted) }}</field>
-            <field name="email_to">{{ object.vendor_id.email }}</field>
+            <field name="email_to">{{ object.create_uid.email_formatted or object.create_uid.email }}</field>
+            <field name="use_default_to" eval="False"/>
             <field name="description">Sent to QA when a vendor submits their questionnaire</field>
             <field name="body_html" type="html">
 <div style="margin: 0px; padding: 0px;">
@@ -55,7 +57,7 @@
         Please click the button below to review the responses:
         <br/><br/>
         <div style="margin: 16px 0px 16px 0px; text-align: center;">
-            <a t-attf-href="/web#id={{ object.id }}&amp;model=pharma.vendor.qualification&amp;view_type=form"
+            <a t-attf-href="/web?db={{ object.env.cr.dbname }}#id={{ object.id }}&amp;model=pharma.vendor.qualification&amp;view_type=form"
                 style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
                 View Qualification
             </a>

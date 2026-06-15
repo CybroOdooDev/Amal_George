@@ -156,10 +156,6 @@ class PharmaQcTestOrder(models.Model):
                     if not line_invs:
                         raise ValidationError(_("OOS result has no investigation record. Cannot approve."))
                     latest = line_invs[-1]
-                    # Bug 4 fix: lab_error_found=True means the result was invalidated
-                    # and re-tested — that path does NOT need a 'release' disposition.
-                    # Only block if the root cause was NOT a lab error AND there is no
-                    # 'release' disposition on the latest investigation.
                     if not latest.lab_error_found and latest.disposition != 'release':
                         raise ValidationError(_("Cannot approve: OOS result has no 'Release' disposition and was not resolved as a lab error."))
 
@@ -253,8 +249,6 @@ class PharmaQcTestOrder(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        # Bug 3 fix: Selection/Char fields have no .id — compare raw values;
-        # only Many2one fields expose .id.
         _many2one = {'product_id', 'lot_id', 'spec_id'}
         _selection = {'stage'}
         locked = _many2one | _selection
@@ -318,7 +312,8 @@ class PharmaQcResultLine(models.Model):
     expected_min = fields.Float(
         string='Expected Min',
         digits=(16, 4),
-        help='Minimum copied from spec for reference during entry.'
+        help='Minimum copied from spec for reference during entry.',
+        store=True
     )
 
     has_min = fields.Boolean(
@@ -331,7 +326,8 @@ class PharmaQcResultLine(models.Model):
     expected_max = fields.Float(
         string='Expected Max',
         digits=(16, 4),
-        help='Maximum copied from spec for reference during entry.'
+        help='Maximum copied from spec for reference during entry.',
+        store=True
     )
 
     has_max = fields.Boolean(
@@ -385,8 +381,6 @@ class PharmaQcResultLine(models.Model):
         for rec in self:
             is_oos = False
             if rec.result_entered:
-                # Gate each comparison on the explicit flag so that a limit of
-                # 0.0 is still enforced (float 0.0 is falsy in Python).
                 if rec.has_min and rec.actual_value < rec.expected_min:
                     is_oos = True
                 if rec.has_max and rec.actual_value > rec.expected_max:
@@ -396,8 +390,6 @@ class PharmaQcResultLine(models.Model):
 
     @api.onchange('actual_value')
     def _onchange_actual_value(self):
-        # Bug 5 fix: @api.onchange always operates on a single pseudo-record;
-        # the loop is redundant and misleading — use self directly.
         self.result_entered = True
 
     @api.model_create_multi
@@ -414,10 +406,6 @@ class PharmaQcResultLine(models.Model):
     def write(self, vals):
         if 'actual_value' in vals and 'result_entered' not in vals:
             vals['result_entered'] = True
-        # Bug 6 fix: block actual_value edits when the parent order is not open.
-        # Exception: the invalidation-reset signature (actual_value=0.0 AND
-        # result_entered=False) is written by action_invalidate_retest BEFORE it
-        # transitions the order back to in_progress, so we must let it through.
         _is_invalidation_reset = (
             vals.get('actual_value') == 0.0
             and vals.get('result_entered') is False
@@ -446,8 +434,7 @@ class PharmaQcResultLine(models.Model):
             'result_line_id': self.id,
             'phase': 'phase_1',
         })
-        # Bug 8 fix: direct field assignment bypasses write() hooks/validation.
-        # Use write() so that tracking, constraints and any overrides are invoked.
+
         if self.test_order_id and self.test_order_id.status != 'under_investigation':
             self.test_order_id.write({'status': 'under_investigation'})
 

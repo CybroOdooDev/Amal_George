@@ -19,7 +19,7 @@
                                 </p>
                                 <hr/>
 
-                                <form t-attf-action="/pharma/vendor/questionnaire/#{qualification.id}/submit" method="post" enctype="multipart/form-data">
+                                <form t-attf-action="/pharma/vendor/questionnaire/#{qualification.id}/submit?db=#{qualification.env.cr.dbname}" method="post" enctype="multipart/form-data">
                                     <input type="hidden" name="access_token" t-att-value="access_token"/>
 
                                     <t t-set="current_section" t-value="None"/>
@@ -39,11 +39,11 @@
                                             <!-- Yes/No Question -->
                                             <t t-if="response.answer_type == 'yes_no'">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" t-attf-name="answer_yes_no_#{response.id}" t-attf-id="yes_#{response.id}" value="True" t-att-checked="response.answer_yes_no == True" required="required"/>
+                                                    <input class="form-check-input" type="radio" t-attf-name="answer_yes_no_#{response.id}" t-attf-id="yes_#{response.id}" value="True" t-att-checked="response.answer_yes_no == 'yes'" required="required"/>
                                                     <label class="form-check-label" t-attf-for="yes_#{response.id}">Yes</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" t-attf-name="answer_yes_no_#{response.id}" t-attf-id="no_#{response.id}" value="False" t-att-checked="response.answer_yes_no == False" required="required"/>
+                                                    <input class="form-check-input" type="radio" t-attf-name="answer_yes_no_#{response.id}" t-attf-id="no_#{response.id}" value="False" t-att-checked="response.answer_yes_no == 'no'" required="required"/>
                                                     <label class="form-check-label" t-attf-for="no_#{response.id}">No</label>
                                                 </div>
                                             </t>

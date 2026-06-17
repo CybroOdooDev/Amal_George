@@ -4,7 +4,7 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     is_self_invoice = fields.Boolean(
-        string="Self Invoice"
+        string="Self Invoice",default=True
     )
     self_invoice_document_type = fields.Selection([
         ('TD01', 'TD01'),

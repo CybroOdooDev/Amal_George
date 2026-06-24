@@ -23,3 +23,7 @@ access_commission_full_cycle_wizard_finance,Lamess Commission Full Cycle Wizard 
 access_commission_settlement_audit_system,Lamess Commission Settlement Audit - System,model_lamess_commission_settlement_audit,base.group_system,1,0,0,0
 access_commission_settlement_audit_manager,Lamess Commission Settlement Audit - Manager,model_lamess_commission_settlement_audit,lamess_network.group_network_manager,1,0,0,0
 access_commission_settlement_audit_finance,Lamess Commission Settlement Audit - Finance,model_lamess_commission_settlement_audit,lamess_network.group_network_finance,1,0,0,0
+access_payout_sepa_wizard_manager,Lamess Payout SEPA Wizard - Manager,model_lamess_payout_sepa_wizard,lamess_network.group_network_manager,1,1,1,1
+access_payout_sepa_wizard_finance,Lamess Payout SEPA Wizard - Finance,model_lamess_payout_sepa_wizard,lamess_network.group_network_finance,1,1,1,1
+access_payout_sepa_wizard_line_manager,Lamess Payout SEPA Wizard Line - Manager,model_lamess_payout_sepa_wizard_line,lamess_network.group_network_manager,1,1,1,1
+access_payout_sepa_wizard_line_finance,Lamess Payout SEPA Wizard Line - Finance,model_lamess_payout_sepa_wizard_line,lamess_network.group_network_finance,1,1,1,1

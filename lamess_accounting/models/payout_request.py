@@ -48,6 +48,15 @@ class LamessPayoutRequest(models.Model):
         digits=(16, 2),
         tracking=True,
     )
+    x_amount_is_net = fields.Boolean(
+        string='Importo gia\' al netto',
+        default=False,
+        help=(
+            "Se attivo, l'importo richiesto e' gia' il netto da liquidare "
+            "(la ritenuta e' stata applicata a monte nel portale): nessuna "
+            "ritenuta o costo amministrativo viene riapplicato qui."
+        ),
+    )
     taxable_base_amount = fields.Float(
         string='Base imponibile (€)',
         digits=(16, 2),
@@ -233,9 +242,22 @@ class LamessPayoutRequest(models.Model):
                 dict(record._fields['state'].selection).get(record.state, record.state or ''),
             )
 
-    @api.depends('gross_amount', 'company_id')
+    @api.depends('gross_amount', 'company_id', 'x_amount_is_net')
     def _compute_amount_breakdown(self):
         for record in self:
+            if record.x_amount_is_net:
+                # Importo gia' al netto: nessuna ritenuta/fee, il netto coincide
+                # con l'importo richiesto (la ritenuta e' gia' stata applicata
+                # nel calcolo del prelevabile a portale).
+                net = record._round_payout_amount(
+                    record.gross_amount or 0.0,
+                    company=record.company_id or self.env.company,
+                )
+                record.taxable_base_amount = 0.0
+                record.withholding_amount = 0.0
+                record.administrative_fee_amount = 0.0
+                record.net_amount = net
+                continue
             breakdown = self._compute_net_payout_breakdown(
                 record.gross_amount or 0.0,
                 company=record.company_id or self.env.company,
@@ -316,7 +338,7 @@ class LamessPayoutRequest(models.Model):
         inps_rate = float(partner.x_inps_rate_pct or '0') / 100.0
         if inps_rate:
             config = self.env['lamess.config'].get_config(company=company)
-            threshold = config.autoinv_gross_threshold or 0.0
+            threshold = config.scn_threshold or 0.0
             ceiling = config.autoinv_inps_ceiling or 0.0
             ytd = partner.x_ytd_gross_withdrawals or 0.0
             upper = min(ytd + gross_amount, ceiling) if ceiling else (ytd + gross_amount)
@@ -459,6 +481,13 @@ class LamessPayoutRequest(models.Model):
     def action_approve(self):
         for record in self.filtered(lambda rec: rec.state in ('requested', 'review')):
             record._validate_business_rules()
+            if record.gross_amount > record.partner_id.x_wallet_balance:
+                raise UserError(_("Il saldo wallet non e' sufficiente per approvare questa richiesta."))
+            # All'approvazione l'importo richiesto viene subito dedotto dal wallet
+            # del consulente; la scrittura contabile avviene poi in liquidazione.
+            record.partner_id.write({
+                'x_wallet_balance': record.partner_id.x_wallet_balance - record.gross_amount,
+            })
             record.write({
                 'state': 'approved',
                 'reviewed_at': fields.Datetime.now(),
@@ -468,6 +497,11 @@ class LamessPayoutRequest(models.Model):
 
     def action_reject(self):
         for record in self.filtered(lambda rec: rec.state in ('requested', 'review', 'approved')):
+            # Se era gia' approvata il wallet era stato dedotto: lo ripristiniamo.
+            if record.state == 'approved':
+                record.partner_id.write({
+                    'x_wallet_balance': record.partner_id.x_wallet_balance + record.gross_amount,
+                })
             record.write({
                 'state': 'rejected',
                 'reviewed_at': fields.Datetime.now(),
@@ -477,6 +511,11 @@ class LamessPayoutRequest(models.Model):
 
     def action_cancel(self):
         for record in self.filtered(lambda rec: rec.state in ('requested', 'review', 'approved')):
+            # Se era gia' approvata il wallet era stato dedotto: lo ripristiniamo.
+            if record.state == 'approved':
+                record.partner_id.write({
+                    'x_wallet_balance': record.partner_id.x_wallet_balance + record.gross_amount,
+                })
             record.write({'state': 'cancelled'})
         return True
 
@@ -603,15 +642,91 @@ class LamessPayoutRequest(models.Model):
                 taxes |= config.autoinv_inps_tax_id
         return taxes
 
-    def _create_vendor_bill(self):
-        """Genera la bozza di autofattura (account.move in_invoice) alla richiesta.
+    def _prepare_self_invoice_lines(self, config, breakdown, partner, company=False):
+        """Righe della bozza autofattura, con split sulla soglia annua.
 
-        Idempotente: se la richiesta ha gia' una autofattura collegata la
-        restituisce senza crearne una nuova.
+        Se il prelievo, sommato al lordo gia' prelevato nell'anno (YTD), supera
+        la soglia lorda annua (``autoinv_gross_threshold``, es. 6.410,26 €), la
+        riga viene divisa in due:
+
+        - quota SOTTO soglia -> solo ritenuta IRPEF (+ IVA se scenario B);
+        - quota OLTRE soglia -> ritenuta IRPEF + contributo INPS (+ IVA).
+
+        Lo split scatta per i consulenti con P.IVA (scenario B) che superano la
+        soglia. L'INPS sulla quota oltre soglia e' applicata solo se dovuta.
+        Sotto soglia, o senza P.IVA, resta una riga unica.
+        """
+        self.ensure_one()
+        company = company or self.company_id or self.env.company
+        gross = self.gross_amount or 0.0
+        expense_account = config.autoinv_expense_account_id.id
+
+        # IRPEF sempre presente; IVA solo in scenario B per consulente non esente.
+        irpef_tax = config.autoinv_withholding_tax_id
+        vat_tax = self.env['account.tax']
+        if breakdown['scenario'] == 'B' and not partner.x_vat_exempt and config.autoinv_vat_tax_id:
+            vat_tax = config.autoinv_vat_tax_id
+        inps_tax = config.autoinv_inps_tax_id
+        common_taxes = irpef_tax | vat_tax
+
+        # Quota di questo prelievo ancora sotto la soglia annua: la soglia tiene
+        # conto del lordo gia' prelevato nell'anno (Total Withdrawn YTD).
+        threshold = config.scn_threshold or 0.0
+        ytd = partner.x_ytd_gross_withdrawals or 0.0
+        if threshold:
+            below_slice = max(0.0, min(gross, threshold - ytd))
+        else:
+            below_slice = gross
+        below_slice = self._round_payout_amount(below_slice, company=company)
+        above_slice = self._round_payout_amount(gross - below_slice, company=company)
+
+        # Split per consulente con P.IVA (scenario B) quando il prelievo supera
+        # la soglia annua. INPS sulla quota oltre soglia solo se effettivamente
+        # dovuta; altrimenti la riga oltre soglia porta IRPEF (+ IVA) come quella
+        # sotto soglia, ma la riga resta separata come richiesto.
+        split = breakdown['scenario'] == 'B' and above_slice > 0
+        if not split:
+            return [(0, 0, {
+                'name': _("Autofattura prelievo %s") % self.display_name,
+                'account_id': expense_account,
+                'quantity': 1.0,
+                'price_unit': gross,
+                'tax_ids': [(6, 0, common_taxes.ids)],
+            })]
+
+        above_taxes = common_taxes
+        if inps_tax and breakdown['inps_total'] > 0:
+            above_taxes = common_taxes | inps_tax
+
+        lines = []
+        if below_slice > 0:
+            lines.append((0, 0, {
+                'name': _("Autofattura prelievo %s - quota sotto soglia") % self.display_name,
+                'account_id': expense_account,
+                'quantity': 1.0,
+                'price_unit': below_slice,
+                'tax_ids': [(6, 0, common_taxes.ids)],
+            }))
+        lines.append((0, 0, {
+            'name': _("Autofattura prelievo %s - quota oltre soglia") % self.display_name,
+            'account_id': expense_account,
+            'quantity': 1.0,
+            'price_unit': above_slice,
+            'tax_ids': [(6, 0, above_taxes.ids)],
+        }))
+        return lines
+
+    def _create_vendor_bill(self):
+        """Genera la bozza del documento (account.move) alla richiesta.
+
+        - Consulente con P.IVA -> autofattura (``in_invoice``).
+        - Privato senza P.IVA -> ricevuta (``in_receipt``).
+
+        Idempotente: se la richiesta ha gia' un documento collegato lo
+        restituisce senza crearne uno nuovo.
         """
         self.ensure_one()
         if self.vendor_bill_id:
-            print(self.vendor_bill_id,'self.vendor_bill_idself.vendor_bill_id')
             return self.vendor_bill_id
         company = self.company_id or self.env.company
         config = self.env['lamess.config'].get_config(company=company)
@@ -619,23 +734,24 @@ class LamessPayoutRequest(models.Model):
         breakdown = self._get_self_invoice_breakdown(
             self.gross_amount or 0.0, self.partner_id, company=company,
         )
-        taxes = self._get_self_invoice_taxes(config, breakdown, self.partner_id)
+        # Righe della bozza: split automatico sulla soglia annua quando il
+        # prelievo (+ YTD) la supera (IRPEF sotto soglia, IRPEF + INPS sopra).
+        invoice_lines = self._prepare_self_invoice_lines(
+            config, breakdown, self.partner_id, company=company,
+        )
         # Numero progressivo per consulente, riparte ogni anno solare.
-        ref = self.partner_id._next_autoinv_number_ref()
+        ref = self.partner_id._next_autoinv_number()
+        # Consulente con posizione IVA -> fattura (in_invoice). Privato senza
+        # P.IVA (scenario A) -> ricevuta (in_receipt).
+        move_type = 'in_invoice' if self._partner_has_vat(self.partner_id) else 'in_receipt'
         move = self.env['account.move'].create({
-            'move_type': 'in_invoice',
+            'move_type': move_type,
             'company_id': company.id,
             'journal_id': config.autoinv_purchase_journal_id.id,
             'partner_id': self.partner_id.id,
             'ref': ref,
             # Nessuna invoice_date: la registrazione resta in bozza ed editabile.
-            'invoice_line_ids': [(0, 0, {
-                'name': _("Autofattura prelievo %s") % self.display_name,
-                'account_id': config.autoinv_expense_account_id.id,
-                'quantity': 1.0,
-                'price_unit': self.gross_amount,
-                'tax_ids': [(6, 0, taxes.ids)],
-            })],
+            'invoice_line_ids': invoice_lines,
         })
         self.vendor_bill_id = move.id
         if hasattr(self, 'message_post'):

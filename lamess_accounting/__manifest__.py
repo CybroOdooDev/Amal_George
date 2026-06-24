@@ -19,11 +19,12 @@ Foundation module for:
     'license': 'OPL-1',
     'depends': [
         'account',
+        'account_iso20022',
+        'account_batch_payment',
         'lamess_base',
         'lamess_commission',
         'lamess_membership',
         'lamess_m3_admin',
-        'l10n_it_edi'
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -33,8 +34,9 @@ Foundation module for:
         'views/commission_settlement_wizard_views.xml',
         'views/lamess_config_views.xml',
         'views/payout_request_views.xml',
+        'views/payout_sepa_wizard_views.xml',
         'views/res_partner_views.xml',
-        'views/l10n_it_edi_export_template.xml',
+        'views/l10n_it_edi_export_template.xml'
     ],
     'installable': True,
     'application': False,

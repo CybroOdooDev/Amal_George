@@ -9,7 +9,7 @@
                 <group string="Wallet">
                     <group>
                         <field name="x_wallet_balance" string="Wallet Balance (€)"/>
-                        <field name="x_ytd_gross_withdrawals" readonly="1"/>
+                        <field name="x_ytd_gross_withdrawals" string="YTD Gross Withdrawals (€)"/>
                     </group>
                 </group>
                 <group string="Autofattura (fiscale)" invisible="not x_is_networker">

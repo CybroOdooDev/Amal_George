@@ -3,7 +3,7 @@
     <data>
         <template id="account_invoice_it_FatturaPA_export_self_invoice" inherit_id="l10n_it_edi.account_invoice_it_FatturaPA_export">
             <xpath expr="//CessionarioCommittente" position="after">
-                <SoggettoEmittente>CC</SoggettoEmittente>
+                <SoggettoEmittente t-if="document_type == 'TD01'">CC</SoggettoEmittente>
             </xpath>
         </template>
     </data>

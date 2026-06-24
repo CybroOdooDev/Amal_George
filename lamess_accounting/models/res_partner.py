@@ -3,6 +3,7 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import float_round
 
 
 class ResPartner(models.Model):
@@ -74,31 +75,35 @@ class ResPartner(models.Model):
         copy=False,
     )
     x_ytd_gross_withdrawals = fields.Float(
-        string='Prelievi lordi YTD (€)',
+        string='YTD Gross Withdrawals (€)',
         digits=(16, 2),
         compute='_compute_ytd_gross_withdrawals',
-        help='Somma dei prelievi lordi autofatturati nell\'anno solare corrente.',
+        help="Totale lordo prelevato (richieste liquidate) dal 1 gennaio "
+             "dell'anno corrente fino ad oggi.",
     )
 
     def _compute_ytd_gross_withdrawals(self):
-        # Il contatore considera solo le richieste effettivamente autofatturate
-        # (vendor_bill_id valorizzato) e non annullate/rifiutate dell'anno corrente.
+        # Somma gross_amount delle richieste 'paid' liquidate dal 1 gennaio
+        # dell'anno corrente. Aggregazione unica per tutto il batch.
         year_start = fields.Date.context_today(self).replace(month=1, day=1)
         grouped = self.env['lamess.payout.request']._read_group(
             [
                 ('partner_id', 'in', self.ids),
-                ('vendor_bill_id', '!=', False),
-                ('state', 'not in', ['rejected', 'cancelled']),
-                ('requested_at', '>=', fields.Datetime.to_datetime(year_start)),
+                ('state', '=', 'paid'),
+                ('paid_at', '>=', '%s 00:00:00' % year_start),
             ],
             ['partner_id'],
             ['gross_amount:sum'],
         )
-        totals = {partner.id: total for partner, total in grouped if partner}
+        totals = {
+            partner.id: total
+            for partner, total in grouped
+            if partner
+        }
         for partner in self:
             partner.x_ytd_gross_withdrawals = totals.get(partner.id, 0.0)
 
-    def _next_autoinv_number_ref(self):
+    def _next_autoinv_number(self):
         """Restituisce il prossimo numero autofattura del consulente.
 
         La progressione riparte da 1 a ogni cambio di anno solare. Usiamo un
@@ -122,36 +127,6 @@ class ResPartner(models.Model):
         letter = (partner.x_autoinv_letter or 'A').strip() or 'A'
         # Formato richiesto dalle specifiche: progressivo/anno-a-due-cifre + lettera serie (es. 01/26L).
         return "%02d/%02d%s" % (next_number, current_year % 100, letter)
-
-    def _next_autoinv_number(self):
-        self.ensure_one()
-
-        self.env.cr.execute(
-            "SELECT id FROM res_partner WHERE id = %s FOR UPDATE",
-            (self.id,)
-        )
-
-        current_year = fields.Date.context_today(self).year
-
-        if self.x_autoinv_last_seq_year != current_year:
-            next_number = 1
-            self.write({
-                'x_autoinv_last_seq_year': current_year,
-                'x_autoinv_last_seq_number': next_number,
-            })
-        else:
-            next_number = self.x_autoinv_last_seq_number + 1
-            self.write({
-                'x_autoinv_last_seq_number': next_number,
-            })
-
-        letter = (self.x_autoinv_letter or 'A').strip().upper()
-
-        return "%s%02d/%02d" % (
-            letter,
-            next_number,
-            current_year % 100,
-        )
 
     def _compute_payout_request_count(self):
         # Aggreghiamo una sola volta per tutto il batch cosi il bottone
@@ -191,17 +166,37 @@ class ResPartner(models.Model):
             'target': 'current',
         }
 
-    def action_request_payout(self):
+    def action_request_payout(self, amount=None):
         self.ensure_one()
         config_vals = self._get_lamess_payout_config_values(company=self.company_id or self.env.company)
         if not self.can_request_payout():
             raise UserError(_(
                 "Questo consulente non puo' richiedere il prelievo: servono stato Attivo e KYC verificato."
             ))
-        if self.x_wallet_balance < config_vals['minimum_payout']:
+        # Importo richiesto: se il portale invia un valore esplicito (importo netto
+        # prelevabile digitato dall'utente) lo usiamo come lordo della richiesta,
+        # altrimenti ricadiamo sull'intero saldo wallet disponibile.
+        if amount is None or amount == '':
+            requested_amount = self.x_wallet_balance
+        else:
+            try:
+                requested_amount = float(amount)
+            except (TypeError, ValueError):
+                raise UserError(_("Importo di prelievo non valido."))
+        # L'importo richiesto e' il lordo: viene dedotto integralmente dal wallet
+        # all'approvazione e la ritenuta determina il netto liquidato.
+        amount_is_net = False
+        requested_amount = float_round(requested_amount, precision_digits=2)
+        if requested_amount <= 0:
+            raise UserError(_("L'importo di prelievo deve essere maggiore di zero."))
+        if requested_amount < config_vals['minimum_payout']:
             raise UserError(_(
-                "Il saldo wallet e' inferiore al minimo configurato per il prelievo (%.2f €)."
+                "L'importo di prelievo e' inferiore al minimo configurato (%.2f €)."
             ) % config_vals['minimum_payout'])
+        if requested_amount > self.x_wallet_balance:
+            raise UserError(_(
+                "L'importo di prelievo supera il saldo wallet disponibile (%.2f €)."
+            ) % self.x_wallet_balance)
         existing = self.env['lamess.payout.request'].search(self._get_open_payout_request_domain(), limit=1)
         if existing:
             raise UserError(_(
@@ -217,8 +212,11 @@ class ResPartner(models.Model):
         # prelievi lordi YTD, supera la soglia annua, blocchiamo e invitiamo
         # il consulente a inserire la partita IVA nel profilo.
         if not self.env['lamess.payout.request']._partner_has_vat(self):
-            threshold = config.autoinv_gross_threshold or 0.0
-            if threshold and (self.x_ytd_gross_withdrawals + self.x_wallet_balance) > threshold:
+            threshold = config.scn_threshold or 0.0
+            # Blocco sull'importo effettivamente prelevato (YTD + questa richiesta),
+            # non sull'intero saldo wallet: prelevare meno della soglia resta valido
+            # anche con un wallet capiente.
+            if threshold and (self.x_ytd_gross_withdrawals + requested_amount) > threshold:
                 raise UserError(_(
                     "Il prelievo supererebbe la soglia annua di %.2f € per i collaboratori "
                     "occasionali. Aggiorna il profilo inserendo la partita IVA per continuare."
@@ -227,8 +225,9 @@ class ResPartner(models.Model):
         # I passaggi successivi gestiscono revisione, approvazione e liquidazione.
         request = self.env['lamess.payout.request'].create({
             'partner_id': self.id,
-            'company_id': company.id,
-            'gross_amount': self.x_wallet_balance,
+            'company_id': (self.company_id or self.env.company).id,
+            'gross_amount': requested_amount,
+            'x_amount_is_net': amount_is_net,
             'state': 'requested',
         })
         # Bozza autofattura generata nella stessa transazione: un errore di

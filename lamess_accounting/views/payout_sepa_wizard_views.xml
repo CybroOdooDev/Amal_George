@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lamess_payout_sepa_wizard_form" model="ir.ui.view">
+        <field name="name">lamess.payout.sepa.wizard.form</field>
+        <field name="model">lamess.payout.sepa.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Disposizione bonifici SEPA">
+                <group>
+                    <group>
+                        <field name="journal_id"/>
+                        <field name="payment_date"/>
+                    </group>
+                    <group>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="total_net"/>
+                    </group>
+                </group>
+                <field name="line_ids">
+                    <list editable="bottom" create="0">
+                        <field name="payout_request_id" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
+                        <field name="vendor_bill_id" readonly="1"/>
+                        <field name="currency_id" column_invisible="1"/>
+                        <field name="gross_amount" readonly="1"/>
+                        <field name="vat_amount" readonly="1"/>
+                        <field name="withholding_amount" readonly="1"/>
+                        <field name="administrative_fee_amount" readonly="1"/>
+                        <field name="net_amount" readonly="1" sum="Totale netto"/>
+                        <field name="partner_bank_id"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_generate_sepa" type="object"
+                            string="Genera file SEPA" class="btn-primary"/>
+                    <button string="Annulla" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_lamess_payout_sepa_wizard" model="ir.actions.act_window">
+        <field name="name">Genera bonifici SEPA</field>
+        <field name="res_model">lamess.payout.sepa.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_lamess_payout_request"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+</odoo>

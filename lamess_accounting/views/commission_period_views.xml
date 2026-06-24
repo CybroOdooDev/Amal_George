@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lamess_commission_period_accounting_list" model="ir.ui.view">
+        <field name="name">lamess.commission.period.accounting.list</field>
+        <field name="model">lamess.commission.period</field>
+        <field name="arch" type="xml">
+            <list string="Periodi commissioni" default_order="year desc, month desc">
+                <header>
+                    <button name="action_sync_pv_ledger_state"
+                            type="object"
+                            string="Aggiorna stato ledger"
+                            class="btn-secondary"
+                            confirm="Aggiornare stati PV Ledger, pagamenti confermati e refund per i periodi selezionati?"
+                            groups="base.group_system,lamess_network.group_network_manager"/>
+                </header>
+                <field name="display_name"/>
+                <field name="year"/>
+                <field name="month"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="state"/>
+                <field name="invoice_count"/>
+                <field name="invoice_paid_count"/>
+                <field name="pv_confirmed_amount" digits="[16, 0]"/>
+                <field name="pv_pending_amount" digits="[16, 0]"/>
+                <field name="bonus_total_amount"/>
+                <button name="action_open_m3_bonus_preview"
+                        type="object"
+                        string="Anteprima"
+                        groups="base.group_system,lamess_network.group_network_manager,lamess_network.group_network_finance"/>
+                <button name="action_mark_closed" type="object" string="Chiudi" invisible="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lamess_commission_period_accounting_form" model="ir.ui.view">
+        <field name="name">lamess.commission.period.accounting.form</field>
+        <field name="model">lamess.commission.period</field>
+        <field name="arch" type="xml">
+            <form string="Periodo commissioni">
+                <header>
+                    <button name="action_mark_processing" type="object" string="In lavorazione" class="btn-secondary" invisible="state != 'open'"/>
+                    <button name="action_sync_pv_ledger_state"
+                            type="object"
+                            string="Aggiorna stato ledger"
+                            class="btn-secondary"
+                            confirm="Aggiornare stati PV Ledger, pagamenti confermati e refund per questo periodo?"
+                            groups="base.group_system,lamess_network.group_network_manager"/>
+                    <button name="action_reset_rank_snapshots_and_caches"
+                            type="object"
+                            string="Reset snapshot e cache"
+                            class="btn-secondary"
+                            confirm="Eliminare gli snapshot di questo periodo e azzerare le cache/rank dei consulenti? Vendite, fatture e PV Ledger non verranno eliminati."
+                            groups="base.group_system,lamess_network.group_network_manager"/>
+                    <button name="action_regenerate_pc_rank"
+                            type="object"
+                            string="Rigenera PR e rank"
+                            class="btn-secondary"
+                            confirm="Ricalcolare PR, rank e snapshot del periodo usando il PV Ledger confermato di questo mese?"
+                            groups="base.group_system,lamess_network.group_network_manager"/>
+                    <button name="action_clear_m3_runtime"
+                            type="object"
+                            string="Cancella runtime mese"
+                            class="btn-secondary"
+                            confirm="Cancellare le righe runtime M3 generate per questo mese? Le righe bloccate non verranno eliminate."
+                            groups="base.group_system,lamess_network.group_network_manager"/>
+                    <button name="action_generate_m3_runtime"
+                            type="object"
+                            string="Runtime di questo mese"
+                            class="btn-secondary"
+                            confirm="Generare il runtime M3 per questo mese? Le righe generate Direct/Team/Matching verranno ricalcolate; le righe bloccate restano intatte."
+                            groups="base.group_system,lamess_network.group_network_manager"/>
+                    <button name="action_open_m3_bonus_preview"
+                            type="object"
+                            string="Anteprima compensi"
+                            class="btn-secondary"
+                            groups="base.group_system,lamess_network.group_network_manager,lamess_network.group_network_finance"/>
+                    <button name="action_mark_closed" type="object" string="Chiudi periodo" class="btn-primary" invisible="state == 'closed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,processing,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="display_name" readonly="1"/>
+                            <field name="year"/>
+                            <field name="month"/>
+                        </group>
+                        <group>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_end" readonly="1"/>
+                            <field name="state" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Report tecnico del mese"/>
+                    <group>
+                        <group string="Fatturazione">
+                            <field name="sales_total_amount" readonly="1"/>
+                            <field name="paid_total_amount" readonly="1"/>
+                            <field name="residual_total_amount" readonly="1"/>
+                            <field name="sale_order_count" readonly="1"/>
+                            <field name="invoice_count" readonly="1"/>
+                            <field name="invoice_paid_count" readonly="1"/>
+                            <field name="invoice_pending_count" readonly="1"/>
+                        </group>
+                        <group string="PV Ledger">
+                            <field name="pv_confirmed_amount" readonly="1" digits="[16, 0]"/>
+                            <field name="pv_pending_amount" readonly="1" digits="[16, 0]"/>
+                            <field name="pv_antifraud_amount" readonly="1" digits="[16, 0]"/>
+                            <field name="pv_movement_count" readonly="1"/>
+                            <field name="pv_confirmed_count" readonly="1"/>
+                            <field name="pv_pending_count" readonly="1"/>
+                            <field name="consultant_with_pv_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="PR e Rank">
+                        <group>
+                            <field name="pc_month_total" readonly="1" digits="[16, 0]"/>
+                            <field name="pc_consultant_count" readonly="1"/>
+                            <field name="pc_career_updated_count" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="pc_live_snapshot_count" readonly="1"/>
+                            <field name="pc_official_snapshot_count" readonly="1"/>
+                            <field name="pc_rank_calculated_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Bonus runtime">
+                        <group>
+                            <field name="bonus_total_amount" readonly="1"/>
+                            <field name="runtime_line_count" readonly="1"/>
+                            <field name="runtime_recipient_count" readonly="1"/>
+                            <button name="action_open_m3_bonus_preview"
+                                    type="object"
+                                    string="Apri anteprima compensi"
+                                    class="btn-secondary"
+                                    groups="base.group_system,lamess_network.group_network_manager,lamess_network.group_network_finance"/>
+                        </group>
+                        <group>
+                            <field name="bonus_direct_amount" readonly="1"/>
+                            <field name="bonus_team_amount" readonly="1"/>
+                            <field name="bonus_matching_amount" readonly="1"/>
+                            <field name="bonus_rank_amount" readonly="1"/>
+                            <field name="bonus_fast_start_amount" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_lamess_commission_period_accounting_search" model="ir.ui.view">
+        <field name="name">lamess.commission.period.accounting.search</field>
+        <field name="model">lamess.commission.period</field>
+        <field name="arch" type="xml">
+            <search string="Periodi commissioni">
+                <field name="display_name"/>
+                <field name="year"/>
+                <field name="month"/>
+                <field name="state"/>
+                <filter string="Aperti" name="open" domain="[('state', '=', 'open')]"/>
+                <filter string="In lavorazione" name="processing" domain="[('state', '=', 'processing')]"/>
+                <filter string="Chiusi" name="closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Raggruppa per stato" name="group_state" context="{'group_by': 'state'}"/>
+                <filter string="Raggruppa per anno" name="group_year" context="{'group_by': 'year'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_lamess_commission_period_accounting" model="ir.actions.act_window">
+        <field name="name">Periodi commissioni</field>
+        <field name="res_model">lamess.commission.period</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_lamess_commission_period_accounting_search"/>
+    </record>
+
+    <menuitem id="menu_lamess_commission_period_accounting"
+              name="Periodi commissioni"
+              parent="lamess_commission.menu_lamess_network_root"
+              action="action_lamess_commission_period_accounting"
+              sequence="23"
+              groups="base.group_system,lamess_network.group_network_manager,lamess_network.group_network_finance"/>
+</odoo>

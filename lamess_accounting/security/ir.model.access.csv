@@ -1,0 +1,25 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_payout_request_system,Lamess Payout Request - System,model_lamess_payout_request,base.group_system,1,1,1,1
+access_payout_request_manager,Lamess Payout Request - Manager,model_lamess_payout_request,lamess_network.group_network_manager,1,1,1,1
+access_payout_request_finance,Lamess Payout Request - Finance,model_lamess_payout_request,lamess_network.group_network_finance,1,1,1,1
+access_payout_request_settlement_line_system,Lamess Payout Settlement Trace Line - System,model_lamess_payout_request_settlement_line,base.group_system,1,1,1,1
+access_payout_request_settlement_line_manager,Lamess Payout Settlement Trace Line - Manager,model_lamess_payout_request_settlement_line,lamess_network.group_network_manager,1,1,1,0
+access_payout_request_settlement_line_finance,Lamess Payout Settlement Trace Line - Finance,model_lamess_payout_request_settlement_line,lamess_network.group_network_finance,1,1,1,0
+access_commission_settlement_system,Lamess Commission Settlement - System,model_lamess_commission_settlement,base.group_system,1,1,1,1
+access_commission_settlement_manager,Lamess Commission Settlement - Manager,model_lamess_commission_settlement,lamess_network.group_network_manager,1,1,1,0
+access_commission_settlement_finance,Lamess Commission Settlement - Finance,model_lamess_commission_settlement,lamess_network.group_network_finance,1,1,1,0
+access_commission_settlement_line_system,Lamess Commission Settlement Line - System,model_lamess_commission_settlement_line,base.group_system,1,1,1,1
+access_commission_settlement_line_manager,Lamess Commission Settlement Line - Manager,model_lamess_commission_settlement_line,lamess_network.group_network_manager,1,1,1,0
+access_commission_settlement_line_finance,Lamess Commission Settlement Line - Finance,model_lamess_commission_settlement_line,lamess_network.group_network_finance,1,1,1,0
+access_commission_settlement_generate_wizard_system,Lamess Commission Settlement Generate Wizard - System,model_lamess_commission_settlement_generate_wizard,base.group_system,1,1,1,1
+access_commission_settlement_generate_wizard_manager,Lamess Commission Settlement Generate Wizard - Manager,model_lamess_commission_settlement_generate_wizard,lamess_network.group_network_manager,1,1,1,1
+access_commission_settlement_generate_wizard_finance,Lamess Commission Settlement Generate Wizard - Finance,model_lamess_commission_settlement_generate_wizard,lamess_network.group_network_finance,1,1,1,1
+access_commission_wallet_post_wizard_system,Lamess Commission Wallet Post Wizard - System,model_lamess_commission_wallet_post_wizard,base.group_system,1,1,1,1
+access_commission_wallet_post_wizard_manager,Lamess Commission Wallet Post Wizard - Manager,model_lamess_commission_wallet_post_wizard,lamess_network.group_network_manager,1,1,1,1
+access_commission_wallet_post_wizard_finance,Lamess Commission Wallet Post Wizard - Finance,model_lamess_commission_wallet_post_wizard,lamess_network.group_network_finance,1,1,1,1
+access_commission_full_cycle_wizard_system,Lamess Commission Full Cycle Wizard - System,model_lamess_commission_full_cycle_wizard,base.group_system,1,1,1,1
+access_commission_full_cycle_wizard_manager,Lamess Commission Full Cycle Wizard - Manager,model_lamess_commission_full_cycle_wizard,lamess_network.group_network_manager,1,1,1,1
+access_commission_full_cycle_wizard_finance,Lamess Commission Full Cycle Wizard - Finance,model_lamess_commission_full_cycle_wizard,lamess_network.group_network_finance,1,1,1,1
+access_commission_settlement_audit_system,Lamess Commission Settlement Audit - System,model_lamess_commission_settlement_audit,base.group_system,1,0,0,0
+access_commission_settlement_audit_manager,Lamess Commission Settlement Audit - Manager,model_lamess_commission_settlement_audit,lamess_network.group_network_manager,1,0,0,0
+access_commission_settlement_audit_finance,Lamess Commission Settlement Audit - Finance,model_lamess_commission_settlement_audit,lamess_network.group_network_finance,1,0,0,0

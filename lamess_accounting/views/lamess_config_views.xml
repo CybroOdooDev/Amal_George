@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lamess_config_form_accounting" model="ir.ui.view">
+        <field name="name">lamess.config.form.accounting</field>
+        <field name="model">lamess.config</field>
+        <field name="inherit_id" ref="lamess_base.view_lamess_config_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='administrative_fee']/ancestor::group[2]" position="after">
+                <group string="Payout Accounting">
+                    <group>
+                        <field name="payout_journal_id"/>
+                        <field name="payout_payable_account_id"/>
+                        <field name="payout_liquidity_account_id"/>
+                    </group>
+                    <group>
+                        <field name="payout_withholding_account_id"/>
+                        <field name="payout_fee_account_id"/>
+                        <button name="action_check_payout_accounting_configuration"
+                                type="object"
+                                string="Verifica contabilita payout"
+                                class="btn-secondary"/>
+                    </group>
+                </group>
+                <group string="Autofattura (self-invoice)">
+                    <group>
+                        <field name="autoinv_purchase_journal_id"/>
+                        <field name="autoinv_expense_account_id"/>
+                        <field name="autoinv_gross_threshold"/>
+                        <field name="autoinv_inps_ceiling"/>
+                    </group>
+                    <group>
+                        <field name="autoinv_withholding_tax_id"/>
+                        <field name="autoinv_vat_tax_id"/>
+                        <field name="autoinv_inps_tax_id"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lamess_commission_settlement_audit_list" model="ir.ui.view">
+        <field name="name">lamess.commission.settlement.audit.list</field>
+        <field name="model">lamess.commission.settlement.audit</field>
+        <field name="arch" type="xml">
+            <list string="Audit settlement commissioni" default_order="period_id desc, issue_level, partner_id">
+                <field name="period_id"/>
+                <field name="partner_id"/>
+                <field name="issue_level"/>
+                <field name="runtime_generated_line_count"/>
+                <field name="runtime_generated_amount" sum="Totale generato"/>
+                <field name="runtime_locked_line_count"/>
+                <field name="runtime_locked_amount" sum="Totale bloccato"/>
+                <field name="settlement_line_count"/>
+                <field name="settlement_amount" sum="Totale settlement"/>
+                <field name="locked_without_settlement_count"/>
+                <field name="amount_delta" sum="Delta"/>
+                <field name="wallet_balance"/>
+                <field name="settlement_state"/>
+                <button name="action_open_runtime_lines" type="object" string="Runtime"/>
+                <button name="action_open_settlement" type="object" string="Settlement"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lamess_commission_settlement_audit_form" model="ir.ui.view">
+        <field name="name">lamess.commission.settlement.audit.form</field>
+        <field name="model">lamess.commission.settlement.audit</field>
+        <field name="arch" type="xml">
+            <form string="Audit settlement commissioni" create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_open_runtime_lines" type="object" string="Apri runtime M3" class="btn-secondary"/>
+                    <button name="action_open_settlement" type="object" string="Apri settlement" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Contesto">
+                            <field name="period_id"/>
+                            <field name="partner_id"/>
+                            <field name="issue_level"/>
+                            <field name="settlement_id"/>
+                            <field name="settlement_state"/>
+                        </group>
+                        <group string="Wallet">
+                            <field name="wallet_balance"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Runtime M3">
+                            <field name="runtime_generated_line_count"/>
+                            <field name="runtime_generated_amount"/>
+                            <field name="runtime_locked_line_count"/>
+                            <field name="runtime_locked_amount"/>
+                            <field name="runtime_cancelled_line_count"/>
+                        </group>
+                        <group string="Settlement">
+                            <field name="settlement_line_count"/>
+                            <field name="settlement_amount"/>
+                            <field name="locked_without_settlement_count"/>
+                            <field name="locked_without_settlement_amount"/>
+                            <field name="amount_delta"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_lamess_commission_settlement_audit_search" model="ir.ui.view">
+        <field name="name">lamess.commission.settlement.audit.search</field>
+        <field name="model">lamess.commission.settlement.audit</field>
+        <field name="arch" type="xml">
+            <search string="Audit settlement commissioni">
+                <field name="period_id"/>
+                <field name="partner_id"/>
+                <field name="issue_level"/>
+                <filter string="Da liquidare" name="pending_runtime" domain="[('issue_level', '=', 'pending_runtime')]"/>
+                <filter string="Locked senza settlement" name="locked_without_settlement" domain="[('issue_level', '=', 'locked_without_settlement')]"/>
+                <filter string="Bozze" name="draft" domain="[('issue_level', '=', 'draft')]"/>
+                <filter string="Pronti wallet" name="ready_wallet" domain="[('issue_level', '=', 'ready_wallet')]"/>
+                <filter string="Accreditati" name="posted" domain="[('issue_level', '=', 'posted')]"/>
+                <separator/>
+                <filter string="Raggruppa per esito" name="group_issue" context="{'group_by': 'issue_level'}"/>
+                <filter string="Raggruppa per periodo" name="group_period" context="{'group_by': 'period_id'}"/>
+                <filter string="Raggruppa per consulente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_lamess_commission_settlement_audit" model="ir.actions.act_window">
+        <field name="name">Audit settlement commissioni</field>
+        <field name="res_model">lamess.commission.settlement.audit</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_lamess_commission_settlement_audit_search"/>
+        <field name="context">{'search_default_group_issue': 1}</field>
+    </record>
+
+    <menuitem id="menu_lamess_commission_settlement_audit"
+              name="Audit settlement"
+              parent="lamess_commission.menu_lamess_network_root"
+              action="action_lamess_commission_settlement_audit"
+              sequence="26"
+              groups="base.group_system,lamess_network.group_network_manager,lamess_network.group_network_finance"/>
+</odoo>

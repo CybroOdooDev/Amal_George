@@ -19,14 +19,13 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 ###############################################################################
-import requests
 from odoo import api, fields, models
 from exa_py import Exa
 
 
 
 class ResConfigSettings(models.TransientModel):
-    """Add field to configuration settings"""
+    """Inherit settings to add Google Search configuration fields."""
     _inherit = 'res.config.settings'
 
     google_search = fields.Boolean(
@@ -40,7 +39,7 @@ class ResConfigSettings(models.TransientModel):
 
     @api.model
     def google_search_config(self, input_data):
-        """Create function to get google custom search api response"""
+        """Get search results from Exa API using the query input."""
         google_search = self.env['ir.config_parameter'].sudo().get_param(
             'google_search_in_odoo.google_search')
         if not google_search:

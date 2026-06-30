@@ -21,7 +21,7 @@ Credits
             (V16) Sruthi Pavithran,
             (V17) Jumana Haseen,
             (V18) Akhil,
-            (V19) Yadhu Shankar E,
+            (V19) Yadhu Shankar E, Amal George
 Contact: odoo@cybrosys.com
 
 Contacts

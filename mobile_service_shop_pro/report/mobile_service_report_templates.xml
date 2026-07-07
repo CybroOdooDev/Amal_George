@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Template of the mobile service report-->
+    <template id="mobile_service_report">
+        <t t-call="web.external_layout">
+            <t t-call="web.html_container">
+                <div class="row mt32">
+                    <br/>
+                    <div style="text-align:center;">
+                        <h2>Service Request Report</h2>
+                        <br/>
+                        <t t-if="start_date">
+                            <strong>Date From:
+                                <t t-esc="start_date"/>
+                            </strong>
+                            <br/>
+                        </t>
+                        <strong>Date To:
+                            <t t-esc="end_date"/>
+                        </strong>
+                    </div>
+                    <div style="text-align:center;">
+                        <strong>Date From:</strong>
+                        <p t-esc="start_date"/>
+                    </div>
+                    <div style="text-align:center;">
+                        <strong>Date To:</strong>
+                        <span t-esc="end_date"/>
+                    </div>
+                </div>
+                <table class="table table-condensed"
+                       style="margin-top:5%;;width:100%;line-height:2;text-align:center;">
+                    <thead> <strong>
+                        <th>Serv No</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Request date</th>
+                        <th>Return date</th>
+                        <th>Technician</th>
+                        <th>Status</th>
+                    </strong></thead>
+                    <tbody>
+                        <tr t-foreach="values" t-as="doc">
+                            <td align="left">
+                                <span t-esc="doc['code']"/>
+                            </td>
+                            <td align="left">
+                                <span t-esc="doc['customer_name']"/>
+                            </td>
+                            <td align="left">
+                                <span t-esc="doc['product_name']"/>
+                            </td>
+
+                            <td align="left">
+                                <span t-esc="doc['date_assign']"/>
+                            </td>
+                            <td align="left">
+                                <span t-esc="doc['date_return']"/>
+                            </td>
+                            <td align="left">
+                                <span t-esc="doc['technician']"/>
+                            </td>
+                            <td align="left">
+                                <span t-esc="doc['status']"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+</odoo>

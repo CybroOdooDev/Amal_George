@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Form view of the model mobile parts report-->
+    <record id="mobile_parts_report_view_form" model="ir.ui.view">
+        <field name="name">Mobile Parts Report View Form</field>
+        <field name="model">mobile.parts.report</field>
+        <field name="arch" type="xml">
+            <form string="Stock Report">
+                <group>
+                    <group>
+                        <field name="date_start"/>
+                        <field name="parts_id"/>
+                    </group>
+                    <group>
+                        <field name="date_end"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="print_pdf_report" string="Print PDF Report"
+                            type="object" class="oe_highlight"/>
+                    <button name="print_xlsx_report" string="Print XLSX Report"
+                            type="object" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!--Action of the model mobile parts report-->
+    <record id="mobile_parts_report_action" model="ir.actions.act_window">
+        <field name="name">Mobile Parts Report</field>
+        <field name="res_model">mobile.parts.report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="mobile_parts_report_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!--Menu item of the model mobile parts menu-->
+    <menuitem id="mobile_parts_report_menu" name="Parts Usage"
+              action="mobile_parts_report_action"
+              parent="mobile_service_report_menu_root" sequence="3"/>
+</odoo>

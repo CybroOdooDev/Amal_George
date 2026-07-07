@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Search view of the model mobile pivot report-->
+    <record id="mobile_pivot_report_view_search" model="ir.ui.view">
+        <field name="name">Mobile Pivot View Search</field>
+        <field name="model">mobile.pivot.report</field>
+        <field name="arch" type="xml">
+            <search string="Service Analysis">
+                <field name="partner_id"/>
+                <filter string="This Year" name="year" invisible="1"
+                        domain="[('date_request','&lt;=', time.strftime('%%Y-12-31')),('date_request','&gt;=',time.strftime('%%Y-01-01'))]"/>
+                <filter name="service_state" string="Service State"/>
+                <filter name="return_date" string="Return date"/>
+                <filter name="date_request" string="Request date"/>
+                <separator/>
+                <field name="technician_id"/>
+                <field name="model_id"/>
+                <group>
+                    <filter string="Customer" name="partner_id"
+                            context="{'group_by':'partner_id'}"/>
+                    <filter string="Brand" name="brand_id"
+                            context="{'group_by':'brand_id'}"/>
+                    <filter string="Model" name="model_id"
+                            context="{'group_by':'model_id'}"/>
+                    <filter string="Technician" name="technician_id"
+                            context="{'group_by':'technician_id'}"/>
+                    <filter string="Service Status" name="service_state"
+                            context="{'group_by':'service_state'}"/>
+                    <separator orientation="vertical"/>
+                    <filter string="Request date" name="date_request"
+                            context="{'group_by':'date_request'}"
+                            help="Date of the service request"/>
+                    <filter string="Return date" name="return_date"
+                            context="{'group_by':'return_date'}"
+                            help="Service request return date"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--Pivot view of the model mobile pivot report-->
+    <record id="mobile_pivot_report_view_pivot" model="ir.ui.view">
+        <field name="name">mobile.pivot.report.view.pivot</field>
+        <field name="model">mobile.pivot.report</field>
+        <field name="priority" eval="8"/>
+        <field name="arch" type="xml">
+            <pivot string="Mobile Service">
+                <field name="technician_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!--Graph view of the model mobile pivot report-->
+    <record id="mobile_pivot_report_view_graph" model="ir.ui.view">
+        <field name="name">mobile.pivot.report.view.graph</field>
+        <field name="model">mobile.pivot.report</field>
+        <field name="arch" type="xml">
+            <graph string="Service Graph">
+                <field name="technician_id" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <!--Filter of the model mobile pivot report by technician-->
+    <record id="mobile_pivot_report_filter_technician" model="ir.filters">
+        <field name="name">By Technician</field>
+        <field name="model_id">mobile.pivot.report</field>
+        <field name="context">{'group_by': ['date_request:month',
+            'technician_id']}
+        </field>
+    </record>
+
+    <!--Filter of the model mobile pivot report by parts-->
+    <record id="mobile_pivot_report_filter_parts" model="ir.filters">
+        <field name="name">By Parts</field>
+        <field name="model_id">mobile.pivot.report</field>
+        <field name="context">{'group_by': ['date_request:month',
+            'product_tmpl_id']}
+        </field>
+    </record>
+
+    <!--Filter of the model mobile pivot report by status-->
+    <record id="mobile_pivot_report_filter_status" model="ir.filters">
+        <field name="name">By Status</field>
+        <field name="model_id">mobile.pivot.report</field>
+        <field name="context">{'group_by': ['date_request:month',
+            'service_state']}
+        </field>
+    </record>
+
+    <!--Filter of the model mobile pivot report by customer-->
+    <record id="mobile_pivot_report_filter_customer" model="ir.filters">
+        <field name="name">By Customer</field>
+        <field name="model_id">mobile.pivot.report</field>
+        <field name="context">{'group_by': ['date_request:month',
+            'partner_id']}
+        </field>
+    </record>
+
+    <!--Action of the model mobile pivot report-->
+    <record id="mobile_pivot_report_action" model="ir.actions.act_window">
+        <field name="name">Mobile Service</field>
+        <field name="res_model">mobile.pivot.report</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="search_view_id" ref="mobile_pivot_report_view_search"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to view pivot report.
+            </p>
+        </field>
+    </record>
+
+    <!--Menu item of the model mobile pivot report-->
+    <menuitem id="mobile_pivot_report_menu" name="Mobile Service"
+              action="mobile_pivot_report_action"
+              parent="mobile_service_report_menu_root" sequence="1"/>
+</odoo>

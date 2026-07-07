@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Template of the report mobile parts report-->
+    <template id="mobile_parts_report">
+        <t t-call="web.external_layout">
+            <t t-call="web.html_container">
+                <div class="row mt32">
+                    <br/>
+                    <div style="text-align:center;">
+                        <h2>Parts Usage Report</h2>
+                        <br/>
+                        <t t-if="start_date">
+                            <strong>Date From:
+                                <t t-esc="start_date"/>
+                            </strong>
+                            <br/>
+                        </t>
+                        <strong>Date To:
+                            <t t-esc="end_date"/>
+                        </strong>
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-condensed"
+                           style="margin-top:5%;;width:100%;line-height:2;text-align:center;">
+                        <thead>
+                            <th style="text-align: center;">Serv No</th>
+                            <th style="text-align: center;">Technician</th>
+                            <th style="text-align: center;">Used Date</th>
+                            <th style="text-align: center;">Used Quantity</th>
+                            <th style="text-align: center;">Qty Invoiced</th>
+                            <th style="text-align: center;">Qty Stock Move</th>
+                            <th style="text-align: center;">Price</th>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="values" t-as="doc">
+                                <tr style="height:25px; font-size:16px; font-weight:bold; text-align:left;">
+                                    <td colspan="5">
+                                        <t t-esc="doc['product_name']"/>
+                                        (
+                                        <t t-esc="doc['part_brand']"/>
+                                        <t t-esc="doc['part_model']"/>
+                                        <t t-esc="doc['part_colour']"/>)
+                                    </td>
+                                </tr>
+                                <t t-foreach="used" t-as="use">
+                                    <t t-if="doc['id'] == use['product_id']">
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <span t-esc="use['serv_id']"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-esc="use['technician']"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-esc="use['create_date']"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-esc="use['qty_used']"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-esc="use['qty']"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-esc="use['qty_stock_move']"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-esc="use['price']"/>
+                                                <span t-esc="use['symbol']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

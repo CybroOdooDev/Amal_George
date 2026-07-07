@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mobile Service Management Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"/>
+    <style>
+        :root {
+          --primary-color: #5d3fd3; /* Deep Purple / Indigo for Pro */
+          --secondary-color: #7f54b3;
+          --bg-white: #fff;
+          --text-color: #121212;
+          --text-color-light: #64728f;
+        }
+        body {
+          font-family: "Montserrat", sans-serif;
+          background-color: #fcfcfd;
+        }
+        .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+          color: #fff;
+          font-family: Montserrat;
+          font-size: 16px !important;
+          font-weight: 600 !important;
+          border-radius: 30px;
+          line-height: normal;
+          text-transform: capitalize;
+          background-color: var(--primary-color);
+          border: none;
+          margin-bottom: 0;
+          padding: 12px 28px;
+          box-shadow: 0px 4px 12px rgba(93, 63, 211, 0.2);
+        }
+        .nav-tabs .nav-link {
+          color: var(--text-color-light);
+          border: none;
+          padding: 12px 28px;
+          border-radius: 30px;
+          transition: all 0.3s ease;
+        }
+        .nav-tabs .nav-link:hover {
+          color: var(--primary-color);
+          background-color: #f0ecfa;
+          border-color: transparent;
+        }
+        .nav-tabs .nav-link:focus-visible {
+          border-color: transparent;
+          box-shadow: none;
+        }
+        .card-highlight {
+          border-radius: 16px;
+          border: 1px solid #eef0f5;
+          background: #fff;
+          padding: 32px;
+          transition: all 0.3s ease;
+          box-shadow: 0px 8px 24px rgba(149, 157, 165, 0.05);
+        }
+        .card-highlight:hover {
+          transform: translateY(-5px);
+          box-shadow: 0px 12px 30px rgba(93, 63, 211, 0.1);
+        }
+        .icon-container {
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+          border-radius: 12px !important;
+          height: 48px;
+          width: 48px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          box-shadow: 0px 4px 10px rgba(93, 63, 211, 0.3);
+        }
+        .badge-premium {
+          background: linear-gradient(135deg, #ffd700, #ffa500);
+          color: #121212;
+          font-weight: 700;
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          display: inline-block;
+          box-shadow: 0px 4px 8px rgba(255, 215, 0, 0.3);
+        }
+        .owl-carousel .owl-nav {
+          position: absolute;
+          top: 42%;
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          transform: translateY(-42%);
+        }
+        .owl-carousel .owl-nav button.owl-prev {
+          position: absolute;
+          right: -36px;
+          font-size: 28px;
+          background-color: #e4e4e4;
+          border-radius: 20px;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .owl-carousel .owl-nav button.owl-next {
+          position: absolute;
+          left: -36px;
+          font-size: 28px;
+          background-color: #e4e4e4;
+          border-radius: 20px;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="my-5">
+        <!-- version support & badge -->
+        <div class="my-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <span class="badge-premium"><i class="fa fa-crown me-1"></i>PRO VERSION</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="text-center" style="background-color:#017E84 !important; font-size:0.8rem !important; color:#fff !important; font-weight:500 !important; padding:6px 14px !important; margin:0 3px !important; border-radius:50px !important; min-width:110px !important">
+                    Community
+                </div>
+                <div class="text-center" style="background-color:#875A7B !important; color:#fff !important;font-size: 0.8rem !important; font-weight:500 !important; padding:6px 14px !important; margin:0 3px !important; border-radius:50px !important;min-width: 110px !important;">
+                    Enterprise
+                </div>
+                <div class="text-center" style="background-color:#7C7BAD !important; color:#fff !important;font-size: 0.8rem !important; font-weight:500 !important; padding:6px 14px !important; margin:0 3px !important; border-radius:50px !important; min-width: 110px !important;">
+                    Odoo.sh
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Hero section -->
+        <div class="position-relative" style="border-radius: 20px; background: linear-gradient(135deg, #f8f7fd, #f2effb); padding: 50px 20px; overflow: hidden; border: 1px solid #e2dbf5;">
+            <div class="row text-center">
+                <div class="col-lg-10 mx-auto gap-3 d-flex flex-column align-items-center">
+                    <p class="my-1 text-uppercase" style="letter-spacing: 4px !important; color: var(--primary-color); font-weight: 700; font-size: 14px; line-height: normal;">
+                        Advanced Mobile Service Center Management with APIs, Analytics, and Reports
+                    </p>
+                    <h1 class="text-uppercase my-0" style="color: var(--text-color); font-size: 44px; font-weight: 800; line-height: 1.2;">
+                        Mobile Service Management Pro
+                    </h1>
+                    <p class="col-md-8 mx-auto text-muted" style="font-size: 1.05rem; line-height: 1.6;">
+                        Boost your repair shop operations with automated IMEI device lookup, physical image capture, smart compatible parts validation, and professional Excel/PDF analytical reports.
+                    </p>
+                </div>
+                
+                <div class="col-lg-12 d-flex justify-content-center align-items-center" style="margin: 2.5rem 0;">
+                    <img src="./assets/icons/brand-pair.svg" width="100%" height="auto" style="width: 35%" class="img-responsive"/>
+                </div>
+
+                <div class="col-md-12 text-center" style="z-index: 5;">
+                    <a href="mailto:odoo@cybrosys.com" target="_blank" style="background-color: var(--primary-color); border-radius: 35px; font-family: Montserrat; display: inline-block; padding: 12px 36px; color: #fff; text-decoration: none; font-weight: 600; box-shadow: 0px 4px 15px rgba(93, 63, 211, 0.4);" class="mx-1 mb-2">
+                        <img class="img me-2" style="width: 20px" src="./assets/icons/banner-mail.svg"/>
+                        <span>Contact Support</span>
+                    </a>
+                </div>
+            </div>
+            <div class="position-absolute" style="bottom: 0; left: 0; z-index: 1; width: 100%;">
+                <img src="./assets/icons/banner-bg.svg" class="img-fluid w-100" style="opacity: 0.5;">
+            </div>
+            <div class="position-absolute" style="bottom: 0; right: 0; z-index: 2;">
+                <img src="./assets/icons/patter.svg" style="opacity: 0.3;">
+            </div>
+        </div>
+
+        <!-- Pro Features Highlights Grid -->
+        <div class="my-5" style="border-radius: 20px; padding: 60px 40px; border: 1px solid #EBEEF2; background: #FFF; box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.03);">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 style="color: var(--text-color); font-size: 36px; font-weight: 800; text-transform: uppercase;">
+                        Advanced Pro Features
+                    </h2>
+                    <p class="text-muted">Explore the powerful integrations and features that make the Pro edition stand out.</p>
+                </div>
+                
+                <!-- Highlight 1: IMEI Lookup -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-highlight h-100 d-flex flex-column gap-3">
+                        <div class="icon-container">
+                            <i class="fa fa-magnifying-glass" style="color:#fff; font-size:18px"></i>
+                        </div>
+                        <h5 class="m-0" style="color:#121212; font-weight:700">IMEI Device Lookup API</h5>
+                        <p class="m-0 text-muted" style="font-size: 15px; line-height: 1.6;">
+                            Integration with ImeiCheck.com. Auto-fetches brand, model, and manufacturer from the 15-digit IMEI. Auto-creates catalog records.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Highlight 2: Photo Capture -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-highlight h-100 d-flex flex-column gap-3">
+                        <div class="icon-container">
+                            <i class="fa fa-camera" style="color:#fff; font-size:18px"></i>
+                        </div>
+                        <h5 class="m-0" style="color:#121212; font-weight:700">Real Device Image Capture</h5>
+                        <p class="m-0 text-muted" style="font-size: 15px; line-height: 1.6;">
+                            Capture or upload photos of physical devices directly at intake, securing visual documentation of pre-existing condition and warranty.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Highlight 3: Smart Product Filtering -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-highlight h-100 d-flex flex-column gap-3">
+                        <div class="icon-container">
+                            <i class="fa fa-filter" style="color:#fff; font-size:18px"></i>
+                        </div>
+                        <h5 class="m-0" style="color:#121212; font-weight:700">Smart Parts Filtering</h5>
+                        <p class="m-0 text-muted" style="font-size: 15px; line-height: 1.6;">
+                            Technicians only see spare parts matching the device's brand and model in the selection dropdown, preventing compatibility mistakes.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Highlight 4: Advanced Excel Reporting -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-highlight h-100 d-flex flex-column gap-3">
+                        <div class="icon-container">
+                            <i class="fa fa-file-excel" style="color:#fff; font-size:18px"></i>
+                        </div>
+                        <h5 class="m-0" style="color:#121212; font-weight:700">Direct XLSX Downloads</h5>
+                        <p class="m-0 text-muted" style="font-size: 15px; line-height: 1.6;">
+                            Custom HTTP controller streams formatted Excel reports (wizards for complaint trends, parts usage, and services) directly to browser.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Highlight 5: Pivot & Graph Analytics -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-highlight h-100 d-flex flex-column gap-3">
+                        <div class="icon-container">
+                            <i class="fa fa-chart-line" style="color:#fff; font-size:18px"></i>
+                        </div>
+                        <h5 class="m-0" style="color:#121212; font-weight:700">Pivot/Graph Dashboards</h5>
+                        <p class="m-0 text-muted" style="font-size: 15px; line-height: 1.6;">
+                            Underpinned by a custom PostgreSQL view (`mobile.pivot.report`) that aggregates technicians, complaint categories, status, and parts.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Highlight 6: Complaint Visibility Control -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-highlight h-100 d-flex flex-column gap-3">
+                        <div class="icon-container">
+                            <i class="fa fa-eye-slash" style="color:#fff; font-size:18px"></i>
+                        </div>
+                        <h5 class="m-0" style="color:#121212; font-weight:700">Privacy Control (Tickets)</h5>
+                        <p class="m-0 text-muted" style="font-size: 15px; line-height: 1.6;">
+                            Toggle complaint and technical description visibility on printed customer tickets with an option under Configuration Settings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call To Action banner -->
+        <div class="my-5">
+            <div style="padding: 5rem 4rem; background-color: #0A1425; border-radius: 20px; position: relative; overflow: hidden;">
+                <div class="wrapper-info" style="display: flex; flex-direction: column; gap: 20px; z-index: 5; position: relative;">
+                    <span style="font-size: 38px; font-weight: 800; color: #fff; line-height: 1.3; text-transform: uppercase;">
+                        Upgrade to Enterprise-Ready Operations
+                    </span>
+                    <h3 style="font-size: 19px; font-weight: 400; color: #b4c2d3; line-height: 1.6;">
+                        Unlock the complete suite of automated IMEI diagnostics and XLSX financial reports today.
+                    </h3>
+                    <div class="d-flex gap-3 flex-wrap mt-3">
+                        <a href="mailto:odoo@cybrosys.com" class="shop-btn" style="cursor: pointer; border-radius: 16px; display: flex; justify-content: center; align-items: center; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.20); background: linear-gradient(93deg, rgba(255, 255, 255, 0.08) 6.01%, rgba(255, 255, 255, 0.17) 90.83%); backdrop-filter: blur(10px); color: #fff; padding: 10px 24px; text-decoration: none;">
+                            <span style="border-radius: 12px; background: rgba(255, 255, 255, 0.10); padding: 8px;">
+                                <img src="./assets/icons/banner-mail.svg" style="width: 18px;">
+                            </span>
+                            <span style="font-weight: 600;">odoo@cybrosys.com</span>
+                        </a>
+                        <a href="https://wa.me/919074270811" target="_blank" class="shop-btn" style="cursor: pointer; border-radius: 16px; display: flex; justify-content: center; align-items: center; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.20); background: linear-gradient(93deg, rgba(255, 255, 255, 0.08) 6.01%, rgba(255, 255, 255, 0.17) 90.83%); backdrop-filter: blur(10px); color: #fff; padding: 10px 24px; text-decoration: none;">
+                            <span style="border-radius: 12px; background: rgba(255, 255, 255, 0.10); padding: 8px;">
+                                <img src="./assets/icons/banner-call.svg" style="width: 18px;">
+                            </span>
+                            <span style="font-weight: 600;">+91 9074270811</span>
+                        </a>
+                    </div>
+                </div>
+                <div style="position: absolute; bottom: 0; right: 0; z-index: 1;">
+                    <img src="./assets/icons/banner-pattern.svg" style="width: 500px; opacity: 0.8;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Screenshots / Features tabs -->
+        <div class="mb-4 bg-white" style="border: 1px solid #eef0f5; border-radius: 16px; box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.04);">
+            <div>
+                <ul class="nav nav-tabs justify-content-center bg-white py-3" id="myTab" role="tablist" style="border-radius: 16px 16px 0 0; border-bottom: 1px solid #f2f4f8;">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="overview-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">
+                            <i class="fa fa-images me-1"></i>Screenshots
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="feature-tab" data-bs-toggle="tab" href="#feature" role="tab" aria-controls="feature" aria-selected="false">
+                            <i class="fa fa-list-check me-1"></i>Pro Capabilities
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="faq-tab" data-bs-toggle="tab" href="#faq" role="tab" aria-controls="faq" aria-selected="false">
+                            <i class="fa fa-circle-question me-1"></i>FAQs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="releases-tab" data-bs-toggle="tab" href="#releases" role="tab" aria-controls="releases" aria-selected="false">
+                            <i class="fa fa-clock-rotate-left me-1"></i>Releases
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="tab-content p-md-5 p-3 py-4" id="myTabContent">
+                <!-- Tab: Screenshots -->
+                <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                    
+                    <!-- Screenshot 1: IMEI Lookup -->
+                    <div class="position-relative mb-5 p-md-5 p-3" style="border-radius:16px; background-color:#f8f9fc; border: 1px solid #eef0f5;">
+                        <div class="row">
+                            <div class="col-md-12 text-center mb-4">
+                                <h4 style="font-weight:700; color:#121212;">
+                                    Service Request & <span style="color: var(--primary-color);">IMEI Lookup API</span>
+                                </h4>
+                                <p class="text-muted">Enter a 15-digit IMEI number and click "Get Details" to retrieve device configurations instantly.</p>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <div class="d-inline-block p-2 shadow-sm bg-white" style="border-radius:12px">
+                                    <img alt="IMEI Lookup" class="img-fluid" src="./assets/screenshots/1.png" style="border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screenshot 2: Real Phone Image -->
+                    <div class="position-relative mb-5 p-md-5 p-3" style="border-radius:16px; background-color:#f8f9fc; border: 1px solid #eef0f5;">
+                        <div class="row">
+                            <div class="col-md-12 text-center mb-4">
+                                <h4 style="font-weight:700; color:#121212;">
+                                    Device Photo <span style="color: var(--primary-color);">Capture & Attachment</span>
+                                </h4>
+                                <p class="text-muted">Attach physical snapshots of the phone to log pre-existing physical damage or model specifications.</p>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <div class="d-inline-block p-2 shadow-sm bg-white" style="border-radius:12px">
+                                    <img alt="Real Phone Image" class="img-fluid" src="./assets/screenshots/2.png" style="border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screenshot 3: Configuration settings -->
+                    <div class="position-relative mb-5 p-md-5 p-3" style="border-radius:16px; background-color:#f8f9fc; border: 1px solid #eef0f5;">
+                        <div class="row">
+                            <div class="col-md-12 text-center mb-4">
+                                <h4 style="font-weight:700; color:#121212;">
+                                    API & Ticket <span style="color: var(--primary-color);">Privacy Configurations</span>
+                                </h4>
+                                <p class="text-muted">Setup ImeiCheck API keys, whitelists, PHP Service IDs, and toggle visibility of complaint logs on PDF tickets.</p>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <div class="d-inline-block p-2 shadow-sm bg-white" style="border-radius:12px">
+                                    <img alt="Configuration" class="img-fluid" src="./assets/screenshots/5.png" style="border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screenshot 4: Pivot Analytics -->
+                    <div class="position-relative mb-5 p-md-5 p-3" style="border-radius:16px; background-color:#f8f9fc; border: 1px solid #eef0f5;">
+                        <div class="row">
+                            <div class="col-md-12 text-center mb-4">
+                                <h4 style="font-weight:700; color:#121212;">
+                                    Interactive <span style="color: var(--primary-color);">Pivot & Graph Analytics</span>
+                                </h4>
+                                <p class="text-muted">Visualize business trends, parts consumption patterns, and technician efficiency charts dynamically.</p>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <div class="d-inline-block p-2 shadow-sm bg-white" style="border-radius:12px">
+                                    <img alt="Pivot Report" class="img-fluid" src="./assets/screenshots/8.png" style="border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Capabilities -->
+                <div class="tab-pane fade" id="feature" role="tabpanel" aria-labelledby="feature-tab">
+                    <div class="row py-3">
+                        <div class="col-md-6 mb-4">
+                            <div class="p-4 h-100" style="border-radius:12px; background-color:#faf8ff; border: 1px solid #f2eefa;">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="d-flex align-items-center justify-content-center" style="width:36px; height:36px; border-radius:50%; background-color:var(--primary-color); margin-right:12px">
+                                        <i class="fa fa-check text-white" style="font-size:14px"></i>
+                                    </div>
+                                    <h5 class="m-0 font-weight-bold" style="color:#1A202C;">ImeiCheck.com API Lookup</h5>
+                                </div>
+                                <p class="text-muted" style="font-size:15px; line-height:1.6;">Automate model, manufacturer, and brand entry to prevent errors and accelerate customer intake.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="p-4 h-100" style="border-radius:12px; background-color:#faf8ff; border: 1px solid #f2eefa;">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="d-flex align-items-center justify-content-center" style="width:36px; height:36px; border-radius:50%; background-color:var(--primary-color); margin-right:12px">
+                                        <i class="fa fa-check text-white" style="font-size:14px"></i>
+                                    </div>
+                                    <h5 class="m-0 font-weight-bold" style="color:#1A202C;">Physical Device Camera Capture</h5>
+                                </div>
+                                <p class="text-muted" style="font-size:15px; line-height:1.6;">Use the system web-camera to photograph the device instantly and keep a permanent history of the phone's physical condition.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="p-4 h-100" style="border-radius:12px; background-color:#faf8ff; border: 1px solid #f2eefa;">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="d-flex align-items-center justify-content-center" style="width:36px; height:36px; border-radius:50%; background-color:var(--primary-color); margin-right:12px">
+                                        <i class="fa fa-check text-white" style="font-size:14px"></i>
+                                    </div>
+                                    <h5 class="m-0 font-weight-bold" style="color:#1A202C;">Compatible Parts Domain Filtering</h5>
+                                </div>
+                                <p class="text-muted" style="font-size:15px; line-height:1.6;">Automatically filter spare parts in product selection to only show inventory items matching the brand and model of the serviced device.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="p-4 h-100" style="border-radius:12px; background-color:#faf8ff; border: 1px solid #f2eefa;">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="d-flex align-items-center justify-content-center" style="width:36px; height:36px; border-radius:50%; background-color:var(--primary-color); margin-right:12px">
+                                        <i class="fa fa-check text-white" style="font-size:14px"></i>
+                                    </div>
+                                    <h5 class="m-0 font-weight-bold" style="color:#1A202C;">Advanced XLSX Reports Streaming</h5>
+                                </div>
+                                <p class="text-muted" style="font-size:15px; line-height:1.6;">Stream fully-formatted Excel (XLSX) workbooks directly from memory using a custom Python report controller and custom JS action interceptors.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: FAQs -->
+                <div class="tab-pane fade" id="faq" role="tabpanel" aria-labelledby="faq-tab">
+                    <div class="accordion" id="accordion_faq">
+                        <!-- Q1 -->
+                        <div class="mb-3" style="border: 1px solid #f0f2f5; border-radius: 12px;">
+                            <div class="card-header collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFAQOne" aria-expanded="false" aria-controls="collapseFAQOne" style="cursor: pointer; background-color:#fdfdfd; padding: 18px 24px; border-radius: 12px;">
+                                <a class="card-title text-decoration-none" style="font-size:16px; font-weight:600; color:#040f3a; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>How does the Pro IMEI Lookup API work?</span>
+                                    <i class="fa fa-chevron-down text-muted" style="font-size: 12px;"></i>
+                                </a>
+                            </div>
+                            <div class="accordion-collapse collapse" id="collapseFAQOne" data-bs-parent="#accordion_faq">
+                                <p style="padding:18px 24px; font-size:15px; line-height:1.6; color:#555; background-color: #fff; margin-bottom: 0;">
+                                    When you enter a 15-digit IMEI, Odoo connects to ImeiCheck.com's endpoints (using your key and optionally PHP Service IDs). It automatically retrieves the brand, model, and manufacturer, creating Odoo brand/model catalog records on the fly and populating your form.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Q2 -->
+                        <div class="mb-3" style="border: 1px solid #f0f2f5; border-radius: 12px;">
+                            <div class="card-header collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFAQTwo" aria-expanded="false" aria-controls="collapseFAQTwo" style="cursor: pointer; background-color:#fdfdfd; padding: 18px 24px; border-radius: 12px;">
+                                <a class="card-title text-decoration-none" style="font-size:16px; font-weight:600; color:#040f3a; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Does it prevent installing incompatible spare parts?</span>
+                                    <i class="fa fa-chevron-down text-muted" style="font-size: 12px;"></i>
+                                </a>
+                            </div>
+                            <div class="accordion-collapse collapse" id="collapseFAQTwo" data-bs-parent="#accordion_faq">
+                                <p style="padding:18px 24px; font-size:15px; line-height:1.6; color:#555; background-color: #fff; margin-bottom: 0;">
+                                    Yes! The Pro module overrides the parts selector line, filtering the available items list based on the target Brand and Model configurations of the device. Technicians are restricted to compatible parts, minimizing repair mistakes.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="mb-3" style="border: 1px solid #f0f2f5; border-radius: 12px;">
+                            <div class="card-header collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFAQThree" aria-expanded="false" aria-controls="collapseFAQThree" style="cursor: pointer; background-color:#fdfdfd; padding: 18px 24px; border-radius: 12px;">
+                                <a class="card-title text-decoration-none" style="font-size:16px; font-weight:600; color:#040f3a; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>What reports are generated, and in what format?</span>
+                                    <i class="fa fa-chevron-down text-muted" style="font-size: 12px;"></i>
+                                </a>
+                            </div>
+                            <div class="accordion-collapse collapse" id="collapseFAQThree" data-bs-parent="#accordion_faq">
+                                <p style="padding:18px 24px; font-size:15px; line-height:1.6; color:#555; background-color: #fff; margin-bottom: 0;">
+                                    The Pro module includes Complaint Type, Mobile Parts, and Mobile Service reports. All three reports can be generated as traditional PDF summaries or as fully formatted Excel (XLSX) spreadsheets that stream directly to your downloads.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Releases -->
+                <div class="tab-pane fade" id="releases" role="tabpanel" aria-labelledby="releases-tab">
+                    <div class="row pt-4">
+                        <div class="col-md-3">
+                            <h5 style="font-size:16px; font-weight:700; color:#121212; margin:0;">
+                                Version 19.0.1.0.0
+                            </h5>
+                            <span class="text-muted" style="font-size:13px; display:block; margin-top: 4px;">
+                                 July 2026
+                            </span>
+                        </div>
+                        <div class="col-md-9">
+                            <div style="padding-bottom:30px">
+                                <span class="badge bg-success mb-2">Release Highlights</span>
+                                <ul class="text-muted pl-3" style="font-size: 15px; line-height: 1.6;">
+                                    <li>Initial commit of Mobile Service Management Pro for Odoo 19.</li>
+                                    <li>Migration to the modern ImeiCheck.com API endpoints.</li>
+                                    <li>Addition of local timezone-aware ticket timestamps.</li>
+                                    <li>Fully integrated custom Odoo 19 JS action managers for in-memory XLSX report downloads.</li>
+                                    <li>Introduction of PostgreSQL-view backed Pivot tables and Graph analysis.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cybrosys Services / Odoo Partner Info -->
+        <section id="services" class="mt-5" style="border-radius: 20px; border: 1px solid #eef0f5; background: #FFF; padding: 60px 40px; box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.03);">
+            <div class="text-center mb-5">
+                <h3 class="mb-0" style="color: #000; font-size: 32px; font-weight: 800; text-transform: uppercase;">
+                    Our Professional Services
+                </h3>
+                <p class="text-muted">Cybrosys is a trusted Odoo Gold Partner, providing end-to-end support for your business needs.</p>
+            </div>
+            <div class="row mt-3">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="p-4 mb-2 d-flex flex-column justify-content-center align-items-center text-center" style="background-color:#FFE2E5; gap: 12px; border-radius: 12px; height: 180px;">
+                        <div class="d-flex justify-content-center align-items-center" style="background-color:#FA5A7D; border-radius:50%; height:48px; width:48px">
+                            <img src="./assets/icons/gear.svg" class="img-responsive" height="24px" width="24px">
+                        </div>
+                        <span style="font-size: 16px; color: var(--text-color); font-weight: 700;">Odoo Customization</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="p-4 mb-2 d-flex flex-column justify-content-center align-items-center text-center" style="background-color:#FFF4DE; gap: 12px; border-radius: 12px; height: 180px;">
+                        <div class="d-flex justify-content-center align-items-center" style="background-color:#FF947A; border-radius:50%; height:48px; width:48px">
+                            <img src="./assets/icons/wrench-icon.svg" class="img-responsive" height="24px" width="24px">
+                        </div>
+                        <span style="font-size: 16px; color: var(--text-color); font-weight: 700;">Odoo Implementation</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="p-4 mb-2 d-flex flex-column justify-content-center align-items-center text-center" style="background-color:#DCFCE7; gap: 12px; border-radius: 12px; height: 180px;">
+                        <div class="d-flex justify-content-center align-items-center" style="background-color:#3CD856; border-radius:50%; height:48px; width:48px">
+                            <img src="./assets/icons/life-ring-icon.svg" class="img-responsive" height="24px" width="24px">
+                        </div>
+                        <span style="font-size: 16px; color: var(--text-color); font-weight: 700;">Odoo Support</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="p-4 mb-2 d-flex flex-column justify-content-center align-items-center text-center" style="background-color:#F3E8FF; gap: 12px; border-radius: 12px; height: 180px;">
+                        <div class="d-flex justify-content-center align-items-center" style="background-color:#BF83FF; border-radius:50%; height:48px; width:48px">
+                            <img src="./assets/icons/arrows-repeat.svg" class="img-responsive" height="24px" width="24px">
+                        </div>
+                        <span style="font-size: 16px; color: var(--text-color); font-weight: 700;">Odoo Migration</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

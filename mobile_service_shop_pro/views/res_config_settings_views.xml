@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- ================================================================
+         Mobile Service Pro — Settings panel inside Odoo Configuration
+    ================================================================ -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mobile.service.shop.pro</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="65"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='general_settings']" position="after">
+                <app data-string="Mobile Service"
+                     string="Mobile Service"
+                     name="mobile_service_shop_pro"
+                     logo="mobile_service_shop_pro/static/description/icon.png">
+
+                    <block title="IMEI Lookup API — ImeiCheck.com" name="api_settings">
+
+                        <setting id="get_api_details"
+                                 title="Enable IMEI Device Auto-Fill"
+                                 help="When enabled, technicians can enter an IMEI number and click 'Get Details' to automatically populate device brand and model from the ImeiCheck.com database.">
+                            <field name="get_api_details" field_id="get_api_details_0"/>
+                        </setting>
+
+                        <setting id="api_key"
+                                 string="ImeiCheck.com API Key"
+                                 help="Your personal API key from ImeiCheck.com. Contact them via https://imeicheck.com/contact to receive a free key (60 req/min). Leave blank to use the public endpoint.">
+                            <label string="API Key" for="api_key" class="col-md-3 o_light_label"/>
+                            <field name="api_key"
+                                   field_id="api_key_0"
+                                   placeholder="Paste your ImeiCheck.com key here"/>
+                        </setting>
+
+                        <setting id="api_username"
+                                 string="ImeiCheck Username"
+                                 help="Optional username/account name supplied by ImeiCheck.com for some integrations.">
+                            <label string="Username" for="api_username" class="col-md-3 o_light_label"/>
+                            <field name="api_username"
+                                   field_id="api_username_0"
+                                   placeholder="Example: username"/>
+                        </setting>
+
+                        <setting id="api_url_slug"
+                                 string="ImeiCheck URL"
+                                 help="Optional URL or account slug supplied by ImeiCheck.com for some integrations.">
+                            <label string="URL" for="api_url_slug" class="col-md-3 o_light_label"/>
+                            <field name="api_url_slug"
+                                   field_id="api_url_slug_0"/>
+                        </setting>
+
+                        <setting id="api_php_service_id"
+                                 string="ImeiCheck PHP Service ID"
+                                 help="Optional service ID from the PHP LIST page. When set, the module uses the PHP API and avoids the public TAC endpoint.">
+                            <label string="Service ID" for="api_php_service_id" class="col-md-3 o_light_label"/>
+                            <field name="api_php_service_id"
+                                   field_id="api_php_service_id_0"
+                                   placeholder="Example: 11"/>
+                        </setting>
+
+                        <setting id="show_complain_types"
+                                 title="Show Complaints on Service Tickets"
+                                 help="When enabled, complaint types and descriptions are printed on customer-facing service ticket PDFs.">
+                            <field name="show_complain_types" field_id="show_complain_types_0"/>
+                        </setting>
+
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action to open Mobile Service settings directly -->
+    <record id="res_config_settings_action_mobile_service_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'mobile_service_shop_pro'}</field>
+    </record>
+</odoo>

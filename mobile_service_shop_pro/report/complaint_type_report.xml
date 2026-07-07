@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Report action of the report complaint type report-->
+    <record id="action_complaint_type_report" model="ir.actions.report">
+        <field name="name">complaint Type PDF Report</field>
+        <field name="model">complaint.type.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mobile_service_shop_pro.complaint_type_report</field>
+        <field name="report_file">mobile_service_shop_pro.complaint_type_report</field>
+    </record>
+</odoo>

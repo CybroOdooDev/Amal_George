@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- ================================================================
+         Inherited form view of mobile.service
+         - Adds IMEI field, "Get Details" button, device photo, and
+           manufacturer/device_name fields from IMEI lookup
+    ================================================================ -->
+    <record id="mobile_service_view_form" model="ir.ui.view">
+        <field name="name">mobile.service.view.form.inherit.mobile.service.shop.pro</field>
+        <field name="model">mobile.service</field>
+        <field name="inherit_id" ref="mobile_service_shop.mobile_service_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Make brand/model optional (auto-filled from IMEI) -->
+            <xpath expr="//field[@name='brand_name']" position="attributes">
+                <attribute name="required">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='model_name']" position="attributes">
+                <attribute name="required">0</attribute>
+            </xpath>
+
+            <!-- Keep a single IMEI field and place the button directly after it -->
+            <xpath expr="//sheet" position="inside">
+                <field name="active_api" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='imei_no']" position="replace">
+                <label for="imei_no"/>
+                <div class="o_row">
+                    <field name="imei_no"
+                           class="oe_inline"
+                           readonly="service_state not in ['draft']"/>
+                    <button string="Get Details"
+                            type="object"
+                            name="get_device_details"
+                            class="btn btn-primary"
+                            invisible="service_state not in ['draft'] or not active_api"
+                            groups="mobile_service_shop.mobile_service_group_manager"/>
+                </div>
+            </xpath>
+
+            <!-- Manufacturer and device name (before warranty_number) -->
+            <xpath expr="//field[@name='warranty_number']" position="before">
+                <field name="manufacturer"
+                       readonly="service_state not in ['draft']"/>
+                <field name="device_name"
+                       readonly="service_state not in ['draft']"/>
+            </xpath>
+
+            <!-- Device photo alongside address block -->
+            <xpath expr="//div[hasclass('o_address_format')]" position="after">
+                <field name="real_phone_image"
+                       widget="image"
+                       class="oe_avatar"/>
+                <field name="complaint_visibility_status" invisible="1"/>
+            </xpath>
+
+            <!-- Hide complaints tab based on settings -->
+            <xpath expr="//page[2]" position="attributes">
+                <attribute name="invisible">not complaint_visibility_status</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ================================================================
+         List view — replace generic image with real device photo
+    ================================================================ -->
+    <record id="mobile_service_view_tree" model="ir.ui.view">
+        <field name="name">mobile.service.view.tree.inherit.mobile.service.shop.pro</field>
+        <field name="model">mobile.service</field>
+        <field name="inherit_id" ref="mobile_service_shop.mobile_service_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='image_medium']" position="replace">
+                <field name="real_phone_image" widget="image"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

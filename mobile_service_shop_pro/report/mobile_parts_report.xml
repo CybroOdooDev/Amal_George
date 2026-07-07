@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Report action of the report mobile parts report-->
+    <record id="action_mobile_parts_report" model="ir.actions.report">
+        <field name="name">Parts Usage PDF Report</field>
+        <field name="model">mobile.parts.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mobile_service_shop_pro.mobile_parts_report</field>
+        <field name="report_file">mobile_service_shop_pro.mobile_parts_report</field>
+    </record>
+</odoo>

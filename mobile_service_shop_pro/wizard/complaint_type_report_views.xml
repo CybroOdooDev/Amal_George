@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Form view of the model complaint type report-->
+    <record id="complaint_type_report_view_form" model="ir.ui.view">
+        <field name="name">Complaint Type Report View Form</field>
+        <field name="model">complaint.type.report</field>
+        <field name="arch" type="xml">
+            <form string="Stock Report">
+                <group>
+                    <group>
+                        <field name="date_start"/>
+                        <field name="complaint_id"/>
+                    </group>
+                    <group>
+                        <field name="date_end"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="print_pdf_report" string="Print PDF Report"
+                            type="object" class="oe_highlight"/>
+                    <button name="print_xlsx_report" string="Print XLSX Report"
+                            type="object" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!--Action of the model complaint type report-->
+    <record id="complaint_type_report_action" model="ir.actions.act_window">
+        <field name="name">Complaint Type Report</field>
+        <field name="res_model">complaint.type.report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="complaint_type_report_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!--Menu item of the model complaint type report-->
+    <menuitem id="complaint_type_report_menu" name="Complaint Type"
+              action="complaint_type_report_action"
+              parent="mobile_service_report_menu_root" sequence="4"/>
+</odoo>

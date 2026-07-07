@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Menu item to get the mobile service settings from thr configuration-->
+    <menuitem id="res_config_settings_menu_get_mobile_service_settings"
+              name="Settings"
+              parent="mobile_service_shop.mobile_service_menu_configuration"
+              sequence="0"
+              action="res_config_settings_action_mobile_service_settings"/>
+    <!--Changing the menu icon of normal mobile service shop into mobile service shop pro icon-->
+    <menuitem id="mobile_service_shop.mobile_service_shop_menu_root"
+              web_icon="mobile_service_shop_pro,static/description/icon.png"
+              name="Mobile Service Pro" sequence="20"/>
+    <!--Changing the group of menu item as the manager only need to see the Configuration menu-->
+    <menuitem id="mobile_service_shop.mobile_service_menu_configuration"
+              parent="mobile_service_shop.mobile_service_shop_menu_root"
+              name="Configuration" sequence="3"
+              groups="mobile_service_shop.mobile_service_group_manager"/>
+</odoo>

@@ -23,7 +23,7 @@
     'name': 'Odoo Professional Report Templates',
     'version': '19.0.1.0.0',
     'category': 'Sales,Purchases,Accounting,Warehouse',
-    'summary': "Report Templates, Professional Report Templates, Report Customisations, Sale Reports, Purchase Reports, Invoice Reports, Templates, Odoo17, Oodoo Apps",
+    'summary': "Report Templates, Professional Report Templates, Report Customisations, Sale Reports, Purchase Reports, Invoice Reports, Templates, Odoo19, Oodoo Apps",
     'description': "To tailor the presentation of different reports such as "
                    "Sales Orders, Purchase Orders, Invoices, and Delivery "
                    "Orders, the process involves customizing the report "

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pos_kitchen_display.KitchenDisplay">
+        <div class="o_kitchen_display_container">
+            <!-- Sleek Top Header -->
+            <header class="kd_header">
+                <div class="kd_header_left">
+                    <span class="kd_logo_icon">🍳</span>
+                    <div>
+                        <h1 class="kd_title">Kitchen Display</h1>
+                        <p class="kd_subtitle">Live Order Management Dashboard</p>
+                    </div>
+                </div>
+                
+                <div class="kd_header_center">
+                    <!-- Filters with Counters -->
+                    <div class="kd_filters">
+                        <button t-attf-class="kd_filter_btn #{state.activeFilter === 'all' ? 'active' : ''}" t-on-click="() => this.setFilter('all')">
+                            All <span class="kd_badge bg-secondary"><t t-out="countAll"/></span>
+                        </button>
+                        <button t-attf-class="kd_filter_btn #{state.activeFilter === 'to_cook' ? 'active' : ''}" t-on-click="() => this.setFilter('to_cook')">
+                            To Cook <span class="kd_badge bg-danger"><t t-out="countToCook"/></span>
+                        </button>
+                        <button t-attf-class="kd_filter_btn #{state.activeFilter === 'ready' ? 'active' : ''}" t-on-click="() => this.setFilter('ready')">
+                            Ready <span class="kd_badge bg-success"><t t-out="countReady"/></span>
+                        </button>
+                        <button t-attf-class="kd_filter_btn #{state.activeFilter === 'completed' ? 'active' : ''}" t-on-click="() => this.setFilter('completed')">
+                            Completed <span class="kd_badge bg-secondary"><t t-out="countCompleted"/></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="kd_header_right">
+                    <button class="kd_close_btn" t-on-click="closeDisplay" title="Close Kitchen Display">
+                        ✕ Close
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Dashboard Board -->
+            <main class="kd_main">
+                <t t-if="!state.isLoaded">
+                    <div class="kd_loading">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <span class="ms-2">Loading Orders...</span>
+                    </div>
+                </t>
+                <t t-else="">
+                    <t t-if="filteredOrders.length === 0">
+                        <div class="kd_empty_state">
+                            <span class="kd_empty_icon">🍽️</span>
+                            <h3>No Orders Active</h3>
+                            <p>Everything is currently prepared and served. Great job!</p>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="kd_grid">
+                            <t t-foreach="filteredOrders" t-as="order" t-key="order.id">
+                                <div t-attf-class="kd_card state-#{order.state}">
+                                    <div class="kd_card_header">
+                                        <div class="kd_card_title_row">
+                                            <span class="kd_order_ref" t-out="order.name"/>
+                                            <span t-attf-class="kd_state_label state-#{order.state}">
+                                                <t t-if="order.state === 'draft' || order.state === 'progress'">To Cook</t>
+                                                <t t-elif="order.state === 'ready'">Ready</t>
+                                                <t t-elif="order.state === 'done'">Completed</t>
+                                            </span>
+                                        </div>
+                                        <div class="kd_card_meta_row">
+                                            <span class="kd_table_name" t-out="order.table"/>
+                                            <t t-if="order.shop_name">
+                                                <span class="kd_shop_name" t-out="order.shop_name"/>
+                                            </t>
+                                        </div>
+                                        
+                                        <!-- Order Progress Bar -->
+                                        <div class="kd_progress_container">
+                                            <div class="kd_progress_bar" t-attf-style="width: #{getOrderProgress(order)}%"></div>
+                                            <span class="kd_progress_text"><t t-out="getOrderProgress(order)"/>%</span>
+                                        </div>
+                                    </div>
+                                    <div class="kd_card_body">
+                                        <ul class="kd_item_list">
+                                            <t t-foreach="order.items" t-as="item" t-key="item.id">
+                                                <li t-attf-class="kd_item #{item.is_completed ? 'kd_item_completed' : ''}">
+                                                    <div class="kd_item_line">
+                                                        <!-- Checkmark only for active (non-completed) orders -->
+                                                        <t t-if="order.state !== 'done'">
+                                                            <span t-attf-class="kd_check_btn #{item.is_completed ? 'completed' : ''}" t-on-click="() => this.toggleItemCompletion(order, item)">
+                                                                ✓
+                                                            </span>
+                                                        </t>
+                                                        <span class="kd_item_qty" t-out="item.qty"/>
+                                                        <span class="kd_item_name" t-out="item.name"/>
+                                                    </div>
+                                                    <t t-if="item.note">
+                                                        <div class="kd_item_note">⚠️ <t t-out="item.note"/></div>
+                                                    </t>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                    <!-- Served button for completed (done) state — dismisses card -->
+                                    <t t-if="order.state === 'done'">
+                                        <div class="kd_card_footer">
+                                            <button class="kd_action_btn btn-served" t-on-click="() => this.dismissOrder(order)">
+                                                ✓ Serve
+                                            </button>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </t>
+            </main>
+        </div>
+    </t>
+</templates>

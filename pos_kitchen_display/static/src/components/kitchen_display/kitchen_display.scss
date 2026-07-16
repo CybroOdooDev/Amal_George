@@ -1,0 +1,538 @@
+.o_kitchen_display_container {
+    background-color: #f1f5f9; /* Slate 100 */
+    color: #1e293b; /* Slate 800 */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Minimal Light Header */
+.kd_header {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.kd_header_left {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.kd_logo_icon {
+    font-size: 1.8rem;
+}
+
+.kd_title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: #0f172a;
+}
+
+.kd_subtitle {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Minimal Filters */
+.kd_filters {
+    display: flex;
+    background: #f8fafc;
+    padding: 0.2rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.kd_filter_btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.15s ease;
+}
+
+.kd_filter_btn:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+
+.kd_filter_btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #cbd5e1;
+}
+
+.kd_badge {
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+/* Sound Button & Clock */
+.kd_sound_btn {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.kd_sound_btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.kd_header_right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.kd_clock {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f172a;
+    background: #f8fafc;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Main Dashboard area */
+.kd_main {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.kd_loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    font-size: 1.1rem;
+    color: #64748b;
+}
+
+.kd_empty_state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    text-align: center;
+}
+
+.kd_empty_icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.kd_empty_state h3 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #334155;
+}
+
+.kd_empty_state p {
+    color: #64748b;
+}
+
+/* Grid Layout */
+.kd_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    align-items: start;
+}
+
+/* Minimal Card Styling */
+.kd_card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kd_card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Left Accent border instead of top accent for a very clean minimal look */
+.kd_card.state-draft {
+    border-left: 5px solid #ef4444;
+}
+
+.kd_card.state-progress {
+    border-left: 5px solid #f59e0b;
+}
+
+.kd_card.state-ready {
+    border-left: 5px solid #10b981;
+}
+
+.kd_card.state-done {
+    border-left: 5px solid #64748b;
+}
+
+/* Card Header */
+.kd_card_header {
+    padding: 1rem;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.kd_card_title_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.kd_order_ref {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.kd_state_label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+}
+
+.kd_state_label.state-draft {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.kd_state_label.state-progress {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.kd_state_label.state-ready {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.kd_state_label.state-done {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.kd_card_meta_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kd_table_name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.kd_shop_name {
+    font-size: 0.8rem;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+}
+
+.kd_timer {
+    font-size: 0.8rem;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+}
+
+.kd_timer.warning {
+    color: #b91c1c;
+    background: #fee2e2;
+    border-color: #fecaca;
+}
+
+/* Card Body */
+.kd_card_body {
+    padding: 1rem;
+    flex-grow: 1;
+}
+
+.kd_item_list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.kd_item {
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.5rem;
+}
+
+.kd_item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.kd_item_line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+}
+
+.kd_item_qty {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2563eb;
+    background: #eff6ff;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    flex-shrink: 0;
+    border: 1px solid #dbeafe;
+}
+
+.kd_item_name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.kd_item_note {
+    font-size: 0.75rem;
+    color: #b45309;
+    background: #fffbeb;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    margin-top: 0.3rem;
+    border-left: 2px solid #f59e0b;
+}
+
+/* Header right actions */
+.kd_header_right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.kd_toggle_btn {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.kd_toggle_btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+.kd_toggle_btn.active {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1d4ed8;
+}
+
+/* Custom Checkbox Button */
+.kd_check_btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #cbd5e1;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: transparent;
+    transition: all 0.15s ease;
+    user-select: none;
+    flex-shrink: 0;
+    margin-right: 0.2rem;
+}
+
+.kd_check_btn:hover {
+    border-color: #94a3b8;
+}
+
+.kd_check_btn.completed {
+    background-color: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+/* Completed Items (Struck through and Faded) */
+.kd_item_completed .kd_item_name {
+    text-decoration: line-through;
+    opacity: 0.45;
+}
+
+.kd_item_completed .kd_item_qty {
+    opacity: 0.35;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #64748b;
+    text-decoration: line-through;
+}
+
+/* Progress Bar Container */
+.kd_progress_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-top: 0.4rem;
+    background: #e2e8f0;
+    height: 6px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.kd_progress_bar {
+    background: linear-gradient(90deg, #10b981, #34d399);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.kd_progress_text {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 0.05rem 0.25rem;
+    border-radius: 4px;
+    position: absolute;
+    right: 4px;
+    top: -16px;
+}
+
+/* Serve button in card footer */
+.kd_card_footer {
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+}
+
+.kd_action_btn {
+    width: 100%;
+    border: 1px solid transparent;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.kd_action_btn:active {
+    transform: scale(0.98);
+}
+
+.btn-serve {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+.btn-serve:hover {
+    background: #2563eb;
+}
+
+.btn-served {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.btn-served:hover {
+    background: #059669;
+}
+
+.kd_close_btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.kd_close_btn:hover {
+    background: #dc2626;
+}
+
+.kd_close_btn:active {
+    transform: scale(0.95);
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Custom Client Action for Kitchen Display -->
+    <record id="action_pos_kitchen_display_client" model="ir.actions.client">
+        <field name="name">Kitchen Display</field>
+        <field name="tag">pos_kitchen_display.kitchen_display</field>
+    </record>
+
+    <!-- Menu Item for Kitchen Display -->
+    <menuitem id="menu_pos_kitchen_display"
+        name="Kitchen Display"
+        parent="point_of_sale.menu_point_root"
+        action="action_pos_kitchen_display_client"
+        sequence="25"/>
+</odoo>

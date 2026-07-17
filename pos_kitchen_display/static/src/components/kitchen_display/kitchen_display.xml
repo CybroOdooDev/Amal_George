@@ -56,10 +56,15 @@
                     <t t-else="">
                         <div class="kd_grid">
                             <t t-foreach="filteredOrders" t-as="order" t-key="order.id">
-                                <div t-attf-class="kd_card state-#{order.state}">
+                                <div t-attf-class="kd_card state-#{order.state} #{order.is_cancelled ? 'order-cancelled-alert' : ''}">
                                     <div class="kd_card_header">
                                         <div class="kd_card_title_row">
-                                            <span class="kd_order_ref" t-out="order.name"/>
+                                            <span class="kd_order_ref">
+                                                <t t-if="order.is_cancelled">
+                                                    <span class="text-danger fw-bold me-1" title="POS Order Cancelled/Deleted">⚠️</span>
+                                                </t>
+                                                <t t-out="order.name"/>
+                                            </span>
                                             <span t-attf-class="kd_state_label state-#{order.state}">
                                                 <t t-if="order.state === 'draft' || order.state === 'progress'">To Cook</t>
                                                 <t t-elif="order.state === 'ready'">Ready</t>
@@ -100,14 +105,19 @@
                                             </t>
                                         </ul>
                                     </div>
-                                    <!-- Served button for completed (done) state — dismisses card -->
-                                    <t t-if="order.state === 'done'">
-                                        <div class="kd_card_footer">
+                                    <!-- Card Actions -->
+                                    <div class="kd_card_footer">
+                                        <t t-if="order.is_cancelled">
+                                            <button class="kd_action_btn btn-served bg-danger border-0 text-white w-100 py-2 d-flex align-items-center justify-content-center gap-1" t-on-click="() => this.dismissOrder(order)" style="hover: { background: #dc2626 }">
+                                                ✕ Dismiss Cancelled Order
+                                            </button>
+                                        </t>
+                                        <t t-elif="order.state === 'done'">
                                             <button class="kd_action_btn btn-served" t-on-click="() => this.dismissOrder(order)">
                                                 ✓ Serve
                                             </button>
-                                        </div>
-                                    </t>
+                                        </t>
+                                    </div>
                                 </div>
                             </t>
                         </div>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence for Restaurant Booking ID -->
+    <record id="seq_restaurant_booking" model="ir.sequence">
+        <field name="name">Restaurant Booking ID</field>
+        <field name="code">restaurant.booking</field>
+        <field name="prefix">BK</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Action for Restaurant Booking -->
+    <record id="action_restaurant_booking" model="ir.actions.act_window">
+        <field name="name">Bookings</field>
+        <field name="res_model">restaurant.booking</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first table booking!
+            </p>
+            <p>
+                Manage table bookings and reservations for your restaurant floors.
+            </p>
+        </field>
+    </record>
+
+    <!-- List (Tree) View -->
+    <record id="view_restaurant_booking_tree" model="ir.ui.view">
+        <field name="name">restaurant.booking.list</field>
+        <field name="model">restaurant.booking</field>
+        <field name="arch" type="xml">
+            <list string="Table Bookings" default_order="booking_date desc">
+                <field name="name" string="Booking ID"/>
+                <field name="booking_date"/>
+                <field name="partner_id"/>
+                <field name="phone"/>
+                <field name="table_id"/>
+                <field name="guests"/>
+                <field name="shop_name"/>
+                <field name="state" widget="badge" decoration-warning="state == 'pending'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_restaurant_booking_form" model="ir.ui.view">
+        <field name="name">restaurant.booking.form</field>
+        <field name="model">restaurant.booking</field>
+        <field name="arch" type="xml">
+            <form string="Table Booking">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'pending'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state == 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,confirmed,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="phone"/>
+                        </group>
+                        <group>
+                            <field name="booking_date"/>
+                            <field name="table_id"/>
+                            <field name="guests"/>
+                            <field name="shop_name" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Pre-ordered Products" name="booking_lines">
+                            <field name="booking_line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_restaurant_booking_search" model="ir.ui.view">
+        <field name="name">restaurant.booking.search</field>
+        <field name="model">restaurant.booking</field>
+        <field name="arch" type="xml">
+            <search string="Search Table Bookings">
+                <field name="name" string="Booking ID"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="phone"/>
+                <field name="table_id"/>
+                <field name="shop_name"/>
+                <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <group>
+                    <filter string="Table" name="group_by_table" context="{'group_by': 'table_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'booking_date'}"/>
+                    <filter string="Stage" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Shop" name="group_by_shop" context="{'group_by': 'shop_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Menu Item for Restaurant Bookings -->
+    <menuitem id="menu_restaurant_booking"
+        name="Bookings"
+        parent="point_of_sale.menu_point_root"
+        action="action_restaurant_booking"
+        sequence="26"/>
+
+    <!-- Client Action for Pending Bookings Screen -->
+    <record id="action_restaurant_booking_display_client" model="ir.actions.client">
+        <field name="name">Pending Bookings Display</field>
+        <field name="tag">pos_kitchen_display.booking_display</field>
+        <field name="target">main</field>
+    </record>
+</odoo>

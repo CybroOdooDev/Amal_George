@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_kitchen_display.BookingDisplay">
+        <div class="booking-display-main d-flex flex-column h-100 bg-light">
+            <!-- HEADER -->
+            <header class="d-flex align-items-center justify-content-between px-4 py-3 bg-white border-bottom shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-outline-secondary btn-icon d-flex align-items-center justify-content-center" t-on-click="closeDisplay" title="Back to POS">
+                        <i class="fa fa-chevron-left me-2"/>
+                        <span>Back to POS</span>
+                    </button>
+                    <h3 class="mb-0 text-dark fw-bold">
+                        <i class="fa fa-calendar me-2 text-primary"/>
+                        <t t-if="state.currentTab === 'pending'">Pending Bookings</t>
+                        <t t-else="">Confirmed Bookings</t>
+                    </h3>
+                </div>
+
+                <!-- TABS FOR NAVIGATION -->
+                <div class="d-flex bg-light p-1 rounded border">
+                    <button class="btn btn-sm px-3 py-1-5 fw-semibold d-flex align-items-center gap-1 transition" 
+                            t-att-class="state.currentTab === 'pending' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary border-0'" 
+                            t-on-click="() => this.switchTab('pending')">
+                        <i class="fa fa-clock-o"/>
+                        <span>Pending</span>
+                    </button>
+                    <button class="btn btn-sm px-3 py-1-5 fw-semibold d-flex align-items-center gap-1 transition" 
+                            t-att-class="state.currentTab === 'confirmed' ? 'btn-primary text-white shadow-sm' : 'btn-light text-secondary border-0'" 
+                            t-on-click="() => this.switchTab('confirmed')">
+                        <i class="fa fa-check-circle"/>
+                        <span>Confirmed</span>
+                    </button>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge fs-6 px-3 py-2 rounded-pill" t-att-class="state.currentTab === 'pending' ? 'bg-warning text-dark' : 'bg-success text-white'">
+                        <t t-out="state.bookings.length"/> <t t-out="state.currentTab === 'pending' ? 'Pending' : 'Confirmed'"/>
+                    </span>
+                </div>
+            </header>
+
+            <!-- CARD CONTENT CONTAINER -->
+            <main class="flex-grow-1 overflow-auto p-4">
+                <!-- Loader state -->
+                <div t-if="!state.isLoaded" class="d-flex flex-column align-items-center justify-content-center h-100 py-5">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="text-muted">Loading bookings...</span>
+                </div>
+
+                <!-- Empty State -->
+                <div t-elif="state.bookings.length === 0" class="d-flex flex-column align-items-center justify-content-center h-100 text-center py-5">
+                    <div class="empty-icon-wrapper mb-3 shadow-sm" t-att-class="state.currentTab === 'pending' ? 'bg-success-light' : 'bg-primary-light'">
+                        <i t-att-class="state.currentTab === 'pending' ? 'fa fa-calendar-check-o text-success' : 'fa fa-calendar-times-o text-primary'"/>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-2">No Bookings Found</h4>
+                    <p class="text-muted max-width-350">
+                        <t t-if="state.currentTab === 'pending'">There are no pending table bookings to confirm or cancel right now.</t>
+                        <t t-else="">There are no confirmed table bookings in the system yet.</t>
+                    </p>
+                </div>
+
+                <!-- Cards Grid -->
+                <div t-else="" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                    <t t-foreach="state.bookings" t-as="booking" t-key="booking.id">
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm booking-pending-card">
+                                <!-- Card Header -->
+                                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+                                    <h5 class="card-title mb-0 text-truncate fw-bold text-dark" style="max-width: 140px;" t-out="booking.customer_name" t-att-title="booking.customer_name"/>
+                                    <span class="badge bg-secondary text-dark rounded-pill px-2 py-1">
+                                        <i class="fa fa-users me-1"/> <t t-out="booking.guests"/>
+                                    </span>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="card-body py-3 d-flex flex-column justify-content-between">
+                                    <div class="booking-card-info mb-3">
+                                        <div t-if="booking.phone" class="text-muted small mb-2">
+                                            <i class="fa fa-phone me-2 text-primary"/> <t t-out="booking.phone"/>
+                                        </div>
+                                        <div class="text-muted small mb-2">
+                                            <i class="fa fa-clock-o me-2 text-primary"/> <t t-out="booking.booking_date"/>
+                                        </div>
+                                        <div class="text-muted small mb-2">
+                                            <i class="fa fa-table me-2 text-primary"/> <strong>Table:</strong> <t t-out="booking.table_name"/>
+                                        </div>
+                                        <div t-if="booking.shop_name" class="text-muted small mb-2">
+                                            <i class="fa fa-home me-2 text-primary"/> <strong>Shop:</strong> <t t-out="booking.shop_name"/>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pre-order Products -->
+                                    <div class="booking-card-products border-top pt-2">
+                                        <div class="text-muted small fw-bold mb-2">Pre-ordered Products:</div>
+                                        <div t-if="booking.items.length === 0" class="text-muted small italic">No products pre-ordered.</div>
+                                        <ul t-else="" class="list-unstyled mb-0">
+                                            <t t-foreach="booking.items" t-as="item" t-key="item.product_name">
+                                                <li class="d-flex justify-content-between small py-1 border-bottom-dashed">
+                                                    <span class="text-dark fw-semibold text-truncate me-2" style="max-width: 150px;" t-out="item.product_name"/>
+                                                    <span class="text-muted">x<t t-out="item.qty"/></span>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Card Footer Actions -->
+                                <div class="card-footer bg-white border-top-0 d-flex gap-2 p-3">
+                                    <t t-if="state.currentTab === 'pending'">
+                                        <button class="btn btn-outline-danger flex-grow-1 d-flex align-items-center justify-content-center py-2" t-on-click="() => this.cancelBooking(booking)">
+                                            <i class="fa fa-times me-2"/> Cancel
+                                        </button>
+                                        <button class="btn btn-success flex-grow-1 d-flex align-items-center justify-content-center text-white py-2" t-on-click="() => this.confirmBooking(booking)">
+                                            <i class="fa fa-check me-2"/> Confirm
+                                        </button>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="w-100 d-flex flex-column gap-2">
+                                            <div class="w-100 text-center text-success py-1 fw-bold border rounded bg-success-light small">
+                                                <i class="fa fa-check-circle me-1"/> Confirmed
+                                            </div>
+                                            <button class="btn btn-sm btn-link text-danger w-100 text-center" t-on-click="() => this.cancelBooking(booking)">
+                                                Cancel Reservation
+                                            </button>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </main>
+        </div>
+    </t>
+</templates>

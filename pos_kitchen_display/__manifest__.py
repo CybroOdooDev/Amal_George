@@ -41,14 +41,22 @@ This module provides a kitchen screen/display interface for Point of Sale orders
     'data': [
         'security/ir.model.access.csv',
         'views/pos_kitchen_screen_views.xml',
+        'views/restaurant_booking_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'pos_kitchen_display/static/src/components/kitchen_display/kitchen_display.js',
             'pos_kitchen_display/static/src/components/kitchen_display/kitchen_display.xml',
             'pos_kitchen_display/static/src/components/kitchen_display/kitchen_display.scss',
+            'pos_kitchen_display/static/src/components/booking_display/booking_display.js',
+            'pos_kitchen_display/static/src/components/booking_display/booking_display.xml',
+            'pos_kitchen_display/static/src/components/booking_display/booking_display.scss',
+        ],
+        'point_of_sale._assets_pos': [
+            'pos_kitchen_display/static/src/pos/**/*',
         ],
     },
+
 
     'installable': True,
     'application': True,

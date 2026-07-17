@@ -1,0 +1,64 @@
+.booking-display-main {
+    height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    .empty-icon-wrapper {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+    }
+
+    .max-width-350 {
+        max-width: 350px;
+    }
+
+    .booking-pending-card {
+        border-radius: 12px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        overflow: hidden;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+        }
+    }
+
+    .border-bottom-dashed {
+        border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    }
+
+    .bg-success-light {
+        background-color: #e8f5e9 !important;
+        border-color: #c8e6c9 !important;
+    }
+
+    .bg-primary-light {
+        background-color: #e3f2fd !important;
+        border-color: #bbdefb !important;
+    }
+
+    .bg-success-light.empty-icon-wrapper {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .bg-primary-light.empty-icon-wrapper {
+        background-color: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .transition {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .py-1-5 {
+        padding-top: 0.375rem !important;
+        padding-bottom: 0.375rem !important;
+    }
+}

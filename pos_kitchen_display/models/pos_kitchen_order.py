@@ -37,6 +37,8 @@ class PosKitchenOrder(models.Model):
     table_name = fields.Char(string='Table')
     shop_name = fields.Char(string='Shop/POS Config Name')
     line_ids = fields.One2many('pos.kitchen.order.line', 'order_id', string='Order Lines')
+    is_cancelled = fields.Boolean(string='Is POS Order Cancelled', default=False)
+    pos_order_id = fields.Many2one('pos.order', string='POS Order', ondelete='set null')
 
 
 class PosKitchenOrderLine(models.Model):
@@ -59,12 +61,13 @@ class PosOrder(models.Model):
     def create(self, vals_list):
         orders = super(PosOrder, self).create(vals_list)
         for order in orders:
-            # Only create kitchen orders for restaurant POS configurations with active floors
-            if order.config_id.module_pos_restaurant and order.config_id.floor_ids:
+            # Only create kitchen orders for restaurant POS configurations with active floors and if there are lines/products
+            if order.config_id.module_pos_restaurant and order.config_id.floor_ids and order.lines:
                 kitchen_order = self.env['pos.kitchen.order'].create({
-                    'name': order.name or order.pos_reference,
+                    'name': order.name or order.pos_reference or '/',
                     'table_name': order.table_id.display_name or 'Takeaway',
                     'shop_name': order.config_id.name,
+                    'pos_order_id': order.id,
                 })
                 for line in order.lines:
                     self.env['pos.kitchen.order.line'].create({
@@ -74,3 +77,20 @@ class PosOrder(models.Model):
                         'note': line.customer_note or line.note or '',
                     })
         return orders
+
+    def action_pos_order_cancel(self):
+        res = super(PosOrder, self).action_pos_order_cancel()
+        kitchen_orders = self.env['pos.kitchen.order'].search([
+            ('pos_order_id', 'in', self.ids)
+        ])
+        if kitchen_orders:
+            kitchen_orders.write({'is_cancelled': True})
+        return res
+
+    def unlink(self):
+        kitchen_orders = self.env['pos.kitchen.order'].search([
+            ('pos_order_id', 'in', self.ids)
+        ])
+        if kitchen_orders:
+            kitchen_orders.write({'is_cancelled': True})
+        return super(PosOrder, self).unlink()

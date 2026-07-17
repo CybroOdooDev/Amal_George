@@ -20,3 +20,5 @@
 #
 
 from . import pos_kitchen_order
+from . import restaurant_booking
+

@@ -51,14 +51,14 @@ class KitchenDisplay extends Component {
             const activeRecords = await this.orm.searchRead(
                 "pos.kitchen.order",
                 [["state", "!=", "done"]],
-                ["name", "state", "table_name", "shop_name", "create_date"]
+                ["name", "state", "table_name", "shop_name", "create_date", "is_cancelled"]
             );
             
             // Fetch recent completed orders
             const completedRecords = await this.orm.searchRead(
                 "pos.kitchen.order",
                 [["state", "=", "done"]],
-                ["name", "state", "table_name", "shop_name", "create_date"],
+                ["name", "state", "table_name", "shop_name", "create_date", "is_cancelled"],
                 { order: "id desc", limit: 30 }
             );
 
@@ -97,9 +97,10 @@ class KitchenDisplay extends Component {
                         shop_name: rec.shop_name || "",
                         createdTime: createdTime,
                         elapsedMinutes: Math.max(0, Math.floor((new Date() - createdTime) / 60000)),
-                        items: linesByOrderId[rec.id] || []
+                        items: linesByOrderId[rec.id] || [],
+                        is_cancelled: rec.is_cancelled || false
                     };
-                });
+                }).filter(order => order.items.length > 0);
             } else {
                 this.state.orders = [];
             }

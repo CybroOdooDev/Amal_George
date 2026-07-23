@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_product_product_form" model="ir.ui.view">
+        <field name="name">view.product.form.inherited</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <group>
+                    <field name="attribute_idd"/>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='attribute_line_ids']/list/field[@name='value_ids']" position="after">
+                <button name="save_preset" string="Save Preset" type="object"/>
+                <field name="attribute_idd"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem id="menu_saved_attributes" name="Saved Attributes" parent="stock.menu_stock_inventory_control" action="action_saved_attributes"/>
+</odoo>

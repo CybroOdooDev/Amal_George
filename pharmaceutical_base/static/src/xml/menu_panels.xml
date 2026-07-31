@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates id="template" xml:space="preserve">
+    <!--
+        Tag the navbar only while the Pharmaceutical ERP app is active, so the
+        brand logo can be swapped to icon2.png for THIS app alone (see
+        backend_theme.scss). Other apps keep their own icon; icon.png stays the
+        app icon in the apps menu / home grid / sidebar tray.
+        Patched on web.NavBar (extension) — this propagates into the Enterprise
+        navbar via its primary inheritance, and is a no-op on Community.
+    -->
+    <t t-inherit="web.NavBar" t-inherit-mode="extension" owl="1">
+        <xpath expr="//nav[hasclass('o_main_navbar')]" position="attributes">
+            <attribute name="t-att-class">{ 'o_pharma_navbar_brand': currentApp and currentApp.xmlid === 'pharmaceutical_base.menu_pharma_quality_root' }</attribute>
+        </xpath>
+    </t>
+
+    <!--  Apps Menu Button Override  -->
+    <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('o_navbar_apps_menu')]" position="replace">
+            <t t-if="!isScopedApp">
+                <button data-hotkey="h" title="Home Menu"
+                        class="o_navbar_apps_menu pharma-back-btn"
+                        t-on-click="_onClickMenusPanel"
+                        style="background-color: transparent; border: transparent; padding: 5px 10px;">
+                    <i class="fa fa-arrow-left"
+                       style="font-size: 20px; color: #ffffff !important;"/>
+                </button>
+            </t>
+        </xpath>
+    </t>
+</templates>

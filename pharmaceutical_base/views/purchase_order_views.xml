@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ─── purchase.order — restrict PO / RFQ lines to lot-tracked products ──
+         Pharma baseline: on a Purchase Order / RFQ only lot-tracked products may
+         be ordered. This is the filter that applies when the optional
+         pharma_vendor_qualification module is NOT installed.
+
+         When pharma_vendor_qualification IS installed it layers the approved-AVL
+         restriction on top of this (its view loads after this one and overrides
+         the order-line product domain with the vendor/AVL filter), mirroring how
+         the BOM component filter is layered in mrp_bom_views.xml. -->
+    <record id="purchase_order_form_pharma_tracking" model="ir.ui.view">
+        <field name="name">purchase.order.form.pharma.tracking</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//field[@name='product_id']" position="attributes">
+                <attribute name="domain">[('tracking', '=', 'lot')]</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

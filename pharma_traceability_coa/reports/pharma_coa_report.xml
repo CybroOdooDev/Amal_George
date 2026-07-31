@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_pharma_coa" model="ir.actions.report">
+        <field name="name">Certificate of Analysis</field>
+        <field name="model">pharma.coa</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pharma_traceability_coa.report_pharma_coa_document</field>
+        <field name="report_file">pharma_traceability_coa.report_pharma_coa_document</field>
+        <field name="print_report_name">'CoA - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_pharma_coa"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Defines the strictly compliant QWeb HTML structure for the official Certificate of Analysis PDF report. -->
+    <template id="report_pharma_coa_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
+                            .page h2 { font-size: 1.5rem; margin-bottom: 24px; }
+                            .page h4 {
+                                font-size: 1.1rem;
+                                margin-top: 8px;
+                                margin-bottom: 16px;
+                                padding-bottom: 6px;
+                                border-bottom: 1px solid #dddddd;
+                            }
+                            /* Breathing room between fields laid out in rows.
+                               wkhtmltopdf's old WebKit ignores flex `gap`, so the
+                               columns are laid out as a fixed grid and separated
+                               with padding/margin, which it renders reliably. */
+                            .page #informations,
+                            .page .row {
+                                display: block;
+                                margin-left: 0;
+                                margin-right: 0;
+                            }
+                            .page .row > [class*="col"] {
+                                display: inline-block;
+                                vertical-align: top;
+                                width: 31%;
+                                box-sizing: border-box;
+                                padding-right: 24px;
+                                padding-bottom: 12px;
+                                margin: 0;
+                            }
+                            /* Small gap between each field label and its value */
+                            .page #informations p.m-0,
+                            .page .row p.m-0 { margin-top: 3px !important; }
+                            /* Roomier, more legible result tables */
+                            .page table.table { margin-top: 12px; margin-bottom: 10px; }
+                            .page table.table th { padding: 9px 10px; }
+                            .page table.table td { padding: 8px 10px; }
+                            /* More space around section dividers */
+                            .page hr { margin-top: 20px !important; margin-bottom: 20px !important; }
+                        </style>
+
+                        <h2 class="mt-4">
+                            <span t-if="o.name">Certificate of Analysis #<span t-field="o.name"/></span>
+                            <span t-else="">Certificate of Analysis</span>
+                        </h2>
+
+                        <div id="informations" class="row mt-4 mb-4">
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Release Date:</strong>
+                                <p class="m-0" t-field="o.release_date"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Released By:</strong>
+                                <p class="m-0" t-field="o.released_by.name"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Batch Number:</strong>
+                                <p class="m-0" t-field="o.batch_id.name"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Lot Number:</strong>
+                                <p class="m-0" t-field="o.lot_id.name"/>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 mb-3">
+                            <h4 style="font-weight: bold;">PRODUCT INFORMATION</h4>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Product Name:</strong>
+                                <p class="m-0" t-field="o.product_id.name"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Product Code:</strong>
+                                <p class="m-0" t-field="o.product_id.default_code"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Product Type:</strong>
+                                <p class="m-0">Finished Goods</p>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Manufacturing Date:</strong>
+                                <p class="m-0" t-field="o.lot_id.manufacture_date"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Expiry Date:</strong>
+                                <p class="m-0" t-field="o.lot_id.expiry_date"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Shelf Life:</strong>
+                                <p class="m-0">24 Months</p>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Storage Conditions:</strong>
+                                <p class="m-0" t-field="o.product_id.storage_conditions"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2">
+                                <strong>Pharmacopoeial Standard:</strong>
+                                <p class="m-0" t-field="o.product_id.pharmacopoeial_ref"/>
+                            </div>
+                        </div>
+
+                        <hr style="border-top: 1px solid #ccc;"/>
+
+                        <div class="mt-4 mb-3">
+                            <h4 style="font-weight: bold;">QUALITY CONTROL RESULTS</h4>
+                        </div>
+                        
+                        <table class="table table-sm table-borderless" style="width: 100%;">
+                            <thead style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                                <tr>
+                                    <th><strong>Test Order</strong></th>
+                                    <th><strong>Stage</strong></th>
+                                    <th><strong>Parameter</strong></th>
+                                    <th><strong>Specification</strong></th>
+                                    <th><strong>Actual Result</strong></th>
+                                    <th><strong>Unit</strong></th>
+                                    <th><strong>Result Status</strong></th>
+                                    <th><strong>Test Status</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody style="border-bottom: 2px solid black;">
+                                <t t-foreach="o.qc_result_ids" t-as="line">
+                                    <tr>
+                                        <td><span t-field="line.test_order_id.name"/></td>
+                                        <td><span t-field="line.test_stage"/></td>
+                                        <td><span t-field="line.parameter"/></td>
+                                        <td>
+                                            <t t-if="line.expected_min and line.expected_max">
+                                                <span t-field="line.expected_min"/> - <span t-field="line.expected_max"/>
+                                            </t>
+                                            <t t-elif="line.expected_min">
+                                                &#8805; <span t-field="line.expected_min"/>
+                                            </t>
+                                            <t t-elif="line.expected_max">
+                                                &#8804; <span t-field="line.expected_max"/>
+                                            </t>
+                                        </td>
+                                        <td><span t-field="line.actual_value"/></td>
+                                        <td><span t-field="line.uom"/></td>
+                                        <td>
+                                            <t t-if="line.status == 'pass'">Pass</t>
+                                            <t t-elif="line.status == 'fail'">Fail</t>
+                                            <t t-else="">OOS</t>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.test_status"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        
+                        <t t-if="o.oos_ids">
+                            <div class="mt-4 mb-3">
+                                <h4 style="font-weight: bold;">OOS INVESTIGATIONS</h4>
+                            </div>
+                            <table class="table table-sm table-borderless" style="width: 100%;">
+                                <thead style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                                    <tr>
+                                        <th><strong>Investigation No</strong></th>
+                                        <th><strong>Phase</strong></th>
+                                        <th><strong>Conclusion</strong></th>
+                                        <th><strong>Disposition</strong></th>
+                                        <th><strong>Closed On</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody style="border-bottom: 2px solid black;">
+                                    <t t-foreach="o.oos_ids" t-as="oos">
+                                        <tr>
+                                            <td><span t-field="oos.name"/></td>
+                                            <td><span t-field="oos.phase"/></td>
+                                            <td><span t-field="oos.conclusion"/></td>
+                                            <td><span t-field="oos.disposition"/></td>
+                                            <td><span t-field="oos.closed_on"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <t t-set="report_deviations" t-value="o._get_report_deviations()"/>
+                        <t t-if="report_deviations">
+                            <div class="mt-4 mb-3">
+                                <h4 style="font-weight: bold;">DEVIATIONS</h4>
+                            </div>
+                            <table class="table table-sm table-borderless" style="width: 100%;">
+                                <thead style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                                    <tr>
+                                        <th><strong>Deviation No</strong></th>
+                                        <th><strong>Stage</strong></th>
+                                        <th><strong>Classification</strong></th>
+                                        <th><strong>Status</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody style="border-bottom: 2px solid black;">
+                                    <t t-foreach="report_deviations" t-as="dev">
+                                        <tr>
+                                            <td><span t-field="dev.name"/></td>
+                                            <td><span t-field="dev.stage"/></td>
+                                            <td><span t-field="dev.classification"/></td>
+                                            <td><span t-field="dev.status"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <t t-set="report_capas" t-value="o._get_report_capas()"/>
+                        <t t-if="report_capas">
+                            <div class="mt-4 mb-3">
+                                <h4 style="font-weight: bold;">CAPAs</h4>
+                            </div>
+                            <table class="table table-sm table-borderless" style="width: 100%;">
+                                <thead style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                                    <tr>
+                                        <th><strong>CAPA No</strong></th>
+                                        <th><strong>Type</strong></th>
+                                        <th><strong>Assigned To</strong></th>
+                                        <th><strong>Status</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody style="border-bottom: 2px solid black;">
+                                    <t t-foreach="report_capas" t-as="capa">
+                                        <tr>
+                                            <td><span t-field="capa.name"/></td>
+                                            <td><span t-field="capa.capa_type"/></td>
+                                            <td><span t-field="capa.assigned_to.name"/></td>
+                                            <td><span t-field="capa.status"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <hr style="border-top: 1px solid #ccc; margin-top: 30px;"/>
+
+                        <div class="mt-4 mb-3">
+                            <h4 style="font-weight: bold;">QUALITY CONCLUSION</h4>
+                        </div>
+                        <p style="line-height: 1.5;">All tests have been performed according to the approved quality
+                            control specification and comply with the applicable pharmacopoeial requirements.</p>
+                        <p style="margin-top: 20px;">RESULT: APPROVED FOR RELEASE</p>
+
+                        <hr style="border-top: 1px solid #ccc; margin-top: 30px;"/>
+
+                        <div class="mt-4 mb-3" style="page-break-inside: avoid;">
+                            <h4 style="font-weight: bold;">RELEASE AUTHORIZATION</h4>
+                        </div>
+                        <div style="line-height: 2; page-break-inside: avoid;">
+                            <div>Released By : <span t-field="o.released_by.name"/> Designation : QA Manager</div>
+                            <div>Release Date : <span t-field="o.release_date"/></div>
+                            <div style="margin-top: 40px;">Signature : ______________________</div>
+                        </div>
+
+                        <hr style="border-top: 1px solid #ccc; margin-top: 30px;"/>
+
+                        <div class="mt-4 mb-3" style="page-break-inside: avoid;">
+                            <h4 style="font-weight: bold;">SYSTEM INFORMATION</h4>
+                        </div>
+                        <div style="line-height: 2; page-break-inside: avoid;">
+                            <p>Source QC Test Orders : <span t-esc="', '.join(o.qc_test_ids.mapped('name'))"/>
+                                <t t-if="report_deviations"><br/>Source Deviations : <span t-esc="', '.join(report_deviations.mapped('name'))"/></t>
+                                <t t-if="report_capas"><br/>Source CAPAs : <span t-esc="', '.join(report_capas.mapped('name'))"/></t>
+                                <br/>Generated From : Pharmaceutical ERP</p>
+                            <p>This Certificate of Analysis is system generated from approved quality control
+                                results and becomes read-only immediately after release.</p>
+                            <p>No manual modification is permitted.</p>
+                            <p style="margin-top: 20px;">END OF CERTIFICATE</p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

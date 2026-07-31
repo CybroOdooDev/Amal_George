@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Deviation & CAPA menus.
+
+        This module is NOT a standalone application. Its menus are grafted onto
+        the core Pharmaceutical ERP "Quality" app (menu_pharma_quality) so that
+        enabling the "CAPA & Deviation Management" setting (which installs this
+        module) makes the Deviations and CAPA entries appear inside the existing
+        Quality app — and disabling it (uninstall) removes them.
+    -->
+
+    <menuitem id="menu_pharma_deviations" name="Deviations"
+        parent="pharmaceutical_base.menu_pharma_quality"
+        action="pharma_deviation_action"
+        groups="pharmaceutical_base.group_pharma_operator"
+        sequence="50"/>
+
+    <menuitem id="menu_pharma_capas" name="CAPA"
+        parent="pharmaceutical_base.menu_pharma_quality"
+        action="pharma_capa_action"
+        groups="pharmaceutical_base.group_pharma_operator"
+        sequence="60"/>
+</odoo>

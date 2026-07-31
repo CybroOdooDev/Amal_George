@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--SOP & Training menus.-->
+    <!-- SOPs & Training section under the core Quality app -->
+    <menuitem id="menu_pharma_sops_top" name="SOPs &amp; Training"
+        parent="pharmaceutical_base.menu_pharma_quality_root"
+        groups="base.group_user"
+        sequence="30"/>
+
+    <!-- SOPs -->
+    <menuitem id="menu_pharma_sops" name="SOPs"
+        parent="menu_pharma_sops_top"
+        action="pharma_sop_action"
+        groups="base.group_user" sequence="10"/>
+
+    <!-- Training Records -->
+    <menuitem id="menu_pharma_training_records" name="Training Records"
+        parent="menu_pharma_sops_top"
+        action="pharma_training_action"
+        groups="base.group_user" sequence="20"/>
+
+    <!-- My Trainings -->
+    <menuitem id="menu_pharma_my_training" name="My Trainings"
+        parent="menu_pharma_sops_top"
+        action="pharma_training_my_action"
+        groups="base.group_user" sequence="30"/>
+</odoo>

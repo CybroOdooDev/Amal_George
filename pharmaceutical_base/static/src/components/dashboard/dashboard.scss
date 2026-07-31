@@ -1,0 +1,532 @@
+// ==========================================================================
+// Pharmaceutical ERP — Quality Dashboard
+// Pharma Color System:  Blue 500 #577CBA · Blue 600 #3E5E9E · light #7FA6D8
+// ==========================================================================
+.pharma-dashboard-wrapper {
+    // Palette
+    --pd-forest:   #577CBA;   // Blue 500 (KPI tile base)
+    --pd-forest-2: #3E5E9E;   // Blue 600 — darker end
+    --pd-emerald:  #577CBA;   // Blue 500 — primary accent (icons, chart, released)
+    --pd-lime:     #7FA6D8;   // light blue accent (trend, highlights)
+    --pd-tint:     #E7EEF5;   // Blue 50 — soft surface / hover
+    --pd-bg:       #F4F1EB;   // warm cream page surface
+    --pd-heading:  #16283F;   // Ink navy
+    --pd-muted:    #3A4E63;   // sharper slate (secondary text)
+    --pd-border:   #E3DDD2;   // warm hairline border
+    --pd-amber:    #8A6A14;   // Quarantine gold (text)
+    --pd-red:      #B23B36;   // Rejected / OOS
+    --pd-cream:    #FBFCFE;   // value text/symbols on chrome tiles
+    --pd-gold:     #E8C766;   // accent icons / trend on chrome tiles
+
+    padding: 22px 30px 60px;
+    background-color: var(--pd-bg);
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    height: 100%;
+    min-height: 100%;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    color: #2C3E50;
+
+    .dash-title h1,
+    .card-title,
+    .kpi-value,
+    .act-val,
+    .donut-pct {
+        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+        letter-spacing: -0.01em;
+    }
+
+    // ---- Header ----------------------------------------------------------
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+        flex-wrap: wrap;
+
+        .dash-title {
+            h1 { margin: 0; font-size: 26px; font-weight: 700; color: var(--pd-heading); }
+            p  { margin: 4px 0 0; color: var(--pd-muted); font-size: 13px; }
+        }
+
+        .dash-filter .date-picker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #ffffff;
+            border: 1px solid var(--pd-border);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+
+            i { color: var(--pd-emerald); }
+            .date-sep { color: var(--pd-muted); }
+            input[type="date"] {
+                border: none;
+                outline: none;
+                background: #ffffff !important;
+                color: #000000 !important;
+                color-scheme: light !important;
+                font-family: inherit;
+                font-size: 13px;
+                cursor: pointer;
+            }
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                filter: brightness(0) saturate(100%) invert(45%) sepia(60%) saturate(500%) hue-rotate(95deg);
+                cursor: pointer;
+            }
+        }
+    }
+
+    .dash-row {
+        display: flex;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    // ---- Generic card ----------------------------------------------------
+    .dash-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 14px rgba(22, 40, 63, 0.06);
+        border: 1px solid var(--pd-border);
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+
+            .card-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--pd-heading);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                i { color: var(--pd-emerald); }
+            }
+        }
+    }
+
+    // ---- KPI tiles (white card, blue content) ----------------------------
+    .kpi-row {
+        .kpi-card {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 16px;
+            padding: 18px 20px;
+            // White tile with Blue 500 (#577CBA) text + icons.
+            background: #FFFFFF;
+            border: 1px solid var(--pd-border);
+            box-shadow: 0 4px 14px rgba(22, 40, 63, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 24px rgba(22, 40, 63, 0.12);
+                border-color: #577CBA;
+            }
+
+            .kpi-body {
+                position: relative;
+                z-index: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .kpi-label {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.09em;
+                color: #577CBA;
+            }
+            .kpi-value {
+                font-size: 30px;
+                font-weight: 800;
+                color: #577CBA;
+                margin: 6px 0 6px;
+                line-height: 1;
+                font-variant-numeric: tabular-nums;   // aligned figures (type style)
+            }
+            .kpi-trend {
+                font-size: 11.5px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                &.up   { color: #2E7D51; }   // sharp green
+                &.down { color: #C42B25; }   // sharp red
+            }
+
+            .kpi-glyph {
+                position: absolute;
+                right: 16px;
+                bottom: 14px;
+                font-size: 40px;
+                color: #577CBA;   // Blue 500 symbol
+                opacity: 0.9;
+                z-index: 0;
+                pointer-events: none;
+            }
+        }
+    }
+
+    // ---- Middle: chart + status -----------------------------------------
+    .middle-cards {
+        .chart-card {
+            flex: 2;
+            min-width: 0;
+            // Column layout so the chart body can stretch and fill the card
+            // down to the bottom (the row stretches this card to match the
+            // taller status card, otherwise the bars leave dead space below).
+            display: flex;
+            flex-direction: column;
+
+            .chart-filter select {
+                border: 1px solid var(--pd-border);
+                border-radius: 8px;
+                background: #ffffff !important;
+                color: #000000 !important;
+                color-scheme: light !important;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 5px 10px;
+                cursor: pointer;
+                option { background: #ffffff !important; color: #000000 !important; }
+            }
+            // Grow to fill the remaining card height so the bar chart reaches
+            // the bottom edge; min-height keeps it usable when the card is short.
+            .chart-body { flex: 1 1 auto; min-height: 260px; width: 100%; position: relative; }
+        }
+
+        .status-card {
+            flex: 1;
+            min-width: 0;
+
+            .status-body {
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+
+            .donut-wrap {
+                position: relative;
+                height: 170px;
+                width: 100%;
+
+                // Canvas must be a plain block (NOT a flex child): Chart.js then
+                // centres the doughnut on the wrapper's true centre, so the
+                // absolutely-centred label below sits inside the hole instead of
+                // overlapping an arc segment.
+                canvas { display: block; }
+
+                .donut-center {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    // Keep the label narrower than the hole so it never spills
+                    // onto the ring.
+                    max-width: 60%;
+                    pointer-events: none;
+
+                    .donut-pct { font-size: 26px; font-weight: 700; color: var(--pd-forest); line-height: 1; }
+                    .donut-cap { font-size: 11px; color: var(--pd-muted); margin-top: 2px; }
+                }
+            }
+
+            .status-legend {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+
+                .legend-item {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    padding: 4px 6px;
+                    border-radius: 8px;
+                    transition: background 0.15s ease;
+                    &:hover { background: var(--pd-tint); }
+
+                    .dot {
+                        width: 10px; height: 10px; border-radius: 50%; margin-right: 10px;
+                        // Sharp, saturated status colours (match the doughnut).
+                        &.dot-released   { background: #2E4D8F; }
+                        &.dot-pending    { background: #5B8DD9; }
+                        &.dot-quarantine { background: #E0A800; }
+                        &.dot-rejected   { background: #DC2626; }
+                    }
+                    .leg-name { flex: 1; font-size: 13px; font-weight: 600; color: #263A52; }
+                    .leg-val  { font-size: 14px; font-weight: 700; color: #16283F; }
+                }
+
+                // Labels take a sharper shade of their own status colour.
+                .leg-released   .leg-name { color: #2E4D8F; }
+                .leg-pending    .leg-name { color: #3A5EA8; }
+                .leg-quarantine .leg-name { color: #8A6A14; }
+                .leg-rejected   .leg-name { color: #C42B25; }
+            }
+        }
+    }
+
+    // ---- Bottom: activities + expiring + high-risk ----------------------
+    .bottom-cards {
+        align-items: stretch;
+
+        .expiring-card   { flex: 1; min-width: 0; }
+        .recent-card     { flex: 1.3; min-width: 0; }
+
+        // Open Quality Activities — sits below the expiring list, same card
+        .activities-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--pd-border);
+
+            .activities-subtitle {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--pd-muted);
+                margin-bottom: 12px;
+            }
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 12px;
+
+            .activity-box {
+                // Pale surface cards with dark text (matches the reference design).
+                background: var(--pd-tint);
+                border: 1px solid var(--pd-border);
+                border-radius: 12px;
+                padding: 12px 14px;
+                cursor: pointer;
+                text-align: left;
+                transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+                &:hover {
+                    transform: translateY(-2px);
+                    border-color: var(--pd-emerald);
+                    box-shadow: 0 6px 14px rgba(22, 40, 63, 0.10);
+                }
+
+                .act-val {
+                    font-size: 22px;
+                    font-weight: 800;
+                    color: var(--pd-heading);
+                    line-height: 1.1;
+                    font-variant-numeric: tabular-nums;
+                }
+                .act-name {
+                    font-size: 11.5px;
+                    font-weight: 500;
+                    color: var(--pd-muted);
+                    margin-top: 2px;
+                }
+            }
+        }
+
+        // Expiring batches — priority rows
+        .expiring-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .exp-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 11px 14px;
+                border-radius: 10px;
+                cursor: pointer;
+                // Light tinted rows; urgency is shown through the tint + text/dot
+                // colour (per Pharma Color System).
+                background: #E7EEF5;
+                transition: transform 0.15s ease, filter 0.15s ease;
+                &:hover { transform: translateX(2px); filter: brightness(0.98); }
+
+                .exp-dot { width: 8px; height: 8px; border-radius: 50%; }
+                .exp-label { flex: 1; font-size: 13px; font-weight: 600; }
+                .exp-count { font-size: 15px; font-weight: 700; }
+
+                // Tint + text by expiring priority: urgent (red) → safe (green).
+                &.prio-today {
+                    background: #FBE9E7;
+                    .exp-dot { background: #E44B55; }
+                    .exp-label, .exp-count { color: #38527c; }   // urgent
+                }
+                &.prio-30 {
+                    background: #FCF3DC;
+                    .exp-dot { background: #E8C766; }
+                    .exp-label, .exp-count { color: #38527c; }   // soon — amber
+                }
+                &.prio-60 {
+                    background: #E5F2E4;
+                    .exp-dot { background: #6FBF73; }
+                    .exp-label, .exp-count { color: #38527c; }   // watch — green
+                }
+                &.prio-90 {
+                    background: #E5F2E4;
+                    .exp-dot { background: #6FBF73; }
+                    .exp-label, .exp-count { color: #38527c; }   // safe — green
+                }
+            }
+        }
+
+        // Recent batches table
+        .recent-table {
+            display: flex;
+            flex-direction: column;
+
+            .rb-head {
+                display: flex;
+                padding: 6px 10px;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--pd-muted);
+                border-bottom: 1px solid var(--pd-border);
+            }
+            .rb-empty {
+                padding: 20px 10px;
+                text-align: center;
+                font-size: 13px;
+                color: var(--pd-muted);
+            }
+            .rb-row {
+                display: flex;
+                align-items: center;
+                padding: 11px 10px;
+                border-bottom: 1px solid #E4EDF5;
+                cursor: pointer;
+                transition: background 0.15s ease;
+                &:hover { background: var(--pd-tint); }
+                &:last-child { border-bottom: none; }
+            }
+            // Shared column geometry for header + rows
+            .rb-col-batch   { flex: 0 0 22%; min-width: 0; display: flex; flex-direction: column;
+                .rb-name    { font-size: 13px; font-weight: 600; color: var(--pd-heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            }
+            .rb-col-product { flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: var(--pd-muted);
+                overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .rb-col-mfg     { flex: 0 0 84px; font-size: 12.5px; color: var(--pd-muted); font-variant-numeric: tabular-nums; }
+            // Fixed width (not auto) so the header cell and the badge cell share
+            // identical geometry — otherwise the flexible product column absorbs
+            // the width difference and MFG / Status headers drift off their rows.
+            .rb-col-status  { flex: 0 0 120px; text-align: right; }
+
+            .rb-badge {
+                display: inline-block;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 3px 10px;
+                border-radius: 20px;
+                // Soft outline pills (bg + text + matching border).
+                &.badge-released   { background: #8cff61; color: #000000; border: 1px solid #8cff61; }
+                &.badge-approved   { background: #E5F2E4; color: #2E7D51; border: 1px solid #9FCFAE; }
+                &.badge-quarantine { background: #FBF3DC; color: #8A6A14; border: 1px solid #EBDCAE; }
+                &.badge-rejected   { background: #FBE4E2; color: var(--pd-red); border: 1px solid #F2C6C3; }
+                &.badge-on_hold    { background: #E7EEF5; color: #54687D; border: 1px solid #CBD8E6; }
+                &.badge-recalled   { background: #FBE4E2; color: #B23B36; border: 1px solid #F2C6C3; }
+            }
+        }
+    }
+}
+
+// ---- Dark theme ----------------------------------------------------------
+// Green-tinted charcoal surfaces, light mint text. KPI tiles stay Pine 900,
+// which reads well on the darker page. Pickers/selects stay light for the
+// native date control's legibility.
+[data-bs-theme="dark"] .pharma-dashboard-wrapper,
+.o_web_client.o_dark_mode .pharma-dashboard-wrapper,
+.o_dark_mode .pharma-dashboard-wrapper {
+    --pd-forest:  #2E4D8F;   // KPI tiles — deep blue (pops on dark)
+    --pd-emerald: #7FA6D8;   // brighter blue accent on dark
+    --pd-tint:    #1B2A3C;   // hover surface
+    --pd-bg:      #111C2C;   // page bg
+    --pd-heading: #E6ECF4;   // ink -> light blue-grey
+    --pd-muted:   #97A5B7;
+    --pd-border:  #2E4257;
+    --pd-white:   #152232;   // card surface
+    color: #E6ECF4;
+
+    .dash-card { background: #152232; }
+
+    // KPI tiles — dark card surface with light-blue content (mirrors the
+    // white-tile / blue-content look used in light mode).
+    .kpi-row .kpi-card {
+        background: #152232;
+        border-color: #2E4257;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+        &:hover { border-color: #7FA6D8; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.40); }
+        .kpi-label, .kpi-value { color: #7FA6D8; }
+        .kpi-glyph { color: #7FA6D8; }
+        .kpi-trend.up   { color: #4BB07E; }
+        .kpi-trend.down { color: #F1706A; }
+    }
+
+    // Text tones on dark cards — status colours brightened for dark bg.
+    .status-card .status-legend {
+        .leg-released   .leg-name { color: #7FA6D8; }
+        .leg-pending    .leg-name { color: #A9C8E8; }
+        .leg-quarantine .leg-name { color: #F0C24A; }
+        .leg-rejected   .leg-name { color: #F1706A; }
+    }
+    .recent-table .rb-badge.badge-approved   { background: rgba(46,125,81,0.22); color: #7FD3A0; border-color: rgba(111,191,115,0.45); }
+    .recent-table .rb-badge.badge-quarantine  { background: rgba(232,199,102,0.16); color: #E8C766; }
+    .recent-table .rb-badge.badge-rejected    { background: rgba(178,59,54,0.20); color: #E8827D; }
+    .recent-table .rb-badge.badge-on_hold     { background: rgba(151,165,183,0.18); color: #C6D0DD; }
+
+    .dash-filter .date-picker,
+    .chart-filter select {
+        background: #ffffff !important;
+        color: #000000 !important;
+        color-scheme: light !important;
+    }
+    .dash-filter .date-picker input[type="date"] { color: #000000 !important; background: #ffffff !important; }
+    .dash-filter .date-picker { color: #333 !important; }
+}
+
+// ---- Responsive ---------------------------------------------------------
+@media (max-width: 1200px) {
+    .pharma-dashboard-wrapper {
+        .dash-row { flex-wrap: wrap; }
+        .kpi-row .kpi-card { flex: 1 1 calc(33.333% - 18px); min-width: 180px; }
+    }
+}
+
+@media (max-width: 992px) {
+    .pharma-dashboard-wrapper {
+        .kpi-row .kpi-card { flex: 1 1 calc(50% - 18px); }
+        .middle-cards { flex-direction: column;
+            .chart-card, .status-card { flex: 1 1 100%; width: 100%; } }
+        .bottom-cards { flex-direction: column;
+            .activities-card, .expiring-card, .recent-card { flex: 1 1 100%; width: 100%; } }
+    }
+}
+
+@media (max-width: 576px) {
+    .pharma-dashboard-wrapper {
+        padding: 15px;
+        .kpi-row .kpi-card { flex: 1 1 100%; }
+        .dash-header { flex-direction: column; align-items: flex-start;
+            .dash-filter { width: 100%; .date-picker { justify-content: space-between; } } }
+    }
+}

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================= -->
+    <!--  Demo employees (SOPs require at least one assigned employee) -->
+    <!-- ============================================================= -->
+    <record id="emp_qa_officer" model="hr.employee">
+        <field name="name">Anita Menon</field>
+        <field name="job_title">QA Officer</field>
+    </record>
+
+    <record id="emp_qc_analyst" model="hr.employee">
+        <field name="name">Deepa Pillai</field>
+        <field name="job_title">QC Analyst</field>
+    </record>
+
+    <record id="emp_prod_supervisor" model="hr.employee">
+        <field name="name">Rahul Nair</field>
+        <field name="job_title">Production Supervisor</field>
+    </record>
+
+    <!-- ============================================================= -->
+    <!--  SOP Records (SOP-001 … SOP-015)                              -->
+    <!--  Author kept distinct from approver; all set Effective.       -->
+    <!-- ============================================================= -->
+    <record id="sop_001" model="pharma.sop">
+        <field name="sop_code">SOP-001</field>
+        <field name="name">Vendor Qualification Procedure</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_002" model="pharma.sop">
+        <field name="sop_code">SOP-002</field>
+        <field name="name">Incoming Raw Material Sampling</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qc_analyst')])]"/>
+    </record>
+
+    <record id="sop_003" model="pharma.sop">
+        <field name="sop_code">SOP-003</field>
+        <field name="name">Incoming Material Quality Control Testing</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qc_analyst')])]"/>
+    </record>
+
+    <record id="sop_004" model="pharma.sop">
+        <field name="sop_code">SOP-004</field>
+        <field name="name">Material Quarantine and Release Procedure</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_005" model="pharma.sop">
+        <field name="sop_code">SOP-005</field>
+        <field name="name">Batch Manufacturing Record Execution</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_prod_supervisor')])]"/>
+    </record>
+
+    <record id="sop_006" model="pharma.sop">
+        <field name="sop_code">SOP-006</field>
+        <field name="name">Equipment Cleaning and Line Clearance</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_prod_supervisor')])]"/>
+    </record>
+
+    <record id="sop_007" model="pharma.sop">
+        <field name="sop_code">SOP-007</field>
+        <field name="name">In-Process Quality Control Procedure</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qc_analyst')])]"/>
+    </record>
+
+    <record id="sop_008" model="pharma.sop">
+        <field name="sop_code">SOP-008</field>
+        <field name="name">Finished Product Release Procedure</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_009" model="pharma.sop">
+        <field name="sop_code">SOP-009</field>
+        <field name="name">Deviation Reporting and Investigation</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_010" model="pharma.sop">
+        <field name="sop_code">SOP-010</field>
+        <field name="name">Corrective and Preventive Action (CAPA)</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_011" model="pharma.sop">
+        <field name="sop_code">SOP-011</field>
+        <field name="name">Change Control Management</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_012" model="pharma.sop">
+        <field name="sop_code">SOP-012</field>
+        <field name="name">Good Documentation Practices (GDP)</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer'), ref('emp_qc_analyst'), ref('emp_prod_supervisor')])]"/>
+    </record>
+
+    <record id="sop_013" model="pharma.sop">
+        <field name="sop_code">SOP-013</field>
+        <field name="name">Product Complaint Handling</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_014" model="pharma.sop">
+        <field name="sop_code">SOP-014</field>
+        <field name="name">Internal Quality Audit Procedure</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+
+    <record id="sop_015" model="pharma.sop">
+        <field name="sop_code">SOP-015</field>
+        <field name="name">Document Control Procedure</field>
+        <field name="status">effective</field>
+        <field name="author_id" ref="base.user_demo"/>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="effective_date">2026-01-15</field>
+        <field name="employee_ids" eval="[(6, 0, [ref('emp_qa_officer')])]"/>
+    </record>
+</odoo>

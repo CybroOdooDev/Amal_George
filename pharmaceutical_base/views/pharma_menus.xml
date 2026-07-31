@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Pharma ERP Menu Restructuring
+        =============================
+        The former monolithic "Pharmaceutical ERP" application is dissolved.
+        Its menus are redistributed:
+          - Quality-centric features -> a new dedicated "Quality" (QMS) app.
+          - Vendor Qualification     -> native Purchase app.
+          - Batch Records / IPQC     -> native Manufacturing app.
+          - Traceability             -> native Inventory app.
+    -->
+
+    <!-- ============================================================= -->
+    <!-- QUALITY (QMS) — dedicated quality management application        -->
+    <!-- ============================================================= -->
+    <menuitem
+        id="menu_pharma_quality_root"
+        name="Pharmaceutical ERP"
+        sequence="50"
+        groups="base.group_user"
+        web_icon="pharmaceutical_base,static/description/icon.png"
+    />
+
+    <record id="action_pharma_dashboard" model="ir.actions.client">
+        <field name="name">Overview</field>
+        <field name="tag">pharma_dashboard_action</field>
+    </record>
+
+    <menuitem id="menu_pharma_dashboard" name="Overview"
+        parent="menu_pharma_quality_root" action="action_pharma_dashboard"
+        groups="base.group_user" sequence="5"/>
+
+    <!-- Certificates of Analysis (menu_pharma_coa_top) lives in the optional
+         pharma_traceability_coa module. -->
+
+    <!-- Quality Control -->
+    <menuitem id="menu_pharma_quality" name="Quality Control"
+        parent="menu_pharma_quality_root" groups="base.group_user" sequence="20"/>
+
+    <menuitem id="menu_pharma_qc_specs" name="QC Specifications"
+        parent="menu_pharma_quality"
+        action="pharmaceutical_base.pharma_qc_spec_action"
+        groups="base.group_user" sequence="10"/>
+
+    <menuitem id="menu_pharma_qc_test_order" name="QC Test Orders"
+        parent="menu_pharma_quality"
+        action="pharmaceutical_base.pharma_qc_test_order"
+        groups="pharmaceutical_base.group_pharma_operator"
+        sequence="20"/>
+
+    <menuitem id="menu_pharma_quarantine" name="Quarantine Queue"
+        parent="menu_pharma_quality"
+        action="pharmaceutical_base.pharma_quarantine_queue_action"
+        groups="base.group_user" sequence="30"/>
+
+    <menuitem id="menu_pharma_oos_investigation" name="OOS Investigations"
+        parent="menu_pharma_quality"
+        action="pharmaceutical_base.pharma_oos_investigation_action"
+        groups="pharmaceutical_base.group_pharma_qc_analyst"
+        sequence="40"/>
+
+    <!-- Deviations (menu_pharma_deviations) and CAPA (menu_pharma_capas) menus
+         live in the separately-installable pharma_capa_deviation module. -->
+
+    <!-- QA Release Queue (menu_pharma_qa_release_queue) lives in the optional
+         pharma_traceability_coa module. -->
+
+    <!-- SOPs & Training menus live in the separately-installable
+         pharma_sop_training module (installed via the SOP & Training setting). -->
+
+    <!-- Audit Trail (menu_pharma_audit_trail) lives in the optional
+         pharma_traceability_coa module. -->
+
+    <!-- Configuration -->
+    <menuitem id="menu_pharma_configuration" name="Configuration"
+        parent="menu_pharma_quality_root" groups="base.group_system" sequence="100"/>
+
+    <menuitem id="menu_pharma_settings" name="Settings"
+        parent="menu_pharma_configuration"
+        action="pharmaceutical_base.pharma_config_settings_action"
+        groups="base.group_system" sequence="10"/>
+
+    <!-- Vendor Qualification menus (Questionnaire Templates, Vendor
+         Qualifications, Approved Vendor List) live in the separately-installable
+         pharma_vendor_qualification module, grafted onto the native Purchase
+         app. Installing that module makes them appear; uninstalling removes them. -->
+
+    <!-- ============================================================= -->
+    <!-- MANUFACTURING — Batch Records moved into native MRP app         -->
+    <!-- ============================================================= -->
+    <menuitem id="menu_pharma_batch_records" name="Batch Records"
+        parent="mrp.menu_mrp_root"
+        groups="base.group_user" sequence="5"/>
+
+    <menuitem id="menu_pharma_bmr" name="Batch Manufacturing Records"
+        parent="menu_pharma_batch_records"
+        action="pharmaceutical_base.pharma_bmr_action"
+        groups="base.group_user" sequence="10"/>
+
+    <menuitem id="menu_pharma_ipqc" name="IPQC Checks"
+        parent="menu_pharma_batch_records"
+        action="pharmaceutical_base.pharma_ipqc_result_action"
+        groups="base.group_user" sequence="20"/>
+
+    <!-- ============================================================= -->
+    <!-- INVENTORY — Traceability moved into native Stock app            -->
+    <!-- ============================================================= -->
+    <menuitem id="menu_pharma_traceability" name="Traceability"
+        parent="stock.menu_stock_root"
+        groups="base.group_user" sequence="50"/>
+
+    <!-- Batch Genealogy (menu_pharma_batch_genealogy) lives in the optional
+         pharma_traceability_coa module, under this Traceability menu. -->
+</odoo>

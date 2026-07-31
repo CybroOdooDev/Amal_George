@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================= -->
+    <!--  Vendor Qualification Questionnaire                           -->
+    <!--  Total Score = 100  |  Passing Score = 70                     -->
+    <!--  (Per-question weight is carried in the question text, since  -->
+    <!--   the question model has no weight field; scoring is captured -->
+    <!--   on the vendor qualification record's Total/Audit Score.)    -->
+    <!-- ============================================================= -->
+    <record id="questionnaire_standard_vendor" model="pharma.questionnaire.template">
+        <field name="name">Standard Vendor Qualification Questionnaire</field>
+        <field name="description">Standard supplier qualification questionnaire. Total Score = 100, Passing Score = 70. Critical questions must be satisfied for approval.</field>
+        <field name="question_ids" eval="[
+            (0, 0, {'sequence': 10,  'section': 'Quality Management', 'answer_type': 'yes_no', 'question_text': 'Is a documented Quality Management System implemented? (Weight: 10)'}),
+            (0, 0, {'sequence': 20,  'section': 'Quality Management', 'answer_type': 'yes_no', 'question_text': 'Is ISO 9001 certification available? (Weight: 5)'}),
+            (0, 0, {'sequence': 30,  'section': 'Quality Management', 'answer_type': 'yes_no', 'question_text': 'Are internal audits conducted periodically? (Weight: 5)'}),
+
+            (0, 0, {'sequence': 40,  'section': 'GMP Compliance', 'answer_type': 'yes_no', 'question_text': 'Does the supplier possess a valid GMP certificate? (Critical) (Weight: 20)'}),
+            (0, 0, {'sequence': 50,  'section': 'GMP Compliance', 'answer_type': 'yes_no', 'question_text': 'Are manufacturing operations GMP compliant? (Weight: 10)'}),
+            (0, 0, {'sequence': 60,  'section': 'GMP Compliance', 'answer_type': 'yes_no', 'question_text': 'Are calibration records maintained? (Weight: 5)'}),
+
+            (0, 0, {'sequence': 70,  'section': 'Documentation', 'answer_type': 'yes_no', 'question_text': 'Is a Certificate of Analysis provided with every batch? (Weight: 10)'}),
+            (0, 0, {'sequence': 80,  'section': 'Documentation', 'answer_type': 'yes_no', 'question_text': 'Are complete batch manufacturing records maintained? (Weight: 5)'}),
+            (0, 0, {'sequence': 90,  'section': 'Documentation', 'answer_type': 'yes_no', 'question_text': 'Is material traceability ensured? (Weight: 5)'}),
+
+            (0, 0, {'sequence': 100, 'section': 'Facilities', 'answer_type': 'yes_no', 'question_text': 'Are storage conditions monitored? (Weight: 5)'}),
+            (0, 0, {'sequence': 110, 'section': 'Facilities', 'answer_type': 'yes_no', 'question_text': 'Is pest control implemented? (Weight: 5)'}),
+            (0, 0, {'sequence': 120, 'section': 'Facilities', 'answer_type': 'yes_no', 'question_text': 'Are environmental conditions controlled? (Weight: 5)'}),
+
+            (0, 0, {'sequence': 130, 'section': 'Regulatory', 'answer_type': 'yes_no', 'question_text': 'Does the supplier hold valid manufacturing licences? (Critical) (Weight: 5)'}),
+            (0, 0, {'sequence': 140, 'section': 'Regulatory', 'answer_type': 'yes_no', 'question_text': 'Have there been any recent regulatory observations or warning letters? (Weight: 5)'}),
+        ]"/>
+    </record>
+</odoo>

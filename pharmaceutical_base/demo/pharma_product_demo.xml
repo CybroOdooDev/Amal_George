@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================= -->
+    <!--  Product Master — Raw Materials, Packaging, Finished Goods    -->
+    <!-- ============================================================= -->
+
+    <!-- ── Raw Materials (Incoming QC) ── UoM: kg ──────────────────── -->
+    <record id="product_rm_paracetamol_api" model="product.template">
+        <field name="name">Paracetamol API USP</field>
+        <field name="default_code">RM-0001</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">api</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="storage_conditions">Store below 25°C, protect from light and moisture.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_rm_lactose" model="product.template">
+        <field name="name">Lactose Monohydrate</field>
+        <field name="default_code">RM-0002</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">excipient</field>
+        <field name="storage_conditions">Store in a cool, dry place below 25°C.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_rm_mcc_ph102" model="product.template">
+        <field name="name">Microcrystalline Cellulose PH102</field>
+        <field name="default_code">RM-0003</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">excipient</field>
+        <field name="storage_conditions">Store in a cool, dry place below 25°C.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_rm_pregel_starch" model="product.template">
+        <field name="name">Pregelatinized Starch</field>
+        <field name="default_code">RM-0004</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">excipient</field>
+        <field name="storage_conditions">Store in a cool, dry place below 25°C.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_rm_mag_stearate" model="product.template">
+        <field name="name">Magnesium Stearate</field>
+        <field name="default_code">RM-0005</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">excipient</field>
+        <field name="storage_conditions">Store in a cool, dry place below 25°C.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_rm_talc" model="product.template">
+        <field name="name">Purified Talc</field>
+        <field name="default_code">RM-0006</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">excipient</field>
+        <field name="storage_conditions">Store in a cool, dry place below 25°C.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_rm_povidone_k30" model="product.template">
+        <field name="name">Povidone K30</field>
+        <field name="default_code">RM-0007</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">excipient</field>
+        <field name="storage_conditions">Store in a tightly closed container below 25°C.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_rm_opadry_white" model="product.template">
+        <field name="name">Opadry White Film Coating</field>
+        <field name="default_code">RM-0008</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">excipient</field>
+        <field name="storage_conditions">Store in a cool, dry place below 25°C, protect from moisture.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <!-- Cold-chain raw material. None of the materials above need
+         refrigeration — their storage_conditions (printed on the CoA) all say
+         "below 25°C" — so the cold-chain storage class gets a material that
+         genuinely requires 2-8 °C rather than repurposing one of them. -->
+    <record id="product_rm_pancreatin_api" model="product.template">
+        <field name="name">Pancreatin USP</field>
+        <field name="default_code">RM-0009</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="product_type_pharma">api</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="storage_conditions">Store refrigerated at 2-8°C, protect from moisture.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <!-- ── Packaging Materials ── UoM: Units ───────────────────────── -->
+    <record id="product_pm_pvc_film" model="product.template">
+        <field name="name">PVC Blister Film 250 Micron</field>
+        <field name="default_code">PM-0001</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">packaging</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_pm_alu_foil" model="product.template">
+        <field name="name">Aluminium Foil 20 Micron</field>
+        <field name="default_code">PM-0002</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">packaging</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_pm_hdpe_bottle" model="product.template">
+        <field name="name">HDPE Tablet Bottle 100 Count</field>
+        <field name="default_code">PM-0003</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">packaging</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_pm_cr_cap" model="product.template">
+        <field name="name">Child Resistant Cap</field>
+        <field name="default_code">PM-0004</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">packaging</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_pm_printed_carton" model="product.template">
+        <field name="name">Printed Carton</field>
+        <field name="default_code">PM-0005</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">packaging</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_pm_package_insert" model="product.template">
+        <field name="name">Package Insert</field>
+        <field name="default_code">PM-0006</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">packaging</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <!-- ── Finished Products ── UoM: Units ─────────────────────────── -->
+    <record id="product_fg_paracetamol_500" model="product.template">
+        <field name="name">Paracetamol 500 mg Tablets</field>
+        <field name="default_code">FG-0001</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">finished_goods</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="storage_conditions">Store below 25°C, protect from light and moisture.</field>
+        <field name="is_favorite">True</field>
+    </record>
+
+    <record id="product_fg_paracetamol_650" model="product.template">
+        <field name="name">Paracetamol 650 mg Tablets</field>
+        <field name="default_code">FG-0002</field>
+        <field name="type">consu</field>
+        <field name="is_storable">True</field>
+        <field name="tracking">lot</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="product_type_pharma">finished_goods</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="storage_conditions">Store below 25°C, protect from light and moisture.</field>
+        <field name="is_favorite">True</field>
+    </record>
+</odoo>

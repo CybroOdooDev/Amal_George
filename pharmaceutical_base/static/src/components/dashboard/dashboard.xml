@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pharmaceutical_base.PharmaDashboard" owl="1">
+        <!-- QWeb template defining the OWL component structure for the Pharmaceutical Dashboard. Responsible for
+        rendering key statistics, charts, and actionable metrics related to batches and quality control. -->
+        <div class="pharma-dashboard-wrapper">
+            <!-- Top Header -->
+            <div class="dash-header">
+                <div class="dash-title">
+                    <h1>Quality Overview</h1>
+                    <p>Batch manufacturing &amp; quality control at a glance</p>
+                </div>
+                <!-- Date Filter -->
+                <div class="dash-filter">
+                    <div class="date-picker">
+                        <i class="fa fa-calendar-o"></i>
+                        <input type="date" t-model="state.startDate" t-on-change="fetchData"/>
+                        <span class="date-sep">-</span>
+                        <input type="date" t-model="state.endDate" t-on-change="fetchData"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Row KPI Cards -->
+            <div class="dash-row kpi-row">
+                <div class="kpi-card" t-on-click="openLots">
+                    <div class="kpi-body">
+                        <span class="kpi-label">Total Batches</span>
+                        <span class="kpi-value"><t t-esc="state.totalBatches"/></span>
+                        <span t-attf-class="kpi-trend {{ state.trendBatches.up ? 'up' : 'down' }}">
+                            <i t-attf-class="fa {{ state.trendBatches.up ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                            <t t-esc="state.trendBatches.value"/>% vs last period
+                        </span>
+                    </div>
+                    <i class="kpi-glyph fa fa-flask"></i>
+                </div>
+
+                <div class="kpi-card" t-on-click="openQcTests">
+                    <div class="kpi-body">
+                        <span class="kpi-label">Open QC Tests</span>
+                        <span class="kpi-value"><t t-esc="state.openQcTests"/></span>
+                        <span t-attf-class="kpi-trend {{ state.trendQc.up ? 'up' : 'down' }}">
+                            <i t-attf-class="fa {{ state.trendQc.up ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                            <t t-esc="state.trendQc.value"/>% vs last period
+                        </span>
+                    </div>
+                    <i class="kpi-glyph fa fa-tint"></i>
+                </div>
+
+                <div class="kpi-card" t-if="state.capaAvailable" t-on-click="openDeviations">
+                    <div class="kpi-body">
+                        <span class="kpi-label">Open Deviations</span>
+                        <span class="kpi-value"><t t-esc="state.openDeviations"/></span>
+                        <span t-attf-class="kpi-trend {{ state.trendDev.up ? 'up' : 'down' }}">
+                            <i t-attf-class="fa {{ state.trendDev.up ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                            <t t-esc="state.trendDev.value"/>% vs last period
+                        </span>
+                    </div>
+                    <i class="kpi-glyph fa fa-exclamation-triangle"></i>
+                </div>
+
+                <div class="kpi-card" t-if="state.capaAvailable" t-on-click="openCapas">
+                    <div class="kpi-body">
+                        <span class="kpi-label">Open CAPAs</span>
+                        <span class="kpi-value"><t t-esc="state.openCapas"/></span>
+                        <span t-attf-class="kpi-trend {{ state.trendCapa.up ? 'up' : 'down' }}">
+                            <i t-attf-class="fa {{ state.trendCapa.up ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                            <t t-esc="state.trendCapa.value"/>% vs last period
+                        </span>
+                    </div>
+                    <i class="kpi-glyph fa fa-shield"></i>
+                </div>
+
+                <div class="kpi-card" t-on-click="openOos">
+                    <div class="kpi-body">
+                        <span class="kpi-label">Open OOS</span>
+                        <span class="kpi-value"><t t-esc="state.openOos"/></span>
+                        <span t-attf-class="kpi-trend {{ state.trendOos.up ? 'up' : 'down' }}">
+                            <i t-attf-class="fa {{ state.trendOos.up ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                            <t t-esc="state.trendOos.value"/>% vs last period
+                        </span>
+                    </div>
+                    <i class="kpi-glyph fa fa-times-circle"></i>
+                </div>
+            </div>
+
+            <!-- Middle Row: Trend chart + Batch status donut -->
+            <div class="dash-row middle-cards">
+                <div class="dash-card chart-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-line-chart"></i> Batch Production Trends</div>
+                        <div class="chart-filter">
+                            <select t-model="state.chartFilter" t-on-change="fetchData">
+                                <option value="yearly">Yearly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas t-ref="chartCanvas"></canvas>
+                    </div>
+                </div>
+
+                <div class="dash-card status-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-server"></i> Batch Status</div>
+                    </div>
+                    <div class="status-body">
+                        <div class="donut-wrap">
+                            <canvas t-ref="statusChartCanvas"></canvas>
+                            <div class="donut-center">
+                                <span class="donut-pct"><t t-esc="state.statusPercent"/>%</span>
+                                <span class="donut-cap">Released</span>
+                            </div>
+                        </div>
+                        <div class="status-legend">
+                            <div class="legend-item leg-released" t-on-click="() => this.openLotsByStatus('released')">
+                                <span class="dot dot-released"></span>
+                                <span class="leg-name">Released</span>
+                                <span class="leg-val"><t t-esc="state.releasedBatches"/></span>
+                            </div>
+                            <div class="legend-item leg-pending" t-on-click="() => this.openLotsByStatus('approved')">
+                                <span class="dot dot-pending"></span>
+                                <span class="leg-name">Pending Release</span>
+                                <span class="leg-val"><t t-esc="state.pendingReleaseBatches"/></span>
+                            </div>
+                            <div class="legend-item leg-quarantine" t-on-click="() => this.openLotsByStatus('quarantine')">
+                                <span class="dot dot-quarantine"></span>
+                                <span class="leg-name">Quarantine</span>
+                                <span class="leg-val"><t t-esc="state.quarantineBatches"/></span>
+                            </div>
+                            <div class="legend-item leg-rejected" t-on-click="() => this.openLotsByStatus('rejected')">
+                                <span class="dot dot-rejected"></span>
+                                <span class="leg-name">Rejected</span>
+                                <span class="leg-val"><t t-esc="state.rejectedBatches"/></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Expiring + Activities (left) · Recent Batches (right) -->
+            <div class="dash-row bottom-cards">
+                <div class="dash-card expiring-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-calendar"></i> Expiring Batches</div>
+                    </div>
+                    <div class="expiring-list">
+                        <div class="exp-row prio-today" t-on-click="() => this.openExpiringLots(0)">
+                            <span class="exp-dot"></span>
+                            <span class="exp-label">Today</span>
+                            <span class="exp-count"><t t-esc="state.expiringToday"/></span>
+                        </div>
+                        <div class="exp-row prio-30" t-on-click="() => this.openExpiringLots(30)">
+                            <span class="exp-dot"></span>
+                            <span class="exp-label">Within 30 Days</span>
+                            <span class="exp-count"><t t-esc="state.expiring30"/></span>
+                        </div>
+                        <div class="exp-row prio-60" t-on-click="() => this.openExpiringLots(60)">
+                            <span class="exp-dot"></span>
+                            <span class="exp-label">Within 60 Days</span>
+                            <span class="exp-count"><t t-esc="state.expiring60"/></span>
+                        </div>
+                        <div class="exp-row prio-90" t-on-click="() => this.openExpiringLots(90)">
+                            <span class="exp-dot"></span>
+                            <span class="exp-label">Within 90 Days</span>
+                            <span class="exp-count"><t t-esc="state.expiring90"/></span>
+                        </div>
+                    </div>
+
+                    <div class="activities-section">
+                        <div class="activities-subtitle">All Quality Activities</div>
+                        <div class="activities-grid">
+                            <div class="activity-box" t-on-click="openAllQcTests">
+                                <div class="act-val"><t t-esc="state.allQcTests"/></div>
+                                <div class="act-name">QC Tests</div>
+                            </div>
+                            <div class="activity-box" t-if="state.capaAvailable" t-on-click="openAllDeviations">
+                                <div class="act-val"><t t-esc="state.allDeviations"/></div>
+                                <div class="act-name">Deviations</div>
+                            </div>
+                            <div class="activity-box" t-if="state.capaAvailable" t-on-click="openAllCapas">
+                                <div class="act-val"><t t-esc="state.allCapas"/></div>
+                                <div class="act-name">CAPAs</div>
+                            </div>
+                            <div class="activity-box" t-on-click="openAllOos">
+                                <div class="act-val"><t t-esc="state.allOos"/></div>
+                                <div class="act-name">OOS</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card recent-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-history"></i> Recent Batches</div>
+                    </div>
+                    <div class="recent-table">
+                        <div class="rb-head">
+                            <span class="rb-col-batch">Batch</span>
+                            <span class="rb-col-product">Product</span>
+                            <span class="rb-col-mfg">MFG Date</span>
+                            <span class="rb-col-status">Status</span>
+                        </div>
+                        <t t-if="state.recentBatches.length === 0">
+                            <div class="rb-empty">No batches yet.</div>
+                        </t>
+                        <t t-foreach="state.recentBatches" t-as="batch" t-key="batch.id">
+                            <div class="rb-row" t-on-click="() => this.openLot(batch.id)">
+                                <span class="rb-col-batch">
+                                    <span class="rb-name" t-esc="batch.name"/>
+                                </span>
+                                <span class="rb-col-product" t-esc="batch.product"/>
+                                <span class="rb-col-mfg" t-esc="batch.mfgDate"/>
+                                <span class="rb-col-status">
+                                    <span t-attf-class="rb-badge badge-{{ batch.status }}" t-esc="batch.statusLabel"/>
+                                </span>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </t>
+</templates>

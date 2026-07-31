@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================= -->
+    <!--  Storage classes and the GMP areas that provide them          -->
+    <!-- ============================================================= -->
+
+    <!-- ── Storage classes ────────────────────────────────────────── -->
+    <record id="storage_category_cold_chain" model="stock.storage.category">
+        <field name="name">Cold Chain 2-8 °C</field>
+        <field name="allow_new_product">mixed</field>
+    </record>
+
+    <record id="storage_category_controlled" model="stock.storage.category">
+        <field name="name">Controlled Room Temperature (max 25 °C)</field>
+        <field name="allow_new_product">mixed</field>
+    </record>
+
+    <record id="storage_category_desiccated" model="stock.storage.category">
+        <field name="name">Desiccated (max 35% RH)</field>
+        <field name="allow_new_product">mixed</field>
+    </record>
+
+    <!-- ── Main storage areas, directly under WH/Stock ────────────── -->
+    <!-- Receipts land on the warehouse's normal stock destination; putaway then
+         drops each line into whichever of these matches the product's class. -->
+    <record id="stock_location_stock_cold_chain" model="stock.location">
+        <field name="name">Cold Chain</field>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="usage">internal</field>
+        <field name="storage_category_id" ref="storage_category_cold_chain"/>
+    </record>
+
+    <record id="stock_location_stock_controlled" model="stock.location">
+        <field name="name">Controlled</field>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="usage">internal</field>
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="stock_location_stock_desiccated" model="stock.location">
+        <field name="name">Desiccated</field>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="usage">internal</field>
+        <field name="storage_category_id" ref="storage_category_desiccated"/>
+    </record>
+
+    <!-- ── Rejected area and its storage sub-areas ────────────────── -->
+    <!-- Rejected material still has to be held under its own storage
+         conditions until it is destroyed or returned to the vendor. -->
+    <record id="stock_location_rejected" model="stock.location">
+        <field name="name">Rejected</field>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="usage">internal</field>
+    </record>
+
+    <record id="stock_location_rejected_cold_chain" model="stock.location">
+        <field name="name">Cold Chain</field>
+        <field name="location_id" ref="stock_location_rejected"/>
+        <field name="usage">internal</field>
+        <field name="storage_category_id" ref="storage_category_cold_chain"/>
+    </record>
+
+    <record id="stock_location_rejected_controlled" model="stock.location">
+        <field name="name">Controlled</field>
+        <field name="location_id" ref="stock_location_rejected"/>
+        <field name="usage">internal</field>
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="stock_location_rejected_desiccated" model="stock.location">
+        <field name="name">Desiccated</field>
+        <field name="location_id" ref="stock_location_rejected"/>
+        <field name="usage">internal</field>
+        <field name="storage_category_id" ref="storage_category_desiccated"/>
+    </record>
+
+    <!-- ── Company configuration: the Rejected area root ──────────── -->
+    <!-- The root carries no storage category of its own. On a QC failure the
+         picking and move headers stay here; putaway drops the line into the
+         matching sub-area so rejected material keeps its storage conditions. -->
+    <record id="base.main_company" model="res.company">
+        <field name="pharma_rejected_location_id" ref="stock_location_rejected"/>
+    </record>
+
+    <!-- ── Storage classes on the demo raw materials ──────────────── -->
+    <record id="product_rm_paracetamol_api" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_rm_lactose" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_rm_mcc_ph102" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <!-- Pregelatinized starch is hygroscopic: humidity, not temperature. -->
+    <record id="product_rm_pregel_starch" model="product.template">
+        <field name="storage_category_id" ref="storage_category_desiccated"/>
+    </record>
+
+    <record id="product_rm_mag_stearate" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_rm_talc" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <!-- "Store in a tightly closed container": Povidone K30 is very hygroscopic. -->
+    <record id="product_rm_povidone_k30" model="product.template">
+        <field name="storage_category_id" ref="storage_category_desiccated"/>
+    </record>
+
+    <!-- "Protect from moisture" on the film-coating premix. -->
+    <record id="product_rm_opadry_white" model="product.template">
+        <field name="storage_category_id" ref="storage_category_desiccated"/>
+    </record>
+
+    <record id="product_pm_pvc_film" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_pm_alu_foil" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_pm_hdpe_bottle" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_pm_cr_cap" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_pm_printed_carton" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_pm_package_insert" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_fg_paracetamol_500" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <record id="product_fg_paracetamol_650" model="product.template">
+        <field name="storage_category_id" ref="storage_category_controlled"/>
+    </record>
+
+    <!-- Pancreatin (RM-0009) is the cold-chain material; it is declared in
+         pharma_product_demo.xml so the QC spec demo can reference it. -->
+    <record id="product_rm_pancreatin_api" model="product.template">
+        <field name="storage_category_id" ref="storage_category_cold_chain"/>
+    </record>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Vendor Qualification menus.
+
+        This module is NOT a standalone application. Its menus are grafted onto
+        the native Purchase app so that installing the module (via the
+        Pharmaceutical ERP Settings toggle "Enable Vendor Qualification") makes
+        the "Vendor Qualification" section — Questionnaire Templates, Vendor
+        Qualifications and Approved Vendor List — appear under Purchase, and
+        uninstalling it removes the section.
+    -->
+
+    <menuitem id="menu_pharma_vendor_qualification_group" name="Vendor Qualification"
+        parent="purchase.menu_purchase_root"
+        groups="base.group_user" sequence="30"/>
+
+    <menuitem id="menu_pharma_questionnaire_template" name="Questionnaire Templates"
+        parent="menu_pharma_vendor_qualification_group"
+        action="pharma_questionnaire_template_action"
+        groups="base.group_user" sequence="10"/>
+
+    <menuitem id="menu_pharma_vendor_qualification" name="Vendor Qualifications"
+        parent="menu_pharma_vendor_qualification_group"
+        action="pharma_vendor_qualification_action"
+        groups="base.group_user" sequence="20"/>
+
+    <menuitem id="menu_pharma_avl" name="Approved Vendor List"
+        parent="menu_pharma_vendor_qualification_group"
+        action="pharma_avl_action"
+        groups="base.group_user" sequence="30"/>
+</odoo>

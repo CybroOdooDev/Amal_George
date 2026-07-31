@@ -1,0 +1,828 @@
+<section class="oe_container">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        section.oe_container .nav-tabs {
+            border: none !important;
+        }
+
+        section.oe_container .nav-tabs .nav-link {
+            border: none !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 700;
+            color: #6b7488 !important;
+            padding: 0.6rem 1.75rem !important;
+            font-size: 14px;
+            background: transparent !important;
+        }
+
+        section.oe_container .nav-tabs .nav-link.active {
+            background: #3a5390 !important;
+            color: #fff !important;
+            border-radius: 30px !important;
+            box-shadow: 0 4px 12px rgba(58, 83, 144, 0.28) !important;
+        }
+
+        section.oe_container .nav-tabs .nav-link:hover:not(.active) {
+            color: #1f2a48 !important;
+            background: rgba(31, 42, 72, 0.04) !important;
+            border-radius: 30px !important;
+        }
+
+        section.oe_container input[type="radio"].pharma-tab-input {
+            display: none !important;
+        }
+
+        section.oe_container .tab-pane {
+            display: none;
+        }
+
+        section.oe_container .tab-pane.active {
+            display: block !important;
+        }
+
+        #tab-screenshots-radio:checked ~ .tab-content #screenshots, #tab-features-radio:checked ~ .tab-content #features, #tab-faqs-radio:checked ~ .tab-content #faqs, #tab-releases-radio:checked ~ .tab-content #releases {
+            display: block !important;
+        }
+
+        #tab-features-radio:checked ~ .tab-content #screenshots.active, #tab-faqs-radio:checked ~ .tab-content #screenshots.active, #tab-releases-radio:checked ~ .tab-content #screenshots.active {
+            display: none !important;
+        }
+
+        div:has(#features-tab.active) ~ .tab-content #screenshots, div:has(#faqs-tab.active) ~ .tab-content #screenshots, div:has(#releases-tab.active) ~ .tab-content #screenshots {
+            display: none !important;
+        }
+
+        #tab-screenshots-radio:checked ~ div ul.nav-tabs #screenshots-tab, #tab-features-radio:checked ~ div ul.nav-tabs #features-tab, #tab-faqs-radio:checked ~ div ul.nav-tabs #faqs-tab, #tab-releases-radio:checked ~ div ul.nav-tabs #releases-tab {
+            background: #3a5390 !important;
+            color: #fff !important;
+            border-radius: 30px !important;
+            box-shadow: 0 4px 12px rgba(58, 83, 144, 0.28) !important;
+        }
+
+        #tab-features-radio:checked ~ div ul.nav-tabs #screenshots-tab.active, #tab-faqs-radio:checked ~ div ul.nav-tabs #screenshots-tab.active, #tab-releases-radio:checked ~ div ul.nav-tabs #screenshots-tab.active {
+            background: transparent !important;
+            color: #6b7488 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+
+        section.oe_container p {
+            overflow-wrap: break-word;
+        }
+    </style>
+    <div style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#33405a;background:#f0ece1;line-height:1.6">
+        <div style="width:100%;max-width:1240px;margin:0 auto;padding:30px 20px 100px;box-sizing:border-box">
+
+            <!-- COMPAT BAR -->
+            <div style="margin-bottom:3rem;position:relative;z-index:100">
+                <div style="background:#fff;border-radius:20px;padding:1.25rem 2.5rem;box-shadow:0px 0px 20px rgba(31,42,72,0.06)">
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+                        <tr>
+                            <td valign="middle">
+                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+                                    <tr>
+                                        <td valign="middle"
+                                            style="padding-right:15px;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:#6b7488;white-space:nowrap;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                            Supports:
+                                        </td>
+                                        <td valign="middle" style="padding-right:8px"><span
+                                                style="padding:6px 18px;border-radius:12px;font-weight:700;font-size:13.5px;background:#45609f;color:#fff;border:1px solid #45609f;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">Community</span>
+                                        </td>
+                                        <td valign="middle"><span
+                                                style="padding:6px 18px;border-radius:12px;font-weight:700;font-size:13.5px;background:#45609f;color:#fff;border:1px solid #45609f;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">Enterprise</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td align="right" valign="middle">
+                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+                                    <tr>
+                                        <td valign="middle"
+                                            style="padding-right:15px;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:#6b7488;white-space:nowrap;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                            Availability:
+                                        </td>
+                                        <td valign="middle" style="padding-right:8px"><span
+                                                style="padding:6px 18px;border-radius:12px;font-weight:700;font-size:13.5px;border:1.25px solid #e7e1d3;color:#33405a;background:#fff;white-space:nowrap;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;display:inline-flex;align-items:center;gap:6px"><img
+                                                src="./assets/icons/ic_check_green.png" alt=""
+                                                style="height:15px;width:auto;display:block"/>On Premise</span></td>
+                                        <td valign="middle" style="padding-right:8px"><span
+                                                style="padding:6px 18px;border-radius:12px;font-weight:700;font-size:13.5px;border:1.25px solid #e7e1d3;color:#33405a;background:#fff;white-space:nowrap;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;display:inline-flex;align-items:center;gap:6px"><img
+                                                src="./assets/icons/ic_xmark_red.png" alt=""
+                                                style="height:15px;width:auto;display:block"/>Odoo Online</span></td>
+                                        <td valign="middle"><span
+                                                style="padding:6px 18px;border-radius:12px;font-weight:700;font-size:13.5px;border:1.25px solid #e7e1d3;color:#33405a;background:#fff;white-space:nowrap;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;display:inline-flex;align-items:center;gap:6px"><img
+                                                src="./assets/icons/ic_check_green.png" alt=""
+                                                style="height:15px;width:auto;display:block"/>Odoo.sh</span></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- HERO -->
+            <img src="./assets/screenshots/hero_card.png" alt="Pharmaceutical ERP CAPA &amp; Deviations"
+                 style="width:100%;max-width:100%;display:block;margin-bottom:4rem"/>
+
+            <!-- KEY HIGHLIGHTS -->
+            <div style="margin-bottom:4rem">
+                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#45609f;text-align:center;margin:0 0 10px 0">
+                    The Core Pillars</p>
+                <h2 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:2.5rem;font-weight:800;letter-spacing:-0.02em;text-align:center;margin:0 0 40px 0;color:#1f2a48">
+                    Why Pharmaceutical ERP?</h2>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                       style="border-collapse:separate;border-spacing:20px 0">
+                    <tr>
+                        <td width="25%" valign="top" style="padding:0;height:100%">
+                            <div style="background:#fff;border-radius:24px;padding:2.5rem 2rem;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:340px">
+                                <div style="width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,#5c76ba,#45609f);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+                                    <img src="./assets/icons/ic_triangle-exclamation_w.png" alt=""
+                                         style="height:24px;width:auto;display:block"/></div>
+                                <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48;min-height:3.4rem">
+                                    Quality Deviation Tracking</h4>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                    Track and classify deviations with dedicated investigation deadlines and disposition
+                                    workflows.</p>
+                            </div>
+                        </td>
+                        <td width="25%" valign="top" style="padding:0;height:100%">
+                            <div style="background:#fff;border-radius:24px;padding:2.5rem 2rem;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:340px">
+                                <div style="width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,#5c76ba,#45609f);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+                                    <img src="./assets/icons/ic_clipboard-check_w.png" alt=""
+                                         style="height:24px;width:auto;display:block"/></div>
+                                <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48;min-height:3.4rem">
+                                    Corrective &amp; Preventive Actions</h4>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                    Trace every CAPA directly back to its originating deviation for full quality
+                                    accountability.</p>
+                            </div>
+                        </td>
+                        <td width="25%" valign="top" style="padding:0;height:100%">
+                            <div style="background:#fff;border-radius:24px;padding:2.5rem 2rem;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:340px">
+                                <div style="width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,#5c76ba,#45609f);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+                                    <img src="./assets/icons/ic_link_w.png" alt=""
+                                         style="height:24px;width:auto;display:block"/></div>
+                                <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48;min-height:3.4rem">
+                                    Automated Couplings</h4>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                    OOS investigations and IPQC failures automatically raise and link to deviations in
+                                    real-time.</p>
+                            </div>
+                        </td>
+                        <td width="25%" valign="top" style="padding:0;height:100%">
+                            <div style="background:#fff;border-radius:24px;padding:2.5rem 2rem;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:340px">
+                                <div style="width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,#5c76ba,#45609f);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+                                    <img src="./assets/icons/ic_ban_w.png" alt=""
+                                         style="height:24px;width:auto;display:block"/></div>
+                                <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48;min-height:3.4rem">
+                                    Process Gating</h4>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                    Block BMR completions and QC test order approvals while critical deviations or CAPAs
+                                    remain open.</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- TAB SECTION -->
+            <div style="background:#fff;border-radius:40px;padding:3rem;box-shadow:0px 0px 20px rgba(31,42,72,0.07);border:1px solid #e7e1d3;box-sizing:border-box">
+                <input type="radio" id="tab-screenshots-radio" name="pharma-tabs" class="pharma-tab-input" checked
+                       style="display:none"/>
+                <input type="radio" id="tab-features-radio" name="pharma-tabs" class="pharma-tab-input"
+                       style="display:none"/>
+                <input type="radio" id="tab-faqs-radio" name="pharma-tabs" class="pharma-tab-input"
+                       style="display:none"/>
+                <input type="radio" id="tab-releases-radio" name="pharma-tabs" class="pharma-tab-input"
+                       style="display:none"/>
+                <div style="text-align:center;margin-bottom:2rem">
+                    <ul class="nav nav-tabs" id="pharmaTab" role="tablist"
+                        style="border:none;background:#f6f3ec;border-radius:30px;padding:6px;display:inline-flex;list-style:none;margin:0 auto;box-shadow:inset 0 2px 4px rgba(31,42,72,0.05)">
+                        <li class="nav-item" role="presentation" style="margin:0"><label class="nav-link active"
+                                                                                         id="screenshots-tab"
+                                                                                         data-bs-toggle="tab"
+                                                                                         href="#screenshots"
+                                                                                         for="tab-screenshots-radio"
+                                                                                         role="tab"
+                                                                                         style="text-decoration:none;display:inline-block;border-radius:24px;margin:0 3px;cursor:pointer;padding:0.7rem 1.9rem;font-weight:700;font-size:14px;color:#6b7488">Screenshots</label>
+                        </li>
+                        <li class="nav-item" role="presentation" style="margin:0"><label class="nav-link"
+                                                                                         id="features-tab"
+                                                                                         data-bs-toggle="tab"
+                                                                                         href="#features"
+                                                                                         for="tab-features-radio"
+                                                                                         role="tab"
+                                                                                         style="text-decoration:none;display:inline-block;border-radius:24px;margin:0 3px;cursor:pointer;padding:0.7rem 1.9rem;font-weight:700;font-size:14px;color:#6b7488">Features</label>
+                        </li>
+                        <li class="nav-item" role="presentation" style="margin:0"><label class="nav-link" id="faqs-tab"
+                                                                                         data-bs-toggle="tab"
+                                                                                         href="#faqs"
+                                                                                         for="tab-faqs-radio" role="tab"
+                                                                                         style="text-decoration:none;display:inline-block;border-radius:24px;margin:0 3px;cursor:pointer;padding:0.7rem 1.9rem;font-weight:700;font-size:14px;color:#6b7488">FAQs</label>
+                        </li>
+                        <li class="nav-item" role="presentation" style="margin:0"><label class="nav-link"
+                                                                                         id="releases-tab"
+                                                                                         data-bs-toggle="tab"
+                                                                                         href="#releases"
+                                                                                         for="tab-releases-radio"
+                                                                                         role="tab"
+                                                                                         style="text-decoration:none;display:inline-block;border-radius:24px;margin:0 3px;cursor:pointer;padding:0.7rem 1.9rem;font-weight:700;font-size:14px;color:#6b7488">Releases</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content" id="pharmaTabContent">
+                    <div class="tab-pane fade show active" id="screenshots" role="tabpanel"
+                         aria-labelledby="screenshots-tab">
+                        <div style="padding-top:2rem">
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Feature
+                                                Activation
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot0.png"
+                                     alt="Activate CAPA &amp; Deviation from Settings"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Activate CAPA &amp; Deviation from Settings</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        The CAPA &amp; Deviation tier is switched on with a single toggle in the
+                                        Pharmaceutical ERP configuration &mdash; no separate install step. Once enabled,
+                                        the deviation and CAPA menus and the quality-gating couplings across OOS, IPQC,
+                                        QC and BMR come online automatically.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>OOS
+                                                Auto-Trigger
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot1.png"
+                                     alt="OOS Investigation Triggered Automatically"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        OOS Investigation Triggered Automatically</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        The moment a QC result falls outside its specification&#39;s minimum or maximum
+                                        limit, an Out-of-Specification investigation is raised automatically, with no
+                                        manual step required from the analyst.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Phase
+                                                I
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot2.png" alt="Phase I Lab-Error Correction"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Phase I Lab-Error Correction</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        The initial Phase I review checks for lab or testing errors first, letting a
+                                        confirmed lab mistake be corrected and closed without escalating into a full
+                                        investigation.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Phase
+                                                II
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot3.png"
+                                     alt="Escalation to Phase II Investigation"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Escalation to Phase II Investigation</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        When Phase I does not resolve the OOS result, it escalates automatically to a
+                                        Phase II investigation covering the manufacturing process, materials, and
+                                        equipment involved.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Disposition
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot4.png"
+                                     alt="Phase II Closure with Release or Reject"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Phase II Closure with Release or Reject</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        Phase II concludes with a documented root-cause finding and a clear release or
+                                        reject disposition, keeping every OOS outcome fully auditable.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Register
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot5.png"
+                                     alt="Auto-Created Deviation in the Register"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Auto-Created Deviation in the Register</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        Confirmed OOS and IPQC failures automatically create a corresponding entry in
+                                        the Deviation Register, so nothing has to be logged twice.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Investigation
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot6.png"
+                                     alt="Deviation Form &amp; Investigation Kick-Off"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Deviation Form &amp; Investigation Kick-Off</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        Each deviation opens into a structured form capturing classification,
+                                        description, and investigation ownership from the moment it is raised.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>CAPA
+                                                Link
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot7.png"
+                                     alt="CAPA Started with Source Deviation Linked"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        CAPA Started with Source Deviation Linked</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        A Corrective &amp; Preventive Action is created directly from its source
+                                        deviation, preserving a traceable link between root cause and remediation.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Closure
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot8.png"
+                                     alt="Root Cause, Effectiveness &amp; Closure"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Root Cause, Effectiveness &amp; Closure</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        CAPA records capture the root-cause analysis and an effectiveness check before
+                                        closure, ensuring corrective actions actually resolved the issue.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Disposition
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot9.png"
+                                     alt="Deviation Closure with Final Disposition"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Deviation Closure with Final Disposition</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        Deviations close out with a final disposition, giving QA a complete,
+                                        time-stamped record from detection through resolution.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Quality
+                                                Gate
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot10.png" alt="QC Test Order Passed"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        QC Test Order Passed</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        When a QC test order passes cleanly, it proceeds through sign-off without
+                                        interruption &mdash; the gating logic only engages when a result actually
+                                        requires it.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:3.5rem">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Quality
+                                                Gate
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot11.png"
+                                     alt="Identical Flow for BMR &amp; IPQC Tests"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Identical Flow for BMR &amp; IPQC Tests</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        The same OOS-to-deviation-to-CAPA cascade applies identically across BMR and
+                                        IPQC test points, keeping quality logic consistent throughout production.</p>
+                                </div>
+                            </div>
+                            <div style="border-radius:28px;overflow:hidden;border:1px solid #e7e1d3;background:#fff;margin-bottom:0">
+                                <div style="background:#f6f3ec;padding:1.25rem 2rem;border-bottom:1px solid #e7e1d3">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                           style="border-collapse:collapse">
+                                        <tr>
+                                            <td valign="middle">
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;margin-right:6px;display:inline-block"></span>
+                                                <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:inline-block"></span>
+                                            </td>
+                                            <td align="right" valign="middle"
+                                                style="color:#6b7488;font-size:1rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+                                                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Quality
+                                                Gate
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <img src="./assets/screenshots/Screenshot12.png"
+                                     alt="Full Cascade on Every Test Failure"
+                                     style="width:100%;max-width:100%;display:block"/>
+                                <div style="padding:30px">
+                                    <h4 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 10px 0;color:#1f2a48">
+                                        Full Cascade on Every Test Failure</h4>
+                                    <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0;line-height:1.6">
+                                        Any failing test &mdash; regardless of where it occurs &mdash; triggers the same
+                                        investigation, deviation, and CAPA cascade, and the source order stays blocked
+                                        until closure. One failure, one complete auditable quality trail.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
+                        <div style="padding-top:2rem">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                   style="border-collapse:collapse">
+                                <tr>
+                                    <td width="50%" valign="top" style="padding:10px">
+                                        <div style="background:#f6f3ec;padding:25px;border-radius:12px;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:160px">
+                                            <h6 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:700;margin:0 0 15px 0;color:#1f2a48;display:flex;align-items:center;gap:12px">
+                                                <img src="./assets/icons/ic_triangle-exclamation_blue.png" alt=""
+                                                     style="height:22px;width:auto;display:block"/><span>Deviation Workflow</span>
+                                            </h6>
+                                            <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;font-size:15px;margin:0;line-height:1.6">
+                                                Structured lifecycle from initiation to investigation and
+                                                disposition.</p>
+                                        </div>
+                                    </td>
+                                    <td width="50%" valign="top" style="padding:10px">
+                                        <div style="background:#f6f3ec;padding:25px;border-radius:12px;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:160px">
+                                            <h6 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:700;margin:0 0 15px 0;color:#1f2a48;display:flex;align-items:center;gap:12px">
+                                                <img src="./assets/icons/ic_clipboard-check_blue.png" alt=""
+                                                     style="height:22px;width:auto;display:block"/><span>CAPA Management</span>
+                                            </h6>
+                                            <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;font-size:15px;margin:0;line-height:1.6">
+                                                Create, assign, and track corrective actions to prevent recurrence.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%" valign="top" style="padding:10px">
+                                        <div style="background:#f6f3ec;padding:25px;border-radius:12px;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:160px">
+                                            <h6 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:700;margin:0 0 15px 0;color:#1f2a48;display:flex;align-items:center;gap:12px">
+                                                <img src="./assets/icons/ic_ban_blue.png" alt=""
+                                                     style="height:22px;width:auto;display:block"/><span>Quality Gates</span>
+                                            </h6>
+                                            <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;font-size:15px;margin:0;line-height:1.6">
+                                                Stop non-compliant batches from proceeding to sign-off
+                                                automatically.</p>
+                                        </div>
+                                    </td>
+                                    <td width="50%" valign="top" style="padding:10px">
+                                        <div style="background:#f6f3ec;padding:25px;border-radius:12px;border:1px solid #e7e1d3;box-sizing:border-box;height:100%;min-height:160px">
+                                            <h6 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:700;margin:0 0 15px 0;color:#1f2a48;display:flex;align-items:center;gap:12px">
+                                                <img src="./assets/icons/ic_link_blue.png" alt=""
+                                                     style="height:22px;width:auto;display:block"/><span>Integrated Flow</span>
+                                            </h6>
+                                            <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;font-size:15px;margin:0;line-height:1.6">
+                                                Works seamlessly with existing OOS, IPQC, and QC test workflows.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
+                        <div style="padding-top:2rem">
+                            <details
+                                    style="background:#f6f3ec;border-radius:16px;margin-bottom:10px;border:1px solid #e7e1d3;overflow:hidden">
+                                <summary
+                                        style="padding:1.25rem 1.75rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-weight:600;font-size:1rem;color:#1f2a48;cursor:pointer;list-style:none">
+                                    What does this module manage?
+                                </summary>
+                                <div style="padding:0 1.75rem 1.25rem;color:#6b7488;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;line-height:1.6">
+                                    It manages the Quality Deviation and Corrective &amp; Preventive Action (CAPA)
+                                    lifecycle within the Pharmaceutical ERP suite.
+                                </div>
+                            </details>
+                            <details
+                                    style="background:#f6f3ec;border-radius:16px;margin-bottom:10px;border:1px solid #e7e1d3;overflow:hidden">
+                                <summary
+                                        style="padding:1.25rem 1.75rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-weight:600;font-size:1rem;color:#1f2a48;cursor:pointer;list-style:none">
+                                    How does it interact with production?
+                                </summary>
+                                <div style="padding:0 1.75rem 1.25rem;color:#6b7488;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;line-height:1.6">
+                                    It automatically blocks BMR sign-offs and QA approvals if there are open deviations
+                                    linked to the batch.
+                                </div>
+                            </details>
+                            <details
+                                    style="background:#f6f3ec;border-radius:16px;margin-bottom:10px;border:1px solid #e7e1d3;overflow:hidden">
+                                <summary
+                                        style="padding:1.25rem 1.75rem;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-weight:600;font-size:1rem;color:#1f2a48;cursor:pointer;list-style:none">
+                                    Can it be uninstalled safely?
+                                </summary>
+                                <div style="padding:0 1.75rem 1.25rem;color:#6b7488;font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;line-height:1.6">
+                                    Yes, uninstalling returns the OOS, IPQC, and BMR flows to their native behaviour
+                                    without deviation-based gating.
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="releases" role="tabpanel" aria-labelledby="releases-tab">
+                        <div style="padding-top:2rem">
+                            <div style="background:#f6f3ec;border-radius:24px;padding:2rem;border:1px solid #e7e1d3"><h4
+                                    style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:700;color:#1f2a48;margin:0 0 10px 0">
+                                Release 19.0.1.0.0</h4>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:#6b7488;margin:0">
+                                    1st April, 2026 - Add: Initial commit</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ECOSYSTEM -->
+            <div style="background:#fff;border-radius:40px;padding:5rem 3rem;margin-top:4rem;box-shadow:0px 0px 20px rgba(31,42,72,0.07);border:1px solid #e7e1d3;box-sizing:border-box">
+                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#45609f;text-align:center;margin:0 0 10px 0">
+                    The Ecosystem</p>
+                <h2 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:2.5rem;font-weight:800;letter-spacing:-0.02em;text-align:center;margin:0 0 3rem 0;color:#1f2a48">
+                    Explore the Pharmaceutical ERP Suite</h2>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                       style="border-collapse:collapse;text-align:center">
+                    <tr>
+                        <td width="25%" valign="top" style="padding:12px"><a href="#"
+                                                                             style="text-decoration:none;display:block;height:100%">
+                            <div style="background:#f6f3ec;border:1px solid #e7e1d3;border-radius:24px;padding:2rem 1.5rem;text-align:center;box-sizing:border-box;height:100%">
+                                <div style="width:78px;height:78px;margin:0 auto 1.25rem;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(31,42,72,0.08);box-sizing:border-box">
+                                    <img src="./assets/icons/ic_handshake_blue.png" alt=""
+                                         style="height:34px;width:auto;display:block"/></div>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:0.95rem;font-weight:700;margin:0;line-height:1.4;color:#1f2a48">
+                                    Vendor Qualification</p></div>
+                        </a></td>
+                        <td width="25%" valign="top" style="padding:12px"><a href="#"
+                                                                             style="text-decoration:none;display:block;height:100%">
+                            <div style="background:#f6f3ec;border:1px solid #e7e1d3;border-radius:24px;padding:2rem 1.5rem;text-align:center;box-sizing:border-box;height:100%">
+                                <div style="width:78px;height:78px;margin:0 auto 1.25rem;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(31,42,72,0.08);box-sizing:border-box">
+                                    <img src="./assets/icons/ic_route_blue.png" alt=""
+                                         style="height:34px;width:auto;display:block"/></div>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:0.95rem;font-weight:700;margin:0;line-height:1.4;color:#1f2a48">
+                                    Batch &amp; Lot Traceability</p></div>
+                        </a></td>
+                        <td width="25%" valign="top" style="padding:12px"><a href="#"
+                                                                             style="text-decoration:none;display:block;height:100%">
+                            <div style="background:#f6f3ec;border:1px solid #e7e1d3;border-radius:24px;padding:2rem 1.5rem;text-align:center;box-sizing:border-box;height:100%">
+                                <div style="width:78px;height:78px;margin:0 auto 1.25rem;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(31,42,72,0.08);box-sizing:border-box">
+                                    <img src="./assets/icons/ic_triangle-exclamation_blue.png" alt=""
+                                         style="height:34px;width:auto;display:block"/></div>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:0.95rem;font-weight:700;margin:0;line-height:1.4;color:#1f2a48">
+                                    Deviation, CAPA &amp; OOS</p></div>
+                        </a></td>
+                        <td width="25%" valign="top" style="padding:12px"><a href="#"
+                                                                             style="text-decoration:none;display:block;height:100%">
+                            <div style="background:#f6f3ec;border:1px solid #e7e1d3;border-radius:24px;padding:2rem 1.5rem;text-align:center;box-sizing:border-box;height:100%">
+                                <div style="width:78px;height:78px;margin:0 auto 1.25rem;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(31,42,72,0.08);box-sizing:border-box">
+                                    <img src="./assets/icons/ic_file-lines_blue.png" alt=""
+                                         style="height:34px;width:auto;display:block"/></div>
+                                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:0.95rem;font-weight:700;margin:0;line-height:1.4;color:#1f2a48">
+                                    SOP</p></div>
+                        </a></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- SERVICES -->
+            <div style="background:#fff;border-radius:40px;padding:5rem 3rem;margin-top:4rem;box-shadow:0px 0px 20px rgba(31,42,72,0.07);border:1px solid #e7e1d3;box-sizing:border-box">
+                <p style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#45609f;text-align:center;margin:0 0 10px 0">
+                    Professional Support</p>
+                <h2 style="font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;font-size:2.5rem;font-weight:800;letter-spacing:-0.02em;text-align:center;margin:0 0 3rem 0;color:#1f2a48">
+                    Our Expert Services</h2>
+                <table width="100%" border="0" cellpadding="12" cellspacing="0"
+                       style="border-collapse:collapse;table-layout:fixed">
+                    <tr>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/odoo-customization-and-installation"
+                                style="display:block"><img src="./assets/screenshots/odoo_customization.png"
+                                                           alt="Odoo Customization"
+                                                           style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/odoo-erp-implementation" style="display:block"><img
+                                src="./assets/screenshots/odoo_implementation.png" alt="Odoo Implementation"
+                                style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/odoo-erp-support" style="display:block"><img
+                                src="./assets/screenshots/odoo_support.png" alt="Odoo Support"
+                                style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/odoo-migration-service" style="display:block"><img
+                                src="./assets/screenshots/odoo_migration.png" alt="Odoo Migration"
+                                style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/odoo-erp-integration" style="display:block"><img
+                                src="./assets/screenshots/odoo_integration.png" alt="Odoo Integration"
+                                style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/odoo/odoo-consultant" style="display:block"><img
+                                src="./assets/screenshots/odoo_consultancy.png" alt="Odoo Consultancy"
+                                style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/odoo/odoo-licensing-consultancy"
+                                style="display:block"><img src="./assets/screenshots/odoo_licensing.png"
+                                                           alt="Odoo Licensing"
+                                                           style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                        <td align="center" valign="top" style="padding:12px"><a
+                                href="https://www.cybrosys.com/hire-odoo-developer" style="display:block"><img
+                                src="./assets/screenshots/odoo_developer.png" alt="Hire Odoo Developer"
+                                style="width:100%;max-width:100%;height:auto;border-radius:24px;display:block"/></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>

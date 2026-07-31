@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================= -->
+    <!--  QC Specifications — one per demo product.                    -->
+    <!--  Raw materials and packaging use the 'incoming' stage; only    -->
+    <!--  finished goods use 'finished' (the two stages the model has). -->
+    <!--  Name and version are auto-assigned by pharma.qc.spec.create  -->
+    <!-- ============================================================= -->
+
+    <!-- ── Incoming: Paracetamol API USP ──────────────────────────── -->
+    <record id="qc_spec_rm_paracetamol_api" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_paracetamol_api"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="notes">Sample as per SOP-002. Test as per SOP-003.</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass', 'test_method': 'IR / USP'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Assay', 'min_value': 99.0, 'max_value': 101.0, 'notes': '%', 'test_method': 'HPLC'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Loss on Drying', 'min_value': 0.0, 'max_value': 0.5, 'notes': '%'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Sulphated Ash', 'min_value': 0.0, 'max_value': 0.1, 'notes': '%'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Heavy Metals', 'min_value': 0.0, 'max_value': 10.0, 'notes': 'ppm'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Pass'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Lactose Monohydrate ──────────────────────────── -->
+    <record id="qc_spec_rm_lactose" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_lactose"/>
+        <field name="stage">incoming</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Moisture', 'min_value': 0.0, 'max_value': 5.5, 'notes': '%'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'pH', 'min_value': 4.5, 'max_value': 7.5}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Pass'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Microcrystalline Cellulose PH102 ─────────────── -->
+    <record id="qc_spec_rm_mcc_ph102" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_mcc_ph102"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass', 'test_method': 'IR'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Loss on Drying', 'min_value': 0.0, 'max_value': 5.0, 'notes': '%'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'pH', 'min_value': 5.0, 'max_value': 7.5}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Bulk Density', 'min_value': 0.28, 'max_value': 0.33, 'notes': 'g/mL'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Residue on Ignition', 'min_value': 0.0, 'max_value': 0.25, 'notes': '%'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Microbial Limit', 'acceptance_criteria': 'Complies'}),
+            (0, 0, {'sequence': 70, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White or almost white powder'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Pregelatinized Starch ────────────────────────── -->
+    <record id="qc_spec_rm_pregel_starch" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_pregel_starch"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Loss on Drying', 'min_value': 0.0, 'max_value': 14.0, 'notes': '%'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'pH', 'min_value': 4.5, 'max_value': 7.0}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Residue on Ignition', 'min_value': 0.0, 'max_value': 0.6, 'notes': '%'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Microbial Limit', 'acceptance_criteria': 'Complies'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White to off-white powder'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Magnesium Stearate ───────────────────────────── -->
+    <record id="qc_spec_rm_mag_stearate" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_mag_stearate"/>
+        <field name="stage">incoming</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Assay', 'min_value': 95.0, 'max_value': 105.0, 'notes': '%'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Loss on Drying', 'min_value': 0.0, 'max_value': 6.0, 'notes': '%'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Pass'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Purified Talc ────────────────────────────────── -->
+    <record id="qc_spec_rm_talc" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_talc"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass', 'test_method': 'XRD / IR'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Loss on Drying', 'min_value': 0.0, 'max_value': 0.5, 'notes': '%'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Acid-Soluble Substances', 'min_value': 0.0, 'max_value': 2.0, 'notes': '%'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Water-Soluble Iron', 'acceptance_criteria': 'Complies'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Microbial Limit', 'acceptance_criteria': 'Complies'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Fine white to greyish-white powder'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Povidone K30 ─────────────────────────────────── -->
+    <record id="qc_spec_rm_povidone_k30" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_povidone_k30"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass', 'test_method': 'IR'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'K-Value', 'min_value': 27.0, 'max_value': 32.4}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Water Content', 'min_value': 0.0, 'max_value': 5.0, 'notes': '%'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'pH', 'min_value': 3.0, 'max_value': 5.0, 'notes': '5% w/v solution'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Aldehydes', 'min_value': 0.0, 'max_value': 500.0, 'notes': 'ppm'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White to creamy-white powder'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Opadry White Film Coating ────────────────────── -->
+    <record id="qc_spec_rm_opadry_white" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_opadry_white"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">inhouse</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="notes">Test as per supplier CoA and in-house STP.</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Complies with supplier CoA'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Loss on Drying', 'min_value': 0.0, 'max_value': 5.0, 'notes': '%'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Viscosity', 'min_value': 200.0, 'max_value': 400.0, 'notes': 'mPa.s of 12% w/w dispersion'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Film Formation', 'acceptance_criteria': 'Smooth, continuous film'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White uniform powder'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Pancreatin USP (cold chain) ──────────────────── -->
+    <record id="qc_spec_rm_pancreatin_api" model="pharma.qc.spec">
+        <field name="product_id" ref="product_rm_pancreatin_api"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="notes">Sample and test under refrigeration; return to 2-8°C immediately after sampling.</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Identification', 'acceptance_criteria': 'Pass', 'test_method': 'USP'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Lipase Activity', 'min_value': 8.0, 'max_value': 25.0, 'notes': 'USP units/mg'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Amylase Activity', 'min_value': 8.0, 'max_value': 25.0, 'notes': 'USP units/mg'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Protease Activity', 'min_value': 8.0, 'max_value': 25.0, 'notes': 'USP units/mg'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Loss on Drying', 'min_value': 0.0, 'max_value': 5.0, 'notes': '%'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Microbial Limit', 'acceptance_criteria': 'Complies'}),
+            (0, 0, {'sequence': 70, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Cream to light-brown amorphous powder'}),
+        ]"/>
+    </record>
+
+    <!-- ============================================================= -->
+    <!--  Packaging Materials — tested on receipt ('incoming' stage)   -->
+    <!-- ============================================================= -->
+
+    <!-- ── Incoming: PVC Blister Film 250 Micron ──────────────────── -->
+    <record id="qc_spec_pm_pvc_film" model="pharma.qc.spec">
+        <field name="product_id" ref="product_pm_pvc_film"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">inhouse</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="notes">Sample per roll as per SOP-005.</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Clear transparent film, free from scratches and gels'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Thickness', 'min_value': 240.0, 'max_value': 260.0, 'notes': 'micron'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Width', 'min_value': 118.0, 'max_value': 122.0, 'notes': 'mm'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Identification', 'acceptance_criteria': 'Complies', 'test_method': 'IR'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Water Vapour Transmission Rate', 'min_value': 0.0, 'max_value': 3.0, 'notes': 'g/sq.m/day'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Aluminium Foil 20 Micron ─────────────────────── -->
+    <record id="qc_spec_pm_alu_foil" model="pharma.qc.spec">
+        <field name="product_id" ref="product_pm_alu_foil"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">inhouse</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Uniform coating, legible print, no pinholes'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Thickness', 'min_value': 19.0, 'max_value': 21.0, 'notes': 'micron'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Width', 'min_value': 118.0, 'max_value': 122.0, 'notes': 'mm'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Pinhole Test', 'acceptance_criteria': 'Complies'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Heat Seal Strength', 'min_value': 5.0, 'max_value': 12.0, 'notes': 'N/15 mm'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Print Legibility vs Artwork', 'acceptance_criteria': 'Matches approved artwork'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: HDPE Tablet Bottle 100 Count ─────────────────── -->
+    <record id="qc_spec_pm_hdpe_bottle" model="pharma.qc.spec">
+        <field name="product_id" ref="product_pm_hdpe_bottle"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">inhouse</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White opaque bottle, free from flash and deformation'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Bottle Weight', 'min_value': 18.0, 'max_value': 20.0, 'notes': 'g'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Brimful Capacity', 'min_value': 100.0, 'max_value': 105.0, 'notes': 'mL'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Neck Diameter', 'min_value': 32.5, 'max_value': 33.5, 'notes': 'mm'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Leakage Test', 'acceptance_criteria': 'No leakage'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Child Resistant Cap ──────────────────────────── -->
+    <record id="qc_spec_pm_cr_cap" model="pharma.qc.spec">
+        <field name="product_id" ref="product_pm_cr_cap"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">inhouse</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White cap with intact wad / liner'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Cap Weight', 'min_value': 3.0, 'max_value': 3.5, 'notes': 'g'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Inner Diameter', 'min_value': 32.5, 'max_value': 33.5, 'notes': 'mm'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Removal Torque', 'min_value': 0.9, 'max_value': 1.5, 'notes': 'Nm'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Child Resistance', 'acceptance_criteria': 'Complies'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Printed Carton ───────────────────────────────── -->
+    <record id="qc_spec_pm_printed_carton" model="pharma.qc.spec">
+        <field name="product_id" ref="product_pm_printed_carton"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">inhouse</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="notes">Verify print against the approved artwork before release.</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Print matches approved artwork, no smudging'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Grammage', 'min_value': 300.0, 'max_value': 320.0, 'notes': 'gsm'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Dimensions', 'acceptance_criteria': 'As per approved drawing'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Barcode Verification', 'acceptance_criteria': 'Grade A or B'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Text Content', 'acceptance_criteria': 'Matches approved artwork'}),
+        ]"/>
+    </record>
+
+    <!-- ── Incoming: Package Insert ───────────────────────────────── -->
+    <record id="qc_spec_pm_package_insert" model="pharma.qc.spec">
+        <field name="product_id" ref="product_pm_package_insert"/>
+        <field name="stage">incoming</field>
+        <field name="pharmacopoeial_ref">inhouse</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'Legible print, no smudging or missing text'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Grammage', 'min_value': 38.0, 'max_value': 42.0, 'notes': 'gsm'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Dimensions', 'acceptance_criteria': 'As per approved drawing'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Text Content', 'acceptance_criteria': 'Matches approved artwork version'}),
+        ]"/>
+    </record>
+
+    <!-- ── Finished Goods: Paracetamol 500 mg Tablets ─────────────── -->
+    <record id="qc_spec_fg_paracetamol_500" model="pharma.qc.spec">
+        <field name="product_id" ref="product_fg_paracetamol_500"/>
+        <field name="stage">finished</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="notes">Finished product release testing as per SOP-008.</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White to Off-white tablets'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Average Weight', 'min_value': 620.0, 'max_value': 650.0, 'notes': 'mg'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Weight Variation', 'acceptance_criteria': 'Within ±5%'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Hardness', 'min_value': 60.0, 'max_value': 90.0, 'notes': 'N'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Thickness', 'min_value': 4.8, 'max_value': 5.3, 'notes': 'mm'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Friability', 'min_value': 0.0, 'max_value': 1.0, 'notes': '% (NMT 1.0%)'}),
+            (0, 0, {'sequence': 70, 'parameter_name': 'Disintegration', 'min_value': 0.0, 'max_value': 15.0, 'notes': 'min (NMT 15 min)'}),
+            (0, 0, {'sequence': 80, 'parameter_name': 'Dissolution', 'min_value': 80.0, 'max_value': 100.0, 'notes': '% in 30 min (NLT 80%)'}),
+            (0, 0, {'sequence': 90, 'parameter_name': 'Assay', 'min_value': 95.0, 'max_value': 105.0, 'notes': '%'}),
+            (0, 0, {'sequence': 100, 'parameter_name': 'Related Substances', 'acceptance_criteria': 'Within Pharmacopoeial Limits'}),
+            (0, 0, {'sequence': 110, 'parameter_name': 'Microbial Limit', 'acceptance_criteria': 'Complies'}),
+        ]"/>
+    </record>
+
+    <!-- ── Finished Goods: Paracetamol 650 mg Tablets ─────────────── -->
+    <record id="qc_spec_fg_paracetamol_650" model="pharma.qc.spec">
+        <field name="product_id" ref="product_fg_paracetamol_650"/>
+        <field name="stage">finished</field>
+        <field name="pharmacopoeial_ref">usp</field>
+        <field name="state">approved</field>
+        <field name="approved_by" ref="base.user_admin"/>
+        <field name="approval_date">2026-07-01</field>
+        <field name="notes">Finished product release testing as per SOP-008.</field>
+        <field name="parameter_ids" eval="[
+            (0, 0, {'sequence': 10, 'parameter_name': 'Appearance', 'acceptance_criteria': 'White to off-white capsule shaped tablets'}),
+            (0, 0, {'sequence': 20, 'parameter_name': 'Average Weight', 'min_value': 780.0, 'max_value': 820.0, 'notes': 'mg'}),
+            (0, 0, {'sequence': 30, 'parameter_name': 'Weight Variation', 'acceptance_criteria': 'Within ±5%'}),
+            (0, 0, {'sequence': 40, 'parameter_name': 'Hardness', 'min_value': 70.0, 'max_value': 110.0, 'notes': 'N'}),
+            (0, 0, {'sequence': 50, 'parameter_name': 'Thickness', 'min_value': 5.6, 'max_value': 6.2, 'notes': 'mm'}),
+            (0, 0, {'sequence': 60, 'parameter_name': 'Friability', 'min_value': 0.0, 'max_value': 1.0, 'notes': '% (NMT 1.0%)'}),
+            (0, 0, {'sequence': 70, 'parameter_name': 'Disintegration', 'min_value': 0.0, 'max_value': 15.0, 'notes': 'min (NMT 15 min)'}),
+            (0, 0, {'sequence': 80, 'parameter_name': 'Dissolution', 'min_value': 80.0, 'max_value': 100.0, 'notes': '% in 30 min (NLT 80%)'}),
+            (0, 0, {'sequence': 90, 'parameter_name': 'Assay', 'min_value': 95.0, 'max_value': 105.0, 'notes': '%'}),
+            (0, 0, {'sequence': 100, 'parameter_name': 'Related Substances', 'acceptance_criteria': 'Within Pharmacopoeial Limits'}),
+            (0, 0, {'sequence': 110, 'parameter_name': 'Microbial Limit', 'acceptance_criteria': 'Complies'}),
+        ]"/>
+    </record>
+</odoo>

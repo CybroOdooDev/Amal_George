@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_expire_enrollments" model="ir.cron">
+        <field name="name">Expire Enrollments</field>
+        <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+today = datetime.date.today()
+expired_records = model.search([
+    ('x_studio_end_date', '<', today),
+    ('x_studio_status', '=', 'Active'),
+])
+for record in expired_records:
+    record.write({
+        'x_studio_status': 'Expired',
+    })
+        ]]></field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

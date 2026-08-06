@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo Employees -->
+    <record id="employee_trainer_1" model="hr.employee">
+        <field name="name">Alex Carter</field>
+        <field name="job_title">Personal Trainer</field>
+        <field name="work_email">alex.carter@fitness.example.com</field>
+    </record>
+
+    <record id="employee_trainer_2" model="hr.employee">
+        <field name="name">Sarah Jenkins</field>
+        <field name="job_title">Yoga Instructor &amp; Personal Trainer</field>
+        <field name="work_email">sarah.jenkins@fitness.example.com</field>
+    </record>
+
+    <!-- Demo Equipment -->
+    <record id="equipment_treadmill" model="x_equipment">
+        <field name="x_name">Commercial Treadmill T800</field>
+        <field name="x_studio_equipment_code">EQ-TR-001</field>
+        <field name="x_studio_category">Cardio Strength Flexibility Recovery Functional</field>
+
+        <field name="x_studio_status">Available</field>
+        <field name="x_studio_value">3500.00</field>
+        <field name="x_studio_purchase_date" eval="time.strftime('%Y-01-15')"/>
+    </record>
+
+    <record id="equipment_benchpress" model="x_equipment">
+        <field name="x_name">Olympic Bench Press</field>
+        <field name="x_studio_equipment_code">EQ-BP-002</field>
+        <field name="x_studio_category">Strength</field>
+
+        <field name="x_studio_status">Available</field>
+        <field name="x_studio_value">1200.00</field>
+        <field name="x_studio_purchase_date" eval="time.strftime('%Y-02-10')"/>
+    </record>
+
+    <record id="equipment_dumbbells" model="x_equipment">
+        <field name="x_name">Dumbbell Set 5kg-40kg</field>
+        <field name="x_studio_equipment_code">EQ-DB-003</field>
+        <field name="x_studio_category">Functional</field>
+        <field name="x_studio_status">Available</field>
+        <field name="x_studio_value">850.00</field>
+        <field name="x_studio_purchase_date" eval="time.strftime('%Y-03-01')"/>
+    </record>
+
+    <!-- Demo Membership Plans -->
+    <record id="plan_basic" model="x_membership_plans">
+        <field name="x_name">Basic Monthly Plan</field>
+        <field name="x_studio_duration_months">1</field>
+        <field name="x_studio_value">49.00</field>
+        <field name="x_studio_status">Active</field>
+        <field name="x_studio_trainer_1" eval="False"/>
+        <field name="x_studio_fitness_class" eval="False"/>
+        <field name="x_studio_personal_training" eval="False"/>
+    </record>
+
+    <record id="plan_premium" model="x_membership_plans">
+        <field name="x_name">Premium 3-Month Plan</field>
+        <field name="x_studio_duration_months">3</field>
+        <field name="x_studio_value">89.00</field>
+        <field name="x_studio_status">Active</field>
+        <field name="x_studio_trainer_1" eval="True"/>
+        <field name="x_studio_trainer" ref="employee_trainer_1"/>
+        <field name="x_studio_fitness_class" eval="True"/>
+        <field name="x_studio_personal_training" eval="False"/>
+    </record>
+
+    <record id="plan_vip" model="x_membership_plans">
+        <field name="x_name">VIP Annual Plan</field>
+        <field name="x_studio_duration_months">12</field>
+        <field name="x_studio_value">199.00</field>
+        <field name="x_studio_status">Active</field>
+        <field name="x_studio_trainer_1" eval="True"/>
+        <field name="x_studio_trainer" ref="employee_trainer_2"/>
+        <field name="x_studio_fitness_class" eval="True"/>
+        <field name="x_studio_personal_training" eval="True"/>
+    </record>
+
+    <!-- Demo Fitness Classes -->
+    <record id="class_yoga" model="x_fitness_classes">
+        <field name="x_name">Sunrise Yoga</field>
+        <field name="x_studio_instructor" ref="employee_trainer_2"/>
+        <field name="x_studio_category">Yoga Zumba HIIT Pilates Cycling Boxing Swimming Aerobics</field>
+        <field name="x_studio_maximum_capacity">20</field>
+        <field name="x_studio_duration_minutes">60</field>
+        <field name="x_studio_value">15.00</field>
+        <field name="x_studio_selection_1">Active</field>
+    </record>
+
+    <record id="class_hiit" model="x_fitness_classes">
+        <field name="x_name">HIIT Cardio Burn</field>
+        <field name="x_studio_instructor" ref="employee_trainer_1"/>
+        <field name="x_studio_category">HIIT</field>
+        <field name="x_studio_maximum_capacity">15</field>
+        <field name="x_studio_duration_minutes">45</field>
+        <field name="x_studio_value">20.00</field>
+        <field name="x_studio_selection_1">Active</field>
+    </record>
+
+    <record id="class_cycling" model="x_fitness_classes">
+        <field name="x_name">Spindirect Cycling</field>
+        <field name="x_studio_instructor" ref="employee_trainer_1"/>
+        <field name="x_studio_category">Cycling</field>
+        <field name="x_studio_maximum_capacity">12</field>
+        <field name="x_studio_duration_minutes">50</field>
+        <field name="x_studio_value">18.00</field>
+        <field name="x_studio_selection_1">Active</field>
+    </record>
+
+    <!-- Demo Personal Training -->
+    <record id="pt_package_starter" model="x_personal_training">
+        <field name="x_name">1-on-1 Personal Training Starter Package</field>
+        <field name="x_studio_trainer" ref="employee_trainer_1"/>
+        <field name="x_studio_session_duration_hours">1.0</field>
+        <field name="x_studio_total_sessions">10</field>
+        <field name="x_studio_value">350.00</field>
+        <field name="x_studio_status">Active</field>
+    </record>
+
+    <record id="pt_package_elite" model="x_personal_training">
+        <field name="x_name">VIP Personal Training Elite Package</field>
+        <field name="x_studio_trainer" ref="employee_trainer_2"/>
+        <field name="x_studio_session_duration_hours">1.5</field>
+        <field name="x_studio_total_sessions">24</field>
+        <field name="x_studio_value">850.00</field>
+        <field name="x_studio_status">Active</field>
+    </record>
+</odoo>

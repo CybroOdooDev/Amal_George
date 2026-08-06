@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard sub-view actions -->
+    <record id="action_dashboard_enrollments_graph" model="ir.actions.act_window">
+        <field name="name">Active Enrollments by Plan</field>
+        <field name="res_model">x_enrollment</field>
+        <field name="view_mode">graph</field>
+        <field name="domain">[('x_studio_status', '=', 'Active')]</field>
+    </record>
+
+    <record id="action_dashboard_sessions_list" model="ir.actions.act_window">
+        <field name="name">Today's Scheduled Sessions</field>
+        <field name="res_model">x_training_sessions</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('x_studio_date', '=', context_today())]</field>
+    </record>
+
+    <record id="action_dashboard_membership_pivot" model="ir.actions.act_window">
+        <field name="name">Membership Plans Revenue Analytics</field>
+        <field name="res_model">x_membership_plans</field>
+        <field name="view_mode">pivot</field>
+    </record>
+
+    <!-- Main Dashboard View -->
+    <record id="view_fitness_center_dashboard" model="ir.ui.view">
+        <field name="name">Fitness Center Dashboard Form</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Fitness Center Dashboard">
+                <board style="1-1">
+                    <column>
+                        <action name="%(action_dashboard_enrollments_graph)d" string="Active Enrollments by Plan"/>
+                        <action name="%(action_dashboard_membership_pivot)d" string="Membership Plans Revenue Analytics"/>
+                    </column>
+                    <column>
+                        <action name="%(action_dashboard_sessions_list)d" string="Today's Scheduled Sessions"/>
+                    </column>
+                </board>
+            </form>
+        </field>
+    </record>
+
+    <!-- Main Dashboard Action -->
+    <record id="action_fitness_center_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_mode">form</field>
+        <field name="usage">menu</field>
+        <field name="view_id" ref="view_fitness_center_dashboard"/>
+    </record>
+</odoo>

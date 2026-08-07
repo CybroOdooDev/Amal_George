@@ -41,7 +41,7 @@
     <field name="sequence">6</field>
   </record>
   <record id="fitness_center_dashboard_menu" model="ir.ui.menu" context="{'studio': True}">
-    <field name="action" ref="action_fitness_center_dashboard"/>
+    <field name="action" ref="action_fitness_center_dashboard_client"/>
     <field name="name">Dashboard</field>
     <field name="parent_id" ref="fitness_center_1f570d78-8f99-4d5c-a806-2a414e78a4f1"/>
     <field name="sequence">0</field>

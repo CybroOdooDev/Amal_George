@@ -25,4 +25,11 @@
           'data/ir_ui_menu.xml',
           'data/ir_default.xml'],
  'demo': ['demo/fitness_demo_data.xml'],
+ 'assets': {
+     'web.assets_backend': [
+         'fitness_center_saas/static/src/css/fitness_dashboard.css',
+         'fitness_center_saas/static/src/xml/fitness_dashboard.xml',
+         'fitness_center_saas/static/src/js/fitness_dashboard.js',
+     ],
+ },
  'license': 'OPL-1'}

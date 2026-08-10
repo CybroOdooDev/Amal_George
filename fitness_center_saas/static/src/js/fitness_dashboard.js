@@ -32,17 +32,8 @@ export class FitnessDashboard extends Component {
             filters: {
                 dateStart: "",
                 dateEnd: "",
-                planId: "",
-                trainerId: "",
-                classId: "",
-                enrollmentStatus: "",
-                equipmentStatus: "",
             },
-            filterOptions: {
-                plans: [],
-                trainers: [],
-                classes: [],
-            },
+            attendanceDashArray: "0 110",
             kpi: {
                 activeMembers: 0,
                 totalEnrollments: 0,
@@ -114,30 +105,19 @@ export class FitnessDashboard extends Component {
 
     onFilterChange(name, ev) {
         let val = ev.target.value;
-        if (["planId", "trainerId", "classId"].includes(name) && val !== "") {
-            val = parseInt(val) || "";
-        }
         this.state.filters[name] = val;
-        this.loadDashboardData();
+        this.loadDashboardData(true);
     }
 
     clearFilters() {
         this.state.filters = proxy({
             dateStart: "",
             dateEnd: "",
-            planId: "",
-            trainerId: "",
-            classId: "",
-            enrollmentStatus: "",
-            equipmentStatus: "",
         });
-        // Reset select values in UI
-        const selects = document.querySelectorAll(".fc_filter_item select");
-        selects.forEach(s => s.value = "");
-        const inputs = document.querySelectorAll(".fc_filter_item input");
+        const inputs = document.querySelectorAll(".fc_filter_item input, .fc_filter_item_vertical input");
         inputs.forEach(i => i.value = "");
         
-        this.loadDashboardData();
+        this.loadDashboardData(true);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -152,14 +132,6 @@ export class FitnessDashboard extends Component {
         if (this.state.filters.dateEnd) {
             domain.push(["x_studio_start_date", "<=", this.state.filters.dateEnd]);
         }
-        if (this.state.filters.planId) {
-            domain.push(["x_studio_membership_plan", "=", parseInt(this.state.filters.planId)]);
-        }
-        if (this.state.filters.enrollmentStatus) {
-            const idx = domain.findIndex(c => c[0] === "x_studio_status");
-            if (idx > -1) domain[idx] = ["x_studio_status", "=", this.state.filters.enrollmentStatus];
-            else domain.push(["x_studio_status", "=", this.state.filters.enrollmentStatus]);
-        }
         return domain;
     }
 
@@ -171,29 +143,15 @@ export class FitnessDashboard extends Component {
         if (this.state.filters.dateEnd) {
             domain.push(["x_studio_date", "<=", this.state.filters.dateEnd]);
         }
-        if (this.state.filters.trainerId) {
-            domain.push(["x_studio_trainer_1_1", "=", parseInt(this.state.filters.trainerId)]);
-        }
-        if (this.state.filters.classId) {
-            domain.push(["x_studio_fitness_class", "=", parseInt(this.state.filters.classId)]);
-        }
         return domain;
     }
 
     _getClassesDomain(baseDomain = []) {
-        const domain = [...baseDomain];
-        if (this.state.filters.classId) {
-            domain.push(["id", "=", parseInt(this.state.filters.classId)]);
-        }
-        return domain;
+        return baseDomain;
     }
 
     _getEquipmentDomain(baseDomain = []) {
-        const domain = [...baseDomain];
-        if (this.state.filters.equipmentStatus) {
-            domain.push(["x_studio_status", "=", this.state.filters.equipmentStatus]);
-        }
-        return domain;
+        return baseDomain;
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -205,7 +163,6 @@ export class FitnessDashboard extends Component {
             this.state.loading = true;
         }
         try {
-            await this._loadFilterOptions();
             await Promise.all([
                 this._loadKPIs(),
                 this._loadEnrollmentByStatus(),
@@ -227,23 +184,7 @@ export class FitnessDashboard extends Component {
         }
     }
 
-    async _loadFilterOptions() {
-        if (this.state.filterOptions.plans.length > 0) return;
-        try {
-            const [plans, trainers, classes] = await Promise.all([
-                this.orm.searchRead("x_membership_plans", [["x_studio_status", "=", "Active"]], ["x_name"]),
-                this.orm.searchRead("hr.employee", [], ["name"]),
-                this.orm.searchRead("x_fitness_classes", [["x_studio_selection_1", "=", "Active"]], ["x_name"]),
-            ]);
-            this.state.filterOptions = proxy({
-                plans: plans.map(p => ({ id: p.id, name: p.x_name })),
-                trainers: trainers.map(t => ({ id: t.id, name: t.name })),
-                classes: classes.map(c => ({ id: c.id, name: c.x_name })),
-            });
-        } catch (err) {
-            console.error("Error loading filter options:", err);
-        }
-    }
+
 
     async _loadKPIs() {
         const todayStr = this._todayString();
@@ -274,65 +215,37 @@ export class FitnessDashboard extends Component {
                 this.orm.searchCount("x_enrollment", enrollmentDomainExpiring),
             ]);
 
-        // Monthly recurring revenue (MRR) - Recalculated from invoices
+        // Monthly Revenue — sum of posted customer invoices in the selected period (or current month if no filters)
         let monthlyRevenue = 0;
         try {
-            const activeEnrollments = await this.orm.searchRead(
-                "x_enrollment",
-                enrollmentDomainActive,
-                ["x_studio_membership_plan", "x_studio_invoice_1"],
-                { limit: 200 }
-            );
-            const planIds = [
-                ...new Set(
-                    activeEnrollments
-                        .map(e => e.x_studio_membership_plan && e.x_studio_membership_plan[0])
-                        .filter(Boolean)
-                )
-            ];
-            const invoiceIds = [
-                ...new Set(
-                    activeEnrollments
-                        .map(e => e.x_studio_invoice_1 && e.x_studio_invoice_1[0])
-                        .filter(Boolean)
-                )
+            const mrrDomainBase = [
+                ["move_type", "=", "out_invoice"],
+                ["state", "=", "posted"],
+                ["payment_state", "=", "paid"],
+                ["invoice_date", "!=", false],
             ];
 
-            let planMap = {};
-            if (planIds.length > 0) {
-                const plans = await this.orm.searchRead(
-                    "x_membership_plans",
-                    [["id", "in", planIds]],
-                    ["x_studio_value", "x_studio_duration_months"]
-                );
-                plans.forEach(p => {
-                    planMap[p.id] = p;
-                });
-            }
-
-            let invoiceMap = {};
-            if (invoiceIds.length > 0) {
-                const invoices = await this.orm.searchRead(
-                    "account.move",
-                    [["id", "in", invoiceIds]],
-                    ["amount_total"]
-                );
-                invoices.forEach(inv => {
-                    invoiceMap[inv.id] = inv.amount_total;
-                });
-            }
-
-            monthlyRevenue = activeEnrollments.reduce((sum, e) => {
-                const planId = e.x_studio_membership_plan && e.x_studio_membership_plan[0];
-                const plan = planMap[planId] || {};
-                const duration = plan.x_studio_duration_months || 1;
-                
-                const invId = e.x_studio_invoice_1 && e.x_studio_invoice_1[0];
-                if (invId && invoiceMap[invId] !== undefined) {
-                    return sum + (invoiceMap[invId] / duration);
+            if (this.state.filters.dateStart || this.state.filters.dateEnd) {
+                if (this.state.filters.dateStart) {
+                    mrrDomainBase.push(["invoice_date", ">=", this.state.filters.dateStart]);
                 }
-                return sum + (plan.x_studio_value || 0);
-            }, 0);
+                if (this.state.filters.dateEnd) {
+                    mrrDomainBase.push(["invoice_date", "<=", this.state.filters.dateEnd]);
+                }
+            } else {
+                const now = new Date();
+                const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+                const monthEnd = this._todayString();
+                mrrDomainBase.push(["invoice_date", ">=", monthStart]);
+                mrrDomainBase.push(["invoice_date", "<=", monthEnd]);
+            }
+
+            const mrrInvoices = await this.orm.searchRead(
+                "account.move",
+                mrrDomainBase,
+                ["amount_total"]
+            );
+            monthlyRevenue = mrrInvoices.reduce((sum, inv) => sum + inv.amount_total, 0);
         } catch (_) {}
 
         // Attendance Rate
@@ -378,6 +291,7 @@ export class FitnessDashboard extends Component {
             availableEquipment: availEquip,
             trainerUtilization: `${trainerUtilization}%`,
         });
+        this.state.attendanceDashArray = `${(attendanceRate / 100) * 110} 110`;
     }
 
     async _loadEnrollmentByStatus() {
@@ -414,7 +328,7 @@ export class FitnessDashboard extends Component {
             "x_membership_plans",
             [["x_studio_status", "=", "Active"]],
             ["x_name", "x_studio_value", "x_studio_duration_months"],
-            { limit: 10, order: "x_studio_value desc" }
+            { order: "x_studio_value desc" }
         );
         this.state.membershipPlans = plans;
     }
@@ -433,7 +347,7 @@ export class FitnessDashboard extends Component {
                 "x_studio_membership_plan",
                 "x_studio_end_date",
             ],
-            { limit: 5, order: "x_studio_end_date asc" }
+            { order: "x_studio_end_date asc" }
         );
 
         const today = new Date();
@@ -469,7 +383,7 @@ export class FitnessDashboard extends Component {
                 "x_studio_personal_training",
                 "x_studio_status",
             ],
-            { limit: 5, order: "x_studio_start_time asc" }
+            { order: "x_studio_start_time asc" }
         );
 
         this.state.todaySchedule = records.map((r) => {
@@ -529,8 +443,7 @@ export class FitnessDashboard extends Component {
         const employees = await this.orm.searchRead(
             "hr.employee",
             employeeDomain,
-            ["id", "name", "job_title"],
-            { limit: 5 }
+            ["id", "name", "job_title"]
         );
 
         this.state.trainerAvailability = employees.map(emp => {
@@ -544,15 +457,14 @@ export class FitnessDashboard extends Component {
                 status: "Available",
                 statusClass: "available",
             };
-        });
+        }).sort((a, b) => b.sessionsCount - a.sessionsCount);
     }
 
     async _loadClassOpenings() {
         const records = await this.orm.searchRead(
             "x_fitness_classes",
             this._getClassesDomain([["x_studio_selection_1", "=", "Active"]]),
-            ["x_name", "x_studio_maximum_capacity", "x_studio_members"],
-            { limit: 5 }
+            ["x_name", "x_studio_maximum_capacity", "x_studio_members"]
         );
 
         this.state.classOpenings = records.map(r => {
@@ -576,22 +488,15 @@ export class FitnessDashboard extends Component {
         const records = await this.orm.searchRead(
             "x_equipment",
             this._getEquipmentDomain([]),
-            ["x_name", "x_studio_equipment_code", "x_studio_status", "x_studio_category"],
-            { limit: 5 }
+            ["x_name", "x_studio_equipment_code", "x_studio_status", "x_studio_category"]
         );
 
         this.state.equipmentAlerts = records.map(r => {
-            let severity = "info";
+            let severity = "success";
             let msg = "Optimal condition";
             if (r.x_studio_status === "Not Available") {
                 severity = "danger";
                 msg = "Out of service — Needs repair";
-            } else {
-                const needsService = r.id % 3 === 0;
-                if (needsService) {
-                    severity = "warning";
-                    msg = "Routine servicing due";
-                }
             }
 
             return {
@@ -695,82 +600,54 @@ export class FitnessDashboard extends Component {
             cancelled: trainerSessions[name].Cancelled,
         }));
 
-        // 5. Dynamic Monthly Revenue Trend Calculation - Recalculated from invoices
-        const enrollmentsTrend = await this.orm.searchRead(
-            "x_enrollment",
-            this._getEnrollmentDomain([["x_studio_status", "=", "Active"]]),
-            ["x_studio_start_date", "x_studio_membership_plan", "x_studio_invoice_1"]
-        );
-
-        const trendPlanIds = [
-            ...new Set(
-                enrollmentsTrend
-                    .map(e => e.x_studio_membership_plan && e.x_studio_membership_plan[0])
-                    .filter(Boolean)
-            )
-        ];
-        const trendInvoiceIds = [
-            ...new Set(
-                enrollmentsTrend
-                    .map(e => e.x_studio_invoice_1 && e.x_studio_invoice_1[0])
-                    .filter(Boolean)
-            )
-        ];
-
-        let trendPlanMap = {};
-        if (trendPlanIds.length > 0) {
-            const plans = await this.orm.searchRead(
-                "x_membership_plans",
-                [["id", "in", trendPlanIds]],
-                ["x_studio_value", "x_studio_duration_months"]
-            );
-            plans.forEach(p => {
-                trendPlanMap[p.id] = p;
-            });
-        }
-
-        let trendInvoiceMap = {};
-        if (trendInvoiceIds.length > 0) {
-            const invoices = await this.orm.searchRead(
-                "account.move",
-                [["id", "in", trendInvoiceIds]],
-                ["amount_total"]
-            );
-            invoices.forEach(inv => {
-                trendInvoiceMap[inv.id] = inv.amount_total;
-            });
-        }
-
-        const monthlyRevenueMap = {};
+        // 5. Monthly Revenue Trend — directly from posted customer invoices
+        //    move_type = 'out_invoice', state = 'posted', grouped by invoice_date
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const todayDate = new Date();
+
+        // Build the 6-month window (current month included)
+        const monthlyRevenueMap = {};
         for (let i = 5; i >= 0; i--) {
             const d = new Date(todayDate.getFullYear(), todayDate.getMonth() - i, 1);
-            const mLabel = monthNames[d.getMonth()];
-            const yLabel = d.getFullYear();
-            const key = `${mLabel} ${yLabel}`;
-            monthlyRevenueMap[key] = { label: mLabel, revenue: 0, sortKey: d.getTime() };
+            const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            monthlyRevenueMap[key] = { label: monthNames[d.getMonth()], revenue: 0, sortKey: d.getTime() };
         }
 
-        enrollmentsTrend.forEach(e => {
-            if (e.x_studio_start_date && e.x_studio_membership_plan) {
-                const planId = e.x_studio_membership_plan[0];
-                const plan = trendPlanMap[planId] || {};
-                const duration = plan.x_studio_duration_months || 1;
-                
-                let val = plan.x_studio_value || 0;
-                const invId = e.x_studio_invoice_1 && e.x_studio_invoice_1[0];
-                if (invId && trendInvoiceMap[invId] !== undefined) {
-                    val = trendInvoiceMap[invId] / duration;
-                }
+        // Determine date range for the query (oldest month start → today)
+        const windowStart = new Date(todayDate.getFullYear(), todayDate.getMonth() - 5, 1);
+        const windowStartStr = `${windowStart.getFullYear()}-${String(windowStart.getMonth() + 1).padStart(2, "0")}-01`;
+        const windowEndStr = this._todayString();
 
-                const startDate = new Date(e.x_studio_start_date);
-                const mLabel = monthNames[startDate.getMonth()];
-                const yLabel = startDate.getFullYear();
-                const key = `${mLabel} ${yLabel}`;
-                if (key in monthlyRevenueMap) {
-                    monthlyRevenueMap[key].revenue += val;
-                }
+        // Base domain: paid posted outgoing invoices within the 6-month window
+        const invoiceDomain = [
+            ["move_type", "=", "out_invoice"],
+            ["state", "=", "posted"],
+            ["payment_state", "=", "paid"],
+            ["invoice_date", "!=", false],
+            ["invoice_date", ">=", windowStartStr],
+            ["invoice_date", "<=", windowEndStr],
+        ];
+
+        // Apply dashboard date filters to invoice_date when set
+        if (this.state.filters.dateStart) {
+            invoiceDomain.push(["invoice_date", ">=", this.state.filters.dateStart]);
+        }
+        if (this.state.filters.dateEnd) {
+            invoiceDomain.push(["invoice_date", "<=", this.state.filters.dateEnd]);
+        }
+
+        const invoices = await this.orm.searchRead(
+            "account.move",
+            invoiceDomain,
+            ["invoice_date", "amount_total"]
+        );
+
+        invoices.forEach(inv => {
+            if (!inv.invoice_date) return;
+            const invDate = new Date(inv.invoice_date);
+            const key = `${monthNames[invDate.getMonth()]} ${invDate.getFullYear()}`;
+            if (key in monthlyRevenueMap) {
+                monthlyRevenueMap[key].revenue += inv.amount_total;
             }
         });
 
@@ -1050,8 +927,8 @@ export class FitnessDashboard extends Component {
         // eslint-disable-next-line no-undef
         if (typeof Chart === "undefined") return;
 
-        const textColor = "#8fbca9";
-        const gridColor = "rgba(0, 230, 118, 0.1)";
+        const textColor = "#a0aec0";
+        const gridColor = "rgba(226, 232, 240, 0.08)";
 
         const self = this;
 
@@ -1067,13 +944,18 @@ export class FitnessDashboard extends Component {
                     datasets: [{
                         label: "Plan Popularity",
                         data: data.map(d => d.count),
-                        borderColor: "#00ff87",
-                        backgroundColor: "rgba(0, 255, 135, 0.15)"
+                        borderColor: "#0075ff",
+                        backgroundColor: "rgba(0, 117, 255, 0.15)"
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         r: {
                             grid: { color: gridColor },
@@ -1104,8 +986,8 @@ export class FitnessDashboard extends Component {
                     datasets: [{
                         label: "Revenue Trend",
                         data: data.map(d => d.revenue),
-                        borderColor: "#00ff87",
-                        backgroundColor: "rgba(0, 255, 135, 0.1)",
+                        borderColor: "#00b5d8",
+                        backgroundColor: "rgba(0, 181, 216, 0.15)",
                         fill: true,
                         tension: 0.4
                     }]
@@ -1133,7 +1015,7 @@ export class FitnessDashboard extends Component {
                     datasets: [{
                         label: "Utilization %",
                         data: data.map(d => d.utilization),
-                        backgroundColor: "#00ff87",
+                        backgroundColor: "#0075ff",
                         borderRadius: 6
                     }]
                 },
@@ -1141,6 +1023,11 @@ export class FitnessDashboard extends Component {
                     indexAxis: "y",
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         x: { grid: { color: gridColor }, ticks: { color: textColor } },
                         y: { grid: { color: gridColor }, ticks: { color: textColor } }
@@ -1156,41 +1043,52 @@ export class FitnessDashboard extends Component {
             });
         }
 
-        // 4. Polar Area Chart - Trainer Performance Metrics
+        // 4. Polar Area Chart - Trainer Performance Metrics (Completed Sessions)
         const canvas4 = document.getElementById("trainerPerformanceRadarChart");
         if (canvas4) {
             const workload = this.state.chartsData.trainerWorkload || [];
-            // Sort to find the top active trainers
+            // Sort to find the top active trainers by completed sessions
             const topTrainers = [...workload]
                 .filter(t => t.id && t.name !== "Unassigned")
-                .sort((a, b) => (b.completed + b.scheduled) - (a.completed + a.scheduled))
+                .sort((a, b) => b.completed - a.completed)
                 .slice(0, 5);
 
             const datasets = [{
-                data: topTrainers.map(t => t.completed + t.scheduled),
-                backgroundColor: ["#00ff87ee", "#60efffee", "#39ff14ee", "#0df38cee", "#85ffc7ee"]
+                data: topTrainers.map(t => t.completed),
+                backgroundColor: ["#0075ff", "#00b5d8", "#7928ca", "#ff7300", "#01b574"]
             }];
 
             // Fallback if no trainers exist
-            if (topTrainers.length === 0) {
+            const hasCompleted = topTrainers.length > 0 && datasets[0].data.some(val => val > 0);
+            if (!hasCompleted) {
                 datasets[0].data = [0];
-                datasets[0].backgroundColor = ["#00ff87ee"];
+                datasets[0].backgroundColor = ["rgba(255, 255, 255, 0.1)"];
             }
 
             // eslint-disable-next-line no-undef
             this.charts.radar = new Chart(canvas4, {
                 type: "polarArea",
                 data: {
-                    labels: topTrainers.length > 0 ? topTrainers.map(t => t.name) : ["No Active Trainers"],
+                    labels: hasCompleted ? topTrainers.map(t => t.name) : ["No Completed Sessions"],
                     datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                boxWidth: 10,
+                                font: { size: 10 },
+                                color: textColor
+                            }
+                        }
+                    },
                     scales: {
                         r: {
                             grid: { color: gridColor },
-                            ticks: { backdropColor: "transparent", color: textColor }
+                            ticks: { backdropColor: "transparent", color: textColor, showLabelBackdrop: false }
                         }
                     },
                     onClick: (ev, elements) => {
@@ -1215,12 +1113,22 @@ export class FitnessDashboard extends Component {
                     labels: data.map(d => d.status),
                     datasets: [{
                         data: data.map(d => d.count),
-                        backgroundColor: ["#00ff87ee", "#ff3860ee"]
+                        backgroundColor: ["#01b574", "#ff3b30"]
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                boxWidth: 10,
+                                font: { size: 10 },
+                                color: textColor
+                            }
+                        }
+                    },
                     onClick: (ev, elements) => {
                         if (elements.length > 0) {
                             const index = elements[0].index;

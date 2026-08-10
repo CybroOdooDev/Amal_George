@@ -28,11 +28,27 @@
     <field name="parent_id" ref="fitness_center_1f570d78-8f99-4d5c-a806-2a414e78a4f1"/>
     <field name="sequence">5</field>
   </record>
+  <!-- Parent Menu: Enrollment -->
   <record id="fitness_center_enrol_daf813eb-df96-4699-9494-e412657c8e4b" model="ir.ui.menu" context="{'studio': True}">
-    <field name="action" ref="enrollment_006959b1-3b5e-4bc8-b37d-5b1de3ef88e9"/>
     <field name="name">Enrollment</field>
     <field name="parent_id" ref="fitness_center_1f570d78-8f99-4d5c-a806-2a414e78a4f1"/>
     <field name="sequence">1</field>
+  </record>
+
+  <!-- Sub Menu: Enrollments -->
+  <record id="fitness_center_enrollments_submenu" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="enrollment_006959b1-3b5e-4bc8-b37d-5b1de3ef88e9"/>
+    <field name="name">Enrollments</field>
+    <field name="parent_id" ref="fitness_center_enrol_daf813eb-df96-4699-9494-e412657c8e4b"/>
+    <field name="sequence">1</field>
+  </record>
+
+  <!-- Sub Menu: Members -->
+  <record id="fitness_center_members_submenu" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="action_members_view"/>
+    <field name="name">Members</field>
+    <field name="parent_id" ref="fitness_center_enrol_daf813eb-df96-4699-9494-e412657c8e4b"/>
+    <field name="sequence">2</field>
   </record>
   <record id="fitness_center_train_a526e3ae-3563-4bf6-a7be-e6ab9a9aa065" model="ir.ui.menu" context="{'studio': True}">
     <field name="action" ref="training_sessions_254c3a36-27ca-4b1e-8c32-58440df78369"/>

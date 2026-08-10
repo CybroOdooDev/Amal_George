@@ -38,445 +38,312 @@
 
       <div t-if="!this.state.loading" class="fc_content">
 
-        <!-- Interactive Filter Bar -->
-        <div class="fc_filter_bar">
-          <div class="fc_filter_item">
-            <label>Start Date</label>
-            <input type="date" t-att-value="this.state.filters.dateStart" t-on-change="(ev) => this.onFilterChange('dateStart', ev)"/>
-          </div>
-          <div class="fc_filter_item">
-            <label>End Date</label>
-            <input type="date" t-att-value="this.state.filters.dateEnd" t-on-change="(ev) => this.onFilterChange('dateEnd', ev)"/>
-          </div>
-          <div class="fc_filter_item">
-            <label>Membership Plan</label>
-            <select t-on-change="(ev) => this.onFilterChange('planId', ev)">
-              <option value="" t-att-selected="!this.state.filters.planId">All Plans</option>
-              <t t-foreach="this.state.filterOptions.plans" t-as="plan" t-key="plan.id">
-                <option t-att-value="plan.id" t-att-selected="this.state.filters.planId == plan.id" t-esc="plan.name"/>
-              </t>
-            </select>
-          </div>
-          <div class="fc_filter_item">
-            <label>Trainer</label>
-            <select t-on-change="(ev) => this.onFilterChange('trainerId', ev)">
-              <option value="" t-att-selected="!this.state.filters.trainerId">All Trainers</option>
-              <t t-foreach="this.state.filterOptions.trainers" t-as="trainer" t-key="trainer.id">
-                <option t-att-value="trainer.id" t-att-selected="this.state.filters.trainerId == trainer.id" t-esc="trainer.name"/>
-              </t>
-            </select>
-          </div>
-          
-          <div class="fc_filter_actions">
-            <button class="fc_toggle_advanced_btn" t-on-click="() => this.toggleAdvancedFilters()">
-              <i class="fa fa-sliders me-1"/>Advanced
-            </button>
-            <button class="fc_clear_filters_btn" t-on-click="() => this.clearFilters()">
-              <i class="fa fa-filter me-1"/>Clear
-            </button>
-          </div>
-        </div>
-
-        <!-- Collapsible Advanced Filters Panel -->
-        <div t-if="this.state.showAdvancedFilters" class="fc_advanced_filters_panel">
-          <div class="fc_filter_item">
-            <label>Fitness Class</label>
-            <select t-on-change="(ev) => this.onFilterChange('classId', ev)">
-              <option value="" t-att-selected="!this.state.filters.classId">All Classes</option>
-              <t t-foreach="this.state.filterOptions.classes" t-as="cls" t-key="cls.id">
-                <option t-att-value="cls.id" t-att-selected="this.state.filters.classId == cls.id" t-esc="cls.name"/>
-              </t>
-            </select>
-          </div>
-          <div class="fc_filter_item">
-            <label>Enrollment Status</label>
-            <select t-on-change="(ev) => this.onFilterChange('enrollmentStatus', ev)">
-              <option value="" t-att-selected="!this.state.filters.enrollmentStatus">All Statuses</option>
-              <option value="Draft" t-att-selected="this.state.filters.enrollmentStatus == 'Draft'">Draft</option>
-              <option value="Active" t-att-selected="this.state.filters.enrollmentStatus == 'Active'">Active</option>
-              <option value="Expired" t-att-selected="this.state.filters.enrollmentStatus == 'Expired'">Expired</option>
-              <option value="Renewed" t-att-selected="this.state.filters.enrollmentStatus == 'Renewed'">Renewed</option>
-              <option value="Cancelled" t-att-selected="this.state.filters.enrollmentStatus == 'Cancelled'">Cancelled</option>
-            </select>
-          </div>
-          <div class="fc_filter_item">
-            <label>Equipment Status</label>
-            <select t-on-change="(ev) => this.onFilterChange('equipmentStatus', ev)">
-              <option value="" t-att-selected="!this.state.filters.equipmentStatus">All Statuses</option>
-              <option value="Available" t-att-selected="this.state.filters.equipmentStatus == 'Available'">Available</option>
-              <option value="Not Available" t-att-selected="this.state.filters.equipmentStatus == 'Not Available'">Not Available</option>
-            </select>
-          </div>
-        </div>
-
         <!-- ═══════════════════════════════════════════════
-             SECTION 1 — KPI TILES
+             SECTION 1 — KPI TILES & FILTERS
         ═══════════════════════════════════════════════ -->
         <div class="fc_section">
-          <div class="fc_kpi_grid">
-
-            <!-- Active Members -->
-            <div class="fc_kpi_card fc_kpi_teal" t-on-click="() => this.onTileClick('x_enrollment', this.activeMembersDomain, 'Active Members')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-users"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.activeMembers"/>
-                  <span class="fc_kpi_label">Active Members</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Live</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-            <!-- Monthly Recurring Revenue (MRR) -->
-            <div class="fc_kpi_card fc_kpi_purple" t-on-click="() => this.onTileClick('x_enrollment', this.mrrDomain, 'Active Enrollments')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-money"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.mrr"/>
-                  <span class="fc_kpi_label">MRR</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Revenue</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-            <!-- Active Trainer Sessions Today -->
-            <div class="fc_kpi_card fc_kpi_orange" t-on-click="() => this.onTileClick('x_training_sessions', this.sessionsTodayDomain, 'Today\'s Trainer Sessions')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-calendar-check-o"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.sessionsToday"/>
-                  <span class="fc_kpi_label">Sessions Today</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Sessions</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-            <!-- Today's Attendance Rate -->
-            <div class="fc_kpi_card fc_kpi_green" t-on-click="() => this.onTileClick('x_training_sessions', this.attendanceDomain, 'Today\'s Trainer Sessions')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-check-circle"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.attendanceRate"/>
-                  <span class="fc_kpi_label">Attendance Rate</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Attendance</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-            <!-- Memberships Expiring Within 7 Days -->
-            <div class="fc_kpi_card fc_kpi_red" t-on-click="() => this.onTileClick('x_enrollment', this.expiringSoonDomain, 'Expiring Memberships')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-exclamation-triangle"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.expiringSoon"/>
-                  <span class="fc_kpi_label">Expiring (7d)</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Alert</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-            <!-- Active Fitness Classes -->
-            <div class="fc_kpi_card fc_kpi_pink" t-on-click="() => this.onTileClick('x_fitness_classes', this.activeClassesDomain, 'Active Fitness Classes')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-heartbeat"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.activeClasses"/>
-                  <span class="fc_kpi_label">Active Classes</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Classes</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-            <!-- Available Equipment -->
-            <div class="fc_kpi_card fc_kpi_cyan" t-on-click="() => this.onTileClick('x_equipment', this.availableEquipmentDomain, 'Available Equipment')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-cogs"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.availableEquipment"/>
-                  <span class="fc_kpi_label">Available Equipment</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Equipment</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-            <!-- Trainer Utilization -->
-            <div class="fc_kpi_card fc_kpi_blue" t-on-click="() => this.onTileClick('x_training_sessions', this.trainerUtilizationDomain, 'Today\'s Trainer Sessions')">
-              <div class="fc_kpi_body">
-                <div class="fc_kpi_icon_wrap">
-                  <i class="fa fa-user-secret"/>
-                </div>
-                <div class="fc_kpi_data">
-                  <span class="fc_kpi_value" t-esc="this.state.kpi.trainerUtilization"/>
-                  <span class="fc_kpi_label">Trainer Utilization</span>
-                </div>
-              </div>
-              <div class="fc_kpi_footer">
-                <span class="fc_kpi_badge">Utilization</span>
-                <i class="fa fa-chevron-right fc_kpi_arrow"/>
-              </div>
-            </div>
-
-          </div><!-- /fc_kpi_grid -->
-        </div><!-- /SECTION 1 -->
-
-        <!-- ═══════════════════════════════════════════════
-             MAIN DASHBOARD CONTENT GRID (CRM ARRANGEMENT STYLE)
-        ═══════════════════════════════════════════════ -->
-        <div class="fc_dashboard_main_grid">
-          
-          <!-- LEFT-MIDDLE COLUMN (70% width) -->
-          <div class="fc_col_left">
+          <div class="fc_kpi_filter_wrapper">
             
-            <!-- SECTION 1.5 — COMPACT BUSINESS INSIGHTS CARDS (Indicator Row) -->
-            <div class="fc_insights_compact_row">
-              <div class="fc_insight_compact_card" t-on-click="() => this.onClickTopTrainer()">
-                <i class="fa fa-trophy text-warning fc_insight_compact_icon"/>
-                <div class="fc_insight_compact_data">
-                  <span class="fc_insight_compact_label">Top Trainer</span>
-                  <span class="fc_insight_compact_value" t-esc="this.state.insights.topTrainer"/>
-                </div>
-              </div>
-              <div class="fc_insight_compact_card" t-on-click="() => this.onClickHighestPlan()">
-                <i class="fa fa-money text-success fc_insight_compact_icon"/>
-                <div class="fc_insight_compact_data">
-                  <span class="fc_insight_compact_label">Highest Plan</span>
-                  <span class="fc_insight_compact_value" t-esc="this.state.insights.highestPlan"/>
-                </div>
-              </div>
-              <div class="fc_insight_compact_card" t-on-click="() => this.onClickEquipUtilization()">
-                <i class="fa fa-cogs text-secondary fc_insight_compact_icon"/>
-                <div class="fc_insight_compact_data">
-                  <span class="fc_insight_compact_label">Equipment Util.</span>
-                  <span class="fc_insight_compact_value" t-esc="this.state.insights.equipUtilization"/>
-                </div>
-              </div>
-            </div>
-
-            <!-- Row 2: Large Line Chart (Monthly Revenue Trend) -->
-            <div class="fc_card fc_chart_card mb-4">
-              <div class="fc_card_header">
-                <div class="fc_card_title_wrap">
-                  <div class="fc_card_icon_dot fc_dot_orange"/>
-                  <h3 class="fc_card_title">Monthly Revenue Trend</h3>
-                </div>
-                <div class="fc_card_header_right">
-                  <span class="fc_card_badge">Line Chart</span>
-                  <button class="fc_export_btn" t-on-click="() => this.exportChartPNG('monthlyRevenueTrendChart', 'Monthly Revenue Trend')" title="Export PNG">
-                    <i class="fa fa-download"/>
-                  </button>
-                </div>
-              </div>
-              <div class="fc_card_body fc_chart_container">
-                <canvas id="monthlyRevenueTrendChart"/>
-              </div>
-            </div>
-
-            <!-- Row 3: Circular Charts Side-by-Side (Plan Popularity & Equipment Availability) -->
-            <div class="fc_charts_row_circular">
+            <!-- Left Side: Cards Container (2 lines) -->
+            <div class="fc_kpi_lines_container">
               
-              <!-- 2. Membership Plan Popularity -->
-              <div class="fc_card fc_chart_card">
-                <div class="fc_card_header">
-                  <div class="fc_card_title_wrap">
-                    <div class="fc_card_icon_dot fc_dot_teal"/>
-                    <h3 class="fc_card_title">Plan Popularity</h3>
-                  </div>
-                  <div class="fc_card_header_right">
-                    <span class="fc_card_badge">Radar Chart</span>
-                    <button class="fc_export_btn" t-on-click="() => this.exportChartPNG('planPopularityChart', 'Membership Plan Popularity')" title="Export PNG">
-                      <i class="fa fa-download"/>
-                    </button>
+              <!-- First Line (5 cards) -->
+              <div class="fc_kpi_line_1">
+                <!-- 1. Active Members -->
+                <div class="fc_kpi_card fc_kpi_purple_glow" t-on-click="() => this.onTileClick('x_enrollment', this.activeMembersDomain, 'Active Members')">
+                  <div class="fc_kpi_content">
+                    <div class="fc_kpi_data">
+                      <span class="fc_kpi_label">Active Members</span>
+                      <span class="fc_kpi_value" t-esc="this.state.kpi.activeMembers"/>
+                      <span class="fc_kpi_caption">Total Active Members</span>
+                    </div>
+                    <div class="fc_kpi_icon_wrap fc_icon_purple">
+                      <i class="fa fa-users"/>
+                    </div>
                   </div>
                 </div>
-                <div class="fc_card_body fc_chart_container">
-                  <canvas id="planPopularityChart"/>
+
+                <!-- 2. Monthly Recurring Revenue (MRR) -->
+                <div class="fc_kpi_card fc_kpi_green_glow" t-on-click="() => this.onTileClick('x_enrollment', this.mrrDomain, 'Active Enrollments')">
+                  <div class="fc_kpi_content">
+                    <div class="fc_kpi_data">
+                      <span class="fc_kpi_label">MRR</span>
+                      <span class="fc_kpi_value" t-esc="this.state.kpi.mrr"/>
+                      <span class="fc_kpi_caption">Monthly Recurring Revenue</span>
+                    </div>
+                    <div class="fc_kpi_icon_wrap fc_icon_green">
+                      <i class="fa fa-money"/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Active Fitness Classes -->
+                <div class="fc_kpi_card fc_kpi_orange_glow" t-on-click="() => this.onTileClick('x_fitness_classes', this.activeClassesDomain, 'Active Classes')">
+                  <div class="fc_kpi_content">
+                    <div class="fc_kpi_data">
+                      <span class="fc_kpi_label">Active Classes</span>
+                      <span class="fc_kpi_value" t-esc="this.state.kpi.activeClasses"/>
+                      <span class="fc_kpi_caption">Currently Active</span>
+                    </div>
+                    <div class="fc_kpi_icon_wrap fc_icon_orange">
+                      <i class="fa fa-heartbeat"/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. Available Equipment -->
+                <div class="fc_kpi_card fc_kpi_cyan_glow" t-on-click="() => this.onTileClick('x_equipment', this.availableEquipmentDomain, 'Available Equipment')">
+                  <div class="fc_kpi_content">
+                    <div class="fc_kpi_data">
+                      <span class="fc_kpi_label">Available Equipment</span>
+                      <span class="fc_kpi_value" t-esc="this.state.kpi.availableEquipment"/>
+                      <span class="fc_kpi_caption">Ready to Use</span>
+                    </div>
+                    <div class="fc_kpi_icon_wrap fc_icon_cyan">
+                      <i class="fa fa-cogs"/>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <!-- 5. Equipment Status -->
-              <div class="fc_card fc_chart_card">
-                <div class="fc_card_header">
-                  <div class="fc_card_title_wrap">
-                    <div class="fc_card_icon_dot fc_dot_purple"/>
-                    <h3 class="fc_card_title">Equipment Availability</h3>
-                  </div>
-                  <div class="fc_card_header_right">
-                    <span class="fc_card_badge">Pie Chart</span>
-                    <button class="fc_export_btn" t-on-click="() => this.exportChartPNG('equipmentStatusPolarChart', 'Equipment Availability')" title="Export PNG">
-                      <i class="fa fa-download"/>
-                    </button>
+              <!-- Second Line (3 cards) -->
+              <div class="fc_kpi_line_2">
+                <!-- 1. Sessions Today -->
+                <div class="fc_kpi_card fc_kpi_pink_glow" t-on-click="() => this.onTileClick('x_training_sessions', this.sessionsTodayDomain, 'Today\'s Trainer Sessions')">
+                  <div class="fc_kpi_content">
+                    <div class="fc_kpi_data">
+                      <span class="fc_kpi_label">Sessions Today</span>
+                      <span class="fc_kpi_value" t-esc="this.state.kpi.sessionsToday"/>
+                      <span class="fc_kpi_caption">Total Sessions</span>
+                    </div>
+                    <div class="fc_kpi_icon_wrap fc_icon_pink">
+                      <i class="fa fa-calendar-check-o"/>
+                    </div>
                   </div>
                 </div>
-                <div class="fc_card_body fc_chart_container">
-                  <canvas id="equipmentStatusPolarChart"/>
+
+                <!-- 2. Memberships Expiring Within 7 Days -->
+                <div class="fc_kpi_card fc_kpi_yellow_glow" t-on-click="() => this.onTileClick('x_enrollment', this.expiringSoonDomain, 'Expiring Memberships')">
+                  <div class="fc_kpi_content">
+                    <div class="fc_kpi_data">
+                      <span class="fc_kpi_label">Expiring (7d)</span>
+                      <span class="fc_kpi_value" t-esc="this.state.kpi.expiringSoon"/>
+                      <span class="fc_kpi_caption">Memberships Expiring</span>
+                    </div>
+                    <div class="fc_kpi_icon_wrap fc_icon_yellow">
+                      <i class="fa fa-exclamation-triangle"/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Attendance Rate (Gauge Style) -->
+                <div class="fc_attendance_gauge_card" t-on-click="() => this.onTileClick('x_training_sessions', this.attendanceDomain, 'Today\'s Trainer Sessions')">
+                  <!-- Left Side: Header & Info -->
+                  <div class="fc_gauge_left_content">
+                    <div class="fc_gauge_header">
+                      <span class="fc_gauge_card_title">Attendance</span>
+                      <span class="fc_gauge_card_subtitle">Based on sessions today</span>
+                    </div>
+                    <div class="fc_gauge_footer_box_left">
+                      <div class="fc_gauge_bounds_row">
+                        <span class="fc_gauge_bound">0%</span>
+                        <span class="fc_gauge_bound">100%</span>
+                      </div>
+                      <span class="fc_gauge_caption">Today's Rate</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Right Side: Gauge Circular Body -->
+                  <div class="fc_gauge_right_content">
+                    <svg viewBox="10 10 80 80" class="fc_gauge_svg_large">
+                      <defs>
+                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#0075ff"/>
+                          <stop offset="100%" stop-color="#00b5d8"/>
+                        </linearGradient>
+                      </defs>
+                      <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+                      <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="url(#gaugeGradient)" stroke-width="6" stroke-linecap="round" t-att-stroke-dasharray="this.state.attendanceDashArray" stroke-dashoffset="0"/>
+                    </svg>
+                    <div class="fc_gauge_center_text_wrap">
+                      <span class="fc_gauge_center_value" t-esc="this.state.kpi.attendanceRate"/>
+                    </div>
+                  </div>
                 </div>
               </div>
 
+            </div>
+
+            <!-- Right Side: Filter Card (Spans vertical height of both rows) -->
+            <div class="fc_filter_bar_card">
+              <div class="fc_filter_header">
+                <h3 class="fc_filter_title">
+                  <i class="fa fa-sliders me-2"/>Filter Controls
+                </h3>
+              </div>
+              <div class="fc_filter_body_vertical">
+                <div class="fc_filter_item_vertical">
+                  <label>Start Date</label>
+                  <input type="date" t-att-value="this.state.filters.dateStart" t-on-change="(ev) => this.onFilterChange('dateStart', ev)"/>
+                </div>
+                <div class="fc_filter_item_vertical">
+                  <label>End Date</label>
+                  <input type="date" t-att-value="this.state.filters.dateEnd" t-on-change="(ev) => this.onFilterChange('dateEnd', ev)"/>
+                </div>
+              </div>
+              <div class="fc_filter_actions_vertical">
+                <button class="fc_clear_filters_btn_large" t-on-click="() => this.clearFilters()">
+                  <i class="fa fa-filter me-1"/>Clear Filters
+                </button>
+              </div>
             </div>
 
           </div>
-          
-          <!-- RIGHT COLUMN (30% width) -->
-          <div class="fc_col_right">
-            
-            <!-- 4. Trainer Performance (Mini Polar Area) -->
-            <div class="fc_card fc_chart_card mb-4">
-              <div class="fc_card_header">
-                <div class="fc_card_title_wrap">
-                  <div class="fc_card_icon_dot fc_dot_teal"/>
-                  <h3 class="fc_card_title">Trainer Performance</h3>
-                </div>
-                <div class="fc_card_header_right">
-                  <span class="fc_card_badge">Polar Area</span>
-                  <button class="fc_export_btn" t-on-click="() => this.exportChartPNG('trainerPerformanceRadarChart', 'Trainer Performance Metrics')" title="Export PNG">
-                    <i class="fa fa-download"/>
-                  </button>
-                </div>
-              </div>
-              <div class="fc_card_body fc_chart_container">
-                <canvas id="trainerPerformanceRadarChart"/>
-              </div>
-            </div>
-
-            <!-- 3. Class Capacity Utilization (Vertical Bar Chart) -->
-            <div class="fc_card fc_chart_card">
-              <div class="fc_card_header">
-                <div class="fc_card_title_wrap">
-                  <div class="fc_card_icon_dot fc_dot_purple"/>
-                  <h3 class="fc_card_title">Class Utilization</h3>
-                </div>
-                <div class="fc_card_header_right">
-                  <span class="fc_card_badge">Horizontal Bar</span>
-                  <button class="fc_export_btn" t-on-click="() => this.exportChartPNG('classCapacityUtilizationChart', 'Class Capacity Utilization')" title="Export PNG">
-                    <i class="fa fa-download"/>
-                  </button>
-                </div>
-              </div>
-              <div class="fc_card_body fc_chart_container">
-                <canvas id="classCapacityUtilizationChart"/>
-              </div>
-            </div>
-
-          </div>
-
         </div>
 
         <!-- ═══════════════════════════════════════════════
-             SECTION 3 — COMPACT OPERATIONAL PANELS
+             SECTION 2 — CHARTS ROW 1 (Monthly Revenue & Class Capacity)
         ═══════════════════════════════════════════════ -->
-        <div class="fc_section">
-          <div class="fc_tables_grid">
-            <!-- COLUMN 1: Memberships & Schedule -->
-            <div class="fc_column_group">
+        <div class="fc_charts_row_middle">
+          <!-- Left: Upcoming Membership Expiries Table -->
+          <div class="fc_card fc_panel_card fc_flex_4">
+            <div class="fc_card_header">
+              <div class="fc_card_title_wrap">
+                <div class="fc_card_icon_dot fc_dot_red"/>
+                <h3 class="fc_card_title">Upcoming Membership Expiries</h3>
+              </div>
+              <div class="fc_card_header_right">
+                <button class="fc_view_all_btn" t-on-click="() => this.onTileClick('x_enrollment', this.activeMembersDomain, 'Upcoming Expiries')">
+                  <i class="fa fa-external-link me-1"/>View All
+                </button>
+                <button class="fc_export_btn" t-on-click="() => this.exportTableCSV('expiries')" title="Export CSV">
+                  <i class="fa fa-download"/>
+                </button>
+              </div>
+            </div>
+            <div class="fc_card_body fc_table_body">
+              <table class="fc_table">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Plan</th>
+                    <th>Expiry Date</th>
+                    <th>Days Left</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <t t-if="this.state.upcomingExpiries.length === 0">
+                    <tr>
+                      <td colspan="4" class="fc_table_empty">No memberships expiring soon</td>
+                    </tr>
+                  </t>
+                  <t t-foreach="this.state.upcomingExpiries" t-as="enr" t-key="enr.id">
+                    <tr class="fc_table_row">
+                      <td>
+                        <div class="fc_member_cell">
+                          <div class="fc_avatar" t-esc="enr.memberInitial"/>
+                          <span class="fw-bold" t-esc="enr.member"/>
+                        </div>
+                      </td>
+                      <td><span class="fc_plan_tag" t-esc="enr.plan"/></td>
+                      <td class="fc_date_cell" t-esc="enr.expiryDate"/>
+                      <td>
+                        <span t-attf-class="fc_days_badge #{enr.remainingDays &lt;= 7 ? 'fc_badge_danger' : 'fc_badge_warning'}" t-esc="enr.remainingDays + ' days'"/>
+                      </td>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Right: Monthly Revenue Trend -->
+          <div class="fc_card fc_chart_card fc_flex_6">
+            <div class="fc_card_header">
+              <div class="fc_card_title_wrap">
+                <h3 class="fc_card_title">Monthly Revenue Trend</h3>
+              </div>
+            </div>
+            <div class="fc_card_body fc_chart_container">
+              <canvas id="monthlyRevenueTrendChart"/>
+            </div>
+          </div>
+        </div>
 
-              <!-- 1. Upcoming Membership Expiry -->
-              <div class="fc_card fc_panel_card mb-4">
+        <!-- ═══════════════════════════════════════════════
+             SECTION 3 — CHARTS ROW 2 (Trainer, Equipment & Plan Popularity)
+        ═══════════════════════════════════════════════ -->
+        <div class="fc_charts_row_bottom">
+          <!-- Left: Trainer Performance -->
+          <div class="fc_card fc_chart_card">
+            <div class="fc_card_header">
+              <div class="fc_card_title_wrap">
+                <h3 class="fc_card_title">Trainer Performance (Today)</h3>
+              </div>
+            </div>
+            <div class="fc_card_body fc_chart_container">
+              <canvas id="trainerPerformanceRadarChart"/>
+            </div>
+          </div>
+          <!-- Middle: Equipment Availability -->
+          <div class="fc_card fc_chart_card">
+            <div class="fc_card_header">
+              <div class="fc_card_title_wrap">
+                <h3 class="fc_card_title">Equipment Availability</h3>
+              </div>
+            </div>
+            <div class="fc_card_body fc_chart_container">
+              <canvas id="equipmentStatusPolarChart"/>
+            </div>
+          </div>
+          <!-- Right: Plan Popularity -->
+          <div class="fc_card fc_chart_card">
+            <div class="fc_card_header">
+              <div class="fc_card_title_wrap">
+                <h3 class="fc_card_title">Plan Popularity</h3>
+              </div>
+            </div>
+            <div class="fc_card_body fc_chart_container">
+              <canvas id="planPopularityChart"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             SECTION 4 — OPERATIONAL TABLES
+        ═══════════════════════════════════════════════ -->
+        <div class="fc_section mt-4">
+          <div class="fc_row_tables_grid">
+            
+            <!-- Left: Class Capacity Utilization Chart & Today's Schedule -->
+            <div class="fc_table_left_col">
+              <div class="fc_card fc_chart_card">
                 <div class="fc_card_header">
                   <div class="fc_card_title_wrap">
-                    <div class="fc_card_icon_dot fc_dot_red"/>
-                    <h3 class="fc_card_title">Upcoming Membership Expiries</h3>
-                  </div>
-                  <div class="fc_card_header_right">
-                    <button class="fc_view_all_btn" t-on-click="() => this.onTileClick('x_enrollment', this.activeMembersDomain, 'Upcoming Expiries')">
-                      <i class="fa fa-external-link me-1"/>View All
-                    </button>
-                    <button class="fc_export_btn" t-on-click="() => this.exportTableCSV('expiries')" title="Export CSV">
-                      <i class="fa fa-download"/>
-                    </button>
+                    <h3 class="fc_card_title">Class Capacity Utilization</h3>
                   </div>
                 </div>
-                <div class="fc_card_body fc_table_body">
-                  <table class="fc_table">
-                    <thead>
-                      <tr>
-                        <th>Member</th>
-                        <th>Plan</th>
-                        <th>Expiry Date</th>
-                        <th>Days Left</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <t t-if="this.state.upcomingExpiries.length === 0">
-                        <tr>
-                          <td colspan="4" class="fc_table_empty">No memberships expiring soon</td>
-                        </tr>
-                      </t>
-                      <t t-foreach="this.state.upcomingExpiries" t-as="enr" t-key="enr.id">
-                        <tr class="fc_table_row">
-                          <td>
-                            <div class="fc_member_cell">
-                              <div class="fc_avatar" t-esc="enr.memberInitial"/>
-                              <span class="fw-bold" t-esc="enr.member"/>
-                            </div>
-                          </td>
-                          <td><span class="fc_plan_tag" t-esc="enr.plan"/></td>
-                          <td class="fc_date_cell" t-esc="enr.expiryDate"/>
-                          <td>
-                            <span t-attf-class="fc_days_badge #{enr.remainingDays &lt;= 7 ? 'fc_badge_danger' : 'fc_badge_warning'}" t-esc="enr.remainingDays + ' days'"/>
-                          </td>
-                        </tr>
-                      </t>
-                    </tbody>
-                  </table>
+                <div class="fc_card_body fc_chart_container">
+                  <canvas id="classCapacityUtilizationChart"/>
                 </div>
               </div>
 
-              <!-- 2. Today's Training Schedule -->
+              <!-- Today's Training Schedule -->
               <div class="fc_card fc_panel_card">
                 <div class="fc_card_header">
                   <div class="fc_card_title_wrap">
                     <div class="fc_card_icon_dot fc_dot_orange"/>
-                    <h3 class="fc_card_title">Today's Training Schedule</h3>
+                    <h3 class="fc_card_title">Today's Schedule</h3>
                   </div>
                   <div class="fc_card_header_right">
                     <button class="fc_view_all_btn" t-on-click="() => this.onTileClick('x_training_sessions', this.sessionsTodayDomain, 'Today\'s Schedule')">
                       <i class="fa fa-external-link me-1"/>View All
                     </button>
-                    <button class="fc_export_btn" t-on-click="() => this.exportTableCSV('schedule')" title="Export CSV">
-                      <i class="fa fa-download"/>
-                    </button>
                   </div>
                 </div>
                 <div class="fc_card_body fc_table_body">
                   <table class="fc_table">
                     <thead>
                       <tr>
-                        <th>Time</th>
                         <th>Member</th>
                         <th>Trainer</th>
                         <th>Type</th>
@@ -486,17 +353,20 @@
                     <tbody>
                       <t t-if="this.state.todaySchedule.length === 0">
                         <tr>
-                          <td colspan="5" class="fc_table_empty">No training sessions today</td>
+                          <td colspan="4" class="fc_table_empty">No training sessions today</td>
                         </tr>
                       </t>
                       <t t-foreach="this.state.todaySchedule" t-as="sess" t-key="sess.id">
                         <tr class="fc_table_row" t-on-click="() => this.onClickSession(sess)">
-                          <td class="fw-bold text-primary" t-esc="sess.time"/>
-                          <td t-esc="sess.member"/>
-                          <td class="text-muted" t-esc="sess.trainer"/>
-                          <td><span class="fc_class_tag" t-esc="sess.type"/></td>
                           <td>
-                            <span t-attf-class="fc_status_badge fc_status_#{sess.statusClass}" t-esc="sess.status"/>
+                            <span class="fw-bold" t-esc="sess.member"/>
+                          </td>
+                          <td class="text-muted" t-esc="sess.trainer"/>
+                          <td>
+                            <span class="fc_plan_tag" t-esc="sess.type"/>
+                          </td>
+                          <td>
+                            <span t-attf-class="fc_days_badge fc_badge_#{sess.statusClass}" t-esc="sess.status"/>
                           </td>
                         </tr>
                       </t>
@@ -504,63 +374,20 @@
                   </table>
                 </div>
               </div>
-
             </div>
 
-            <!-- COLUMN 2: Class Openings, Trainers & Assets -->
-            <div class="fc_column_group">
-
-              <!-- 3. Fitness Class Openings -->
-              <div class="fc_card fc_panel_card mb-4">
-                <div class="fc_card_header">
-                  <div class="fc_card_title_wrap">
-                    <div class="fc_card_icon_dot fc_dot_teal"/>
-                    <h3 class="fc_card_title">Fitness Class Openings</h3>
-                  </div>
-                  <div class="fc_card_header_right">
-                    <button class="fc_view_all_btn" t-on-click="() => this.onTileClick('x_fitness_classes', this.activeClassesDomain, 'Fitness Class Openings')">
-                      <i class="fa fa-external-link me-1"/>View All
-                    </button>
-                    <button class="fc_export_btn" t-on-click="() => this.exportTableCSV('openings')" title="Export CSV">
-                      <i class="fa fa-download"/>
-                    </button>
-                  </div>
-                </div>
-                <div class="fc_card_body fc_panel_body">
-                  <t t-if="this.state.classOpenings.length === 0">
-                    <p class="text-muted text-center py-3">No active fitness classes</p>
-                  </t>
-                  <t t-foreach="this.state.classOpenings" t-as="cls" t-key="cls.id">
-                    <div class="fc_opening_row" t-on-click="() => this.onClickClass(cls)">
-                      <div class="fc_opening_info">
-                        <span class="fc_opening_name fw-bold" t-esc="cls.name"/>
-                        <span class="fc_opening_slots text-muted" t-esc="cls.slotsLeft + ' slots left (' + cls.filled + '/' + cls.max + ')'"/>
-                      </div>
-                      <div class="fc_progress_container">
-                        <div class="fc_progress_bar" t-attf-style="width: #{cls.occupancy}%; background: #{cls.occupancy &gt;= 90 ? '#ef4444' : cls.occupancy &gt;= 75 ? '#f97316' : '#00b4d8'}"/>
-                      </div>
-                    </div>
-                  </t>
-                </div>
-              </div>
-
-              <!-- 4. Trainer Workload & Availability -->
+            <!-- Right: Workload, Alerts (30%) -->
+            <div class="fc_table_right_col">
+              
+              <!-- 2. Trainer Workload & Availability -->
               <div class="fc_card fc_panel_card mb-4">
                 <div class="fc_card_header">
                   <div class="fc_card_title_wrap">
                     <div class="fc_card_icon_dot fc_dot_purple"/>
                     <h3 class="fc_card_title">Trainer Workload</h3>
                   </div>
-                  <div class="fc_card_header_right">
-                    <button class="fc_view_all_btn" t-on-click="() => this.onClickViewAllTrainers()">
-                      <i class="fa fa-external-link me-1"/>View All
-                    </button>
-                    <button class="fc_export_btn" t-on-click="() => this.exportTableCSV('trainers')" title="Export CSV">
-                      <i class="fa fa-download"/>
-                    </button>
-                  </div>
                 </div>
-                <div class="fc_card_body fc_panel_body">
+                <div class="fc_card_body fc_panel_body_scroll">
                   <t t-if="this.state.trainerAvailability.length === 0">
                     <p class="text-muted text-center py-3">No trainers loaded</p>
                   </t>
@@ -579,23 +406,15 @@
                 </div>
               </div>
 
-              <!-- 5. Equipment Maintenance Alerts -->
+              <!-- 3. Equipment Maintenance Alerts -->
               <div class="fc_card fc_panel_card">
                 <div class="fc_card_header">
                   <div class="fc_card_title_wrap">
                     <div class="fc_card_icon_dot fc_dot_red"/>
                     <h3 class="fc_card_title">Equipment Alerts</h3>
                   </div>
-                  <div class="fc_card_header_right">
-                    <button class="fc_view_all_btn" t-on-click="() => this.onClickViewAllEquipment()">
-                      <i class="fa fa-external-link me-1"/>View All
-                    </button>
-                    <button class="fc_export_btn" t-on-click="() => this.exportTableCSV('alerts')" title="Export CSV">
-                      <i class="fa fa-download"/>
-                    </button>
-                  </div>
                 </div>
-                <div class="fc_card_body fc_panel_body">
+                <div class="fc_card_body fc_panel_body_scroll">
                   <t t-if="this.state.equipmentAlerts.length === 0">
                     <p class="text-muted text-center py-3">All equipment in optimal condition</p>
                   </t>
@@ -608,15 +427,15 @@
                         <span class="fc_alert_name fw-bold" t-esc="equip.name"/>
                         <span class="fc_alert_msg" t-esc="equip.message"/>
                       </div>
-                      <span class="fc_alert_code" t-esc="equip.code"/>
                     </div>
                   </t>
                 </div>
               </div>
 
             </div>
+
           </div>
-        </div><!-- /SECTION 3 -->
+        </div>
 
         <!-- FOOTER -->
         <div class="fc_footer">

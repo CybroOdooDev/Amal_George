@@ -108,4 +108,34 @@
     <field name="name">Invoice</field>
     <field name="res_model">account.move</field>
   </record>
+  <record id="action_members_view" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Members</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    No members found.
+                </p>
+                <p>
+                    Create a new member contact here.
+                </p>
+            ]]></field>
+  </record>
+  <record id="action_members_view_kanban" model="ir.actions.act_window.view" context="{'studio': True}">
+    <field name="sequence" eval="1"/>
+    <field name="view_mode">kanban</field>
+    <field name="view_id" ref="base.res_partner_kanban_view"/>
+    <field name="act_window_id" ref="action_members_view"/>
+  </record>
+  <record id="action_members_view_list" model="ir.actions.act_window.view" context="{'studio': True}">
+    <field name="sequence" eval="2"/>
+    <field name="view_mode">list</field>
+    <field name="view_id" ref="base.view_partner_tree"/>
+    <field name="act_window_id" ref="action_members_view"/>
+  </record>
+  <record id="action_members_view_form" model="ir.actions.act_window.view" context="{'studio': True}">
+    <field name="sequence" eval="3"/>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="view_partner_form_fitness_member"/>
+    <field name="act_window_id" ref="action_members_view"/>
+  </record>
 </odoo>

@@ -886,4 +886,45 @@ for record in self: record['x_x_studio_enrollment_id_account_move_count'] = self
     <field name="store" eval="False"/>
     <field name="tracking">100</field>
   </record>
+  <record id="field_partner_height" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">float</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Height (cm)</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_height</field>
+  </record>
+  <record id="field_partner_weight" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">float</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Weight (kg)</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_weight</field>
+  </record>
+  <record id="field_partner_gender" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Gender</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_gender</field>
+    <field name="selection">[('male', 'Male'), ('female', 'Female'), ('other', 'Other')]</field>
+  </record>
+  <record id="field_partner_dob" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Date of Birth</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_dob</field>
+  </record>
+  <record id="field_partner_emergency" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Emergency Contact</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_emergency_contact</field>
+  </record>
 </odoo>

@@ -1078,9 +1078,54 @@
     <field name="inherit_id" ref="account.view_move_form"/>
     <field name="key">fitness_center_saas.odoo_studio_account__a8e7544f-24f7-4a5b-8390-bacd6e4d89f8</field>
     <field name="mode">extension</field>
-    <field name="model">account.move</field>
-    <field name="name">Odoo Studio: account.move.form customization</field>
-    <field name="priority">160</field>
-    <field name="type">form</field>
+  </record>
+  <record id="view_partner_form_fitness_member" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">res.partner.form.fitness.member</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">primary</field>
+    <field name="priority">99</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='function']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='website']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='category_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//div[@name='identifiers']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='contact_addresses']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='sales_purchases']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='accounting']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='internal_notes']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//notebook" position="inside">
+        <page string="Fitness Details" name="fitness_details">
+          <group>
+            <group string="Physical Metrics">
+              <field name="x_studio_height"/>
+              <field name="x_studio_weight"/>
+            </group>
+            <group string="Personal Information">
+              <field name="x_studio_gender" widget="radio" options="{'horizontal': true}"/>
+              <field name="x_studio_dob"/>
+              <field name="x_studio_emergency_contact"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+    </field>
   </record>
 </odoo>
+

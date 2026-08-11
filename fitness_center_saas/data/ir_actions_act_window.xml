@@ -16,22 +16,6 @@
     <field name="res_model">x_membership_plans</field>
     <field name="view_mode">kanban,list,form,pivot,graph</field>
   </record>
-  <record id="equipment_ea6e0f7a-8cfe-40e7-a31f-e273174c4e78" model="ir.actions.act_window" context="{'studio': True}">
-    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
-                    This is your new action.
-                </p>
-                <p>By default, it contains a list and a form view and possibly
-                    other view types depending on the options you chose for your model.
-                </p>
-                <p>
-                    You can start customizing these screens by clicking on the Studio icon on the
-                    top right corner (you can also customize this help message there).
-                </p>
-            ]]></field>
-    <field name="name">Equipment</field>
-    <field name="res_model">x_equipment</field>
-    <field name="view_mode">kanban,list,form,pivot,graph</field>
-  </record>
   <record id="fitness_classes_d3c601d1-1032-4f44-825b-c636d1fce9ba" model="ir.actions.act_window" context="{'studio': True}">
     <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
                     This is your new action.
@@ -132,10 +116,25 @@
     <field name="view_id" ref="base.view_partner_tree"/>
     <field name="act_window_id" ref="action_members_view"/>
   </record>
-  <record id="action_members_view_form" model="ir.actions.act_window.view" context="{'studio': True}">
-    <field name="sequence" eval="3"/>
-    <field name="view_mode">form</field>
-    <field name="view_id" ref="view_partner_form_fitness_member"/>
-    <field name="act_window_id" ref="action_members_view"/>
+  <record id="action_enrollment_from_plan" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Enrollments</field>
+    <field name="res_model">x_enrollment</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('x_studio_membership_plan', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_membership_plan': active_id}</field>
+  </record>
+  <record id="action_enrollment_from_partner" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Enrollments</field>
+    <field name="res_model">x_enrollment</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('x_studio_member', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_member': active_id}</field>
+  </record>
+  <record id="action_sessions_from_partner" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Sessions</field>
+    <field name="res_model">x_training_sessions</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('x_studio_member', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_member': active_id}</field>
   </record>
 </odoo>

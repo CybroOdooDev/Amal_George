@@ -53,6 +53,8 @@ export class FitnessDashboard extends Component {
             trainerAvailability: [],
             classOpenings: [],
             equipmentAlerts: [],
+            availableEquipmentIds: [],
+            underMaintenanceIds: [],
             // Compact Insights Panel (4 metrics)
             insights: {
                 topTrainer: "—",
@@ -198,22 +200,46 @@ export class FitnessDashboard extends Component {
         const enrollmentDomainAll = this._getEnrollmentDomain([]);
         const sessionsDomainToday = this._getSessionsDomain([["x_studio_date", "=", todayStr]]);
         const classesDomainActive = this._getClassesDomain([["x_studio_selection_1", "=", "Active"]]);
-        const equipmentDomainAvail = this._getEquipmentDomain([["x_studio_status", "=", "Available"]]);
         const enrollmentDomainExpiring = this._getEnrollmentDomain([
             ["x_studio_status", "=", "Active"],
             ["x_studio_end_date", ">=", todayStr],
             ["x_studio_end_date", "<=", sevenDaysLaterStr]
         ]);
 
-        const [activeEnr, totalEnr, sessCount, activeClasses, availEquip, expiringSoonCount] =
+        const [activeEnr, totalEnr, sessCount, activeClasses, expiringSoonCount] =
             await Promise.all([
                 this.orm.searchCount("x_enrollment", enrollmentDomainActive),
                 this.orm.searchCount("x_enrollment", enrollmentDomainAll),
                 this.orm.searchCount("x_training_sessions", sessionsDomainToday),
                 this.orm.searchCount("x_fitness_classes", classesDomainActive),
-                this.orm.searchCount("x_equipment", equipmentDomainAvail),
                 this.orm.searchCount("x_enrollment", enrollmentDomainExpiring),
             ]);
+
+        let availEquip = 0;
+        let availableIds = [];
+        let busyIdsList = [];
+        try {
+            const allEquip = await this.orm.searchRead("maintenance.equipment", [], ["id"]);
+            const busyEquipIds = await this.orm.searchRead(
+                "maintenance.request",
+                [
+                    ["close_date", "=", false],
+                    ["equipment_id", "!=", false],
+                    ["stage_id.name", "not ilike", "repair"],
+                    ["stage_id.name", "not ilike", "scrap"],
+                    ["stage_id.name", "not ilike", "done"],
+                    ["stage_id.name", "not ilike", "cancel"]
+                ],
+                ["equipment_id"]
+            );
+            const busyIds = new Set(busyEquipIds.map(r => r.equipment_id[0]));
+            const availEquipList = allEquip.filter(e => !busyIds.has(e.id));
+            availEquip = availEquipList.length;
+            availableIds = availEquipList.map(e => e.id);
+            busyIdsList = Array.from(busyIds);
+        } catch (_) {}
+        this.state.availableEquipmentIds = availableIds;
+        this.state.underMaintenanceIds = busyIdsList;
 
         // Monthly Revenue — sum of posted customer invoices in the selected period (or current month if no filters)
         let monthlyRevenue = 0;
@@ -485,30 +511,39 @@ export class FitnessDashboard extends Component {
     }
 
     async _loadEquipmentAlerts() {
-        const records = await this.orm.searchRead(
-            "x_equipment",
-            this._getEquipmentDomain([]),
-            ["x_name", "x_studio_equipment_code", "x_studio_status", "x_studio_category"]
-        );
+        let alerts = [];
+        try {
+            const records = await this.orm.searchRead(
+                "maintenance.request",
+                [
+                    ["close_date", "=", false],
+                    ["equipment_id", "!=", false],
+                    ["stage_id.name", "not ilike", "repair"],
+                    ["stage_id.name", "not ilike", "scrap"],
+                    ["stage_id.name", "not ilike", "done"],
+                    ["stage_id.name", "not ilike", "cancel"]
+                ],
+                ["equipment_id", "name", "priority"]
+            );
+            alerts = records.map(r => {
+                const equip = r.equipment_id;
+                let severity = "warning";
+                if (r.priority === "3") {
+                    severity = "danger";
+                }
+                return {
+                    id: equip[0],
+                    name: equip[1],
+                    code: r.name || "Under Maintenance",
+                    category: "Maintenance",
+                    status: "Under Maintenance",
+                    severity: severity,
+                    message: r.name || "Under Maintenance",
+                };
+            });
+        } catch (_) {}
 
-        this.state.equipmentAlerts = records.map(r => {
-            let severity = "success";
-            let msg = "Optimal condition";
-            if (r.x_studio_status === "Not Available") {
-                severity = "danger";
-                msg = "Out of service — Needs repair";
-            }
-
-            return {
-                id: r.id,
-                name: r.x_name,
-                code: r.x_studio_equipment_code || "EQ-GEN-01",
-                category: r.x_studio_category ? r.x_studio_category.replace(/[^a-zA-Z]/g, '') : "General",
-                status: r.x_studio_status || "Available",
-                severity: severity,
-                message: msg,
-            };
-        });
+        this.state.equipmentAlerts = alerts;
     }
 
     async _loadChartsData() {
@@ -554,20 +589,30 @@ export class FitnessDashboard extends Component {
         });
 
         // 3. Equipment Status
-        const equipment = await this.orm.searchRead(
-            "x_equipment",
-            this._getEquipmentDomain([]),
-            ["x_studio_status"]
-        );
-        const equipCounts = {};
-        equipment.forEach(e => {
-            const status = e.x_studio_status || "Unknown";
-            equipCounts[status] = (equipCounts[status] || 0) + 1;
-        });
-        const equipmentStatus = Object.keys(equipCounts).map(status => ({
-            status: status,
-            count: equipCounts[status]
-        }));
+        let equipmentStatus = [];
+        try {
+            const allEquipCount = await this.orm.searchCount("maintenance.equipment", []);
+            const busyEquipIds = await this.orm.searchRead(
+                "maintenance.request",
+                [
+                    ["close_date", "=", false],
+                    ["equipment_id", "!=", false],
+                    ["stage_id.name", "not ilike", "repair"],
+                    ["stage_id.name", "not ilike", "scrap"],
+                    ["stage_id.name", "not ilike", "done"],
+                    ["stage_id.name", "not ilike", "cancel"]
+                ],
+                ["equipment_id"]
+            );
+            const busyIds = new Set(busyEquipIds.map(r => r.equipment_id[0]));
+            const busyCount = busyIds.size;
+            const availCount = Math.max(0, allEquipCount - busyCount);
+            
+            equipmentStatus = [
+                { status: "Available", count: availCount, type: "available" },
+                { status: "Under Maintenance", count: busyCount, type: "maintenance" }
+            ];
+        } catch (_) {}
 
         // 4. Trainer Workload Today (for Radar calculations/workload calculations)
         const sessionsToday = await this.orm.searchRead(
@@ -710,8 +755,22 @@ export class FitnessDashboard extends Component {
 
         let equipUtil = 0;
         try {
-            const totalEquip = await this.orm.searchCount("x_equipment", []);
-            const availEquip = await this.orm.searchCount("x_equipment", [["x_studio_status", "=", "Available"]]);
+            const allEquip = await this.orm.searchRead("maintenance.equipment", [], ["id"]);
+            const totalEquip = allEquip.length;
+            const busyEquipIds = await this.orm.searchRead(
+                "maintenance.request",
+                [
+                    ["close_date", "=", false],
+                    ["equipment_id", "!=", false],
+                    ["stage_id.name", "not ilike", "repair"],
+                    ["stage_id.name", "not ilike", "scrap"],
+                    ["stage_id.name", "not ilike", "done"],
+                    ["stage_id.name", "not ilike", "cancel"]
+                ],
+                ["equipment_id"]
+            );
+            const busyIds = new Set(busyEquipIds.map(r => r.equipment_id[0]));
+            const availEquip = Math.max(0, totalEquip - busyIds.size);
             if (totalEquip > 0) {
                 equipUtil = Math.round((availEquip / totalEquip) * 100);
             }
@@ -759,7 +818,7 @@ export class FitnessDashboard extends Component {
         return JSON.stringify(this._getClassesDomain([["x_studio_selection_1", "=", "Active"]]));
     }
     get availableEquipmentDomain() {
-        return JSON.stringify(this._getEquipmentDomain([["x_studio_status", "=", "Available"]]));
+        return JSON.stringify(this._getEquipmentDomain([["id", "in", this.state.availableEquipmentIds || []]]));
     }
     get trainerUtilizationDomain() {
         return JSON.stringify(this._getSessionsDomain([["x_studio_date", "=", this._todayString()]]));
@@ -820,7 +879,7 @@ export class FitnessDashboard extends Component {
     }
 
     onClickEquipUtilization() {
-        this.onTileClick("x_equipment", [], "Equipment Registry");
+        this.onTileClick("maintenance.equipment", [], "Equipment Registry");
     }
 
     onClickSession(sess) {
@@ -845,11 +904,11 @@ export class FitnessDashboard extends Component {
     }
 
     onClickEquipment(equip) {
-        this.onTileClick("x_equipment", [["id", "=", equip.id]], equip.name);
+        this.onTileClick("maintenance.equipment", [["id", "=", equip.id]], equip.name);
     }
 
     onClickViewAllEquipment() {
-        this.onTileClick("x_equipment", [], "Equipment Registry");
+        this.onTileClick("maintenance.equipment", [], "Equipment Registry");
     }
 
 
@@ -927,6 +986,19 @@ export class FitnessDashboard extends Component {
         // eslint-disable-next-line no-undef
         if (typeof Chart === "undefined") return;
 
+        // Helper to safely destroy any chart on a canvas
+        const safeDestroy = (canvas) => {
+            if (!canvas) return;
+            try {
+                const existing = Chart.getChart(canvas);
+                if (existing) {
+                    existing.destroy();
+                }
+            } catch (err) {
+                console.warn("[FitnessDashboard] Error destroying chart:", err);
+            }
+        };
+
         const textColor = "#a0aec0";
         const gridColor = "rgba(226, 232, 240, 0.08)";
 
@@ -935,6 +1007,7 @@ export class FitnessDashboard extends Component {
         // 1. Radar Chart - Membership Plan Popularity
         const canvas1 = document.getElementById("planPopularityChart");
         if (canvas1) {
+            safeDestroy(canvas1);
             const data = this.state.chartsData.planPopularity;
             // eslint-disable-next-line no-undef
             this.charts.planPopularity = new Chart(canvas1, {
@@ -977,6 +1050,7 @@ export class FitnessDashboard extends Component {
         // 2. Line Chart - Monthly Revenue Trend
         const canvas2 = document.getElementById("monthlyRevenueTrendChart");
         if (canvas2) {
+            safeDestroy(canvas2);
             const data = this.state.chartsData.revenueTrend;
             // eslint-disable-next-line no-undef
             this.charts.revenueTrend = new Chart(canvas2, {
@@ -1006,6 +1080,7 @@ export class FitnessDashboard extends Component {
         // 3. Horizontal Bar Chart - Class Capacity Utilization
         const canvas3 = document.getElementById("classCapacityUtilizationChart");
         if (canvas3) {
+            safeDestroy(canvas3);
             const data = this.state.chartsData.classUtilization;
             // eslint-disable-next-line no-undef
             this.charts.classUtilization = new Chart(canvas3, {
@@ -1046,6 +1121,7 @@ export class FitnessDashboard extends Component {
         // 4. Polar Area Chart - Trainer Performance Metrics (Completed Sessions)
         const canvas4 = document.getElementById("trainerPerformanceRadarChart");
         if (canvas4) {
+            safeDestroy(canvas4);
             const workload = this.state.chartsData.trainerWorkload || [];
             // Sort to find the top active trainers by completed sessions
             const topTrainers = [...workload]
@@ -1105,6 +1181,7 @@ export class FitnessDashboard extends Component {
         // 5. Pie Chart - Equipment Status
         const canvas5 = document.getElementById("equipmentStatusPolarChart");
         if (canvas5) {
+            safeDestroy(canvas5);
             const data = this.state.chartsData.equipmentStatus;
             // eslint-disable-next-line no-undef
             this.charts.equipmentStatus = new Chart(canvas5, {
@@ -1132,8 +1209,12 @@ export class FitnessDashboard extends Component {
                     onClick: (ev, elements) => {
                         if (elements.length > 0) {
                             const index = elements[0].index;
-                            const status = data[index].status;
-                            self.onTileClick("x_equipment", self._getEquipmentDomain([["x_studio_status", "=", status]]), `Equipment Status: ${status}`);
+                            const item = data[index];
+                            if (item.type === "available") {
+                                self.onTileClick("maintenance.equipment", [["id", "in", self.state.availableEquipmentIds || []]], `Available Equipment`);
+                            } else {
+                                self.onTileClick("maintenance.equipment", [["id", "in", self.state.underMaintenanceIds || []]], `Equipment Under Maintenance`);
+                            }
                         }
                     }
                 }

@@ -1685,148 +1685,161 @@ body.o_dark .fc_dashboard,
 }
 
 /* Distinct Card Accent Outlines & Glows */
+/* Distinct Card Accent Outlines & Glows */
 .fc_kpi_purple_glow {
-    background: linear-gradient(135deg, #4f00d0 0%, #7928ca 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(121, 40, 202, 0.3) !important;
+    background: linear-gradient(135deg, rgba(121, 40, 202, 0.15) 0%, rgba(15, 21, 53, 0.85) 100%) !important;
+    border: 1.5px solid rgba(121, 40, 202, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(121, 40, 202, 0.08) !important;
 }
 .fc_kpi_purple_glow:hover {
-    box-shadow: 0 8px 25px rgba(121, 40, 202, 0.5) !important;
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(121, 40, 202, 0.2) !important;
+    border-color: rgba(121, 40, 202, 0.45) !important;
 }
+
+/* Purple minimal accents */
 .fc_kpi_purple_glow .fc_kpi_label,
 .fc_kpi_purple_glow .fc_kpi_caption {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: var(--fc-text-muted) !important;
 }
 .fc_kpi_purple_glow .fc_kpi_value {
     color: #ffffff !important;
 }
 .fc_kpi_purple_glow .fc_kpi_icon_wrap {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
+    background: rgba(121, 40, 202, 0.12) !important;
 }
 .fc_kpi_purple_glow .fc_kpi_icon_wrap .fa {
-    color: #ffffff !important;
+    color: #7928ca !important;
 }
 
 .fc_kpi_green_glow {
-    background: linear-gradient(135deg, #01905a 0%, #01b574 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(1, 181, 116, 0.3) !important;
+    background: linear-gradient(135deg, rgba(1, 181, 116, 0.15) 0%, rgba(15, 21, 53, 0.85) 100%) !important;
+    border: 1.5px solid rgba(1, 181, 116, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(1, 181, 116, 0.08) !important;
 }
 .fc_kpi_green_glow:hover {
-    box-shadow: 0 8px 25px rgba(1, 181, 116, 0.5) !important;
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(1, 181, 116, 0.2) !important;
+    border-color: rgba(1, 181, 116, 0.45) !important;
 }
+
+/* Green minimal accents */
 .fc_kpi_green_glow .fc_kpi_label,
 .fc_kpi_green_glow .fc_kpi_caption {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: var(--fc-text-muted) !important;
 }
 .fc_kpi_green_glow .fc_kpi_value {
     color: #ffffff !important;
 }
 .fc_kpi_green_glow .fc_kpi_icon_wrap {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
+    background: rgba(1, 181, 116, 0.12) !important;
 }
 .fc_kpi_green_glow .fc_kpi_icon_wrap .fa {
-    color: #ffffff !important;
+    color: #01b574 !important;
 }
 
 .fc_kpi_orange_glow {
-    background: linear-gradient(135deg, #d35400 0%, #ff7300 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(255, 115, 0, 0.3) !important;
+    background: linear-gradient(135deg, rgba(255, 115, 0, 0.15) 0%, rgba(15, 21, 53, 0.85) 100%) !important;
+    border: 1.5px solid rgba(255, 115, 0, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(255, 115, 0, 0.08) !important;
 }
 .fc_kpi_orange_glow:hover {
-    box-shadow: 0 8px 25px rgba(255, 115, 0, 0.5) !important;
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 115, 0, 0.2) !important;
+    border-color: rgba(255, 115, 0, 0.45) !important;
 }
+
+/* Orange minimal accents */
 .fc_kpi_orange_glow .fc_kpi_label,
 .fc_kpi_orange_glow .fc_kpi_caption {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: var(--fc-text-muted) !important;
 }
 .fc_kpi_orange_glow .fc_kpi_value {
     color: #ffffff !important;
 }
 .fc_kpi_orange_glow .fc_kpi_icon_wrap {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
+    background: rgba(255, 115, 0, 0.12) !important;
 }
 .fc_kpi_orange_glow .fc_kpi_icon_wrap .fa {
-    color: #ffffff !important;
+    color: #ff7300 !important;
 }
 
 .fc_kpi_cyan_glow {
-    background: linear-gradient(135deg, #0093af 0%, #00b5d8 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(0, 181, 216, 0.3) !important;
+    background: linear-gradient(135deg, rgba(0, 181, 216, 0.15) 0%, rgba(15, 21, 53, 0.85) 100%) !important;
+    border: 1.5px solid rgba(0, 181, 216, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(0, 181, 216, 0.08) !important;
 }
 .fc_kpi_cyan_glow:hover {
-    box-shadow: 0 8px 25px rgba(0, 181, 216, 0.5) !important;
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 181, 216, 0.2) !important;
+    border-color: rgba(0, 181, 216, 0.45) !important;
 }
+
+/* Cyan minimal accents */
 .fc_kpi_cyan_glow .fc_kpi_label,
 .fc_kpi_cyan_glow .fc_kpi_caption {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: var(--fc-text-muted) !important;
 }
 .fc_kpi_cyan_glow .fc_kpi_value {
     color: #ffffff !important;
 }
 .fc_kpi_cyan_glow .fc_kpi_icon_wrap {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
+    background: rgba(0, 181, 216, 0.12) !important;
 }
 .fc_kpi_cyan_glow .fc_kpi_icon_wrap .fa {
-    color: #ffffff !important;
+    color: #00b5d8 !important;
 }
 
 .fc_kpi_pink_glow {
-    background: linear-gradient(135deg, #b80d57 0%, #e91e63 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3) !important;
+    background: linear-gradient(135deg, rgba(233, 30, 99, 0.15) 0%, rgba(15, 21, 53, 0.85) 100%) !important;
+    border: 1.5px solid rgba(233, 30, 99, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.08) !important;
 }
 .fc_kpi_pink_glow:hover {
-    box-shadow: 0 8px 25px rgba(233, 30, 99, 0.5) !important;
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(233, 30, 99, 0.2) !important;
+    border-color: rgba(233, 30, 99, 0.45) !important;
 }
+
+/* Pink minimal accents */
 .fc_kpi_pink_glow .fc_kpi_label,
 .fc_kpi_pink_glow .fc_kpi_caption {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: var(--fc-text-muted) !important;
 }
 .fc_kpi_pink_glow .fc_kpi_value {
     color: #ffffff !important;
 }
 .fc_kpi_pink_glow .fc_kpi_icon_wrap {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
+    background: rgba(233, 30, 99, 0.12) !important;
 }
 .fc_kpi_pink_glow .fc_kpi_icon_wrap .fa {
-    color: #ffffff !important;
+    color: #e91e63 !important;
 }
 
 .fc_kpi_yellow_glow {
-    background: linear-gradient(135deg, #d35400 0%, #f39c12 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3) !important;
+    background: linear-gradient(135deg, rgba(243, 156, 18, 0.15) 0%, rgba(15, 21, 53, 0.85) 100%) !important;
+    border: 1.5px solid rgba(243, 156, 18, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.08) !important;
 }
 .fc_kpi_yellow_glow:hover {
-    box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5) !important;
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(243, 156, 18, 0.2) !important;
+    border-color: rgba(243, 156, 18, 0.45) !important;
 }
+
+/* Yellow minimal accents */
 .fc_kpi_yellow_glow .fc_kpi_label,
 .fc_kpi_yellow_glow .fc_kpi_caption {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: var(--fc-text-muted) !important;
 }
 .fc_kpi_yellow_glow .fc_kpi_value {
     color: #ffffff !important;
 }
 .fc_kpi_yellow_glow .fc_kpi_icon_wrap {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
+    background: rgba(243, 156, 18, 0.12) !important;
 }
 .fc_kpi_yellow_glow .fc_kpi_icon_wrap .fa {
-    color: #ffffff !important;
+    color: #f39c12 !important;
 }
 
 /* Remove bottom lines on colored cards */

@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+  <function model="ir.ui.view" name="unlink">
+    <value model="ir.ui.view" eval="obj().search([('inherit_id', '=', ref('fitness_center_saas.default_form_view_fo_fd8d708b-7cbe-470d-9a4f-338bfb5135aa'))]).ids"/>
+  </function>
   <record id="default_kanban_view_fo_x_membership_plans" model="ir.ui.view" context="{'studio': True}">
     <field name="name">Default kanban view for x_membership_plans</field>
     <field name="model">x_membership_plans</field>
@@ -173,7 +176,7 @@
         </xpath>
         <xpath expr="/form//group[@name='studio_group_cd12f8']" position="after">
           <notebook name="studio_notebook_1bf_1jv3itkfs">
-            <page string="New Page" name="studio_page_1bf">
+            <page string="Description" name="studio_page_1bf">
               <group name="studio_group_1bf">
                 <field name="x_studio_description_1"/>
               </group>
@@ -196,6 +199,13 @@
           <field name="x_studio_fitness_class"/>
           <field name="x_studio_personal_training"/>
         </xpath>
+        <xpath expr="/form//widget[@name='web_ribbon']" position="before">
+          <div name="button_box" class="oe_button_box">
+            <button class="oe_stat_button" icon="fa-id-card-o" type="action" name="fitness_center_saas.action_enrollment_from_plan">
+              <field widget="statinfo" name="x_studio_enrollment_count" string="Enrollments"/>
+            </button>
+          </div>
+        </xpath>
       </data>
     </field>
     <field name="inherit_id" ref="default_form_view_fo_8ee2d365-df7c-4a51-b35a-17a98d9a30f8"/>
@@ -203,194 +213,6 @@
     <field name="mode">extension</field>
     <field name="model">x_membership_plans</field>
     <field name="name">Odoo Studio: Default form view for x_membership_plans customization</field>
-    <field name="priority">99</field>
-    <field name="type">form</field>
-  </record>
-  <record id="default_list_view_fo_6f521b6e-4310-494a-be6f-f195d5f7e4a9" model="ir.ui.view" context="{'studio': True}">
-    <field name="arch" type="xml">
-      <list default_order="id desc">
-        <field name="x_name"/>
-        <field name="x_studio_currency_id" invisible="1"/>
-        <field name="x_studio_value" sum="Total"/>
-      </list>
-    </field>
-    <field name="key">fitness_center_saas.default_list_view_fo_6f521b6e-4310-494a-be6f-f195d5f7e4a9</field>
-    <field name="model">x_equipment</field>
-    <field name="name">Default list view for x_equipment</field>
-    <field name="type">list</field>
-  </record>
-  <record id="default_kanban_view_fo_x_equipment" model="ir.ui.view" context="{'studio': True}">
-    <field name="arch" type="xml">
-      <kanban class="o_kanban_mobile">
-        <field name="id"/>
-        <field name="x_name"/>
-        <field name="x_studio_image"/>
-        <field name="x_studio_equipment_code"/>
-        <field name="x_studio_category"/>
-        <field name="x_studio_currency_id"/>
-        <templates>
-          <t t-name="card">
-            <div t-attf-class="oe_kanban_global_click d-flex flex-row align-items-center gap-3 p-3 rounded border border-light bg-white shadow-sm">
-              <!-- Image Wrapper -->
-              <div class="o_kanban_image_wrapper d-flex justify-content-center align-items-center" style="width: 80px; height: 80px; flex-shrink: 0; border-radius: 8px; overflow: hidden; background-color: #f8f9fa; border: 1px solid #e9ecef;">
-                <t t-if="record.x_studio_image.raw_value">
-                  <img t-att-src="kanban_image('x_equipment', 'x_studio_image', record.id.raw_value)" style="width: 100%; height: 100%; object-fit: cover;" alt="Equipment Image"/>
-                </t>
-                <t t-else="">
-                  <i class="fa fa-cogs text-muted" style="font-size: 28px;"/>
-                </t>
-              </div>
-
-              <!-- Content Area -->
-              <div class="oe_kanban_details d-flex flex-column justify-content-between flex-grow-1" style="min-width: 0;">
-                <div>
-                  <div class="d-flex justify-content-between align-items-start gap-2">
-                    <strong class="o_kanban_record_title text-dark fs-5 text-truncate" style="font-weight: 600;">
-                      <field name="x_name"/>
-                    </strong>
-                    <span t-attf-class="badge rounded-pill px-2 py-1 text-uppercase #{
-                      record.x_studio_status.raw_value === 'Available' ? 'text-bg-success' :
-                      'text-bg-danger'}" style="font-size: 0.7rem; flex-shrink: 0; font-weight: 700;">
-                      <t t-if="record.x_studio_status.raw_value === 'Available'">Available</t>
-                      <t t-elif="record.x_studio_status.raw_value === 'Not Available'">Not Available</t>
-                      <t t-else=""><field name="x_studio_status"/></t>
-                    </span>
-                  </div>
-                  <div class="text-muted d-flex align-items-center gap-1 mt-1" style="font-size: 0.8rem; font-weight: 500;">
-                    <span class="text-secondary"><field name="x_studio_equipment_code"/></span>
-                    <t t-if="record.x_studio_category.raw_value">
-                      <span>•</span>
-                      <t t-if="record.x_studio_category.raw_value === 'Cardio Strength Flexibility Recovery Functional'">Cardio</t>
-                      <t t-elif="record.x_studio_category.raw_value === 'Strength'">Strength</t>
-                      <t t-elif="record.x_studio_category.raw_value === 'Flexibility'">Flexibility</t>
-                      <t t-elif="record.x_studio_category.raw_value === 'Recovery'">Recovery</t>
-                      <t t-elif="record.x_studio_category.raw_value === 'Functional'">Functional</t>
-                      <t t-else=""><field name="x_studio_category"/></t>
-                    </t>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </t>
-        </templates>
-      </kanban>
-    </field>
-    <field name="key">fitness_center_saas.default_kanban_view_fo_x_equipment</field>
-    <field name="model">x_equipment</field>
-    <field name="name">Default kanban view for x_equipment</field>
-    <field name="type">kanban</field>
-  </record>
-  <record id="default_form_view_fo_f55efe01-e073-46bd-b256-e1d2eba6b912" model="ir.ui.view" context="{'studio': True}">
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="Equipment">
-          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
-          <field name="x_active" invisible="1"/>
-          <field class="oe_avatar" widget="image" name="x_studio_image"/>
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="studio_group_a4cb8f">
-            <group name="studio_group_a4cb8f_left">
-              <field name="x_studio_currency_id" invisible="1"/>
-              <field name="x_studio_value"/>
-            </group>
-            <group name="studio_group_a4cb8f_right"/>
-          </group>
-        </sheet>
-        <chatter/>
-      </form>
-    </field>
-    <field name="key">fitness_center_saas.default_form_view_fo_f55efe01-e073-46bd-b256-e1d2eba6b912</field>
-    <field name="model">x_equipment</field>
-    <field name="name">Default form view for x_equipment</field>
-    <field name="type">form</field>
-  </record>
-  <record id="default_search_view__9c9c1a6b-b91f-4d22-8dfd-f914ba7b724f" model="ir.ui.view" context="{'studio': True}">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-        <filter invisible="1" string="My Activities" name="filter_activities_my" domain="[['activity_user_id', '=', uid]]"/>
-        <separator/>
-        <filter invisible="1" string="Late Activities" name="activities_overdue" domain="[('my_activity_date_deadline', '&lt;', 'today')]"/>
-        <filter invisible="1" string="Today Activities" name="activities_today" domain="[('my_activity_date_deadline', '=', 'today')]"/>
-        <filter invisible="1" string="Future Activities" name="activities_upcoming_all" domain="[('my_activity_date_deadline', '&gt;', 'today')]"/>
-        <separator/>
-        <separator/>
-        <filter string="Archived" name="archived_x_equipment" domain="[['x_active', '=', False]]"/>
-        <separator/>
-      </search>
-    </field>
-    <field name="key">fitness_center_saas.default_search_view__9c9c1a6b-b91f-4d22-8dfd-f914ba7b724f</field>
-    <field name="model">x_equipment</field>
-    <field name="name">Default search view for x_equipment</field>
-    <field name="type">search</field>
-  </record>
-  <record id="default_pivot_view_f_2daad15e-62fa-4158-a1b5-e4056f9d8923" model="ir.ui.view" context="{'studio': True}">
-    <field name="arch" type="xml">
-      <pivot sample="1">
-        <field name="x_studio_value" type="measure"/>
-      </pivot>
-    </field>
-    <field name="key">fitness_center_saas.default_pivot_view_f_2daad15e-62fa-4158-a1b5-e4056f9d8923</field>
-    <field name="model">x_equipment</field>
-    <field name="name">Default pivot view for x_equipment</field>
-    <field name="type">pivot</field>
-  </record>
-  <record id="default_graph_view_f_9ee14d57-e1cf-4aa4-85bd-3f03ae2b3b83" model="ir.ui.view" context="{'studio': True}">
-    <field name="arch" type="xml">
-      <graph sample="1">
-        <field name="x_studio_value" type="measure"/>
-        <field name="create_date" type="row"/>
-      </graph>
-    </field>
-    <field name="key">fitness_center_saas.default_graph_view_f_9ee14d57-e1cf-4aa4-85bd-3f03ae2b3b83</field>
-    <field name="model">x_equipment</field>
-    <field name="name">Default graph view for x_equipment</field>
-    <field name="type">graph</field>
-  </record>
-  <record id="odoo_studio_default__41612c5f-e4aa-488e-b386-c50d84db0c2a" model="ir.ui.view" context="{'studio': True}">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="/form/header" position="inside">
-          <field name="x_studio_status" widget="statusbar" options="{'clickable': '1'}" statusbar_visible="Available,Not Available"/>
-        </xpath>
-        <xpath expr="/form//group[@name='studio_group_a4cb8f']" position="after">
-          <notebook name="studio_notebook_7dm_1jv3lran6">
-            <page string="New Page" name="studio_page_7dm">
-              <group name="studio_group_7dm">
-                <group name="studio_group_7dm_left">
-                  <field name="x_studio_description"/>
-                </group>
-                <group name="studio_group_7dm_right"/>
-              </group>
-            </page>
-          </notebook>
-        </xpath>
-        <xpath expr="/form//field[@name='x_name']" position="attributes">
-          <attribute name="string">Equipment Name</attribute>
-        </xpath>
-        <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
-          <field name="x_studio_equipment_code"/>
-          <field name="x_studio_category"/>
-          <field name="x_studio_purchase_date"/>
-        </xpath>
-        <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
-          <attribute name="string">Purchase Cost</attribute>
-        </xpath>
-        <xpath expr="/form//group[@name='studio_group_a4cb8f_right']" position="inside">
-          <field name="x_active" invisible="1"/>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="default_form_view_fo_f55efe01-e073-46bd-b256-e1d2eba6b912"/>
-    <field name="key">fitness_center_saas.odoo_studio_default__41612c5f-e4aa-488e-b386-c50d84db0c2a</field>
-    <field name="mode">extension</field>
-    <field name="model">x_equipment</field>
-    <field name="name">Odoo Studio: Default form view for x_equipment customization</field>
     <field name="priority">99</field>
     <field name="type">form</field>
   </record>
@@ -593,8 +415,6 @@
                     <field name="category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                     <field name="company_id" groups="base.group_multi_company" readonly="1" optional="hide"/>
                     <field name="properties" optional="hide"/>
-                    <field name="total_due" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide"/>
-                    <field name="total_overdue" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide"/>
                   </list>
                 </field>
               </group>
@@ -777,7 +597,7 @@
         </xpath>
         <xpath expr="/form//group[@name='studio_group_e9b8e6']" position="after">
           <notebook name="studio_notebook_338_1jv3nm47q">
-            <page string="New Page" name="studio_page_338">
+            <page string="Description" name="studio_page_338">
               <group name="studio_group_338">
                 <group name="studio_group_338_left">
                   <field name="x_studio_description"/>
@@ -890,10 +710,10 @@
         </xpath>
         <xpath expr="/form//widget[@name='web_ribbon']" position="before">
           <div name="button_box" class="oe_button_box">
-            <button class="oe_stat_button" icon="fa-steam" type="action" name="fitness_center_saas.training_session_1e616aef-76ec-4260-81e7-a994c9376af5">
+            <button class="oe_stat_button" icon="fa-calendar" type="action" name="fitness_center_saas.training_session_1e616aef-76ec-4260-81e7-a994c9376af5">
               <field widget="statinfo" name="x_x_studio_enrollment_x_training_sessions_count" string="Training Session"/>
             </button>
-            <button class="oe_stat_button" icon="fa-diamond" type="action" name="fitness_center_saas.invoice_8d1999e4-bebc-4619-925b-bb3438678031">
+            <button class="oe_stat_button" icon="fa-usd" type="action" name="fitness_center_saas.invoice_8d1999e4-bebc-4619-925b-bb3438678031">
               <field widget="statinfo" name="x_x_studio_enrollment_id_account_move_count" string="Invoice"/>
             </button>
           </div>
@@ -926,6 +746,7 @@
           <field name="x_studio_trainer" invisible="not x_studio_related_x_studio_trainer_1_1" force_save="1" readonly="x_studio_status != &quot;Draft&quot;"/>
           <field name="x_studio_personal_training" options="{'create_name_field': 'x_name'}" invisible="not x_studio_personal_training_plan" force_save="1" readonly="x_studio_status != &quot;Draft&quot;"/>
           <field name="x_studio_fitness_class" options="{'create_name_field': 'x_name'}" invisible="not x_studio_fitness_class_plan" force_save="1" readonly="x_studio_status != &quot;Draft&quot;"/>
+          <field name="x_studio_sessions_generated_until" readonly="True" force_save="1"/>
           <field name="x_active" invisible="True"/>
           <field name="x_studio_related_payment_state_1" force_save="1" readonly="True"/>
           <field name="x_studio_related_x_studio_trainer_1_1" string="Trainer Plan" invisible="True"/>
@@ -1027,7 +848,7 @@
         </xpath>
         <xpath expr="/form//group[@name='studio_group_ff7030']" position="after">
           <notebook name="studio_notebook_2nu_1jv5io6ub">
-            <page string="New Page" name="studio_page_2nu">
+            <page string="Remarks" name="studio_page_2nu">
               <group name="studio_group_2nu">
                 <group name="studio_group_2nu_left">
                   <field name="x_studio_remarks"/>
@@ -1078,6 +899,7 @@
     <field name="inherit_id" ref="account.view_move_form"/>
     <field name="key">fitness_center_saas.odoo_studio_account__a8e7544f-24f7-4a5b-8390-bacd6e4d89f8</field>
     <field name="mode">extension</field>
+    <field name="model">account.move</field>
   </record>
   <record id="view_partner_form_fitness_member" model="ir.ui.view" context="{'studio': True}">
     <field name="name">res.partner.form.fitness.member</field>
@@ -1125,7 +947,81 @@
           </group>
         </page>
       </xpath>
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" icon="fa-id-card-o" type="action" name="fitness_center_saas.action_enrollment_from_partner">
+          <field widget="statinfo" name="x_studio_enrollment_count" string="Enrollments"/>
+        </button>
+        <button class="oe_stat_button" icon="fa-calendar" type="action" name="fitness_center_saas.action_sessions_from_partner">
+          <field widget="statinfo" name="x_studio_sessions_count" string="Sessions"/>
+        </button>
+      </xpath>
     </field>
+  </record>
+
+  <record id="fitness_maintenance_equipment_view_form_inherit" model="ir.ui.view">
+    <field name="name">maintenance.equipment.view.form.inherit.fitness</field>
+    <field name="model">maintenance.equipment</field>
+    <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+    <field name="priority">99</field>
+    <field name="arch" type="xml">
+      <!-- Hide unwanted fields in service_info_group -->
+      <xpath expr="//field[@name='company_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='equipment_assign_to']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <!-- We also hide hr_maintenance fields since it inherits and adds them -->
+      <xpath expr="//field[@name='employee_id']" position="attributes" raise_on_diff="false">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='department_id']" position="attributes" raise_on_diff="false">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='owner_user_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='maintenance_team_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='technician_user_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='assign_date']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='scrap_date']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+
+      <!-- Add needed fields directly to the main columns -->
+      <xpath expr="//group[@name='service_info_group']/group[1]" position="inside">
+        <field name="model"/>
+        <field name="serial_no"/>
+        <field name="cost"/>
+      </xpath>
+      <xpath expr="//group[@name='service_info_group']/group[2]" position="inside">
+        <field name="partner_id" string="Vendor"/>
+        <field name="partner_ref" string="Vendor Reference"/>
+        <field name="effective_date" string="Effective Date"/>
+        <field name="warranty_date" string="Warranty Expiration Date"/>
+      </xpath>
+
+      <!-- Hide unwanted tabs (Product Information and Maintenance tabs) -->
+      <xpath expr="//page[@name='product_information']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='maintenance']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_members_view_form" model="ir.actions.act_window.view" context="{'studio': True}">
+    <field name="sequence" eval="3"/>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="view_partner_form_fitness_member"/>
+    <field name="act_window_id" ref="action_members_view"/>
   </record>
 </odoo>
 

@@ -16,22 +16,6 @@
     <field name="model">x_membership_plans</field>
     <field name="name">Membership Plans</field>
   </record>
-  <record id="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836" model="ir.model" context="{'studio': True}">
-    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
-
-    Odoo models are created by inheriting from this class::
-
-        class ResUsers(Model):
-            ...
-
-    The system will later instantiate the class once per database (on
-    which the class' module is installed).
-    ]]></field>
-    <field name="is_mail_thread" eval="True"/>
-    <field name="is_mail_activity" eval="True"/>
-    <field name="model">x_equipment</field>
-    <field name="name">Equipment</field>
-  </record>
   <record id="fitness_classes_964ee9b6-fa33-42c8-ae3f-bca81f448362" model="ir.model" context="{'studio': True}">
     <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
 

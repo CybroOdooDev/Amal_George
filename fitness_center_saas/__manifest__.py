@@ -5,11 +5,9 @@
                 'It contains the apps created with Studio and the '
                 'customizations of existing apps.',
  'author': 'My Company',
- 'depends': ['account_payment',
-             'account_reports',
-             'board',
+ 'depends': ['account',
              'hr',
-             'web_grid',
+             'maintenance',
              'web_studio'],
  'data': ['data/ir_model.xml',
           'data/ir_model_fields.xml',

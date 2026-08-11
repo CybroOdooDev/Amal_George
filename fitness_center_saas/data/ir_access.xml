@@ -12,18 +12,6 @@
     <field name="name">Membership Plans group_user</field>
     <field name="operation">cru</field>
   </record>
-  <record id="equipment_group_syst_9c37f9f0-e3b8-42be-bf7a-a0199f6a0c0e" model="ir.access" context="{'studio': True}">
-    <field name="group_id" ref="base.group_system"/>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">Equipment group_system</field>
-    <field name="operation">crud</field>
-  </record>
-  <record id="equipment_group_user_43052442-5ec3-488e-a1e7-b9719be0a7ef" model="ir.access" context="{'studio': True}">
-    <field name="group_id" ref="base.group_user"/>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">Equipment group_user</field>
-    <field name="operation">cru</field>
-  </record>
   <record id="fitness_classes_grou_1b5b87d9-3a21-47e7-a463-22218077a9c0" model="ir.access" context="{'studio': True}">
     <field name="group_id" ref="base.group_system"/>
     <field name="model_id" ref="fitness_classes_964ee9b6-fa33-42c8-ae3f-bca81f448362"/>

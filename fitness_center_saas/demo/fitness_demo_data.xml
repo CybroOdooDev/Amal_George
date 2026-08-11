@@ -13,35 +13,6 @@
         <field name="work_email">sarah.jenkins@fitness.example.com</field>
     </record>
 
-    <!-- Demo Equipment -->
-    <record id="equipment_treadmill" model="x_equipment">
-        <field name="x_name">Commercial Treadmill T800</field>
-        <field name="x_studio_equipment_code">EQ-TR-001</field>
-        <field name="x_studio_category">Cardio Strength Flexibility Recovery Functional</field>
-
-        <field name="x_studio_status">Available</field>
-        <field name="x_studio_value">3500.00</field>
-        <field name="x_studio_purchase_date" eval="time.strftime('%Y-01-15')"/>
-    </record>
-
-    <record id="equipment_benchpress" model="x_equipment">
-        <field name="x_name">Olympic Bench Press</field>
-        <field name="x_studio_equipment_code">EQ-BP-002</field>
-        <field name="x_studio_category">Strength</field>
-
-        <field name="x_studio_status">Available</field>
-        <field name="x_studio_value">1200.00</field>
-        <field name="x_studio_purchase_date" eval="time.strftime('%Y-02-10')"/>
-    </record>
-
-    <record id="equipment_dumbbells" model="x_equipment">
-        <field name="x_name">Dumbbell Set 5kg-40kg</field>
-        <field name="x_studio_equipment_code">EQ-DB-003</field>
-        <field name="x_studio_category">Functional</field>
-        <field name="x_studio_status">Available</field>
-        <field name="x_studio_value">850.00</field>
-        <field name="x_studio_purchase_date" eval="time.strftime('%Y-03-01')"/>
-    </record>
 
     <!-- Demo Membership Plans -->
     <record id="plan_basic" model="x_membership_plans">
@@ -124,5 +95,42 @@
         <field name="x_studio_total_sessions">24</field>
         <field name="x_studio_value">850.00</field>
         <field name="x_studio_status">Active</field>
+    </record>
+
+    <!-- Demo Maintenance Equipment -->
+    <record id="equipment_treadmill" model="maintenance.equipment">
+        <field name="name">Treadmill Pro-2000</field>
+        <field name="model">TR-2000</field>
+        <field name="serial_no">TM98172938</field>
+        <field name="cost">1200.00</field>
+        <field name="effective_date">2025-01-15</field>
+        <field name="warranty_date">2027-01-15</field>
+    </record>
+
+    <record id="equipment_elliptical" model="maintenance.equipment">
+        <field name="name">Elliptical Trainer E50</field>
+        <field name="model">EL-50</field>
+        <field name="serial_no">EP81239812</field>
+        <field name="cost">950.00</field>
+        <field name="effective_date">2025-02-10</field>
+        <field name="warranty_date">2027-02-10</field>
+    </record>
+
+    <record id="equipment_dumbbell_rack" model="maintenance.equipment">
+        <field name="name">Heavy Duty Dumbbell Rack (5-50 lbs)</field>
+        <field name="model">DB-RACK</field>
+        <field name="serial_no">DR091238</field>
+        <field name="cost">450.00</field>
+        <field name="effective_date">2024-11-01</field>
+        <field name="warranty_date">2026-11-01</field>
+    </record>
+
+    <record id="equipment_multipress" model="maintenance.equipment">
+        <field name="name">Multipress Machine</field>
+        <field name="model">MP-300</field>
+        <field name="serial_no">MP991209</field>
+        <field name="cost">2400.00</field>
+        <field name="effective_date">2025-03-20</field>
+        <field name="warranty_date">2028-03-20</field>
     </record>
 </odoo>

@@ -31,24 +31,35 @@
     <field name="usage">base_automation</field>
   </record>
   <record id="execute_code_12727332-a9d9-429a-9794-f9ad20944d8b" model="ir.actions.server" context="{'studio': True}">
-    <field name="code"><![CDATA[for record in records:
-    if record.x_studio_start_date and record.x_studio_end_date:
-
-        current_date = record.x_studio_start_date
-
-        while current_date <= record.x_studio_end_date:
-
-            env['x_training_sessions'].create({
-                'x_name': f"Session - {record.x_studio_member.name} ({current_date})",
-                'x_studio_enrollment': record.id,
-                'x_studio_member': record.x_studio_member.id if record.x_studio_member else False,
-                'x_studio_trainer_1_1': record.x_studio_trainer.id if record.x_studio_trainer else False,
-                'x_studio_fitness_class': record.x_studio_fitness_class.id if record.x_studio_fitness_class else False,
-                'x_studio_personal_training': record.x_studio_personal_training.id if record.x_studio_personal_training else False,
-                'x_studio_date': current_date,
-            })
-
-            current_date += dateutil.relativedelta.relativedelta(days=1)]]></field>
+    <field name="code"><![CDATA[today = datetime.date.today()
+for record in records:
+    if record.x_studio_start_date:
+        start_month_end = (record.x_studio_start_date + dateutil.relativedelta.relativedelta(months=1, day=1)) - dateutil.relativedelta.relativedelta(days=1)
+        current_month_end = (today + dateutil.relativedelta.relativedelta(months=1, day=1)) - dateutil.relativedelta.relativedelta(days=1)
+        target_end = max(start_month_end, current_month_end)
+        limit_date = min(target_end, record.x_studio_end_date) if record.x_studio_end_date else target_end
+        
+        start_gen = record.x_studio_sessions_generated_until + dateutil.relativedelta.relativedelta(days=1) if record.x_studio_sessions_generated_until else record.x_studio_start_date
+        
+        if start_gen <= limit_date:
+            current_date = start_gen
+            while current_date <= limit_date:
+                existing = env['x_training_sessions'].search([
+                    ('x_studio_enrollment', '=', record.id),
+                    ('x_studio_date', '=', current_date)
+                ], limit=1)
+                if not existing:
+                    env['x_training_sessions'].create({
+                        'x_name': f"Session - {record.x_studio_member.name} ({current_date})",
+                        'x_studio_enrollment': record.id,
+                        'x_studio_member': record.x_studio_member.id if record.x_studio_member else False,
+                        'x_studio_trainer_1_1': record.x_studio_trainer.id if record.x_studio_trainer else False,
+                        'x_studio_fitness_class': record.x_studio_fitness_class.id if record.x_studio_fitness_class else False,
+                        'x_studio_personal_training': record.x_studio_personal_training.id if record.x_studio_personal_training else False,
+                        'x_studio_date': current_date,
+                    })
+                current_date += dateutil.relativedelta.relativedelta(days=1)
+            record.write({'x_studio_sessions_generated_until': limit_date})]]></field>
     <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
     <field name="state">code</field>
     <field name="name">Execute Code</field>
@@ -371,21 +382,6 @@
     <field name="model_id" ref="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3"/>
     <field name="state">code</field>
     <field name="name">Set Trainer True on Personal Training</field>
-    <field name="usage">base_automation</field>
-  </record>
-  <record id="action_check_equipment_code_uniqueness" model="ir.actions.server" context="{'studio': True}">
-    <field name="code"><![CDATA[for record in records:
-    if record.x_studio_equipment_code:
-        duplicates = env['x_equipment'].search([
-            ('x_studio_equipment_code', '=ilike', record.x_studio_equipment_code),
-            ('id', '!=', record.id),
-            ('x_active', '=', True)
-        ])
-        if duplicates:
-            raise UserError("The Equipment Code '%s' is already in use by another active equipment record!" % record.x_studio_equipment_code)]]></field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="state">code</field>
-    <field name="name">Check Equipment Code Uniqueness</field>
     <field name="usage">base_automation</field>
   </record>
 </odoo>

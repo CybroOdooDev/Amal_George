@@ -12,18 +12,6 @@
     <field name="field_id" ref="new_integer_membersh_7ea13f8e-ceb5-4897-8f80-b4affffa2974"/>
     <field name="json_value">"0"</field>
   </record>
-  <record id="active_equipment_74e2370e-6d28-4328-baff-e973486d2488" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="active_equipment_c8c8fb8a-7ff1-473c-8b9f-279d138ed4ab"/>
-    <field name="json_value">true</field>
-  </record>
-  <record id="currency_equipment_0c90b918-103b-4232-90a1-ddb415afb52a" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="currency_equipment_ac4f9e69-2cc4-4da5-9289-9e5e4fc2a42f"/>
-    <field name="json_value">1</field>
-  </record>
-  <record id="new_selection_equipm_9555180b-6f35-4b15-b4be-fac157f315ff" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="new_selection_equipm_175009fe-c40f-4d16-93c1-6c2a3b1895fb"/>
-    <field name="json_value">"Available"</field>
-  </record>
   <record id="active_fitness_class_989cc38a-248a-43f4-8b82-f24f34cc4add" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="active_fitness_class_70d62d9e-f5e5-43a9-8dc5-b144fba313ea"/>
     <field name="json_value">true</field>

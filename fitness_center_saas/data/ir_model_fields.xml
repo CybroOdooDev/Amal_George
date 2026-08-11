@@ -78,115 +78,7 @@
     <field name="name">x_studio_description_1</field>
     <field name="on_delete" eval="False"/>
   </record>
-  <record id="description_equipmen_299a0b1f-701f-400f-8f60-78a21b9ed9c4" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Equipment Name</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_name</field>
-    <field name="on_delete" eval="False"/>
-    <field name="required" eval="True"/>
-    <field name="tracking">1</field>
-    <field name="translate">standard</field>
-  </record>
-  <record id="active_equipment_c8c8fb8a-7ff1-473c-8b9f-279d138ed4ab" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Active</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_active</field>
-    <field name="on_delete" eval="False"/>
-    <field name="tracking">1</field>
-  </record>
-  <record id="currency_equipment_ac4f9e69-2cc4-4da5-9289-9e5e4fc2a42f" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Currency</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_currency_id</field>
-    <field name="relation">res.currency</field>
-  </record>
-  <record id="value_equipment_2aab1acd-3969-4815-b816-4603f989501f" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">monetary</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Purchase Cost</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_value</field>
-    <field name="on_delete" eval="False"/>
-    <field name="tracking">1</field>
-    <field name="currency_field">x_studio_currency_id</field>
-  </record>
-  <record id="image_equipment_c836908d-64c0-45b2-bb47-0bf5538b0897" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">binary</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Image</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_image</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_text_equipment_c1ae367d-afcc-4882-b6db-e39fcb498317" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Equipment Code</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_equipment_code</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_selection_equipm_e9f8d976-ec2a-4023-b6c7-204e085e2179" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">selection</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Category</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_category</field>
-    <field name="on_delete" eval="False"/>
-    <field name="selection">[('Cardio Strength Flexibility Recovery Functional', 'Cardio'), ('Strength', 'Strength'), ('Flexibility', 'Flexibility'), ('Recovery', 'Recovery'), ('Functional', 'Functional')]</field>
-  </record>
-  <record id="new_date_equipment_e455f5c0-94cf-4e89-abca-93aa49986dba" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">date</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Purchase Date</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_purchase_date</field>
-    <field name="on_delete" eval="False"/>
-  </record>
 
-  <record id="new_selection_equipm_175009fe-c40f-4d16-93c1-6c2a3b1895fb" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">selection</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Status</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_status</field>
-    <field name="on_delete" eval="False"/>
-    <field name="selection">[('Available', 'Available'), ('Not Available', 'Not Available')]</field>
-  </record>
-
-  <record id="new_multiline_text_e_6ac62179-8311-438e-81e9-c5e3f96da3d4" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">text</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Description</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_description</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_checkbox_equipme_0546c4c3-7e22-4a50-927f-5af0e80f8714" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Active</field>
-    <field name="model">x_equipment</field>
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="name">x_studio_active</field>
-    <field name="on_delete" eval="False"/>
-  </record>
   <record id="description_fitness__6c63e70c-2ad3-4471-9607-95eea1f5f339" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="copied" eval="True"/>
@@ -440,15 +332,7 @@
     <field name="name">x_studio_start_date</field>
     <field name="on_delete" eval="False"/>
   </record>
-  <record id="new_date_enrollment_d280916c-ef4d-48cd-92e3-c27c8959f51c" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">date</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">New Date</field>
-    <field name="model">x_enrollment</field>
-    <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
-    <field name="name">x_studio_date_1</field>
-    <field name="on_delete" eval="False"/>
-  </record>
+
   <record id="new_date_enrollment_c24666e3-d079-446b-8a25-1c1cdbca7161" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">date</field>
     <field name="copied" eval="True"/>
@@ -600,15 +484,6 @@
     <field name="name">x_studio_personal_training</field>
     <field name="relation">x_personal_training</field>
   </record>
-  <record id="new_date_training_se_bfa7ce75-5e10-4fd2-a987-20e1afedf130" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">date</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Session Date</field>
-    <field name="model">x_training_sessions</field>
-    <field name="model_id" ref="training_sessions_4cf37c98-8eaa-4f41-b36f-e0d590971dc2"/>
-    <field name="name">x_studio_session_date</field>
-    <field name="on_delete" eval="False"/>
-  </record>
   <record id="new_datetime_trainin_877b949b-81d8-44d6-967f-c4d133e0bf93" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">datetime</field>
     <field name="copied" eval="True"/>
@@ -653,15 +528,6 @@
     <field name="model">x_training_sessions</field>
     <field name="model_id" ref="training_sessions_4cf37c98-8eaa-4f41-b36f-e0d590971dc2"/>
     <field name="name">x_studio_remarks</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_checkbox_trainin_dad65368-1794-4cb9-9cd8-79773adab48a" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Active</field>
-    <field name="model">x_training_sessions</field>
-    <field name="model_id" ref="training_sessions_4cf37c98-8eaa-4f41-b36f-e0d590971dc2"/>
-    <field name="name">x_studio_active</field>
     <field name="on_delete" eval="False"/>
   </record>
   <record id="enrollment_count_enr_5ab80118-8d97-4993-8273-377d73bf7913" model="ir.model.fields" context="{'studio': True}">
@@ -778,17 +644,6 @@ for record in self: record['x_x_studio_enrollment_id_account_move_count'] = self
     <field name="on_delete" eval="False"/>
     <field name="selection">[('Active', 'Active'), ('Cancelled', 'Cancelled')]</field>
   </record>
-  <record id="new_many2many_fitnes_bd6c6651-ff7a-45c7-a26f-3a5125469cf1" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2many</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">New Many2Many</field>
-    <field name="model">x_fitness_classes</field>
-    <field name="model_id" ref="fitness_classes_964ee9b6-fa33-42c8-ae3f-bca81f448362"/>
-    <field name="name">x_studio_many2many_1</field>
-    <field name="on_delete" eval="False"/>
-    <field name="relation">res.partner</field>
-    <field name="relation_table">x_res_partner_x_fitness_classes_rel</field>
-  </record>
   <record id="new_many2many_fitnes_ea4a6197-fe67-4163-ac5b-9eccd2ede186" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2many</field>
     <field name="copied" eval="True"/>
@@ -820,15 +675,6 @@ for record in self: record['x_x_studio_enrollment_id_account_move_count'] = self
     <field name="on_delete" eval="False"/>
     <field name="selection">[('Active', 'Active'), ('Cancelled', 'Cancelled')]</field>
   </record>
-  <record id="new_many2one_enrollm_e413a32b-006c-437d-8fcf-69885f68d5a6" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">New Many2One</field>
-    <field name="model">x_enrollment</field>
-    <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
-    <field name="name">x_studio_many2one_1</field>
-    <field name="relation">account.account</field>
-  </record>
   <record id="new_many2one_enrollm_c1f34369-0d58-42a0-950d-93e6407bce8f" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
@@ -846,31 +692,6 @@ for record in self: record['x_x_studio_enrollment_id_account_move_count'] = self
     <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
     <field name="name">x_studio_invoice_1</field>
     <field name="relation">account.move</field>
-  </record>
-  <record id="journal_entry_curren_86d614ee-705b-4f7e-8b5d-9fe16146731d" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="related">x_studio_invoice_1.currency_id</field>
-    <field name="field_description">Journal Entry Currency</field>
-    <field name="model">x_enrollment</field>
-    <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
-    <field name="name">x_studio_x_studio_invoice_1_currency_id</field>
-    <field name="readonly" eval="True"/>
-    <field name="relation">res.currency</field>
-    <field name="store" eval="False"/>
-    <field name="tracking">100</field>
-  </record>
-  <record id="amount_paid_enrollme_d3f0305e-2211-48c0-a325-35e2f7cdd7f5" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">monetary</field>
-    <field name="related">x_studio_invoice_1.amount_paid</field>
-    <field name="field_description">Amount paid</field>
-    <field name="model">x_enrollment</field>
-    <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
-    <field name="name">x_studio_related_amount_paid_1</field>
-    <field name="on_delete" eval="False"/>
-    <field name="readonly" eval="True"/>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-    <field name="currency_field">x_studio_x_studio_invoice_1_currency_id</field>
   </record>
   <record id="payment_status_enrol_e0137df5-f7d4-42fa-848e-d26b300b6b8f" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
@@ -926,5 +747,54 @@ for record in self: record['x_x_studio_enrollment_id_account_move_count'] = self
     <field name="model">res.partner</field>
     <field name="model_id" ref="base.model_res_partner"/>
     <field name="name">x_studio_emergency_contact</field>
+  </record>
+  <record id="field_x_enrollment_x_studio_sessions_generated_until" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Sessions Generated Until</field>
+    <field name="model">x_enrollment</field>
+    <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
+    <field name="name">x_studio_sessions_generated_until</field>
+    <field name="on_delete" eval="False"/>
+    <field name="tracking">1</field>
+  </record>
+  <record id="field_x_membership_plans_x_studio_enrollment_count" model="ir.model.fields" context="{'studio': True}">
+    <field name="compute"><![CDATA[
+for record in self: record['x_studio_enrollment_count'] = self.env['x_enrollment'].search_count([('x_studio_membership_plan', '=', record.id)])
+]]></field>
+    <field name="ttype">integer</field>
+    <field name="field_description">Enrollments Count</field>
+    <field name="model">x_membership_plans</field>
+    <field name="model_id" ref="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3"/>
+    <field name="name">x_studio_enrollment_count</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="field_res_partner_x_studio_enrollment_count" model="ir.model.fields" context="{'studio': True}">
+    <field name="compute"><![CDATA[
+for record in self: record['x_studio_enrollment_count'] = self.env['x_enrollment'].search_count([('x_studio_member', '=', record.id)])
+]]></field>
+    <field name="ttype">integer</field>
+    <field name="field_description">Enrollments Count</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_enrollment_count</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="field_res_partner_x_studio_sessions_count" model="ir.model.fields" context="{'studio': True}">
+    <field name="compute"><![CDATA[
+for record in self: record['x_studio_sessions_count'] = self.env['x_training_sessions'].search_count([('x_studio_member', '=', record.id)])
+]]></field>
+    <field name="ttype">integer</field>
+    <field name="field_description">Sessions Count</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_sessions_count</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
   </record>
 </odoo>

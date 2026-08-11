@@ -11,10 +11,23 @@
     <field name="sequence">2</field>
   </record>
   <record id="fitness_center_equip_f1fc61e9-b116-4dc7-b9a7-2a492db7e9c7" model="ir.ui.menu" context="{'studio': True}">
-    <field name="action" ref="equipment_ea6e0f7a-8cfe-40e7-a31f-e273174c4e78"/>
     <field name="name">Equipment</field>
     <field name="parent_id" ref="fitness_center_1f570d78-8f99-4d5c-a806-2a414e78a4f1"/>
     <field name="sequence">3</field>
+  </record>
+
+  <record id="fitness_center_equip_registry_submenu" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="maintenance.hr_equipment_action"/>
+    <field name="name">Equipment</field>
+    <field name="parent_id" ref="fitness_center_equip_f1fc61e9-b116-4dc7-b9a7-2a492db7e9c7"/>
+    <field name="sequence">1</field>
+  </record>
+
+  <record id="fitness_center_equip_cat_submenu" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="maintenance.hr_equipment_category_action"/>
+    <field name="name">Equipment Categories</field>
+    <field name="parent_id" ref="fitness_center_equip_f1fc61e9-b116-4dc7-b9a7-2a492db7e9c7"/>
+    <field name="sequence">2</field>
   </record>
   <record id="fitness_center_fitne_6330f359-85ec-41ad-bf91-b72c8743e9d7" model="ir.ui.menu" context="{'studio': True}">
     <field name="action" ref="fitness_classes_d3c601d1-1032-4f44-825b-c636d1fce9ba"/>

@@ -107,11 +107,4 @@
     <field name="name">Set Trainer True on Personal Training</field>
     <field name="trigger_field_ids" eval="[(6, 0, [ref('new_checkbox_members_2bb79bd6-c562-4057-9010-7d7773b3d2e1')])]"/>
   </record>
-  <record id="auto_check_equipment_code_uniqueness" model="base.automation" context="{'studio': True}">
-    <field name="model_id" ref="equipment_3c1e77cf-a738-4b45-8012-179d5bcef836"/>
-    <field name="action_server_ids" eval="[(6, 0, [ref('action_check_equipment_code_uniqueness')])]"/>
-    <field name="trigger">on_create_or_write</field>
-    <field name="name">Check Equipment Code Uniqueness</field>
-    <field name="trigger_field_ids" eval="[(6, 0, [ref('new_text_equipment_c1ae367d-afcc-4882-b6db-e39fcb498317')])]"/>
-  </record>
 </odoo>

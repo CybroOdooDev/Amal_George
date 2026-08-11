@@ -20,7 +20,7 @@
         <div class="fc_header_right">
           <div class="fc_date_badge">
             <i class="fa fa-calendar me-2"/>
-            <span t-esc="this.state.today"/>
+            <span t-out="this.state.today"/>
           </div>
           <button class="fc_refresh_btn" t-on-click="() => this.loadDashboardData()" t-att-class="this.state.loading ? 'fc_refresh_btn fc_spin' : 'fc_refresh_btn'">
             <i class="fa fa-refresh"/>
@@ -54,7 +54,7 @@
                   <div class="fc_kpi_content">
                     <div class="fc_kpi_data">
                       <span class="fc_kpi_label">Active Members</span>
-                      <span class="fc_kpi_value" t-esc="this.state.kpi.activeMembers"/>
+                      <span class="fc_kpi_value" t-out="this.state.kpi.activeMembers"/>
                       <span class="fc_kpi_caption">Total Active Members</span>
                     </div>
                     <div class="fc_kpi_icon_wrap fc_icon_purple">
@@ -68,7 +68,7 @@
                   <div class="fc_kpi_content">
                     <div class="fc_kpi_data">
                       <span class="fc_kpi_label">MRR</span>
-                      <span class="fc_kpi_value" t-esc="this.state.kpi.mrr"/>
+                      <span class="fc_kpi_value" t-out="this.state.kpi.mrr"/>
                       <span class="fc_kpi_caption">Monthly Recurring Revenue</span>
                     </div>
                     <div class="fc_kpi_icon_wrap fc_icon_green">
@@ -82,7 +82,7 @@
                   <div class="fc_kpi_content">
                     <div class="fc_kpi_data">
                       <span class="fc_kpi_label">Active Classes</span>
-                      <span class="fc_kpi_value" t-esc="this.state.kpi.activeClasses"/>
+                      <span class="fc_kpi_value" t-out="this.state.kpi.activeClasses"/>
                       <span class="fc_kpi_caption">Currently Active</span>
                     </div>
                     <div class="fc_kpi_icon_wrap fc_icon_orange">
@@ -92,11 +92,11 @@
                 </div>
 
                 <!-- 4. Available Equipment -->
-                <div class="fc_kpi_card fc_kpi_cyan_glow" t-on-click="() => this.onTileClick('x_equipment', this.availableEquipmentDomain, 'Available Equipment')">
+                <div class="fc_kpi_card fc_kpi_cyan_glow" t-on-click="() => this.onTileClick('maintenance.equipment', this.availableEquipmentDomain, 'Available Equipment')">
                   <div class="fc_kpi_content">
                     <div class="fc_kpi_data">
                       <span class="fc_kpi_label">Available Equipment</span>
-                      <span class="fc_kpi_value" t-esc="this.state.kpi.availableEquipment"/>
+                      <span class="fc_kpi_value" t-out="this.state.kpi.availableEquipment"/>
                       <span class="fc_kpi_caption">Ready to Use</span>
                     </div>
                     <div class="fc_kpi_icon_wrap fc_icon_cyan">
@@ -113,7 +113,7 @@
                   <div class="fc_kpi_content">
                     <div class="fc_kpi_data">
                       <span class="fc_kpi_label">Sessions Today</span>
-                      <span class="fc_kpi_value" t-esc="this.state.kpi.sessionsToday"/>
+                      <span class="fc_kpi_value" t-out="this.state.kpi.sessionsToday"/>
                       <span class="fc_kpi_caption">Total Sessions</span>
                     </div>
                     <div class="fc_kpi_icon_wrap fc_icon_pink">
@@ -127,7 +127,7 @@
                   <div class="fc_kpi_content">
                     <div class="fc_kpi_data">
                       <span class="fc_kpi_label">Expiring (7d)</span>
-                      <span class="fc_kpi_value" t-esc="this.state.kpi.expiringSoon"/>
+                      <span class="fc_kpi_value" t-out="this.state.kpi.expiringSoon"/>
                       <span class="fc_kpi_caption">Memberships Expiring</span>
                     </div>
                     <div class="fc_kpi_icon_wrap fc_icon_yellow">
@@ -166,7 +166,7 @@
                       <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="url(#gaugeGradient)" stroke-width="6" stroke-linecap="round" t-att-stroke-dasharray="this.state.attendanceDashArray" stroke-dashoffset="0"/>
                     </svg>
                     <div class="fc_gauge_center_text_wrap">
-                      <span class="fc_gauge_center_value" t-esc="this.state.kpi.attendanceRate"/>
+                      <span class="fc_gauge_center_value" t-out="this.state.kpi.attendanceRate"/>
                     </div>
                   </div>
                 </div>
@@ -241,14 +241,14 @@
                     <tr class="fc_table_row">
                       <td>
                         <div class="fc_member_cell">
-                          <div class="fc_avatar" t-esc="enr.memberInitial"/>
-                          <span class="fw-bold" t-esc="enr.member"/>
+                          <div class="fc_avatar" t-out="enr.memberInitial"/>
+                          <span class="fw-bold" t-out="enr.member"/>
                         </div>
                       </td>
-                      <td><span class="fc_plan_tag" t-esc="enr.plan"/></td>
-                      <td class="fc_date_cell" t-esc="enr.expiryDate"/>
+                      <td><span class="fc_plan_tag" t-out="enr.plan"/></td>
+                      <td class="fc_date_cell" t-out="enr.expiryDate"/>
                       <td>
-                        <span t-attf-class="fc_days_badge #{enr.remainingDays &lt;= 7 ? 'fc_badge_danger' : 'fc_badge_warning'}" t-esc="enr.remainingDays + ' days'"/>
+                        <span t-attf-class="fc_days_badge #{enr.remainingDays &lt;= 7 ? 'fc_badge_danger' : 'fc_badge_warning'}" t-out="enr.remainingDays + ' days'"/>
                       </td>
                     </tr>
                   </t>
@@ -359,14 +359,14 @@
                       <t t-foreach="this.state.todaySchedule" t-as="sess" t-key="sess.id">
                         <tr class="fc_table_row" t-on-click="() => this.onClickSession(sess)">
                           <td>
-                            <span class="fw-bold" t-esc="sess.member"/>
+                            <span class="fw-bold" t-out="sess.member"/>
                           </td>
-                          <td class="text-muted" t-esc="sess.trainer"/>
+                          <td class="text-muted" t-out="sess.trainer"/>
                           <td>
-                            <span class="fc_plan_tag" t-esc="sess.type"/>
+                            <span class="fc_plan_tag" t-out="sess.type"/>
                           </td>
                           <td>
-                            <span t-attf-class="fc_days_badge fc_badge_#{sess.statusClass}" t-esc="sess.status"/>
+                            <span t-attf-class="fc_days_badge fc_badge_#{sess.statusClass}" t-out="sess.status"/>
                           </td>
                         </tr>
                       </t>
@@ -394,12 +394,12 @@
                   <t t-foreach="this.state.trainerAvailability" t-as="trainer" t-key="trainer.id">
                     <div class="fc_trainer_row" t-on-click="() => this.onClickTrainerSessions(trainer)">
                       <div class="fc_trainer_info">
-                        <span class="fc_trainer_name fw-bold" t-esc="trainer.name"/>
-                        <span class="fc_trainer_title text-muted" t-esc="trainer.jobTitle"/>
+                        <span class="fc_trainer_name fw-bold" t-out="trainer.name"/>
+                        <span class="fc_trainer_title text-muted" t-out="trainer.jobTitle"/>
                       </div>
                       <div class="fc_trainer_load">
-                        <span class="fc_load_count" t-esc="trainer.sessionsCount + ' sessions'"/>
-                        <span t-attf-class="fc_load_badge fc_load_#{trainer.statusClass}" t-esc="trainer.status"/>
+                        <span class="fc_load_count" t-out="trainer.sessionsCount + ' sessions'"/>
+                        <span t-attf-class="fc_load_badge fc_load_#{trainer.statusClass}" t-out="trainer.status"/>
                       </div>
                     </div>
                   </t>
@@ -424,8 +424,8 @@
                         <i t-attf-class="fa #{equip.severity === 'danger' ? 'fa-ban text-danger' : equip.severity === 'warning' ? 'fa-warning text-warning' : 'fa-check-circle text-success'}"/>
                       </div>
                       <div class="fc_alert_info">
-                        <span class="fc_alert_name fw-bold" t-esc="equip.name"/>
-                        <span class="fc_alert_msg" t-esc="equip.message"/>
+                        <span class="fc_alert_name fw-bold" t-out="equip.name"/>
+                        <span class="fc_alert_msg" t-out="equip.message"/>
                       </div>
                     </div>
                   </t>
@@ -441,7 +441,7 @@
         <div class="fc_footer">
           <span>
             <i class="fa fa-heartbeat me-1"/>
-            Fitness Center Dashboard · Last refreshed: <span t-esc="this.state.lastRefreshed"/>
+            Fitness Center Dashboard · Last refreshed: <span t-out="this.state.lastRefreshed"/>
           </span>
         </div>
 

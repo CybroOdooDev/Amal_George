@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_access.xml
+  Description: Declares security groups and model access rights (ACLs) for the fitness center's studio models.
+-->
+
 <odoo noupdate="1">
   <record id="membership_plans_gro_fb392e6d-b2a7-4e35-92dd-31039f538f43" model="ir.access" context="{'studio': True}">
     <field name="group_id" ref="base.group_system"/>

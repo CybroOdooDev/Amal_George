@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_actions_server.xml
+  Description: Contains server actions executing python code for training session calculations, payment validation, and enrollment handling.
+-->
+
 <odoo>
   <record id="base_automation.ir_cron_data_base_automation_check_ir_actions_server" model="ir.actions.server" context="{'studio': True}" forcecreate="1">
     <field name="code"><![CDATA[model._cron_process_time_based_actions()]]></field>
@@ -232,12 +238,21 @@ for record in records:
   </record>
   <record id="execute_code_8433386f-4089-47eb-8bef-3d7d0e150b18" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    if record.x_studio_status in ['Cancelled', 'Expired', 'Renewed']:
+        continue
     if not record.x_studio_fitness_class:
         continue
 
     fitness_class = record.x_studio_fitness_class
+    member = record.x_studio_member
 
-    if len(fitness_class.x_studio_members) > fitness_class.x_studio_maximum_capacity:
+    # Check if the member is already enrolled in the class
+    is_member_enrolled = member and (member.id in fitness_class.x_studio_members.ids)
+
+    current_count = len(fitness_class.x_studio_members)
+    projected_count = current_count if is_member_enrolled else (current_count + 1)
+
+    if projected_count > fitness_class.x_studio_maximum_capacity:
         raise UserError(
             "The fitness class '%s' has reached its maximum capacity of %s members."
             % (fitness_class.x_name, fitness_class.x_studio_maximum_capacity)
@@ -382,6 +397,24 @@ for record in records:
     <field name="model_id" ref="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3"/>
     <field name="state">code</field>
     <field name="name">Set Trainer True on Personal Training</field>
+    <field name="usage">base_automation</field>
+  </record>
+  <record id="action_check_membership_plan_duration" model="ir.actions.server" context="{'studio': True}">
+    <field name="code"><![CDATA[for record in records:
+    if record.x_studio_duration_months is False or record.x_studio_duration_months <= 0:
+        raise UserError("Duration must be greater than 0.")]]></field>
+    <field name="model_id" ref="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3"/>
+    <field name="state">code</field>
+    <field name="name">Check Membership Plan Duration</field>
+    <field name="usage">base_automation</field>
+  </record>
+  <record id="action_check_enrollment_readonly_after_invoice" model="ir.actions.server" context="{'studio': True}">
+    <field name="code"><![CDATA[for record in records:
+    if record.x_studio_invoice_1:
+        raise UserError("This enrollment cannot be modified because an invoice has already been created.")]]></field>
+    <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
+    <field name="state">code</field>
+    <field name="name">Check Enrollment Readonly After Invoice</field>
     <field name="usage">base_automation</field>
   </record>
 </odoo>

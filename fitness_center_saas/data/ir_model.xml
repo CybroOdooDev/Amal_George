@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_model.xml
+  Description: Registers custom database models created via Odoo Studio (Plans, Classes, Enrollments, Sessions, etc.).
+-->
+
 <odoo>
   <record id="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3" model="ir.model" context="{'studio': True}">
     <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.

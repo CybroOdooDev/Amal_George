@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: base_automation.xml
+  Description: Defines automated base rules (e.g., date calculations, notifications triggers) for gym memberships and class scheduling.
+-->
+
 <odoo>
   <record id="auto_calculate_end_d_86530941-0a5a-4ddd-bb8f-46e4c2980f6c" model="base.automation" context="{'studio': True}">
     <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
@@ -58,6 +64,7 @@
     <field name="action_server_ids" eval="[(6, 0, [ref('execute_code_8433386f-4089-47eb-8bef-3d7d0e150b18')])]"/>
     <field name="trigger">on_create_or_write</field>
     <field name="name">Check Fitness Class Capacity</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('new_selection_enroll_1a587850-a01a-46e5-8fb9-12b2b6c257bd'), ref('new_many2one_enrollm_f9a5380e-8ecd-4277-af54-dadbb0c54ac3')])]"/>
   </record>
   <record id="update_active_flag_f_4211ad0b-6788-4c45-90b7-30fc4297970d" model="base.automation" context="{'studio': True}">
     <field name="model_id" ref="fitness_classes_964ee9b6-fa33-42c8-ae3f-bca81f448362"/>
@@ -106,5 +113,27 @@
     <field name="filter_domain">[("x_studio_personal_training", "=", True)]</field>
     <field name="name">Set Trainer True on Personal Training</field>
     <field name="trigger_field_ids" eval="[(6, 0, [ref('new_checkbox_members_2bb79bd6-c562-4057-9010-7d7773b3d2e1')])]"/>
+  </record>
+  <record id="check_membership_plan_duration" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_check_membership_plan_duration')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Check Membership Plan Duration</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('new_integer_membersh_7ea13f8e-ceb5-4897-8f80-b4affffa2974')])]"/>
+  </record>
+  <record id="check_enrollment_readonly_after_invoice" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="enrollment_cb27ce50-8ceb-4ad5-b5fe-a9c9536f0399"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_check_enrollment_readonly_after_invoice')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Check Enrollment Readonly After Invoice</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [
+        ref('new_many2one_enrollm_16486279-b1b7-46c5-b050-72fccb80ec1a'),
+        ref('new_many2one_enrollm_5fb27860-6864-47b1-bca6-1a9bfe261146'),
+        ref('new_date_enrollment_a925dda8-e507-461a-9a35-a4983e06448d'),
+        ref('new_many2one_enrollm_c520f2db-c273-4b1c-aa14-39dbdcf5c4a1'),
+        ref('new_many2one_enrollm_a8827b97-5385-4655-8596-4a4a86594f3b'),
+        ref('new_many2one_enrollm_f9a5380e-8ecd-4277-af54-dadbb0c54ac3'),
+        ref('new_multiline_text_e_9d860d99-2ace-436b-8014-ac3ac056828d')
+    ])]"/>
   </record>
 </odoo>

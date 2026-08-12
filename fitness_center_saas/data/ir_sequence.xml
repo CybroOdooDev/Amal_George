@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_sequence.xml
+  Description: Registers sequence generator for unique membership enrollment numbering (ENR/XXXXX).
+-->
+
 <odoo>
     <data noupdate="1">
         <record id="sequence_enrollment" model="ir.sequence">

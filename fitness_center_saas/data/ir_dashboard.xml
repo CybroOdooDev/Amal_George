@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_dashboard.xml
+  Description: Declares standard/legacy reporting actions and registers the main OWL client dashboard action.
+-->
+
 <odoo>
     <!-- Dashboard sub-view actions (kept for compatibility) -->
     <record id="action_dashboard_enrollments_graph" model="ir.actions.act_window">

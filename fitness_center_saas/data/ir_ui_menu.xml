@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_ui_menu.xml
+  Description: Defines backend user interface menus and submenu paths for the Fitness Center app suite.
+-->
+
 <odoo>
   <record id="fitness_center_1f570d78-8f99-4d5c-a806-2a414e78a4f1" model="ir.ui.menu" context="{'studio': True}">
     <field name="name">Fitness Center</field>

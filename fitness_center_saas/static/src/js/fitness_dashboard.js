@@ -13,6 +13,18 @@ import { Component, onMounted, onWillUnmount, proxy, onWillStart } from "@odoo/o
 export class FitnessDashboard extends Component {
     static template = "fitness_center_saas.FitnessDashboard";
 
+    /**
+
+
+     * Component initialization and setup lifecycle hook.
+
+
+     * Registers services, configures OWL reactive state, and handles auto-refresh timers.
+
+
+     */
+
+
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
@@ -90,12 +102,30 @@ export class FitnessDashboard extends Component {
         });
     }
 
+    /**
+
+
+     * Safely destroys all Chart.js instances to avoid memory leaks.
+
+
+     */
+
+
     _destroyCharts() {
         Object.values(this.charts).forEach((chart) => {
             if (chart) chart.destroy();
         });
         this.charts = {};
     }
+
+    /**
+
+
+     * Toggles the visibility state of advanced search filter panel.
+
+
+     */
+
 
     toggleAdvancedFilters() {
         this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
@@ -105,11 +135,35 @@ export class FitnessDashboard extends Component {
     //  Interactive Filter Bar Handlers
     // ─────────────────────────────────────────────────────────────
 
+    /**
+
+
+     * Handles date input changes and triggers reactive dashboard reloads.
+
+
+     * @param {string} name - The filter state variable to update (e.g. dateStart, dateEnd).
+
+
+     * @param {Event} ev - The input change event.
+
+
+     */
+
+
     onFilterChange(name, ev) {
         let val = ev.target.value;
         this.state.filters[name] = val;
         this.loadDashboardData(true);
     }
+
+    /**
+
+
+     * Resets date filter states and triggers dashboard silent reloads.
+
+
+     */
+
 
     clearFilters() {
         this.state.filters = proxy({
@@ -126,6 +180,21 @@ export class FitnessDashboard extends Component {
     //  Domain Helper Functions (Dynamic filtering propagation)
     // ─────────────────────────────────────────────────────────────
 
+    /**
+
+
+     * Combines base criteria with selected dates to build the enrollment search domain.
+
+
+     * @param {Array} baseDomain - The base criteria array.
+
+
+     * @returns {Array} Compiled Odoo search domain.
+
+
+     */
+
+
     _getEnrollmentDomain(baseDomain = []) {
         const domain = [...baseDomain];
         if (this.state.filters.dateStart) {
@@ -136,6 +205,21 @@ export class FitnessDashboard extends Component {
         }
         return domain;
     }
+
+    /**
+
+
+     * Combines base criteria with selected dates to build the training sessions search domain.
+
+
+     * @param {Array} baseDomain - The base criteria array.
+
+
+     * @returns {Array} Compiled Odoo search domain.
+
+
+     */
+
 
     _getSessionsDomain(baseDomain = []) {
         const domain = [...baseDomain];
@@ -159,6 +243,18 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
     //  Data Loading
     // ─────────────────────────────────────────────────────────────
+
+    /**
+
+
+     * Main controller method to load all KPI, operational lists, and charts data from Odoo backend.
+
+
+     * @param {boolean} [silent=false] - If true, skips loading overlay rendering.
+
+
+     */
+
 
     async loadDashboardData(silent = false) {
         if (!silent) {
@@ -185,6 +281,21 @@ export class FitnessDashboard extends Component {
             setTimeout(() => this._initCharts(), 150);
         }
     }
+
+
+
+    /**
+
+
+
+
+     * Queries Odoo database to count active members, MRR, sessions, classes, and available equipment.
+
+
+
+
+     */
+
 
 
 
@@ -363,6 +474,15 @@ export class FitnessDashboard extends Component {
     //  Actionable Operational Panels Data Loaders (Top 5 Records)
     // ─────────────────────────────────────────────────────────────
 
+    /**
+
+
+     * Queries active enrollments expiring in the next 30 days.
+
+
+     */
+
+
     async _loadUpcomingExpiries() {
         const records = await this.orm.searchRead(
             "x_enrollment",
@@ -394,6 +514,15 @@ export class FitnessDashboard extends Component {
             };
         });
     }
+
+    /**
+
+
+     * Loads today\'s training sessions schedule list.
+
+
+     */
+
 
     async _loadTodaySchedule() {
         const todayStr = this._todayString();
@@ -440,6 +569,15 @@ export class FitnessDashboard extends Component {
             };
         });
     }
+
+    /**
+
+
+     * Queries hr.employee and maps active session counts to determine trainer workloads.
+
+
+     */
+
 
     async _loadTrainerAvailability() {
         const todayStr = this._todayString();
@@ -510,6 +648,15 @@ export class FitnessDashboard extends Component {
         });
     }
 
+    /**
+
+
+     * Loads equipment maintenance alerts and status alerts.
+
+
+     */
+
+
     async _loadEquipmentAlerts() {
         let alerts = [];
         try {
@@ -545,6 +692,15 @@ export class FitnessDashboard extends Component {
 
         this.state.equipmentAlerts = alerts;
     }
+
+    /**
+
+
+     * Prepares aggregated dataset metrics for the 5 dashboard charts.
+
+
+     */
+
 
     async _loadChartsData() {
         const todayStr = this._todayString();
@@ -828,6 +984,24 @@ export class FitnessDashboard extends Component {
     //  Interactive Click & Export Helpers
     // ─────────────────────────────────────────────────────────────
 
+    /**
+
+
+     * Triggers Odoo action client to open standard list/form views for clicked KPI cards.
+
+
+     * @param {string} model - The database model to view.
+
+
+     * @param {Array} domain - The filter domain array.
+
+
+     * @param {string} title - The header title of the target list view.
+
+
+     */
+
+
     onTileClick(model, domain, title) {
         // domain may be an array or a JSON string (backward-compat)
         const resolvedDomain = Array.isArray(domain) ? domain : JSON.parse(domain);
@@ -979,6 +1153,15 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
     //  Chart.js Render Actions (5 Management Charts Rendered Inline)
     // ─────────────────────────────────────────────────────────────
+
+    /**
+
+
+     * Instantiates the 5 Chart.js objects (Radar, Line, Bar, Polar, Pie) on the template canvases.
+
+
+     */
+
 
     _initCharts() {
         this._destroyCharts();

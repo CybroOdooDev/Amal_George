@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_model_fields.xml
+  Description: Registers custom fields (dates, relations, selection fields, status fields) on standard and custom models.
+-->
+
 <odoo>
   <record id="description_membersh_bf5033b5-5fa7-438f-9fa9-e524316512bc" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
@@ -39,6 +45,7 @@
     <field name="model_id" ref="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3"/>
     <field name="name">x_studio_value</field>
     <field name="on_delete" eval="False"/>
+    <field name="required" eval="True"/>
     <field name="tracking">1</field>
     <field name="currency_field">x_studio_currency_id</field>
   </record>
@@ -50,6 +57,7 @@
     <field name="model_id" ref="membership_plans_4cc6e019-3fa2-4a0d-be2b-900d51ec6df3"/>
     <field name="name">x_studio_duration_months</field>
     <field name="on_delete" eval="False"/>
+    <field name="required" eval="True"/>
   </record>
   <record id="new_multiline_text_m_6988e41c-f3ca-4167-a649-f2e51bce01a2" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">text</field>

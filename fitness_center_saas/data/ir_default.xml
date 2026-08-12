@@ -1,4 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: ir_default.xml
+  Description: Defines defaults, parameters, and action parameters for the modules.
+-->
+
 <odoo>
   <record id="active_membership_pl_c6b53779-6425-416e-a20e-0386315d340d" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="active_membership_pl_41f945f0-19cc-47f1-8f07-0a8d99eb77b3"/>

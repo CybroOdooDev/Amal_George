@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: mail_template.xml
+  Description: Configures email templates for session scheduling notifications and membership updates.
+-->
+
 <odoo>
     <record id="email_template_enrollment_activation_member" model="mail.template">
         <field name="name">Enrollment: Member Activation</field>

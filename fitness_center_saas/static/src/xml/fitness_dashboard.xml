@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Fitness Center Management SaaS Module
+  File: fitness_dashboard.xml
+  Description: OWL template view defining dashboard markup, KPI cards, filter layouts, charts canvases, and grids.
+-->
+
 <templates xml:space="preserve">
 
   <t t-name="fitness_center_saas.FitnessDashboard">

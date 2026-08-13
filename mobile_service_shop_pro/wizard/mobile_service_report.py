@@ -1,10 +1,25 @@
 # -*- coding: utf-8 -*-
-################################################################################
+###############################################################################
 #
-#    Mobile Service Management Pro — Odoo 19
-#    Wizard: Mobile Service Report (PDF + XLSX)
+#    Cybrosys Technologies Pvt. Ltd.
 #
-################################################################################
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author:Vishnuraj P (odoo@cybrosys.com)
+#
+#    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
+#
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
 import datetime
 import io
 import json
@@ -50,6 +65,7 @@ class MobileServiceReport(models.TransientModel):
         ],
         string='Service Status',
         default='draft',
+        help="Filter service records by their current workflow status.",
     )
     technician_id = fields.Many2one(
         'res.users', string="Technician",
@@ -91,6 +107,9 @@ class MobileServiceReport(models.TransientModel):
     # ------------------------------------------------------------------
     def print_pdf_report(self):
         """Render the Mobile Service PDF report."""
+        domain = self._build_domain()
+        if not self.env['mobile.service'].search(domain):
+            raise ValidationError(_("No records found for the selected filters."))
         data = self.get_report_data()
         return self.env.ref(
             'mobile_service_shop_pro.action_mobile_service_report'
@@ -98,6 +117,9 @@ class MobileServiceReport(models.TransientModel):
 
     def print_xlsx_report(self):
         """Trigger the XLSX download via the custom controller."""
+        domain = self._build_domain()
+        if not self.env['mobile.service'].search(domain):
+            raise ValidationError(_("No records found for the selected filters."))
         data = self.get_report_data()
         return {
             'type': 'ir.actions.report',
@@ -114,13 +136,14 @@ class MobileServiceReport(models.TransientModel):
         """Write the XLSX workbook into the HTTP response stream."""
         domain = []
         form = data['form']
-        if form['date_start']:
-            domain.append(('date_request', '>=', form['date_start']))
-        domain.append(('date_request', '<=', form['date_end']))
+        if form.get('date_start'):
+            domain.append(('date_request', '>=', form.get('date_start')))
+        if form.get('date_end'):
+            domain.append(('date_request', '<=', form.get('date_end')))
         if form.get('service_status'):
-            domain.append(('service_state', '=', form['service_status']))
+            domain.append(('service_state', '=', form.get('service_status')))
         if form.get('technician_id'):
-            domain.append(('technician_name', '=', form['technician_id']))
+            domain.append(('technician_name', '=', form.get('technician_id')))
 
         service_ids = self.env['mobile.service'].search(domain)
         if not service_ids:
@@ -166,3 +189,5 @@ class MobileServiceReport(models.TransientModel):
         output.seek(0)
         response.stream.write(output.read())
         output.close()
+
+

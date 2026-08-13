@@ -1,15 +1,31 @@
 # -*- coding: utf-8 -*-
-################################################################################
+###############################################################################
 #
-#    Mobile Service Management Pro — Odoo 19
+#    Cybrosys Technologies Pvt. Ltd.
 #
-#    IMEI lookup migrated from imeidb.xyz  →  ImeiCheck.com free API
-#    API endpoint: https://alpha.imeicheck.com/api/modelBrandName
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author:Vishnuraj P (odoo@cybrosys.com)
 #
-################################################################################
+#    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
+#
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+import base64
 import json
 import logging
+import os
 import pytz
+import requests
 import urllib.parse
 import urllib.request
 import urllib.error
@@ -32,7 +48,7 @@ class MobileService(models.Model):
     # Fields
     # ------------------------------------------------------------------
     real_phone_image = fields.Binary(
-        string="Real Phone Image", attachment=True, store=True,
+        string="Phone Image", attachment=True, store=True,
         help="Attach a photo of the physical device being serviced.")
     complaint_visibility_status = fields.Boolean(
         compute='_compute_complaint_visibility_status',
@@ -84,7 +100,7 @@ class MobileService(models.Model):
     # ------------------------------------------------------------------
     # Service ticket report
     # ------------------------------------------------------------------
-    def get_ticket(self):
+    def action_get_ticket(self):
         """Generate the printable service ticket PDF with timezone-aware timestamp."""
         self.ensure_one()
         user = self.env['res.users'].browse(self.env.uid)
@@ -114,7 +130,7 @@ class MobileService(models.Model):
             'date_request': self.date_request,
             'date_return': self.return_date,
             'sev_id': self.name,
-            'real_phone_image': self.real_phone_image,
+            'real_phone_image': self.real_phone_image.decode('utf-8') if self.real_phone_image else False,
             'warranty': self.is_in_warranty,
             'customer_name': self.person_name.name,
             'imei_no': self.imei_no,
@@ -162,51 +178,140 @@ class MobileService(models.Model):
         api_key = self._get_config_param('api_key')
         api_username = self._get_config_param('api_username')
         api_url_slug = self._get_config_param('api_url_slug')
-        api_php_service_id = self._get_config_param('api_php_service_id')
+        api_php_service_id = '11'
 
-        if api_key and api_php_service_id:
-            res = self._imeicheck_php_lookup(api_key, api_php_service_id)
-        else:
-            res = self._imeicheck_tac_lookup(api_key, api_username, api_url_slug)
-
-        # Handle API-level errors
-        if isinstance(res, dict) and res.get('error'):
-            error_msg = res['error']
-            if 'invalid' in error_msg.lower() or 'imei' in error_msg.lower():
-                raise UserError(_("Invalid IMEI number. Please check and try again."))
-            elif 'not found' in error_msg.lower():
-                raise UserError(_(
-                    "Device not found in ImeiCheck.com database. "
-                    "The IMEI is valid but its TAC may not be listed yet."
-                ))
+        warning_msg = None
+        try:
+            if api_key and api_php_service_id:
+                res = self._imeicheck_php_lookup(api_key, api_php_service_id)
             else:
-                raise UserError(_("ImeiCheck.com error: %(msg)s", msg=error_msg))
+                res = self._imeicheck_tac_lookup(api_key, api_username, api_url_slug)
 
-        # Parse successful response
-        # ImeiCheck.com returns: {"model": "...", "brand": "...", "name": "..."}
-        # It may also return a plain string "Brand Model" for simple lookups
-        if isinstance(res, str):
-            # Fallback: plain text response — use as device name
-            self.device_name = res
-            self.manufacturer = res.split()[0] if res else ''
-            _logger.warning("ImeiCheck.com returned plain string: %s", res)
+            # Handle API-level errors
+            if isinstance(res, dict) and res.get('error'):
+                error_msg = res['error']
+                if 'invalid' in error_msg.lower() or 'imei' in error_msg.lower():
+                    raise UserError(_("Invalid IMEI number. Please check and try again."))
+                elif 'not found' in error_msg.lower():
+                    raise UserError(_(
+                        "Device not found in ImeiCheck.com database. "
+                        "The IMEI is valid but its TAC may not be listed yet."
+                    ))
+                else:
+                    raise UserError(_("ImeiCheck.com error: %(msg)s", msg=error_msg))
+
+            # Parse successful response
+            # ImeiCheck.com returns: {"model": "...", "brand": "...", "name": "..."}
+            # It may also return a plain string "Brand Model" for simple lookups
+            if isinstance(res, str):
+                # Fallback: plain text response — use as device name
+                self.device_name = res
+                self.manufacturer = res.split()[0] if res else ''
+                _logger.warning("ImeiCheck.com returned plain string: %s", res)
+                self._fetch_and_set_device_image_mobileapi(self.manufacturer, self.device_name)
+                return
+            
+            response_brand = res.get('brand', res.get('manufacturer', ''))
+            response_model = res.get('model', res.get('model_name', ''))
+            response_name = res.get('name', res.get('modelName', res.get('device_name', '')))
+
+            if not response_brand and not response_model:
+                raise UserError(_(
+                    "ImeiCheck.com returned an empty result for this IMEI. "
+                    "The device TAC may not be in their database."
+                ))
+
+            self.device_name = response_name or f"{response_brand} {response_model}".strip()
+            self.manufacturer = response_brand
+
+            # Auto-create or link brand/model records
+            self._link_or_create_brand_model(response_brand, response_model)
+            self._fetch_and_set_device_image_mobileapi(response_brand, self.device_name)
+
+        except UserError as e:
+            warning_msg = e.args[0]
+            _logger.warning("IMEI lookup warning: %s.", str(e))
+        except Exception as e:
+            warning_msg = str(e)
+            _logger.error("IMEI lookup error: %s.", str(e))
+
+        if warning_msg:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('IMEI Lookup Warning'),
+                    'message': warning_msg,
+                    'sticky': False,
+                    'type': 'warning',
+                }
+            }
+
+    def _fetch_and_set_device_image_mobileapi(self, brand_name=None, device_name=None):
+        """Fetch device image from MobileAPI.dev search endpoint and set it.
+        If the fetch fails, set the local default phone placeholder image.
+        """
+        brand = brand_name or self.manufacturer or (self.brand_name.brand_name if self.brand_name else '')
+        device = device_name or self.device_name or (self.model_name.mobile_brand_models if self.model_name else '')
+
+        if not brand or not device:
+            _logger.warning("Cannot fetch device image from MobileAPI: Brand or Device Name is missing.")
             return
 
-        response_brand = res.get('brand', res.get('manufacturer', ''))
-        response_model = res.get('model', res.get('model_name', ''))
-        response_name = res.get('name', res.get('modelName', res.get('device_name', '')))
+        mobileapi_key = self._get_config_param('mobileapi_key')
+        if not mobileapi_key:
+            _logger.warning("MobileAPI.dev API Key is not configured. Skipping image fetch.")
+            return
 
-        if not response_brand and not response_model:
-            raise UserError(_(
-                "ImeiCheck.com returned an empty result for this IMEI. "
-                "The device TAC may not be in their database."
-            ))
+        query_name = f"{brand} {device}".strip()
+        params = {
+            'name': query_name,
+            'key': mobileapi_key,
+        }
+        url = "https://api.mobileapi.dev/devices/search/?%s" % (
+            urllib.parse.urlencode(params)
+        )
+        _logger.info("Fetching device image from MobileAPI.dev for query: %s", query_name)
 
-        self.device_name = response_name or f"{response_brand} {response_model}".strip()
-        self.manufacturer = response_brand
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
 
-        # Auto-create or link brand/model records
-        self._link_or_create_brand_model(response_brand, response_model)
+        image_saved = False
+        try:
+            response = requests.get(url, headers=headers, timeout=15)
+            if response.status_code == 200:
+                data = response.json()
+                # MobileAPI.dev search returns a dict: {"total": 100, "devices": [...]}
+                if isinstance(data, dict) and isinstance(data.get('devices'), list) and len(data['devices']) > 0:
+                    device_data = data['devices'][0]
+                    image_b64 = device_data.get('image') or device_data.get('image_b64')
+                    if image_b64:
+                        self.real_phone_image = image_b64.encode('utf-8')
+                        _logger.info("Successfully fetched and saved device image from MobileAPI.dev.")
+                        image_saved = True
+                    else:
+                        _logger.warning("No image or image_b64 found in MobileAPI.dev response for %s", query_name)
+                else:
+                    _logger.warning("No device search results found on MobileAPI.dev for %s", query_name)
+            else:
+                _logger.warning("MobileAPI.dev returned HTTP status: %s for %s", response.status_code, query_name)
+        except Exception as e:
+            _logger.error("Error calling MobileAPI.dev search endpoint: %s", str(e))
+
+        if not image_saved:
+            try:
+                from odoo.modules.module import get_module_path
+                module_path = get_module_path('mobile_service_shop_pro')
+                fallback_path = os.path.join(module_path, 'static', 'src', 'img', 'default_phone.png') if module_path else False
+                if fallback_path and os.path.exists(fallback_path):
+                    with open(fallback_path, 'rb') as f:
+                        self.real_phone_image = base64.b64encode(f.read())
+                    _logger.info("Loaded and set default phone fallback image.")
+                else:
+                    _logger.warning("Default phone fallback image not found at static/src/img/default_phone.png")
+            except Exception as e:
+                _logger.error("Failed to load default phone fallback image: %s", str(e))
 
     def _imeicheck_php_lookup(self, api_key, service_id):
         """Use ImeiCheck PHP API when a PHP LIST service ID is configured."""
@@ -248,6 +353,7 @@ class MobileService(models.Model):
                 'model': res.get('result', ''),
                 'brand': '',
             }
+        print(res)
         return res
 
     def _imeicheck_tac_lookup(self, api_key, api_username, api_url_slug):
@@ -356,3 +462,5 @@ class MobileService(models.Model):
 
         self.model_name = new_model
         self.brand_name = brand_rec
+
+

@@ -14,5 +14,5 @@
     <menuitem id="mobile_service_shop.mobile_service_menu_configuration"
               parent="mobile_service_shop.mobile_service_shop_menu_root"
               name="Configuration" sequence="3"
-              groups="mobile_service_shop.mobile_service_group_manager"/>
+              groups="mobile_service_shop.mobile_service_shop_group_manager"/>
 </odoo>

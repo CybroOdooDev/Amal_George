@@ -1,10 +1,25 @@
 # -*- coding: utf-8 -*-
-################################################################################
+###############################################################################
 #
-#    Mobile Service Management Pro — Odoo 19
-#    Wizard: Complaint Type Report (PDF + XLSX)
+#    Cybrosys Technologies Pvt. Ltd.
 #
-################################################################################
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author:Vishnuraj P (odoo@cybrosys.com)
+#
+#    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
+#
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
 import datetime
 import io
 import json
@@ -32,11 +47,14 @@ class ComplaintTypeReport(models.TransientModel):
     _name = 'complaint.type.report'
     _description = 'Complaint Type Report'
 
-    date_start = fields.Date(string="Start Date")
+    date_start = fields.Date(
+        string="Start Date",
+        help="Start date for filtering the complaint type records.")
     date_end = fields.Date(
         string="End Date",
         default=fields.Date.today,
         required=True,
+        help="End date for filtering the complaint type records.",
     )
     complaint_id = fields.Many2one(
         'mobile.complaint',
@@ -48,6 +66,10 @@ class ComplaintTypeReport(models.TransientModel):
     # Helpers
     # ------------------------------------------------------------------
     def get_report_data(self):
+        """Prepare the parameters dictionary representing this wizard's filter settings.
+
+        Validates the date range before returning the form data structure.
+        """
         if self.date_start and self.date_start > self.date_end:
             raise UserError(_("Start date must be before or equal to end date."))
         return {
@@ -60,16 +82,33 @@ class ComplaintTypeReport(models.TransientModel):
             },
         }
 
-    # ------------------------------------------------------------------
-    # Actions
-    # ------------------------------------------------------------------
+    def _check_data_exists(self):
+        """Pre-validate the database to ensure that matching complaint data exists.
+
+        Raises ValidationError if no complaint tree records match the selected date range
+        and type filters, preventing printing empty documents.
+        """
+        self.get_report_data()
+        domain = []
+        if self.date_start:
+            domain.append(('complaint_id.date_request', '>=', self.date_start))
+        domain.append(('complaint_id.date_request', '<=', self.date_end))
+        if self.complaint_id:
+            domain.append(('complaint_type_tree', '=', self.complaint_id.id))
+        if not self.env['mobile.complaint.tree'].search(domain):
+            raise ValidationError(_("No complaint data found for the selected filters."))
+
     def print_pdf_report(self):
+        """Action that validates input and returns the PDF report printout action."""
+        self._check_data_exists()
         data = self.get_report_data()
         return self.env.ref(
             'mobile_service_shop_pro.action_complaint_type_report'
         ).report_action(self, data=data)
 
     def print_xlsx_report(self):
+        """Action that validates input and triggers the custom XLSX report download."""
+        self._check_data_exists()
         data = self.get_report_data()
         return {
             'type': 'ir.actions.report',
@@ -86,11 +125,12 @@ class ComplaintTypeReport(models.TransientModel):
         """Write the Complaint Type XLSX workbook into the HTTP response stream."""
         form = data['form']
         domain = []
-        if form['date_start']:
-            domain.append(('write_date', '>=', form['date_start']))
-        domain.append(('write_date', '<=', form['date_end']))
-        if form['complaint_type']:
-            domain.append(('complaint_type_tree', '=', form['complaint_type']))
+        if form.get('date_start'):
+            domain.append(('complaint_id.date_request', '>=', form.get('date_start')))
+        if form.get('date_end'):
+            domain.append(('complaint_id.date_request', '<=', form.get('date_end')))
+        if form.get('complaint_type'):
+            domain.append(('complaint_type_tree', '=', form.get('complaint_type')))
 
         complaints = self.env['mobile.complaint.tree'].search(domain)
         if not complaints:
@@ -98,30 +138,30 @@ class ComplaintTypeReport(models.TransientModel):
 
         # Build data structures
         complaint_list = []
-        for line in self.env['mobile.complaint.description'].search([]):
-            complaint_list.append({
-                'complaint_type': line.complaint_type_template.complaint_type,
-                'description': line.description,
-                'print': False,
-            })
+        seen = set()
+        for line in complaints:
+            c_type = line.complaint_type_tree.complaint_type or ''
+            desc = line.description_tree.description or ''
+            key = (c_type, desc)
+            if key not in seen:
+                seen.add(key)
+                complaint_list.append({
+                    'complaint_type': c_type,
+                    'description': desc,
+                    'print': True,
+                })
 
         complaint_detail = []
         for line in complaints:
             complaint_detail.append({
-                'complaint_type': line.complaint_type_tree.complaint_type,
-                'description': line.description_tree.description,
-                'serv_no': line.complaint_id.name,
-                'brand': line.complaint_id.brand_name.brand_name,
-                'model': line.complaint_id.model_name.mobile_brand_models,
+                'complaint_type': line.complaint_type_tree.complaint_type or '',
+                'description': line.description_tree.description or '',
+                'serv_no': line.complaint_id.name or '',
+                'brand': line.complaint_id.brand_name.brand_name or '',
+                'model': line.complaint_id.model_name.mobile_brand_models or '',
                 'date': str(line.complaint_id.date_request or ''),
-                'technician': line.complaint_id.technician_name.name,
+                'technician': line.complaint_id.technician_name.name or '',
             })
-
-        for lst in complaint_list:
-            for detail in complaint_detail:
-                if (lst['complaint_type'] == detail['complaint_type']
-                        and lst['description'] == detail['description']):
-                    lst['print'] = True
 
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -165,3 +205,5 @@ class ComplaintTypeReport(models.TransientModel):
         output.seek(0)
         response.stream.write(output.read())
         output.close()
+
+

@@ -34,7 +34,7 @@
                             name="get_device_details"
                             class="btn btn-primary"
                             invisible="service_state not in ['draft'] or not active_api"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                 </div>
             </xpath>
 
@@ -70,7 +70,7 @@
         <field name="inherit_id" ref="mobile_service_shop.mobile_service_view_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='image_medium']" position="replace">
-                <field name="real_phone_image" widget="image"/>
+                <field name="real_phone_image" widget="image" options="{'size': [100, 120]}"/>
             </xpath>
         </field>
     </record>

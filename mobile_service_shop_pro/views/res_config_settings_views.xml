@@ -13,7 +13,7 @@
                 <app data-string="Mobile Service"
                      string="Mobile Service"
                      name="mobile_service_shop_pro"
-                     logo="mobile_service_shop_pro/static/description/icon.png">
+                     logo="/mobile_service_shop_pro/static/description/icon.png">
 
                     <block title="IMEI Lookup API — ImeiCheck.com" name="api_settings">
 
@@ -29,34 +29,27 @@
                             <label string="API Key" for="api_key" class="col-md-3 o_light_label"/>
                             <field name="api_key"
                                    field_id="api_key_0"
+                                   password="True"
                                    placeholder="Paste your ImeiCheck.com key here"/>
                         </setting>
 
-                        <setting id="api_username"
-                                 string="ImeiCheck Username"
-                                 help="Optional username/account name supplied by ImeiCheck.com for some integrations.">
-                            <label string="Username" for="api_username" class="col-md-3 o_light_label"/>
-                            <field name="api_username"
-                                   field_id="api_username_0"
-                                   placeholder="Example: username"/>
+                    </block>
+
+                    <block title="Device Image API — MobileAPI.dev" name="mobileapi_settings">
+
+                        <setting id="mobileapi_key"
+                                 string="MobileAPI.dev API Key"
+                                 help="API key to fetch device images from MobileAPI.dev.">
+                            <label string="MobileAPI Key" for="mobileapi_key" class="col-md-3 o_light_label"/>
+                            <field name="mobileapi_key"
+                                   field_id="mobileapi_key_0"
+                                   password="True"
+                                   placeholder="Paste your MobileAPI.dev key here"/>
                         </setting>
 
-                        <setting id="api_url_slug"
-                                 string="ImeiCheck URL"
-                                 help="Optional URL or account slug supplied by ImeiCheck.com for some integrations.">
-                            <label string="URL" for="api_url_slug" class="col-md-3 o_light_label"/>
-                            <field name="api_url_slug"
-                                   field_id="api_url_slug_0"/>
-                        </setting>
+                    </block>
 
-                        <setting id="api_php_service_id"
-                                 string="ImeiCheck PHP Service ID"
-                                 help="Optional service ID from the PHP LIST page. When set, the module uses the PHP API and avoids the public TAC endpoint.">
-                            <label string="Service ID" for="api_php_service_id" class="col-md-3 o_light_label"/>
-                            <field name="api_php_service_id"
-                                   field_id="api_php_service_id_0"
-                                   placeholder="Example: 11"/>
-                        </setting>
+                    <block title="Printed Service Ticket Settings" name="ticket_settings">
 
                         <setting id="show_complain_types"
                                  title="Show Complaints on Service Tickets"

@@ -1,4 +1,25 @@
 # -*- coding: utf-8 -*-
+###############################################################################
+#
+#    Cybrosys Technologies Pvt. Ltd.
+#
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author:Vishnuraj P (odoo@cybrosys.com)
+#
+#    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
+#
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
 from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
@@ -10,15 +31,22 @@ class MobilePartsReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        """Retrieve and compile parts usage records for the PDF report template.
+
+        Retrieves part template details and individual usage transactions (lines)
+        based on date range and optional part filters, formatting them for rendering.
+        """
         form = data['form']
 
         if form.get('date_start'):
             order_lines = self.env['product.order.line'].search([
-                ('write_date', '>=', form['date_start']),
-                ('write_date', '<=', form['date_end']),
+                ('product_order_id.date_request', '>=', form['date_start']),
+                ('product_order_id.date_request', '<=', form['date_end']),
             ])
         else:
-            order_lines = self.env['product.order.line'].search([])
+            order_lines = self.env['product.order.line'].search([
+                ('product_order_id.date_request', '<=', form['date_end']),
+            ])
 
         used_tmpl_ids = {
             line.product_id.product_tmpl_id.id
@@ -66,3 +94,5 @@ class MobilePartsReport(models.AbstractModel):
             'start_date': form.get('date_start'),
             'end_date': form.get('date_end'),
         }
+
+

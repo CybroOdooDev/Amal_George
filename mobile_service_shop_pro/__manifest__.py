@@ -1,14 +1,25 @@
 # -*- coding: utf-8 -*-
-################################################################################
+###############################################################################
 #
-#    Mobile Service Management Pro — Odoo 19 Migration
+#    Cybrosys Technologies Pvt. Ltd.
 #
-#    Original module by Cybrosys Technologies Pvt. Ltd.
-#    Migrated to Odoo 19 with ImeiCheck.com API integration.
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author:Vishnuraj P (odoo@cybrosys.com)
 #
 #    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
 #
-################################################################################
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
 {
     'name': 'Mobile Service Management Pro',
     'version': '19.0.1.0.0',
@@ -25,13 +36,12 @@
     'depends': ['mobile_service_shop'],
     'data': [
         'security/ir.model.access.csv',
-        'views/mobile_service_views.xml',
         'views/res_config_settings_views.xml',
-        'views/menuitems.xml',
+        'views/mobile_service_views.xml',
         'wizard/mobile_service_report_views.xml',
-        'views/mobile_pivot_report_views.xml',
         'wizard/mobile_parts_report_views.xml',
         'wizard/complaint_type_report_views.xml',
+        'views/mobile_pivot_report_views.xml',
         'report/complaint_type_report.xml',
         'report/complaint_type_report_templates.xml',
         'report/mobile_parts_report.xml',
@@ -39,6 +49,7 @@
         'report/mobile_service_report.xml',
         'report/mobile_service_report_templates.xml',
         'report/mobile_service_ticket_report_templates.xml',
+        'views/menuitems.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -53,3 +64,4 @@
     'application': False,
     'auto_install': False,
 }
+

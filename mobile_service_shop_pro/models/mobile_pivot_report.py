@@ -1,10 +1,25 @@
 # -*- coding: utf-8 -*-
-################################################################################
+###############################################################################
 #
-#    Mobile Service Management Pro — Odoo 19
-#    Pivot/Graph analytics model (PostgreSQL view)
+#    Cybrosys Technologies Pvt. Ltd.
 #
-################################################################################
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author:Vishnuraj P (odoo@cybrosys.com)
+#
+#    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
+#
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
 from odoo import fields, models, tools
 
 
@@ -18,14 +33,30 @@ class MobilePivotReport(models.Model):
     _auto = False
     _rec_name = 'service'
 
-    service = fields.Char(string='Service Number', readonly=True)
-    partner_id = fields.Many2one('res.partner', string="Customer", readonly=True)
-    brand_id = fields.Many2one('mobile.brand', string="Mobile Brand", readonly=True)
-    imei_no = fields.Char(string="IMEI Number", readonly=True)
-    model_id = fields.Many2one('brand.model', string="Model", readonly=True)
-    date_request = fields.Date(string="Requested Date", readonly=True)
-    return_date = fields.Date(string="Return Date", readonly=True)
-    technician_id = fields.Many2one('res.users', string="Technician", readonly=True)
+    service = fields.Char(
+        string='Service Number', readonly=True,
+        help="Unique identifier/name of the service request.")
+    partner_id = fields.Many2one(
+        'res.partner', string="Customer", readonly=True,
+        help="Customer associated with the service request.")
+    brand_id = fields.Many2one(
+        'mobile.brand', string="Mobile Brand", readonly=True,
+        help="Brand of the mobile device.")
+    imei_no = fields.Char(
+        string="IMEI Number", readonly=True,
+        help="15-digit IMEI number of the mobile device.")
+    model_id = fields.Many2one(
+        'brand.model', string="Model", readonly=True,
+        help="Model of the mobile brand.")
+    date_request = fields.Date(
+        string="Requested Date", readonly=True,
+        help="Date when the service request was created.")
+    return_date = fields.Date(
+        string="Return Date", readonly=True,
+        help="Expected or actual date the device is returned to the customer.")
+    technician_id = fields.Many2one(
+        'res.users', string="Technician", readonly=True,
+        help="Technician assigned to repair the device.")
     service_state = fields.Selection(
         selection=[
             ('draft', 'Draft'),
@@ -36,10 +67,14 @@ class MobilePivotReport(models.Model):
         ],
         string='Service Status',
         readonly=True,
+        help="Current status of the service request.",
     )
     product_tmpl_id = fields.Many2one(
-        'product.template', string='Parts Used', readonly=True)
-    complaint_type = fields.Char(string='Complaint Types', readonly=True)
+        'product.template', string='Parts Used', readonly=True,
+        help="Spare part template used during the repair.")
+    complaint_type = fields.Char(
+        string='Complaint Types', readonly=True,
+        help="Registered customer complaint description.")
 
     def init(self):
         """Create or replace the PostgreSQL view backing this model."""
@@ -79,3 +114,5 @@ class MobilePivotReport(models.Model):
             )
         """
         self.env.cr.execute(query)
+
+

@@ -20,7 +20,7 @@
 #
 ###############################################################################
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class ResConfigSettings(models.TransientModel):
@@ -33,45 +33,19 @@ class ResConfigSettings(models.TransientModel):
     api_key = fields.Char(
         string="ImeiCheck API Key",
         help=(
-            "Personal API key from ImeiCheck.com.\n"
-            "Register at https://imeicheck.com and contact them to obtain "
-            "a free key with 60 requests/minute.\n"
-            "Leave blank to use the public endpoint (may be CAPTCHA-protected)."
+            "Personal API key from ImeiCheck.com. Contact them via "
+            "https://imeicheck.com/contact to register and receive limited "
+            "credits for testing."
         ),
         config_parameter="mobile_service_shop_pro.api_key",
     )
-    api_username = fields.Char(
-        string="ImeiCheck Username",
-        help=(
-            "Optional username/account name supplied by ImeiCheck.com. "
-            "If set, it is forwarded with the lookup request."
-        ),
-        config_parameter="mobile_service_shop_pro.api_username",
-    )
-    api_url_slug = fields.Char(
-        string="ImeiCheck URL",
-        help=(
-            "Optional URL or account slug supplied by ImeiCheck.com. "
-            "For example: 'vishnuraj'. If set, it is forwarded with the "
-            "lookup request."
-        ),
-        config_parameter="mobile_service_shop_pro.api_url_slug",
-    )
-    api_php_service_id = fields.Char(
-        string="ImeiCheck PHP Service ID",
-        help=(
-            "Optional service ID from the ImeiCheck.com PHP LIST page. "
-            "When set, Odoo will use the PHP API endpoint instead of the "
-            "public TAC endpoint."
-        ),
-        config_parameter="mobile_service_shop_pro.api_php_service_id",
-    )
+
     get_api_details = fields.Boolean(
-        string="IMEI Device Details",
+        string="IMEI Device Lookup & Auto-Fill",
         help=(
-            "Enable this to allow technicians to auto-fill device brand and model "
-            "by entering the IMEI number and clicking 'Get Details'.\n"
-            "Requires a valid ImeiCheck.com API key."
+            "Enable this to allow technicians to auto-fill device brand, model, "
+            "and manufacturer by entering an IMEI number and clicking 'Get Details'.\n"
+            "Please provide the credentials below to enable this feature."
         ),
         config_parameter="mobile_service_shop_pro.get_api_details",
     )
@@ -88,5 +62,75 @@ class ResConfigSettings(models.TransientModel):
         help="API Key from MobileAPI.dev to fetch device images.",
         config_parameter="mobile_service_shop_pro.mobileapi_key",
     )
+    fetch_device_images = fields.Boolean(
+        string="Fetch Device Images",
+        help=(
+            "Enable this to automatically fetch device images from MobileAPI.dev "
+            "when lookup is executed.\n"
+            "Requires a valid MobileAPI.dev API key."
+        ),
+        config_parameter="mobile_service_shop_pro.fetch_device_images",
+    )
+
+    def action_imeicheck_login(self):
+        """Redirect to ImeiCheck.com login dashboard."""
+        return {
+            'type': 'ir.actions.act_url',
+            'url': 'https://imeicheck.com/dashboard/auth/login',
+            'target': 'new',
+        }
+
+    def action_mobileapi_login(self):
+        """Redirect to MobileAPI.dev login page."""
+        return {
+            'type': 'ir.actions.act_url',
+            'url': 'https://mobileapi.dev/signin/',
+            'target': 'new',
+        }
+
+    @api.onchange('get_api_details')
+    def _onchange_get_api_details(self):
+        """Clear dependent fields when get_api_details is disabled."""
+        if not self.get_api_details:
+            self.api_key = False
+            self.fetch_device_images = False
+            self.mobileapi_key = False
+
+    @api.onchange('fetch_device_images')
+    def _onchange_fetch_device_images(self):
+        """Clear dependent mobileapi_key when fetch_device_images is disabled."""
+        if not self.fetch_device_images:
+            self.mobileapi_key = False
+
+    @api.model
+    def default_get(self, fields):
+        """Load settings values, clearing API key fields in memory if disabled."""
+        res = super().default_get(fields)
+        if not res.get('get_api_details'):
+            res.update({
+                'api_key': False,
+                'fetch_device_images': False,
+                'mobileapi_key': False,
+            })
+        elif not res.get('fetch_device_images'):
+            res.update({
+                'mobileapi_key': False,
+            })
+        return res
+
+    def set_values(self):
+        """Save settings values, clearing API keys from DB parameters if toggles are off."""
+        if not self.get_api_details:
+            self.api_key = False
+            self.fetch_device_images = False
+            self.mobileapi_key = False
+        elif not self.fetch_device_images:
+            self.mobileapi_key = False
+        super().set_values()
+
+
+
+
+
 
 

@@ -18,33 +18,59 @@
                     <block title="IMEI Lookup API — ImeiCheck.com" name="api_settings">
 
                         <setting id="get_api_details"
-                                 title="Enable IMEI Device Auto-Fill"
-                                 help="When enabled, technicians can enter an IMEI number and click 'Get Details' to automatically populate device brand and model from the ImeiCheck.com database.">
+                                 title="IMEI Device Lookup &amp; Auto-Fill"
+                                 help="When enabled, technicians can enter an IMEI number and click 'Get Details' to automatically populate device brand, model, and manufacturer from the ImeiCheck.com database. Please provide the credentials below to get device info.">
                             <field name="get_api_details" field_id="get_api_details_0"/>
                         </setting>
 
                         <setting id="api_key"
                                  string="ImeiCheck.com API Key"
-                                 help="Your personal API key from ImeiCheck.com. Contact them via https://imeicheck.com/contact to receive a free key (60 req/min). Leave blank to use the public endpoint.">
+                                 help="Your personal API key from ImeiCheck.com. Contact them via https://imeicheck.com/contact to register and receive limited credits for testing."
+                                 invisible="not get_api_details">
                             <label string="API Key" for="api_key" class="col-md-3 o_light_label"/>
                             <field name="api_key"
                                    field_id="api_key_0"
                                    password="True"
-                                   placeholder="Paste your ImeiCheck.com key here"/>
+                                   placeholder="Paste your ImeiCheck.com key here"
+                                   required="get_api_details"/>
+                            <div class="mt-2">
+                                <button string="Login / Register on ImeiCheck.com"
+                                        type="object"
+                                        name="action_imeicheck_login"
+                                        icon="oi-arrow-right"
+                                        class="btn-link"
+                                        help="Open ImeiCheck.com Login Dashboard"/>
+                            </div>
                         </setting>
 
                     </block>
 
-                    <block title="Device Image API — MobileAPI.dev" name="mobileapi_settings">
+                    <block title="Device Image API — MobileAPI.dev" name="mobileapi_settings" invisible="not get_api_details">
+
+                        <setting id="fetch_device_images"
+                                 title="Fetch Device Images"
+                                 help="Automatically fetch and display device images from MobileAPI.dev. Please provide the credentials below to get device images.">
+                            <field name="fetch_device_images" field_id="fetch_device_images_0"/>
+                        </setting>
 
                         <setting id="mobileapi_key"
                                  string="MobileAPI.dev API Key"
-                                 help="API key to fetch device images from MobileAPI.dev.">
+                                 help="API key to fetch device images from MobileAPI.dev."
+                                 invisible="not fetch_device_images">
                             <label string="MobileAPI Key" for="mobileapi_key" class="col-md-3 o_light_label"/>
                             <field name="mobileapi_key"
                                    field_id="mobileapi_key_0"
                                    password="True"
-                                   placeholder="Paste your MobileAPI.dev key here"/>
+                                   placeholder="Paste your MobileAPI.dev key here"
+                                   required="fetch_device_images"/>
+                            <div class="mt-2">
+                                <button string="Login / Register on MobileAPI.dev"
+                                        type="object"
+                                        name="action_mobileapi_login"
+                                        icon="oi-arrow-right"
+                                        class="btn-link"
+                                        help="Open MobileAPI.dev Sign-in Page"/>
+                            </div>
                         </setting>
 
                     </block>

@@ -176,8 +176,7 @@ class MobileService(models.Model):
             ))
 
         api_key = self._get_config_param('api_key')
-        api_username = self._get_config_param('api_username')
-        api_url_slug = self._get_config_param('api_url_slug')
+        api_url_slug = 'https://dhru.checkimei.com'
         api_php_service_id = '11'
 
         warning_msg = None
@@ -185,7 +184,7 @@ class MobileService(models.Model):
             if api_key and api_php_service_id:
                 res = self._imeicheck_php_lookup(api_key, api_php_service_id)
             else:
-                res = self._imeicheck_tac_lookup(api_key, api_username, api_url_slug)
+                res = self._imeicheck_tac_lookup(api_key, api_url_slug)
 
             # Handle API-level errors
             if isinstance(res, dict) and res.get('error'):
@@ -258,9 +257,11 @@ class MobileService(models.Model):
             _logger.warning("Cannot fetch device image from MobileAPI: Brand or Device Name is missing.")
             return
 
+        if not self._get_bool_config('fetch_device_images'):
+            return
+
         mobileapi_key = self._get_config_param('mobileapi_key')
         if not mobileapi_key:
-            _logger.warning("MobileAPI.dev API Key is not configured. Skipping image fetch.")
             return
 
         query_name = f"{brand} {device}".strip()
@@ -271,7 +272,6 @@ class MobileService(models.Model):
         url = "https://api.mobileapi.dev/devices/search/?%s" % (
             urllib.parse.urlencode(params)
         )
-        _logger.info("Fetching device image from MobileAPI.dev for query: %s", query_name)
 
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -288,7 +288,6 @@ class MobileService(models.Model):
                     image_b64 = device_data.get('image') or device_data.get('image_b64')
                     if image_b64:
                         self.real_phone_image = image_b64.encode('utf-8')
-                        _logger.info("Successfully fetched and saved device image from MobileAPI.dev.")
                         image_saved = True
                     else:
                         _logger.warning("No image or image_b64 found in MobileAPI.dev response for %s", query_name)
@@ -307,7 +306,6 @@ class MobileService(models.Model):
                 if fallback_path and os.path.exists(fallback_path):
                     with open(fallback_path, 'rb') as f:
                         self.real_phone_image = base64.b64encode(f.read())
-                    _logger.info("Loaded and set default phone fallback image.")
                 else:
                     _logger.warning("Default phone fallback image not found at static/src/img/default_phone.png")
             except Exception as e:
@@ -356,7 +354,7 @@ class MobileService(models.Model):
         print(res)
         return res
 
-    def _imeicheck_tac_lookup(self, api_key, api_username, api_url_slug):
+    def _imeicheck_tac_lookup(self, api_key, api_url_slug):
         """Use the public TAC lookup endpoint."""
         params = {
             'imei': self.imei_no,
@@ -364,8 +362,6 @@ class MobileService(models.Model):
         }
         if api_key:
             params['key'] = api_key
-        if api_username:
-            params['username'] = api_username
         if api_url_slug:
             params['url'] = api_url_slug
         url = "https://alpha.imeicheck.com/api/modelBrandName?%s" % (
@@ -378,8 +374,6 @@ class MobileService(models.Model):
 
     def _imeicheck_request_json(self, url, api_key):
         """Execute request and decode a JSON response from ImeiCheck."""
-        _logger.info("IMEI lookup request: %s", url.replace(api_key or '', '***'))
-
         try:
             req = urllib.request.Request(
                 url,
@@ -451,14 +445,12 @@ class MobileService(models.Model):
         brand_rec = MobileBrand.search([('brand_name', '=', brand_name)], limit=1)
         if not brand_rec:
             brand_rec = MobileBrand.create({'brand_name': brand_name})
-            _logger.info("Auto-created mobile brand: %s", brand_name)
 
         # Create the model
         new_model = BrandModel.create({
             'mobile_brand_name': brand_rec.id,
             'mobile_brand_models': model_name,
         })
-        _logger.info("Auto-created brand model: %s / %s", brand_name, model_name)
 
         self.model_name = new_model
         self.brand_name = brand_rec

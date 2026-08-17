@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: QWeb template overrides for printing the mobile service ticket receipt.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <template id="mobile_service_shop.mobile_service_ticket_template">
         <t t-call="web.external_layout">

@@ -3,8 +3,8 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2024-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author:Jumana Jabin MP (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Anupriya Ashok (odoo@cybrosys.com)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -25,7 +25,7 @@ from odoo import api, models
 class MobileServiceTicket(models.AbstractModel):
     """Mobile service ticket report abstract model"""
     _name = 'report.mobile_service_shop.mobile_service_ticket_template'
-    _description = 'Mobile Service Ticket Report'
+    _description = "Mobile Service Ticket Report"
 
     @api.model
     def _get_report_values(self, docids, data):

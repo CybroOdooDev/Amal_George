@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: Report action registrations for Complaint Type PDF and XLSX reports.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Report action of the report complaint type report-->
     <record id="action_complaint_type_report" model="ir.actions.report">

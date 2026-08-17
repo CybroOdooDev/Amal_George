@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: Menu items overrides and additions for Mobile Service Pro.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Menu item to get the mobile service settings from thr configuration-->
     <menuitem id="res_config_settings_menu_get_mobile_service_settings"

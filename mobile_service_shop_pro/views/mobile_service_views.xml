@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Description: View modifications and additions for the main mobile.service model.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!-- ================================================================
          Inherited form view of mobile.service

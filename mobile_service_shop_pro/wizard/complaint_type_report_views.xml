@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: Views and actions for the Complaint Type Report wizard.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Form view of the model complaint type report-->
     <record id="complaint_type_report_view_form" model="ir.ui.view">

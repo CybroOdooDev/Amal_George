@@ -3,8 +3,8 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2024-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author:Jumana Jabin MP (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Anupriya Ashok(odoo@cybrosys.com)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -19,36 +19,31 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models, _
+from odoo import fields, models
 from odoo.exceptions import UserError
 
 
 class MobileInvoice(models.TransientModel):
     """Model for managing the creation of invoices in mobile service
      operations."""
-    _name = 'mobile.invoice'
-    _description = 'Mobile Service Invoice Wizard'
+    _name = 'mobile.invoice.wizard'
+    _description = 'Mobile Invoice'
 
     advance_payment_method = fields.Selection(
         [('advance', 'Advance'), ('full_amount', 'Full amount')],
         string='Invoice method', default='advance')
     amount = fields.Integer(string='Amount', help="Payment Amount")
     number = fields.Char(string='Service Id', help="Payment service id'")
-
+    company_id = fields.Many2one('res.company', string='Company',  help="Company associated with this invoice.",
+                                 default=lambda self: self.env.company, required=True)
     def action_invoice_create(self):
         """Creating invoice"""
         active_id = self.env.context.get('active_id')
-        service_id = self.env['mobile.service'].browse(active_id).exists()
-        if not service_id:
-            raise UserError(_('No service request selected.'))
-        if not service_id.env['product.product'].search(
-                [("name", "=", "Mobile Service Advance")]):
-            vals = self._prepare_advance_product()
-            self.env['product.product'].create(vals)
-        if not service_id.env['product.product'].search(
-                [("name", "=", "Mobile Service Charge")]):
-            vals1 = self._prepare_service_product()
-            self.env['product.product'].create(vals1)
+        service_id = self.env['mobile.service'].browse(active_id)
+        advance_product = self.env.ref(
+            'mobile_service_shop.mobile_service_advance_product').product_variant_id
+        charge_product = self.env.ref(
+            'mobile_service_shop.mobile_service_product').product_variant_id
         service_id.first_invoice_created = True
         inv_obj = self.env['account.move']
         supplier = service_id.person_name
@@ -65,18 +60,16 @@ class MobileInvoice(models.TransientModel):
         service_id.first_payment_inv = inv_id.id
         self.number = service_id.name
         if self.advance_payment_method != 'advance':
-            product_id = service_id.env['product.product'].search(
-                [("name", "=", "Mobile Service Charge")])
+            product_id = charge_product
         else:
-            product_id = service_id.env['product.product'].search(
-                [("name", "=", "Mobile Service Advance")])
+            product_id = advance_product
         if product_id.property_account_income_id.id:
             income_account = product_id.property_account_income_id.id
         elif product_id.categ_id.property_account_income_categ_id.id:
             income_account = product_id.categ_id.property_account_income_categ_id.id
         else:
             raise UserError(
-                _(f'Please define income account for this '
+                (f'Please define income account for this '
                   f'product: "{product_id.name}" (id:{product_id.id}).'))
         flag = 0
         if self.amount:
@@ -95,12 +88,12 @@ class MobileInvoice(models.TransientModel):
                 'invoice_line_ids': inv_line_data})
             inv_id._compute_journal_id()
         sale_order_product = self.env['product.order.line'].search(
-            [('product_order_id', '=', service_id.id)])
+            [('product_order_id', '=', service_id.name)])
         for line_data in sale_order_product:
             qty = line_data.product_uom_qty - line_data.qty_invoiced
             if line_data.product_uom_qty < line_data.qty_invoiced:
                 raise UserError(
-                    _('Used quantity is less than invoiced quantity'))
+                    ('Used quantity is less than invoiced quantity'))
             uom_id = line_data.product_id.product_tmpl_id.uom_id
             if qty > 0:
                 flag = 1
@@ -119,7 +112,7 @@ class MobileInvoice(models.TransientModel):
                 line_data.qty_invoiced = line_data.qty_invoiced + qty
                 inv_id._compute_journal_id()
         if flag != 1:
-            raise UserError(_('Nothing to create invoice'))
+            raise UserError(('Nothing to create invoice'))
         imd = service_id.env['ir.model.data']
         action = self.env.ref('account.action_move_out_invoice_type')
         list_view_id = imd._xmlid_to_res_id('account.view_move_tree')
@@ -128,7 +121,7 @@ class MobileInvoice(models.TransientModel):
             'name': action.name,
             'help': action.help,
             'type': 'ir.actions.act_window',
-            'views': [[list_view_id, 'list'], [form_view_id, 'form'],
+            'views': [[list_view_id, 'tree'], [form_view_id, 'form'],
                       [False, 'graph'], [False, 'kanban'],
                       [False, 'calendar'], [False, 'pivot']],
             'target': action.target,

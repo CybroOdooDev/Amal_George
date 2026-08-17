@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: QWeb HTML report template for Complaint Type Report.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Template of the report complaint type report-->
     <template id="complaint_type_report">

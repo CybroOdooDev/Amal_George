@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: Graph, Pivot, and Search views for the Mobile Pivot Report.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Search view of the model mobile pivot report-->
     <record id="mobile_pivot_report_view_search" model="ir.ui.view">

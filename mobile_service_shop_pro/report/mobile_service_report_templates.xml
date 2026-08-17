@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: QWeb HTML report template for Mobile Service Report.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Template of the mobile service report-->
     <template id="mobile_service_report">

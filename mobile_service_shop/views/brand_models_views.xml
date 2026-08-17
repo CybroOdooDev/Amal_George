@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <!--        Brand model form view-->
     <record id="brand_model_view_form" model="ir.ui.view">
         <field name="name">brand.model.view.form</field>
         <field name="model">brand.model</field>
@@ -16,58 +15,47 @@
                     </group>
                 </sheet>
                 <chatter/>
-
             </form>
         </field>
     </record>
-    <!--        Brand model kanban view-->
-    <record id="mobile_brand_view_kanban" model="ir.ui.view">
+    <record id="brand_model_view_kanban" model="ir.ui.view">
         <field name="name">brand.model.view.kanban</field>
         <field name="model">brand.model</field>
         <field name="arch" type="xml">
             <kanban>
-                <field name="image_medium"/>
-                <field name="id"/>
-                <progressbar field="activity_state"
-                             colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}"/>
+                <field name="image_medium" widget="image" class="o_kanban_avatar"/>
+                <field name="mobile_brand_name"/>
                 <templates>
                     <t t-name="card">
                         <div class="oe_kanban_global_click">
                             <div class="o_kanban_image">
-                                <img t-attf-src="/web/image/brand.model/{{ record.id.raw_value }}/image_medium"
-                                     alt="Product" class="o_image_64_contain"/>
+                                <field name="image_medium" widget="image" class="o_image_64_contain o_kanban_avatar"/>
                             </div>
                             <div class="oe_kanban_details">
                                 <strong class="o_kanban_record_title">
                                     <field name="mobile_brand_name"/>
                                 </strong>
                             </div>
-                            <div name="tags"/>
-                            <ul>
-                                <li>model:
-                                    <field name="mobile_brand_models"/>
-                                </li>
-                            </ul>
-                            <div name="tags"/>
+                            <p>
+                                <field name="mobile_brand_models"/>
+                            </p>
                         </div>
                     </t>
                 </templates>
             </kanban>
         </field>
     </record>
-    <!-- Brand model tree view-->
-    <record id="mobile_brand_view_tree" model="ir.ui.view">
+    <record id="brand_model_view_tree" model="ir.ui.view">
         <field name="name">brand.model.view.list</field>
         <field name="model">brand.model</field>
         <field name="arch" type="xml">
             <list>
                 <field name="mobile_brand_name"/>
                 <field name="mobile_brand_models"/>
-                <field name="image_medium" widget='image' class="Your_custom_class"/>
+                <field name="image_medium" widget='image' class="o_mobile_part_image"/>
             </list>
         </field>
     </record>
-    <!--        Brand model action-->
     <record id="brand_model_action" model="ir.actions.act_window">
         <field name="name">Models</field>
         <field name="res_model">brand.model</field>
@@ -78,7 +66,6 @@
             </p>
         </field>
     </record>
-    <!--        Brand model main menu-->
     <menuitem action="brand_model_action" id="brand_model_menu"
               parent="mobile_service_menu_configuration"
               name="Models" sequence="2"/>

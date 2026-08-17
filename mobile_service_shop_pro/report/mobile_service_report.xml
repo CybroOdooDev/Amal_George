@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Description: Report action registrations for Mobile Service PDF and XLSX reports.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Report action of the model mobile service report-->
     <record id="action_mobile_service_report" model="ir.actions.report">

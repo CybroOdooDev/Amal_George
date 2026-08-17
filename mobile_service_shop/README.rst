@@ -17,7 +17,7 @@ Company
 License
 -------
 General Public License, Version 3 (LGPL v3).
-(https://www.odoo.com/documentation/17.0/legal/licenses.html)
+(https://www.odoo.com/documentation/19.0/legal/licenses.html)
 
 Credits
 -------
@@ -26,6 +26,7 @@ Credits
                 (V16) Neenu Merlin Jose,
                 (V17) Vishnu KP,
                 (V18) Jumana Jabin MP,
+                (V19)  Anupriya Ashok
   Contact : odoo@cybrosys.com
 
 Contacts

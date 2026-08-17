@@ -3,8 +3,8 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2024-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author:Jumana Jabin MP (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Anupriya Ashok (odoo@cybrosys.com)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -19,7 +19,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 
 class ProductOrderLine(models.Model):
@@ -45,7 +45,7 @@ class ProductOrderLine(models.Model):
     qty_stock_move = fields.Float(string='Stock Move Posted Qty', readonly=True,
                                   help="Count of stock move.")
     part_price = fields.Float(compute='_compute_part_price', string='Price',
-                             readonly=True, store=True, help="Price for the "
+                             store=True, help="Price for the "
                                                              "part.")
     product_uom = fields.Char(string='Unit of Measure', required=True,
                               help="Unit of measure of the product.")
@@ -53,7 +53,7 @@ class ProductOrderLine(models.Model):
                                readonly=True)
 
     @api.onchange('product_id')
-    def change_prod(self):
+    def _onchange_product_id(self):
         """It will return the product price and the unit of measurement"""
         self.ensure_one()
         if self.product_id:

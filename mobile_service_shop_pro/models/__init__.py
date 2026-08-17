@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+# -- coding: utf-8 --
 ###############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author:Vishnuraj P (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>).
+#    Author: Cybrosys Technologies(odoo@cybrosys.com)
 #
 #    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
 #    It is forbidden to publish, distribute, sublicense, or sell copies of the
@@ -19,7 +19,6 @@
 #    DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-
 from . import mobile_service
 from . import mobile_pivot_report
 from . import product_order_line

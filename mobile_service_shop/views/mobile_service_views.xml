@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <!--        Mobile service model sequence-->
-    <record id="mobile_service_sequence" model="ir.sequence">
-        <field name="name">Service Code</field>
-        <field name="code">mobile.service</field>
-        <field name="prefix">SERV/</field>
-        <field eval="4" name="padding"/>
-        <field name="company_id" eval="False"/>
-    </record>
-    <!--Mobile service model search view-->
+<!--    Mobile service model search view-->
     <record id="mobile_service_view_search" model="ir.ui.view">
         <field name="name">mobile.service.view.search</field>
         <field name="model">mobile.service</field>
@@ -20,14 +12,15 @@
                 <field name="imei_no"/>
                 <field name="return_date"/>
                 <field name="service_state"/>
-                <filter string="Returned" name="returned" domain="[('service_state', '=', 'returned')]"/>
-                <filter string="Draft" name="draft" domain="[('service_state', '=', 'draft')]"/>
-                <filter string="Not Solved" name="not_solved" domain="[('service_state', '=', 'not_solved')]"/>
-                <separator/>
+                <!--  filter-->
+                <filter string="Returned" name="service_returned"  domain="[('service_state', '=', 'returned')]"/>
+                <filter string="Draft" name="service_draft" domain="[('service_state', '=', 'draft')]"/>
+                <filter string="Not Solved" name="service_not_solved" domain="[('service_state', '=', 'not_solved')]"/>
+
                 <group>
-                    <filter string="Service State" name="service_state" domain="[]"
+                    <filter string="Service State" name="group_service_state"
                             context="{'group_by': 'service_state'}"/>
-                    <filter string="Technician" name="technician" domain="[]"
+                    <filter string="Technician" name="group_technician"
                             context="{'group_by': 'technician_name'}"/>
                 </group>
             </search>
@@ -40,35 +33,35 @@
         <field name="arch" type="xml">
             <form string="Mobile Shop">
                 <header>
-                    <button string="Assign to technician" type="object" name="approve"
+                    <button string="Assign to technician" type="object" name="action_approve"
                             class="oe_highlight"
-                            invisible="service_state not in 'draft'"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
-                    <button string="Completed" type="object" name="complete"
+                            invisible="service_state != 'draft'"
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
+                    <button string="Completed" type="object" name="action_complete"
                             class="oe_highlight"
-                            invisible="service_state not in 'assigned'"/>
-                    <button string="Return advance" type="object" name="return_advance"
+                            invisible="service_state != 'assigned'"/>
+                    <button string="Return advance" type="object" name="action_return_advance"
                             class="oe_highlight"
-                            invisible="service_state not in 'not_solved'"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
+                            invisible="service_state != 'not_solved'"
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                     <button name="action_invoice_create_wizard" string="Create Invoice"
                             invisible="service_state not in ('completed', 'assigned')"
                             type="object" class="oe_highlight"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                     <button name="action_post_stock" string="Post Stock moves"
                             invisible="service_state not in ('completed', 'assigned')"
                             type="object" class="oe_highlight"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
-                    <button string="Return to customer" type="object" name="return_to"
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
+                    <button string="Return to customer" type="object" name="action_return_to"
                             invisible="service_state not in ('completed')"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
-                    <button string="Not Solved" type="object" name="not_solved"
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
+                    <button string="Not Solved" type="object" name="action_not_solved"
                             invisible="service_state not in ('assigned')"/>
-                    <button name="get_ticket" string="Print Ticket" type="object" class="oe_highlight"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
+                    <button name="action_get_ticket" string="Print Ticket" type="object" class="oe_highlight"
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                     <button name="action_send_mail" string="Send email" type="object"
                             invisible="service_state in ('draft')"
-                            groups="mobile_service_shop.mobile_service_group_manager"/>
+                            groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                     <field name="service_state" widget="statusbar" statusbar_visible="draft,returned,not_solved"/>
                 </header>
                 <sheet>
@@ -113,8 +106,6 @@
                             </div>
                         </group>
                         <group>
-                            <field name="imei_no" style="width:50%;" colspan="1"
-                                   readonly="service_state not in 'draft'"/>
                             <label for="brand_name"/>
                             <div class="o_row">
                                 <field name="brand_name" placeholder="Brand name"
@@ -135,6 +126,8 @@
                         <page string="Description">
                             <group>
                                 <group>
+                                    <field name="imei_no" style="width:50%;" colspan="1"
+                                           readonly="service_state not in 'draft'"/>
                                     <field name="warranty_number" style="width:50%;"
                                            readonly="service_state not in 'draft'"
                                            required="is_in_warranty == True" invisible="is_in_warranty != True"/>
@@ -163,7 +156,7 @@
                             <field name="product_order_line" mode="list"
                                    readonly="service_state in ('returned','not_solved')">
                                 <list string="Complaints" editable="bottom">
-                                    <field name="product_id"/>
+                                    <field name="product_id" context="{'default_is_a_parts': True}" options="{'no_quick_create': True}"/>
                                     <field name="product_uom_qty"/>
                                     <field name="product_uom"/>
                                     <field name="price_unit"/>
@@ -193,11 +186,10 @@
                 <field name="image_medium"/>
                 <field name="id"/>
                 <templates>
-                    <t t-name="card">
+                    <t t-name="kanban-box">
                         <div class="oe_kanban_card oe_kanban_global_click">
                             <div class="o_kanban_image">
-                                <img t-attf-src="/web/image/mobile.service/{{ record.id.raw_value }}/image_medium"
-                                     alt="Service device"/>
+                                <img t-att-src="kanban_image('mobile.service', 'image_medium', record.id.raw_value)" alt="Mobile Service"/>
                             </div>
                             <div class="oe_kanban_content">
                                 <div>
@@ -242,7 +234,7 @@
                 <field name="brand_name"/>
                 <field name="model_name"/>
                 <field name="imei_no"/>
-                <field name="image_medium" widget='image' class="Your_custom_class" string="Image"/>
+                <field name="image_medium" widget='image' class="o_mobile_part_image" string="Image"/>
                 <field name="technician_name"/>
                 <field name="return_date"/>
                 <field name="service_state"/>
@@ -254,8 +246,8 @@
         <field name="name">Service Request</field>
         <field name="res_model">mobile.service</field>
         <field name="view_mode">list,form,kanban,pivot,graph</field>
-        <field name="search_view_id" ref="mobile_service_view_search"/>
-        <field name="view_id" ref="mobile_service_view_tree"/>
+        <field name="search_view_id" ref="mobile_service_shop.mobile_service_view_search"/>
+        <field name="view_id" ref="mobile_service_shop.mobile_service_view_tree"/>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Click to Create a New Record.
@@ -263,8 +255,9 @@
         </field>
     </record>
     <!--Mobile service model menus-->
-    <menuitem id="mobile_service_shop_menu_root" web_icon="mobile_service_shop,static/description/icon.png"
-              name="Mobile Service" sequence="20" groups="mobile_service_shop.mobile_service_group_executer"/>
+    <menuitem id="mobile_service_shop_menu_root" web_icon="mobile_service_shop/static/description/icon.png"
+              name="Mobile Service" sequence="20"
+              groups="mobile_service_shop.mobile_service_shop_group_user,mobile_service_shop.mobile_service_shop_group_manager"/>
     <menuitem id="mobile_service_shop_menu" parent="mobile_service_shop_menu_root" sequence="20"/>
     <menuitem action="mobile_service_action_request" id="mobile_service_menu_request"
               parent="mobile_service_shop_menu_root"

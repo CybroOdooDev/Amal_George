@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Description: Report action registrations for Mobile Parts PDF and XLSX reports.
+    Module: mobile_service_shop_pro
+-->
+
 <odoo>
     <!--Report action of the report mobile parts report-->
     <record id="action_mobile_parts_report" model="ir.actions.report">

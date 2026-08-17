@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+# -- coding: utf-8 --
 ###############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author:Vishnuraj P (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>).
+#    Author: Cybrosys Technologies(odoo@cybrosys.com)
 #
 #    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
 #    It is forbidden to publish, distribute, sublicense, or sell copies of the
@@ -19,7 +19,6 @@
 #    DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-
 import base64
 import json
 import logging
@@ -310,6 +309,9 @@ class MobileService(models.Model):
                     _logger.warning("Default phone fallback image not found at static/src/img/default_phone.png")
             except Exception as e:
                 _logger.error("Failed to load default phone fallback image: %s", str(e))
+
+        if self.model_name and self.real_phone_image:
+            self.model_name.image_medium = self.real_phone_image
 
     def _imeicheck_php_lookup(self, api_key, service_id):
         """Use ImeiCheck PHP API when a PHP LIST service ID is configured."""

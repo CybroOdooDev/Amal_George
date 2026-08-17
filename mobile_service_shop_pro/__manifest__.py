@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+# -- coding: utf-8 --
 ###############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author:Vishnuraj P (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>).
+#    Author: Cybrosys Technologies(odoo@cybrosys.com)
 #
 #    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
 #    It is forbidden to publish, distribute, sublicense, or sell copies of the
@@ -32,6 +32,8 @@
         "customized pivot reports, and image capture for service devices."
     ),
     'author': 'Cybrosys Techno Solutions',
+    'company': 'Cybrosys Techno Solutions',
+    'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
     'depends': ['mobile_service_shop'],
     'data': [
@@ -61,7 +63,7 @@
     'price': 99,
     'currency': 'EUR',
     'installable': True,
-    'application': False,
     'auto_install': False,
+    'application': False,
 }
 

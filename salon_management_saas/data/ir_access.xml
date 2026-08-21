@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+  <record id="service_category_gro_c35e0758-e221-4d2e-b581-6ba1275006fd" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="service_category_524a6824-0a30-4cff-bf93-7e89575929c3"/>
+    <field name="name">Service Category group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="service_category_gro_0d9c19c1-f08a-4051-a6e3-2b82867edbb3" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="service_category_524a6824-0a30-4cff-bf93-7e89575929c3"/>
+    <field name="name">Service Category group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="service_group_system_3e3736d1-677f-4920-ba5f-93db6c46b728" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="service_5786dd1a-49e9-4766-9e35-0068d351443e"/>
+    <field name="name">Service group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="service_group_user_5d0028ee-c8da-48d6-9899-b06423bae8dc" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="service_5786dd1a-49e9-4766-9e35-0068d351443e"/>
+    <field name="name">Service group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="appointment_group_sy_01194085-909f-41c2-9bbf-51ad0c87bc50" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">Appointment group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="appointment_group_us_0a88b8da-db0c-4f45-a96e-540c2b876925" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">Appointment group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="service_package_grou_aba3ddba-fd45-4cc6-8a85-10607c9c79d0" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="name">Service Package group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="service_package_grou_94c2ca92-ee09-47c8-9c91-7fcc729fbe8a" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="name">Service Package group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="chair_group_system" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="chair_x_chair"/>
+    <field name="name">Chair group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="chair_group_user" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="chair_x_chair"/>
+    <field name="name">Chair group_user</field>
+    <field name="operation">cru</field>
+  </record>
+</odoo>

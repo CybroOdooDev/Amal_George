@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="active_service_categ_9baea2c0-c109-4d55-9669-bbf24bc1531b" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_service_categ_52af0054-fd3b-4e00-821f-4a861761135f"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="active_service_ec3982fc-2835-483e-a9da-ebdf986faf11" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_service_dc8fc42e-cb89-4e2f-8633-ad0886113b25"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="currency_service_dce98ff0-043f-49dd-a8b1-643fa0a474d1" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_service_10d1c66b-5fe7-4130-a883-2cd05cf4065f"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="currency_service_82a0fd15-74ff-47b7-9a18-0501c774db7f" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_service_10d1c66b-5fe7-4130-a883-2cd05cf4065f"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="new_integer_service_2f63a567-34de-43d3-97b7-65a38a3000da" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_integer_service_6063f2b9-3d37-4497-9c42-4adf839fa749"/>
+    <field name="json_value">"0"</field>
+  </record>
+  <record id="active_appointment_f8196a6d-6b03-4211-8043-561b6f386fa1" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_appointment_64d07f57-de72-476b-b4c0-69f6746bb49c"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="currency_appointment_c68d6b73-e454-48a1-b244-673878ccf289" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_appointment_517db8b4-2ae0-407b-9bd5-25f339ac4ca8"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="currency_appointment_10605025-560f-4377-ab4e-3baa836317f8" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_appointment_517db8b4-2ae0-407b-9bd5-25f339ac4ca8"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="new_integer_appointm_78a2cf55-bfcd-42c3-afc5-e009bbf42507" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_integer_appointm_4b8c3017-f685-4f1c-9d5d-5d03f360ed04"/>
+    <field name="json_value">"0"</field>
+  </record>
+  <record id="new_selection_appoin_5901dd94-c54e-497b-9ef0-c2fa12830690" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_selection_appoin_965396f8-e7aa-4304-9693-4c9419dafa71"/>
+    <field name="json_value">"Draft"</field>
+  </record>
+  <record id="active_service_packa_d2f3d48b-0827-402e-bd91-3a88f70f83c6" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_service_packa_c6d0e645-6116-446c-a93a-7088b49130fd"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="currency_service_pac_bb337a79-97bd-482d-b001-0613a6661b24" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_service_pac_dfd773ce-c891-4879-a6c8-36a8b39a7c44"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="currency_service_pac_04440021-a7a8-44db-ac5b-faa2f8d5904b" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_service_pac_dfd773ce-c891-4879-a6c8-36a8b39a7c44"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="new_integer_service__a12332d8-3c54-4649-8f8e-a0866b6c101c" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_integer_service__018c5872-ba28-4327-88e9-52631c41b2c2"/>
+    <field name="json_value">"0"</field>
+  </record>
+  <record id="default_appointment_x_name" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="description_appointm_1cc7848b-a678-4c38-abbc-81e72ab3aaba"/>
+    <field name="json_value">"New"</field>
+  </record>
+  <record id="default_service_package_x_studio_status" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="status_service_package_selection"/>
+    <field name="json_value">"active"</field>
+  </record>
+  <record id="action_salon_res_config_settings" model="ir.actions.act_window">
+    <field name="name">Settings</field>
+    <field name="res_model">res.config.settings</field>
+    <field name="view_mode">form</field>
+    <field name="target">current</field>
+    <field name="context">{'module': 'salon_management', 'bin_size': False}</field>
+  </record>
+  <record id="menu_salon_settings" model="ir.ui.menu" context="{'studio': True}">
+    <field name="name">Settings</field>
+    <field name="parent_id" ref="salon_management_saas.salon_spa_management_configuration"/>
+    <field name="action" ref="salon_management_saas.action_salon_res_config_settings"/>
+    <field name="sequence">1</field>
+  </record>
+  <record id="access_salon_holiday_system" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="salon_management_saas.model_x_salon_holiday"/>
+    <field name="name">Salon Holiday group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="access_salon_holiday_user" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="salon_management_saas.model_x_salon_holiday"/>
+    <field name="name">Salon Holiday group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="action_salon_holiday" model="ir.actions.act_window">
+    <field name="name">Holidays</field>
+    <field name="res_model">x_salon_holiday</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <record id="menu_salon_holiday" model="ir.ui.menu" context="{'studio': True}">
+    <field name="name">Holidays</field>
+    <field name="parent_id" ref="salon_management_saas.salon_spa_management_configuration"/>
+    <field name="action" ref="salon_management_saas.action_salon_holiday"/>
+    <field name="sequence">5</field>
+  </record>
+</odoo>

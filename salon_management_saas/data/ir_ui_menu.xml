@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="salon_spa_management_c4a5397f-3858-418a-a68d-293b1a431941" model="ir.ui.menu" context="{'studio': True}">
+    <field name="name">Salon Management</field>
+    <field name="web_icon">salon_management_saas,static/description/icon.png</field>
+  </record>
+  <record id="salon_spa_management_configuration" model="ir.ui.menu" context="{'studio': True}">
+    <field name="name">Configuration</field>
+    <field name="parent_id" ref="salon_spa_management_c4a5397f-3858-418a-a68d-293b1a431941"/>
+    <field name="sequence">50</field>
+  </record>
+  <record id="salon_spa_management_dashboard_root" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="salon_management_saas.action_salon_dashboard_client"/>
+    <field name="name">Dashboard</field>
+    <field name="parent_id" ref="salon_spa_management_c4a5397f-3858-418a-a68d-293b1a431941"/>
+    <field name="sequence">1</field>
+  </record>
+  <record id="salon_spa_management_64dce982-deff-4c71-a72a-4443ca44c15b" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="service_bb297416-ec83-4f90-a410-1aa833e79112"/>
+    <field name="name">Services</field>
+    <field name="parent_id" ref="salon_spa_management_c4a5397f-3858-418a-a68d-293b1a431941"/>
+    <field name="sequence">3</field>
+  </record>
+  <record id="salon_spa_management_60917df4-775b-4568-91f7-d9bab53f6a9b" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="service_category_237db3db-39cc-4bc9-9290-b577e197f48c"/>
+    <field name="name">Service Category</field>
+    <field name="parent_id" ref="salon_spa_management_configuration"/>
+    <field name="sequence">10</field>
+  </record>
+  <record id="salon_spa_management_472b8018-189c-4d45-8ffb-b8b318fdb7f2" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="service_bb297416-ec83-4f90-a410-1aa833e79112"/>
+    <field name="name">Services</field>
+    <field name="parent_id" ref="salon_spa_management_64dce982-deff-4c71-a72a-4443ca44c15b"/>
+    <field name="sequence">1</field>
+  </record>
+  <record id="salon_spa_management_7e635596-2000-423f-9255-2a752bef0e7e" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="appointment_85dfbfa4-f9a2-485f-816f-0b6b8b34fb84"/>
+    <field name="name">Bookings</field>
+    <field name="parent_id" ref="salon_spa_management_c4a5397f-3858-418a-a68d-293b1a431941"/>
+    <field name="sequence">2</field>
+  </record>
+  <record id="salon_spa_management_staff_child" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="staff_889a84c4-d6cb-4a30-bbd8-348c3a5fc13a"/>
+    <field name="name">Staff</field>
+    <field name="parent_id" ref="salon_spa_management_7e635596-2000-423f-9255-2a752bef0e7e"/>
+    <field name="sequence">3</field>
+  </record>
+  <record id="salon_spa_management_customers_child" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="base.action_partner_form"/>
+    <field name="name">Customers</field>
+    <field name="parent_id" ref="salon_spa_management_7e635596-2000-423f-9255-2a752bef0e7e"/>
+    <field name="sequence">4</field>
+  </record>
+  <record id="salon_spa_management_ef047817-a7f2-45ef-9c79-59bffbd3ac65" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="appointment_85dfbfa4-f9a2-485f-816f-0b6b8b34fb84"/>
+    <field name="name">Bookings</field>
+    <field name="parent_id" ref="salon_spa_management_7e635596-2000-423f-9255-2a752bef0e7e"/>
+    <field name="sequence">1</field>
+  </record>
+  <record id="salon_spa_management_today_confirmed" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="salon_management_saas.action_today_confirmed_bookings"/>
+    <field name="name">Today's Bookings</field>
+    <field name="parent_id" ref="salon_spa_management_7e635596-2000-423f-9255-2a752bef0e7e"/>
+    <field name="sequence">2</field>
+  </record>
+  <record id="salon_spa_management_ed0e17b2-432d-4da0-bd99-3724506946ab" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="service_package_98635255-de0f-48c2-a711-d35932dc13ac"/>
+    <field name="name">Service Package</field>
+    <field name="parent_id" ref="salon_spa_management_64dce982-deff-4c71-a72a-4443ca44c15b"/>
+    <field name="sequence">3</field>
+  </record>
+  <record id="salon_spa_management_chairs_child" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="chair_action"/>
+    <field name="name">Chairs</field>
+    <field name="parent_id" ref="salon_spa_management_configuration"/>
+    <field name="sequence">2</field>
+  </record>
+</odoo>

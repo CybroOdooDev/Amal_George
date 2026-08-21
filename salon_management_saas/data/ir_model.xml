@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="service_category_524a6824-0a30-4cff-bf93-7e89575929c3" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="model">x_service_category</field>
+    <field name="name">Service Category</field>
+  </record>
+  <record id="service_5786dd1a-49e9-4766-9e35-0068d351443e" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="model">x_service</field>
+    <field name="name">Service</field>
+  </record>
+  <record id="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="is_mail_thread" eval="True"/>
+    <field name="is_mail_activity" eval="True"/>
+    <field name="model">x_appointment</field>
+    <field name="name">Booking</field>
+  </record>
+  <record id="service_package_951f0d2f-a641-4327-bba5-df02164d574a" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="model">x_service_package</field>
+    <field name="name">Service Package</field>
+  </record>
+  <record id="chair_x_chair" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Chair model to manage active booking resources. ]]></field>
+    <field name="model">x_chair</field>
+    <field name="name">Chair</field>
+  </record>
+  <record id="model_x_salon_holiday" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Holiday dates for the salon. ]]></field>
+    <field name="model">x_salon_holiday</field>
+    <field name="name">Salon Holiday</field>
+  </record>
+</odoo>

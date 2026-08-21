@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="service_category_237db3db-39cc-4bc9-9290-b577e197f48c" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Service Category</field>
+    <field name="res_model">x_service_category</field>
+  </record>
+  <record id="service_bb297416-ec83-4f90-a410-1aa833e79112" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Service</field>
+    <field name="res_model">x_service</field>
+    <field name="view_mode">kanban,list,form,pivot,graph</field>
+  </record>
+  <record id="staff_889a84c4-d6cb-4a30-bbd8-348c3a5fc13a" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Staff</field>
+    <field name="res_model">hr.employee</field>
+    <field name="view_mode">kanban,list,form,pivot,graph,activity,hierarchy</field>
+  </record>
+  <record id="appointment_85dfbfa4-f9a2-485f-816f-0b6b8b34fb84" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Bookings</field>
+    <field name="res_model">x_appointment</field>
+    <field name="view_mode">list,form,calendar,map,pivot,graph</field>
+  </record>
+  <record id="service_package_98635255-de0f-48c2-a711-d35932dc13ac" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Service Package</field>
+    <field name="res_model">x_service_package</field>
+    <field name="view_mode">kanban,list,form,pivot,graph</field>
+  </record>
+  <record id="action_customer_appointments" model="ir.actions.act_window">
+    <field name="name">Bookings</field>
+    <field name="res_model">x_appointment</field>
+    <field name="view_mode">list,form,calendar,map,pivot,graph</field>
+    <field name="domain">[('x_studio_partner_id', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_partner_id': active_id}</field>
+  </record>
+  <record id="chair_action" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Chairs</field>
+    <field name="res_model">x_chair</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">Create a new Chair</p>]]></field>
+  </record>
+  <record id="action_today_confirmed_bookings" model="ir.actions.act_window">
+    <field name="name">Today's Bookings</field>
+    <field name="res_model">x_appointment</field>
+    <field name="view_mode">list,form,calendar,map,pivot,graph</field>
+    <field name="domain">[('x_studio_selection_1', '=', 'Confirmed'), ('x_studio_date', '=', context_today().strftime('%Y-%m-%d'))]</field>
+    <field name="context">{'default_x_studio_selection_1': 'Confirmed'}</field>
+  </record>
+  <record id="action_salon_dashboard" model="ir.actions.act_window">
+    <field name="name">Dashboard</field>
+    <field name="res_model">x_appointment</field>
+    <field name="view_mode">graph,pivot,kanban</field>
+    <field name="context">{'graph_measure': 'x_studio_value', 'graph_mode': 'bar', 'graph_groupbys': ['x_studio_date']}</field>
+  </record>
+  <record id="action_salon_dashboard_client" model="ir.actions.client">
+    <field name="name">Dashboard</field>
+    <field name="tag">salon_dashboard_client_action</field>
+  </record>
+</odoo>

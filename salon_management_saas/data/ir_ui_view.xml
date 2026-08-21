@@ -1,0 +1,1063 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="default_list_view_fo_e487fb87-45f4-4d44-8bcc-ee5080b6a865" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list editable="bottom" default_order="id desc">
+        <field name="x_name"/>
+        <field name="x_studio_category_code"/>
+      </list>
+    </field>
+    <field name="key">salon_management_saas.default_list_view_fo_e487fb87-45f4-4d44-8bcc-ee5080b6a865</field>
+    <field name="model">x_service_category</field>
+    <field name="name">Default list view for x_service_category</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_4f04f54e-d657-45a7-b1ce-ef7e0cc5b223" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Service Category">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_9ead44">
+            <group name="studio_group_9ead44_left"/>
+            <group name="studio_group_9ead44_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">salon_management_saas.default_form_view_fo_4f04f54e-d657-45a7-b1ce-ef7e0cc5b223</field>
+    <field name="model">x_service_category</field>
+    <field name="name">Default form view for x_service_category</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__c98646f7-7bb0-4b1f-a3c8-83be33f10f2f" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_service_category" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="key">salon_management_saas.default_search_view__c98646f7-7bb0-4b1f-a3c8-83be33f10f2f</field>
+    <field name="model">x_service_category</field>
+    <field name="name">Default search view for x_service_category</field>
+    <field name="type">search</field>
+  </record>
+  <record id="odoo_studio_default__76e8e014-0f6a-4306-b27a-b7c235929cb3" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="string">Category Name</attribute>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_9ead44_left']" position="inside">
+          <field name="x_studio_category_code" required="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_4f04f54e-d657-45a7-b1ce-ef7e0cc5b223"/>
+    <field name="key">salon_management_saas.odoo_studio_default__76e8e014-0f6a-4306-b27a-b7c235929cb3</field>
+    <field name="mode">extension</field>
+    <field name="model">x_service_category</field>
+    <field name="name">Odoo Studio: Default form view for x_service_category customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_52929bb4-c5e0-4d54-81fd-dc3d7df45bb1" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list default_order="id desc">
+        <field name="x_name" decoration-bf="1"/>
+        <field name="x_studio_service_category" widget="badge"/>
+        <field name="x_studio_duration_minutes"/>
+        <field name="x_studio_gender" widget="badge" decoration-info="x_studio_gender == 'Male'" decoration-danger="x_studio_gender == 'Female'" decoration-success="x_studio_gender == 'Unisex / Male / Female'"/>
+        <field name="x_studio_value" sum="Total" decoration-bf="1"/>
+      </list>
+    </field>
+    <field name="key">salon_management_saas.default_list_view_fo_52929bb4-c5e0-4d54-81fd-dc3d7df45bb1</field>
+    <field name="model">x_service</field>
+    <field name="name">Default list view for x_service</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_eb8a877e-04a7-47e0-8cb6-85807b5a37b3" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Service">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_1d9602">
+            <group name="studio_group_1d9602_left">
+              <field name="x_studio_currency_id" invisible="1"/>
+              <field name="x_studio_value"/>
+            </group>
+            <group name="studio_group_1d9602_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">salon_management_saas.default_form_view_fo_eb8a877e-04a7-47e0-8cb6-85807b5a37b3</field>
+    <field name="model">x_service</field>
+    <field name="name">Default form view for x_service</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__8ade02e6-b4dc-41d1-b129-285d412cdbc3" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_service" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="key">salon_management_saas.default_search_view__8ade02e6-b4dc-41d1-b129-285d412cdbc3</field>
+    <field name="model">x_service</field>
+    <field name="name">Default search view for x_service</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_pivot_view_f_afe23a95-2173-4636-85f7-4ac89f6a6e3b" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <pivot sample="1">
+        <field name="x_studio_value" type="measure"/>
+      </pivot>
+    </field>
+    <field name="key">salon_management_saas.default_pivot_view_f_afe23a95-2173-4636-85f7-4ac89f6a6e3b</field>
+    <field name="model">x_service</field>
+    <field name="name">Default pivot view for x_service</field>
+    <field name="type">pivot</field>
+  </record>
+  <record id="default_graph_view_f_a6e9f10f-0fc8-48b9-8023-34de72f803bd" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <graph sample="1">
+        <field name="x_studio_value" type="measure"/>
+        <field name="create_date" type="row"/>
+      </graph>
+    </field>
+    <field name="key">salon_management_saas.default_graph_view_f_a6e9f10f-0fc8-48b9-8023-34de72f803bd</field>
+    <field name="model">x_service</field>
+    <field name="name">Default graph view for x_service</field>
+    <field name="type">graph</field>
+  </record>
+  <record id="odoo_studio_default__46e45f2b-a748-4836-a0f5-04b92d47d2c3" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form//group[@name='studio_group_1d9602']" position="after">
+          <notebook name="studio_notebook_79a_1k07o52ju">
+            <page string="Description" name="studio_page_79a">
+              <group name="studio_group_79a">
+                <group name="studio_group_79a_left">
+                  <field name="x_studio_description"/>
+                </group>
+                <group name="studio_group_79a_right"/>
+              </group>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="string">Service Name</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
+          <field name="x_studio_service_code" required="True"/>
+          <field name="x_studio_service_category" options="{'create_name_field': 'x_name'}" required="True"/>
+          <field name="x_studio_duration_minutes" required="True"/>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_1d9602_right']" position="inside">
+          <xpath expr="/form//field[@name='x_studio_value']" position="move"/>
+          <field name="x_studio_gender" required="True"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
+          <attribute name="string">Price</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_eb8a877e-04a7-47e0-8cb6-85807b5a37b3"/>
+    <field name="key">salon_management_saas.odoo_studio_default__46e45f2b-a748-4836-a0f5-04b92d47d2c3</field>
+    <field name="mode">extension</field>
+    <field name="model">x_service</field>
+    <field name="name">Odoo Studio: Default form view for x_service customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_7da98998-80c7-498f-a834-06046aec276c" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list default_order="id desc">
+        <field name="x_name" decoration-bf="1"/>
+        <field name="x_studio_partner_id"/>
+        <field name="x_studio_booking_type"/>
+        <field name="x_studio_staff_beautician" widget="many2one_avatar_user"/>
+        <field name="x_studio_chair_num"/>
+        <field name="x_studio_selection_1" widget="badge" decoration-info="x_studio_selection_1 == 'Draft'" decoration-warning="x_studio_selection_1 == 'Confirmed'" decoration-success="x_studio_selection_1 == 'Completed'" decoration-danger="x_studio_selection_1 == 'Cancelled'"/>
+        <field name="x_studio_value" sum="Total" decoration-bf="1"/>
+        <field name="x_studio_related_payment_state_1" widget="badge" decoration-success="x_studio_related_payment_state_1 == 'paid'" decoration-info="x_studio_related_payment_state_1 in ('in_payment', 'partial')" decoration-warning="x_studio_related_payment_state_1 == 'not_paid'"/>
+      </list>
+    </field>
+    <field name="key">salon_management_saas.default_list_view_fo_7da98998-80c7-498f-a834-06046aec276c</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Default list view for x_appointment</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_8d72a0d8-15ac-4e17-b7f7-2bc6af3dac02" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Booking">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_3d2c3f">
+            <group name="studio_group_3d2c3f_left">
+              <field name="x_studio_partner_id"/>
+              <field name="x_studio_partner_phone" widget="phone" options="{'enable_sms': True}"/>
+              <field name="x_studio_partner_email" widget="email"/>
+              <field name="x_studio_date"/>
+            </group>
+            <group name="studio_group_3d2c3f_right">
+              <field name="x_studio_currency_id" invisible="1"/>
+              <field name="x_studio_value"/>
+            </group>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="key">salon_management_saas.default_form_view_fo_8d72a0d8-15ac-4e17-b7f7-2bc6af3dac02</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Default form view for x_appointment</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__47da0b4d-ac97-4d9b-b46d-4fd6f6bd39d5" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <field name="x_studio_partner_id" operator="child_of"/>
+        <filter invisible="1" string="My Activities" name="filter_activities_my" domain="[['activity_user_id', '=', uid]]"/>
+        <separator/>
+        <filter invisible="1" string="Late Activities" name="activities_overdue" domain="[('my_activity_date_deadline', '&lt;', 'today')]"/>
+        <filter invisible="1" string="Today Activities" name="activities_today" domain="[('my_activity_date_deadline', '=', 'today')]"/>
+        <filter invisible="1" string="Future Activities" name="activities_upcoming_all" domain="[('my_activity_date_deadline', '&gt;', 'today')]"/>
+        <separator/>
+        <separator/>
+        <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_appointment" domain="[['x_active', '=', False]]"/>
+        <separator/>
+        <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
+      </search>
+    </field>
+    <field name="key">salon_management_saas.default_search_view__47da0b4d-ac97-4d9b-b46d-4fd6f6bd39d5</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Default search view for x_appointment</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_calendar_vie_9b01879b-f7ed-482b-bb88-76e72ae1e624" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <calendar date_start="x_studio_date" create_name_field="x_name"/>
+    </field>
+    <field name="key">salon_management_saas.default_calendar_vie_9b01879b-f7ed-482b-bb88-76e72ae1e624</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Default calendar view for x_appointment</field>
+    <field name="type">calendar</field>
+  </record>
+  <record id="default_map_view_for_67a48253-bc7c-43c1-85e8-0abc727859d3" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <map res_partner="x_studio_partner_id">
+        <field name="x_studio_partner_id" string="Partner"/>
+      </map>
+    </field>
+    <field name="key">salon_management_saas.default_map_view_for_67a48253-bc7c-43c1-85e8-0abc727859d3</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Default map view for x_appointment</field>
+    <field name="type">map</field>
+  </record>
+  <record id="default_pivot_view_f_729cc0b2-f30f-4016-ba41-e5b490ac720c" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <pivot sample="1">
+        <field name="x_studio_value" type="measure"/>
+        <field name="x_studio_date" type="row"/>
+      </pivot>
+    </field>
+    <field name="key">salon_management_saas.default_pivot_view_f_729cc0b2-f30f-4016-ba41-e5b490ac720c</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Default pivot view for x_appointment</field>
+    <field name="type">pivot</field>
+  </record>
+  <record id="default_graph_view_f_7b6397d3-05a4-4e9d-bc5e-52a6b6492f62" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <graph sample="1">
+        <field name="x_studio_value" type="measure"/>
+        <field name="create_date" type="row"/>
+      </graph>
+    </field>
+    <field name="key">salon_management_saas.default_graph_view_f_7b6397d3-05a4-4e9d-bc5e-52a6b6492f62</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Default graph view for x_appointment</field>
+    <field name="type">graph</field>
+  </record>
+  <record id="odoo_studio_default__6e40d031-5bc2-45af-a725-1a5660f3d9fd" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/header" position="inside">
+          <button string="Confirm" type="action" class="btn btn-primary" name="%(salon_management_saas.action_appointment_confirm)d" invisible="x_studio_selection_1 != 'Draft'"/>
+          <button string="Complete" type="action" class="btn btn-primary" name="%(salon_management_saas.action_appointment_complete)d" invisible="x_studio_selection_1 != 'Confirmed'"/>
+          <button string="Cancel" type="action" class="btn btn-secondary" name="%(salon_management_saas.action_appointment_cancel)d" invisible="x_studio_selection_1 not in ['Draft', 'Confirmed']"/>
+          <field widget="statusbar" name="x_studio_selection_1" readonly="1" statusbar_visible="Draft,Confirmed,Completed"/>
+          <button string="Create Invoice" type="action" class="btn btn-primary" name="salon_management_saas.create_invoice_a8248fb7-0a99-4237-bce2-13dfe7175916" invisible="x_studio_selection_1 not in ['Confirmed', 'Completed'] or x_studio_invoice_1 != False"/>
+        </xpath>
+        <xpath expr="//sheet/*[1]" position="before">
+          <widget name="web_ribbon" text="Paid" bg_color="text-bg-success" invisible="x_studio_related_payment_state_1 != 'paid'"/>
+          <div class="oe_button_box" name="button_box">
+            <button name="salon_management_saas.action_open_appointment_invoice" type="action" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not x_studio_invoice_1">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Invoice</span>
+              </div>
+            </button>
+          </div>
+        </xpath>
+        <xpath expr="/form/sheet/group[2]" position="replace">
+          <notebook name="studio_notebook_9jh_1k0a5m99t">
+            <page string="Notes" name="studio_page_9jh">
+              <group name="studio_group_9jh">
+                <field name="x_studio_notes_3" readonly="x_studio_selection_1 != 'Draft'"/>
+              </group>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="string">Booking No</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_phone']" position="after">
+          <field name="x_studio_booking_type" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_service" options="{'create_name_field': 'x_name'}" required="x_studio_booking_type == 'service'" invisible="x_studio_booking_type != 'service'" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_service_package" required="x_studio_booking_type == 'package'" invisible="x_studio_booking_type != 'package'" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_start_time" readonly="True"/>
+          <field name="x_studio_duration" force_save="1" readonly="True"/>
+          <xpath expr="/form//field[@name='x_studio_value']" position="move"/>
+          <field name="x_studio_invoice_1" force_save="1" readonly="True"/>
+          <field name="x_studio_chair_num" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_id']" position="attributes">
+          <attribute name="required">True</attribute>
+          <attribute name="string">Customer</attribute>
+          <attribute name="readonly">x_studio_selection_1 != 'Draft'</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
+          <attribute name="force_save">1</attribute>
+          <attribute name="readonly">True</attribute>
+          <attribute name="string">Price</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
+          <field name="x_studio_staff_beautician" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
+          <xpath expr="/form//field[@name='x_studio_partner_email']" position="move"/>
+          <xpath expr="/form//field[@name='x_studio_date']" position="move"/>
+          <field name="x_studio_time_slot" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_end_time" readonly="True"/>
+          <field name="x_studio_related_payment_state_1"/>
+          <field name="x_studio_currency_id" invisible="True"/>
+          <field name="x_studio_currency_id" invisible="True"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_date']" position="attributes">
+          <attribute name="required">True</attribute>
+          <attribute name="string">Appointment Date</attribute>
+          <attribute name="readonly">x_studio_selection_1 != 'Draft'</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_8d72a0d8-15ac-4e17-b7f7-2bc6af3dac02"/>
+    <field name="key">salon_management_saas.odoo_studio_default__6e40d031-5bc2-45af-a725-1a5660f3d9fd</field>
+    <field name="mode">extension</field>
+    <field name="model">x_appointment</field>
+    <field name="name">Odoo Studio: Default form view for x_appointment customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_0281a3af-48e6-4a6a-9259-7e0975aa6f12" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list default_order="id desc">
+        <field name="x_name" decoration-bf="1"/>
+        <field name="x_studio_package_code"/>
+        <field name="x_studio_many2many_1" widget="many2many_tags"/>
+        <field name="x_studio_value" sum="Total" decoration-bf="1"/>
+        <field name="x_studio_end_date"/>
+        <field name="x_studio_status" widget="badge" decoration-success="x_studio_status == 'active'" decoration-danger="x_studio_status == 'inactive'"/>
+      </list>
+    </field>
+    <field name="key">salon_management_saas.default_list_view_fo_0281a3af-48e6-4a6a-9259-7e0975aa6f12</field>
+    <field name="model">x_service_package</field>
+    <field name="name">Default list view for x_service_package</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_3c1f332d-a62c-4fc3-8492-4359c66be8ed" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Service Package">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_d9cbd6">
+            <group name="studio_group_d9cbd6_left">
+              <field name="x_studio_currency_id" invisible="1"/>
+              <field name="x_studio_value"/>
+            </group>
+            <group name="studio_group_d9cbd6_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">salon_management_saas.default_form_view_fo_3c1f332d-a62c-4fc3-8492-4359c66be8ed</field>
+    <field name="model">x_service_package</field>
+    <field name="name">Default form view for x_service_package</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__c8ca4a10-39ff-4700-994a-d584dfaefde5" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_service_package" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="key">salon_management_saas.default_search_view__c8ca4a10-39ff-4700-994a-d584dfaefde5</field>
+    <field name="model">x_service_package</field>
+    <field name="name">Default search view for x_service_package</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_pivot_view_f_98991a13-6f82-4223-97ae-38924d83cace" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <pivot sample="1">
+        <field name="x_studio_value" type="measure"/>
+      </pivot>
+    </field>
+    <field name="key">salon_management_saas.default_pivot_view_f_98991a13-6f82-4223-97ae-38924d83cace</field>
+    <field name="model">x_service_package</field>
+    <field name="name">Default pivot view for x_service_package</field>
+    <field name="type">pivot</field>
+  </record>
+  <record id="default_graph_view_f_d7d59ae6-bcb6-4dab-b833-47755a1b21e1" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <graph sample="1">
+        <field name="x_studio_value" type="measure"/>
+        <field name="create_date" type="row"/>
+      </graph>
+    </field>
+    <field name="key">salon_management_saas.default_graph_view_f_d7d59ae6-bcb6-4dab-b833-47755a1b21e1</field>
+    <field name="model">x_service_package</field>
+    <field name="name">Default graph view for x_service_package</field>
+    <field name="type">graph</field>
+  </record>
+  <record id="odoo_studio_default__af59ed91-1638-49a8-8dda-dd46fe86bf74" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/header" position="inside">
+          <field widget="statusbar" name="x_studio_status" readonly="1"/>
+        </xpath>
+        <xpath expr="/form/sheet/group[2]" position="replace">
+          <notebook name="studio_notebook_2lg_1k0a6d9pn">
+            <page string="Description" name="studio_page_2lg">
+              <group name="studio_group_2lg">
+                <field name="x_studio_description_1"/>
+              </group>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="string">Package Name</attribute>
+          <attribute name="readonly">x_studio_status == 'inactive'</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
+          <field name="x_studio_package_code" required="True" readonly="x_studio_status == 'inactive'"/>
+          <field name="x_studio_many2many_1" widget="many2many_tags" string="Services" required="True" readonly="x_studio_status == 'inactive'"/>
+          <field name="x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
+          <field name="x_studio_end_date" required="x_studio_limited_time" invisible="not x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_d9cbd6_right']" position="inside">
+          <field name="x_studio_original_value" force_save="1" readonly="True"/>
+          <field name="x_studio_discount_1" readonly="x_studio_status == 'inactive'"/>
+          <xpath expr="/form//field[@name='x_studio_value']" position="move"/>
+          <field name="x_studio_currency_id" invisible="True"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
+          <attribute name="force_save">1</attribute>
+          <attribute name="readonly">True</attribute>
+          <attribute name="required">True</attribute>
+          <attribute name="string">Package Price</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_3c1f332d-a62c-4fc3-8492-4359c66be8ed"/>
+    <field name="key">salon_management_saas.odoo_studio_default__af59ed91-1638-49a8-8dda-dd46fe86bf74</field>
+    <field name="mode">extension</field>
+    <field name="model">x_service_package</field>
+    <field name="name">Odoo Studio: Default form view for x_service_package customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_account__887b79a1-a808-4baf-9393-a7b5b31e4a85" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/sheet/group/group[@id='header_left_group']/div" position="after">
+          <field name="x_studio_appointment_id" options="{'create_name_field': 'x_name'}" force_save="1" readonly="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="key">salon_management_saas.odoo_studio_account__887b79a1-a808-4baf-9393-a7b5b31e4a85</field>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="name">Odoo Studio: account.move.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="view_partner_form_salon_spa" model="ir.ui.view">
+    <field name="name">res.partner.form.salon.spa</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='parent_id']/parent::div" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//div[@name='identifiers']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='function']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='website']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='category_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='category_id']" position="after">
+        <field name="x_studio_gender"/>
+        <field name="x_studio_birth_date"/>
+        <field name="x_studio_emergency_contact_name"/>
+        <field name="x_studio_emergency_contact_phone"/>
+        <field name="x_studio_medical_conditions"/>
+        <field name="x_studio_allergies"/>
+      </xpath>
+      <xpath expr="//page[@name='contact_addresses']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='sales_purchases']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='accounting']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button name="%(salon_management_saas.action_customer_appointments)d"
+                type="action"
+                class="oe_stat_button"
+                icon="fa-calendar">
+          <field name="x_studio_appointment_count" widget="statinfo" string="Bookings"/>
+        </button>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_employee_form_salon_spa" model="ir.ui.view">
+    <field name="name">hr.employee.form.salon.spa</field>
+    <field name="model">hr.employee</field>
+    <field name="inherit_id" ref="hr.view_employee_form"/>
+    <field name="arch" type="xml">
+      <!-- Hide tags on header -->
+      <xpath expr="//field[@name='category_ids']/parent::div" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <!-- Replace work group with Staff Details -->
+      <xpath expr="//group[@name='work']" position="replace">
+        <group name="work" string="Staff Details">
+          <field name="x_studio_gender"/>
+          <field name="x_studio_specialties" widget="many2many_tags"/>
+          <field name="x_studio_bio"/>
+        </group>
+      </xpath>
+      <!-- Hide Location group and Usual Work Location group -->
+      <xpath expr="//group[@name='work_location']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='monday_location_id']/parent::group" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <!-- Hide Organization Chart -->
+      <xpath expr="//div[@id='o_employee_org_chart']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <!-- Hide unnecessary tabs -->
+      <xpath expr="//page[@name='resume']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='certification']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='personal_information']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='payroll_information']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='hr_settings']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="x_service_view_kanban" model="ir.ui.view">
+    <field name="name">x_service.kanban</field>
+    <field name="model">x_service</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile" default_group_by="x_studio_service_category">
+        <field name="id"/>
+        <field name="x_name"/>
+        <field name="x_studio_image"/>
+        <field name="x_studio_value"/>
+        <field name="x_studio_duration_minutes"/>
+        <field name="x_studio_currency_id"/>
+        <field name="x_studio_gender"/>
+        <field name="x_studio_service_category"/>
+        <templates>
+          <t t-name="card">
+            <style>
+              .o_kanban_record {
+                  padding: 0 !important;
+                  border: none !important;
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  margin: 12px 10px !important;
+              }
+              .my-custom-card {
+                  border-radius: 12px;
+                  background: #ffffff;
+                  border: 1px solid #e2e8f0;
+                  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+                  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                  position: relative;
+                  overflow: hidden;
+                  min-height: 105px;
+                  width: 100%;
+                  height: 100%;
+              }
+              .my-custom-card:hover {
+                  transform: translateY(-3px);
+                  box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.08);
+                  border-color: #cbd5e1;
+              }
+              .my-card-left-bar {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  bottom: 0;
+                  width: 4px;
+                  background: linear-gradient(to bottom, #ec4899, #8b5cf6);
+                  transition: width 0.25s ease;
+              }
+              .my-custom-card:hover .my-card-left-bar {
+                  width: 6px;
+              }
+            </style>
+            <div class="oe_kanban_global_click my-custom-card p-4 d-flex align-items-center justify-content-between gap-3">
+              <div class="my-card-left-bar"/>
+              <div class="d-flex flex-column gap-1.5 min-w-0">
+                <h5 class="mb-0 text-truncate text-dark font-weight-bold" style="font-size: 1.05rem; letter-spacing: -0.2px; line-height: 1.2;">
+                  <field name="x_name"/>
+                </h5>
+                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                  <span class="badge rounded-pill px-2.5 py-0.5 bg-light text-muted d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                    <i class="fa fa-clock-o text-secondary" style="font-size: 0.7rem;" title="Duration"/>
+                    <field name="x_studio_duration_minutes"/> mins
+                  </span>
+                  <!-- Gender badge -->
+                  <t t-if="record.x_studio_gender.raw_value == 'Male'">
+                    <span class="badge rounded-pill px-2 py-0.5" style="background-color: #eff6ff; color: #1d4ed8; font-size: 0.72rem; font-weight: 500;">
+                      <i class="fa fa-mars" title="Male"/> Male
+                    </span>
+                  </t>
+                  <t t-if="record.x_studio_gender.raw_value == 'Female'">
+                    <span class="badge rounded-pill px-2 py-0.5" style="background-color: #fdf2f8; color: #db2777; font-size: 0.72rem; font-weight: 500;">
+                      <i class="fa fa-venus" title="Female"/> Female
+                    </span>
+                  </t>
+                  <t t-if="record.x_studio_gender.raw_value == 'Unisex / Male / Female'">
+                    <span class="badge rounded-pill px-2 py-0.5" style="background-color: #f5f3ff; color: #7c3aed; font-size: 0.72rem; font-weight: 500;">
+                      <i class="fa fa-transgender-alt" title="Unisex"/> Unisex
+                    </span>
+                  </t>
+                </div>
+              </div>
+              <div class="flex-shrink-0" style="background-color: #f8fafc; border-radius: 8px; padding: 6px 12px; text-align: right;">
+                <span class="text-muted d-block" style="font-size: 0.65rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; line-height: 1;">Price</span>
+                <span class="font-weight-bold" style="font-size: 1.15rem; color: #0f172a; line-height: 1.2; display: block; margin-top: 2px;">
+                  <field name="x_studio_value" widget="monetary" options="{'currency_field': 'x_studio_currency_id'}"/>
+                </span>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <record id="x_service_package_view_kanban" model="ir.ui.view">
+    <field name="name">x_service_package.kanban</field>
+    <field name="model">x_service_package</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile">
+        <field name="id"/>
+        <field name="x_name"/>
+        <field name="x_studio_image"/>
+        <field name="x_studio_value"/>
+        <field name="x_studio_currency_id"/>
+        <field name="x_studio_discount_1"/>
+        <field name="x_studio_package_code"/>
+        <field name="x_studio_original_value"/>
+        <field name="x_studio_limited_time"/>
+        <field name="x_studio_end_date"/>
+        <field name="x_studio_status"/>
+        <field name="x_studio_many2many_1"/>
+        <templates>
+          <t t-name="card">
+            <style>
+              .o_kanban_record {
+                  padding: 0 !important;
+                  border: none !important;
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  margin: 15px 12px !important;
+              }
+              .my-pkg-card {
+                  border-radius: 16px;
+                  background: #ffffff;
+                  border: 1px solid #e2e8f0;
+                  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+                  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                  position: relative;
+                  overflow: hidden;
+                  min-height: 180px;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: space-between;
+                  width: 100%;
+                  height: 100%;
+              }
+              .my-pkg-card:hover {
+                  transform: translateY(-4px);
+                  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
+                  border-color: #cbd5e1;
+              }
+              .my-pkg-left-bar {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  bottom: 0;
+                  width: 4px;
+                  background: linear-gradient(to bottom, #F9D423, #FF4E50);
+                  transition: width 0.25s ease;
+              }
+              .my-pkg-card:hover .my-pkg-left-bar {
+                  width: 6px;
+              }
+              .my-badge-active {
+                  font-size: 0.7rem;
+                  font-weight: 600;
+                  padding: 2px 8px;
+                  border-radius: 9999px;
+                  background-color: #ecfdf5;
+                  color: #059669;
+                  border: none;
+              }
+              .my-badge-inactive {
+                  font-size: 0.7rem;
+                  font-weight: 600;
+                  padding: 2px 8px;
+                  border-radius: 9999px;
+                  background-color: #fef2f2;
+                  color: #dc2626;
+                  border: none;
+              }
+            </style>
+            <div class="oe_kanban_global_click my-pkg-card p-4">
+              <div class="my-pkg-left-bar"/>
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h4 class="mb-0 text-truncate text-dark font-weight-bold" style="font-size: 1.15rem; letter-spacing: -0.3px;">
+                  <field name="x_name"/>
+                </h4>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                  <span class="text-uppercase text-muted font-weight-bold" style="font-size: 0.72rem; letter-spacing: 0.5px; color: #64748b;">
+                    <field name="x_studio_package_code"/>
+                  </span>
+                  <t t-if="record.x_studio_status.raw_value == 'active'">
+                    <span class="my-badge-active">Active</span>
+                  </t>
+                  <t t-else="">
+                    <span class="my-badge-inactive">Inactive</span>
+                  </t>
+                </div>
+              </div>
+              <div class="my-2 flex-grow-1">
+                <div class="text-truncate text-muted small" style="margin-bottom: 6px;">
+                  <i class="fa fa-scissors text-secondary mr-1" title="Services"/>
+                  <span class="font-weight-normal text-secondary">Services: </span>
+                  <field name="x_studio_many2many_1" widget="many2many_tags"/>
+                </div>
+                <t t-if="record.x_studio_limited_time.raw_value">
+                  <div class="d-flex align-items-center gap-1.5 text-danger small font-weight-bold" style="background-color: #fef2f2; border-radius: 6px; padding: 4px 8px; width: fit-content;">
+                    <i class="fa fa-calendar-times-o" title="Expiry Date"/>
+                    <span>Expires: <field name="x_studio_end_date"/></span>
+                  </div>
+                </t>
+              </div>
+              <div class="d-flex align-items-end justify-content-between pt-2 mt-2">
+                <div>
+                  <t t-if="record.x_studio_discount_1.raw_value">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted text-decoration-line-through small" style="font-size: 0.85rem; color: #94a3b8 !important;">
+                        <field name="x_studio_original_value" widget="monetary" options="{'currency_field': 'x_studio_currency_id'}"/>
+                      </span>
+                      <span class="badge bg-danger text-white rounded-pill px-2.5 py-0.5" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2px;">
+                        <field name="x_studio_discount_1"/>% OFF
+                      </span>
+                    </div>
+                  </t>
+                </div>
+                <div class="text-right" style="background-color: #f8fafc; border-radius: 8px; padding: 4px 12px;">
+                  <span class="text-muted small d-block" style="font-size: 0.65rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; line-height: 1;">Total Price</span>
+                  <span class="font-weight-bold" style="font-size: 1.35rem; color: #0f172a; line-height: 1.2; display: block; margin-top: 2px;">
+                    <field name="x_studio_value" widget="monetary" options="{'currency_field': 'x_studio_currency_id'}"/>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <record id="default_form_view_fo_x_chair" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <sheet string="Chair">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name/Number..."/>
+            </h1>
+          </div>
+          <group name="studio_group_x_chair">
+            <group name="studio_group_x_chair_left">
+              <field name="x_studio_filter_date"/>
+            </group>
+            <group name="studio_group_x_chair_right"/>
+          </group>
+          <notebook>
+            <page string="Bookings" name="page_bookings">
+              <field name="x_studio_bookings" readonly="1"
+                     context="{'search_default_confirmed_completed': 1}">
+                <list>
+                  <field name="x_name" string="Booking ID"/>
+                  <field name="x_studio_partner_id" string="Customer"/>
+                  <field name="x_studio_date" string="Date"/>
+                  <field name="x_studio_start_time" string="From"/>
+                  <field name="x_studio_end_time" string="To"/>
+                  <field name="x_studio_duration" string="Duration (mins)"/>
+                  <field name="x_studio_selection_1" string="Stage" widget="badge"/>
+                  <field name="x_studio_value" string="Price"/>
+                </list>
+                <search>
+                  <filter name="confirmed_completed"
+                          string="Confirmed/Completed"
+                          invisible="1"
+                          domain="[('x_studio_selection_1', 'in', ['Confirmed', 'Completed'])]"/>
+                </search>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">salon_management_saas.default_form_view_fo_x_chair</field>
+    <field name="model">x_chair</field>
+    <field name="name">Default form view for x_chair</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_x_chair" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="key">salon_management_saas.default_list_view_fo_x_chair</field>
+    <field name="model">x_chair</field>
+    <field name="name">Default list view for x_chair</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_kanban_view_fo_x_chair" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile">
+        <field name="id"/>
+        <field name="x_name"/>
+        <templates>
+          <t t-name="card">
+            <style>
+              .o_kanban_record {
+                  padding: 0 !important;
+                  border: none !important;
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  margin: 12px 10px !important;
+              }
+              .my-chair-card {
+                  border-radius: 16px;
+                  background: #ffffff;
+                  border: 1px solid #e2e8f0;
+                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+                  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                  position: relative;
+                  overflow: hidden;
+                  min-height: 80px;
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+              }
+              .my-chair-card:hover {
+                  transform: translateY(-3px);
+                  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.06);
+                  border-color: #cbd5e1;
+              }
+              .my-chair-left-bar {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  bottom: 0;
+                  width: 4px;
+                  background: linear-gradient(to bottom, #06b6d4, #3b82f6);
+                  transition: width 0.25s ease;
+              }
+              .my-chair-card:hover .my-chair-left-bar {
+                  width: 6px;
+              }
+              .my-chair-icon-wrapper {
+                  width: 42px;
+                  height: 42px;
+                  border-radius: 10px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f1f5f9;
+                  color: #0ea5e9;
+                  font-size: 1.20rem;
+                  transition: all 0.25s ease;
+              }
+            </style>
+            <div class="oe_kanban_global_click my-chair-card p-4 d-flex align-items-center justify-content-between gap-3">
+              <div class="my-chair-left-bar"/>
+              <div class="d-flex align-items-center gap-3">
+                <div class="my-chair-icon-wrapper">
+                  <img src="/salon_management_saas/static/src/img/chair.svg" alt="Chair Icon" style="width: 22px; height: 22px;"/>
+                </div>
+                <div class="d-flex flex-column gap-1">
+                  <h5 class="mb-0 font-weight-bold text-dark" style="font-size: 1.1rem; line-height: 1.2;">
+                    <field name="x_name"/>
+                  </h5>
+                </div>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+    <field name="key">salon_management_saas.default_kanban_view_fo_x_chair</field>
+    <field name="model">x_chair</field>
+    <field name="name">Default kanban view for x_chair</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="view_salon_res_config_settings" model="ir.ui.view" context="{'studio': True}">
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="model">res.config.settings</field>
+    <field name="name">res.config.settings.view.form.inherit.salon</field>
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <app string="Salon Management" name="salon_management">
+          <block title="Holiday Configuration" name="holiday_config">
+            <setting string="Holidays" help="Select dates on which appointments cannot be booked.">
+              <field name="x_studio_holiday_ids" widget="many2many_tags" placeholder="Select holidays..."/>
+            </setting>
+          </block>
+          <block title="Weekly Holidays" name="weekly_holiday_config">
+            <setting string="Sunday" help="Mark Sundays as weekly holidays.">
+              <field name="x_studio_holiday_sunday"/>
+            </setting>
+            <setting string="Monday" help="Mark Mondays as weekly holidays.">
+              <field name="x_studio_holiday_monday"/>
+            </setting>
+            <setting string="Tuesday" help="Mark Tuesdays as weekly holidays.">
+              <field name="x_studio_holiday_tuesday"/>
+            </setting>
+            <setting string="Wednesday" help="Mark Wednesdays as weekly holidays.">
+              <field name="x_studio_holiday_wednesday"/>
+            </setting>
+            <setting string="Thursday" help="Mark Thursdays as weekly holidays.">
+              <field name="x_studio_holiday_thursday"/>
+            </setting>
+            <setting string="Friday" help="Mark Fridays as weekly holidays.">
+              <field name="x_studio_holiday_friday"/>
+            </setting>
+            <setting string="Saturday" help="Mark Saturdays as weekly holidays.">
+              <field name="x_studio_holiday_saturday"/>
+            </setting>
+          </block>
+          <block title="Break Time Configuration" name="break_time_config">
+            <setting string="Break Start Time" help="Scheduled daily break start time.">
+              <field name="x_studio_break_start"/>
+            </setting>
+            <setting string="Break End Time" help="Scheduled daily break end time.">
+              <field name="x_studio_break_end"/>
+            </setting>
+          </block>
+        </app>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_salon_holiday_list" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list string="Holidays" editable="bottom">
+        <field name="x_name" string="Holiday Label"/>
+        <field name="x_studio_date" string="Date"/>
+      </list>
+    </field>
+    <field name="key">salon_management_saas.view_salon_holiday_list</field>
+    <field name="model">x_salon_holiday</field>
+    <field name="name">Salon Holiday List View</field>
+    <field name="type">list</field>
+  </record>
+</odoo>

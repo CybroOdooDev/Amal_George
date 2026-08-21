@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Service Categories -->
+        <record id="demo_category_hair" model="x_service_category">
+            <field name="x_name">Hair Care</field>
+            <field name="x_studio_category_code">CAT-HAIR</field>
+        </record>
+
+        <record id="demo_category_skin" model="x_service_category">
+            <field name="x_name">Skin Care</field>
+            <field name="x_studio_category_code">CAT-SKIN</field>
+        </record>
+
+        <record id="demo_category_nail" model="x_service_category">
+            <field name="x_name">Nail Care</field>
+            <field name="x_studio_category_code">CAT-NAIL</field>
+        </record>
+
+        <record id="demo_category_massage" model="x_service_category">
+            <field name="x_name">Massage Therapy</field>
+            <field name="x_studio_category_code">CAT-MASSAGE</field>
+        </record>
+
+        <record id="demo_category_makeup" model="x_service_category">
+            <field name="x_name">Makeup &amp; Styling</field>
+            <field name="x_studio_category_code">CAT-MAKEUP</field>
+        </record>
+
+        <!-- Services -->
+        <record id="demo_service_haircut" model="x_service">
+            <field name="x_name">Premium Haircut</field>
+            <field name="x_studio_service_code">SRV-HCUT</field>
+            <field name="x_studio_service_category" ref="demo_category_hair"/>
+            <field name="x_studio_value">45.00</field>
+            <field name="x_studio_duration_minutes">30</field>
+        </record>
+
+        <record id="demo_service_haircolor" model="x_service">
+            <field name="x_name">Full Hair Coloring</field>
+            <field name="x_studio_service_code">SRV-HCOLOR</field>
+            <field name="x_studio_service_category" ref="demo_category_hair"/>
+            <field name="x_studio_value">120.00</field>
+            <field name="x_studio_duration_minutes">120</field>
+        </record>
+
+        <record id="demo_service_facial" model="x_service">
+            <field name="x_name">Hydrating Facial</field>
+            <field name="x_studio_service_code">SRV-FACIAL</field>
+            <field name="x_studio_service_category" ref="demo_category_skin"/>
+            <field name="x_studio_value">75.00</field>
+            <field name="x_studio_duration_minutes">60</field>
+        </record>
+
+        <record id="demo_service_cpeel" model="x_service">
+            <field name="x_name">Chemical Peel</field>
+            <field name="x_studio_service_code">SRV-CPEEL</field>
+            <field name="x_studio_service_category" ref="demo_category_skin"/>
+            <field name="x_studio_value">90.00</field>
+            <field name="x_studio_duration_minutes">45</field>
+        </record>
+
+        <record id="demo_service_manipedi" model="x_service">
+            <field name="x_name">Classic Mani-Pedi</field>
+            <field name="x_studio_service_code">SRV-MANIPEDI</field>
+            <field name="x_studio_service_category" ref="demo_category_nail"/>
+            <field name="x_studio_value">50.00</field>
+            <field name="x_studio_duration_minutes">60</field>
+        </record>
+
+        <record id="demo_service_gelnails" model="x_service">
+            <field name="x_name">Gel Nail Extensions</field>
+            <field name="x_studio_service_code">SRV-GELNAILS</field>
+            <field name="x_studio_service_category" ref="demo_category_nail"/>
+            <field name="x_studio_value">80.00</field>
+            <field name="x_studio_duration_minutes">90</field>
+        </record>
+
+        <record id="demo_service_deepmassage" model="x_service">
+            <field name="x_name">Deep Tissue Massage</field>
+            <field name="x_studio_service_code">SRV-DEEPMASS</field>
+            <field name="x_studio_service_category" ref="demo_category_massage"/>
+            <field name="x_studio_value">110.00</field>
+            <field name="x_studio_duration_minutes">60</field>
+        </record>
+
+        <record id="demo_service_hotstone" model="x_service">
+            <field name="x_name">Hot Stone Massage</field>
+            <field name="x_studio_service_code">SRV-HOTSTONE</field>
+            <field name="x_studio_service_category" ref="demo_category_massage"/>
+            <field name="x_studio_value">130.00</field>
+            <field name="x_studio_duration_minutes">75</field>
+        </record>
+
+        <record id="demo_service_bridal" model="x_service">
+            <field name="x_name">Bridal Makeup</field>
+            <field name="x_studio_service_code">SRV-BRIDAL</field>
+            <field name="x_studio_service_category" ref="demo_category_makeup"/>
+            <field name="x_studio_value">200.00</field>
+            <field name="x_studio_duration_minutes">120</field>
+        </record>
+
+        <!-- Staff/Beauticians -->
+        <record id="demo_employee_stylist" model="hr.employee">
+            <field name="name">Sarah Stylist</field>
+            <field name="x_studio_gender">female</field>
+            <field name="x_studio_specialties" eval="[(6, 0, [ref('demo_category_hair')])]"/>
+            <field name="x_studio_bio">Expert hair stylist with 5+ years of experience in modern cuts and coloring.</field>
+        </record>
+
+        <record id="demo_employee_esthetician" model="hr.employee">
+            <field name="name">Emma Esthetician</field>
+            <field name="x_studio_gender">female</field>
+            <field name="x_studio_specialties" eval="[(6, 0, [ref('demo_category_skin')])]"/>
+            <field name="x_studio_bio">Certified esthetician specializing in anti-aging treatments and facial care.</field>
+        </record>
+
+        <!-- Customers -->
+        <record id="demo_partner_customer_1" model="res.partner">
+            <field name="name">Alice Johnson</field>
+            <field name="email">alice.johnson@example.com</field>
+            <field name="phone">+15550199</field>
+            <field name="x_studio_gender">Female</field>
+            <field name="x_studio_birth_date">1995-04-12</field>
+            <field name="x_studio_emergency_contact_name">Bob Johnson</field>
+            <field name="x_studio_emergency_contact_phone">+15550200</field>
+        </record>
+
+        <record id="demo_partner_customer_2" model="res.partner">
+            <field name="name">David Smith</field>
+            <field name="email">david.smith@example.com</field>
+            <field name="phone">+15550201</field>
+            <field name="x_studio_gender">Male</field>
+            <field name="x_studio_birth_date">1988-11-23</field>
+            <field name="x_studio_emergency_contact_name">Carol Smith</field>
+            <field name="x_studio_emergency_contact_phone">+15550202</field>
+        </record>
+    </data>
+</odoo>

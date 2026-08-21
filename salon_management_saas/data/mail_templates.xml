@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="mail_template_appointment_confirm_customer" model="mail.template">
+    <field name="name">Booking: Confirmation (Customer)</field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="subject">Booking Confirmation - {{ object.x_name }}</field>
+    <field name="email_to">{{ object.x_studio_partner_email }}</field>
+    <field name="use_default_to" eval="False"/>
+    <field name="auto_delete" eval="False"/>
+    <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #333333;">
+    <p style="margin: 0px; padding: 0px;">
+        Hello <strong><span t-field="object.x_studio_partner_id.name"/></strong>,<br/><br/>
+        Your booking has been successfully scheduled and confirmed. Here are the details of your upcoming visit:
+        <br/><br/>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin: 15px 0;">
+            <tr>
+                <td style="padding: 5px 0; color: #777777; width: 30%; border-bottom: 1px solid #eef2f5;">Booking No:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_name"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Service/Package:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;">
+                    <t t-if="object.x_studio_booking_type == 'service'">
+                        <span t-field="object.x_studio_service.x_name"/>
+                    </t>
+                    <t t-if="object.x_studio_booking_type == 'package'">
+                        <span t-field="object.x_studio_service_package.x_name"/>
+                    </t>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Date:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_date"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Time:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_time_slot"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Duration:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_duration"/> mins</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Staff / Beautician:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_staff_beautician.name"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Price:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #6c5ce7; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_value"/></td>
+            </tr>
+        </table>
+        <br/>
+        If you need to reschedule or cancel your booking, please contact us at least 24 hours in advance.
+        <br/><br/>
+        Thank you!
+    </p>
+</div>
+    </field>
+  </record>
+
+  <record id="mail_template_appointment_confirm_staff" model="mail.template">
+    <field name="name">Booking: Confirmation (Staff)</field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="subject">New Booking Assigned - {{ object.x_name }}</field>
+    <field name="email_to">{{ object.x_studio_staff_beautician.work_email }}</field>
+    <field name="use_default_to" eval="False"/>
+    <field name="auto_delete" eval="False"/>
+    <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #333333;">
+    <p style="margin: 0px; padding: 0px;">
+        Hello <strong><span t-field="object.x_studio_staff_beautician.name"/></strong>,<br/><br/>
+        A new booking has been confirmed and assigned to you. Please find the details below:
+        <br/><br/>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin: 15px 0;">
+            <tr>
+                <td style="padding: 5px 0; color: #777777; width: 30%; border-bottom: 1px solid #eef2f5;">Booking No:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_name"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Customer:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_partner_id.name"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Service/Package:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;">
+                    <t t-if="object.x_studio_booking_type == 'service'">
+                        <span t-field="object.x_studio_service.x_name"/>
+                    </t>
+                    <t t-if="object.x_studio_booking_type == 'package'">
+                        <span t-field="object.x_studio_service_package.x_name"/>
+                    </t>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Date:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_date"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Time:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_time_slot"/></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 0; color: #777777; border-bottom: 1px solid #eef2f5;">Duration:</td>
+                <td style="padding: 5px 0; font-weight: bold; color: #111111; border-bottom: 1px solid #eef2f5;"><span t-field="object.x_studio_duration"/> mins</td>
+            </tr>
+        </table>
+        <br/>
+        Please ensure you are prepared for this booking at the scheduled start time.
+        <br/><br/>
+        Thank you!
+    </p>
+</div>
+    </field>
+  </record>
+</odoo>

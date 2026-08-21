@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="prevent_duplicate_da5a9001-1bf9-44b3-afd0-37ba1e42727d" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_category_524a6824-0a30-4cff-bf93-7e89575929c3"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('execute_code_c394bbfe-a3b0-41a9-84a8-00d93d4af8c9')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Prevent Duplicate Category Code</field>
+  </record>
+  <record id="service_code_duplica_ef74fb68-75d7-4580-86fa-ad4fb88bb9b7" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_5786dd1a-49e9-4766-9e35-0068d351443e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('execute_code_cf3a0428-d6bd-426f-94cb-f8203259b5eb')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Prevent Duplicate Service Codes</field>
+  </record>
+  <record id="prevent_duplicate_pa_5f4f815b-1bd9-4f3f-b8fe-6b0122f86cf7" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('execute_code_15dcbf23-45e7-4fa3-8ae4-0281e7f922e0')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Prevent Duplicate Package Code</field>
+  </record>
+  <record id="discount_from_0_to_1_523b19d9-1b8f-47d3-86e3-65c9042d0a8e" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('execute_code_944f7f3c-cf9c-4356-86a6-fc6b89a31641')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Discount from 0% to 100% only</field>
+  </record>
+  <record id="calculate_original_v_7ab1d458-7fb1-4050-b228-da56899fbd35" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('execute_code_f246619f-5099-4cca-91bc-d8543800bbb6')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Calculate Original Value from Services</field>
+  </record>
+  <record id="calculate_package_pr_767bd85e-7e93-4c72-abed-5df45cffbbc9" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('execute_code_b86f6fed-823f-4000-bfcf-49efb9778ea1')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Calculate Package Price</field>
+  </record>
+  <record id="rule_appointment_auto_populate_details" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_appointment_auto_populate_details')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Auto Populate Service Details &amp; Price</field>
+  </record>
+  <record id="rule_appointment_calculate_end_time" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_appointment_calculate_end_time')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Calculate Appointment End Time</field>
+  </record>
+  <record id="rule_appointment_prevent_double_booking" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_appointment_prevent_double_booking')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Prevent Beautician &amp; Chair Double Booking</field>
+  </record>
+  <record id="rule_service_package_archive_on_inactive" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_service_package_archive_on_inactive')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Archive Package on Inactive State</field>
+  </record>
+  <record id="calculate_appointment_chair_time" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_appointment_update_chair_time')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Update Chair Reserved Time on Appointment Change</field>
+  </record>
+  <record id="rule_chair_update_bookings" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="chair_x_chair"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_chair_update_bookings')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Update Bookings on Chair Date Change</field>
+  </record>
+  <record id="rule_chair_prevent_duplicate_name" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="chair_x_chair"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_chair_prevent_duplicate_name')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Prevent Duplicate Chair Name</field>
+  </record>
+  <record id="rule_holiday_prevent_booking_overlap" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="salon_management_saas.model_x_salon_holiday"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_holiday_prevent_booking_overlap')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Rule: Prevent Holiday Overlapping Bookings</field>
+  </record>
+  <record id="rule_company_prevent_weekly_holiday_overlap" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="base.model_res_company"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_company_prevent_weekly_holiday_overlap')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Rule: Prevent Weekly Holiday Overlapping Bookings</field>
+  </record>
+</odoo>

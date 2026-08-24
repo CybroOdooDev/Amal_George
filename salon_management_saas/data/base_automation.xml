@@ -90,4 +90,38 @@
     <field name="trigger">on_create_or_write</field>
     <field name="name">Rule: Prevent Weekly Holiday Overlapping Bookings</field>
   </record>
+  <record id="rule_appointment_reset_service_on_partner_change" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_appointment_reset_service')])]"/>
+    <field name="trigger">on_change</field>
+    <field name="on_change_field_ids" eval="[(6, 0, [ref('contact_appointment_b984a7ab-fc58-4140-92fe-0005c47756ef')])]"/>
+    <field name="name">Reset Service on Customer Change</field>
+  </record>
+
+  <record id="rule_appointment_reset_beautician_on_service_change" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_appointment_reset_beautician')])]"/>
+    <field name="trigger">on_change</field>
+    <field name="on_change_field_ids" eval="[(6, 0, [
+      ref('new_many2one_appoint_813909af-f255-47a7-a4d4-469c8d9f5ae0'),
+      ref('service_package_appointment_many2one')
+    ])]"/>
+    <field name="name">Reset Beautician on Service/Package Change</field>
+  </record>
+
+  <record id="rule_appointment_reset_fields_on_booking_type_change" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_appointment_reset_fields_on_booking_type_change')])]"/>
+    <field name="trigger">on_change</field>
+    <field name="on_change_field_ids" eval="[(6, 0, [ref('booking_type_appointment_selection')])]"/>
+    <field name="name">Reset Fields on Booking Type Change</field>
+  </record>
+
+  <record id="rule_service_package_reset_services_on_gender_change" model="base.automation" context="{'studio': True}">
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_service_package_reset_services_on_gender_change')])]"/>
+    <field name="trigger">on_change</field>
+    <field name="on_change_field_ids" eval="[(6, 0, [ref('new_selection_package_gender')])]"/>
+    <field name="name">Reset Services on Gender Change</field>
+  </record>
 </odoo>

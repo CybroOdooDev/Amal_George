@@ -348,8 +348,9 @@
           <attribute name="string">Booking No</attribute>
         </xpath>
         <xpath expr="/form//field[@name='x_studio_partner_phone']" position="after">
+          <field name="x_studio_partner_gender" invisible="1"/>
           <field name="x_studio_booking_type" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
-          <field name="x_studio_service" options="{'create_name_field': 'x_name'}" required="x_studio_booking_type == 'service'" invisible="x_studio_booking_type != 'service'" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_service" options="{'create_name_field': 'x_name'}" required="x_studio_booking_type == 'service'" invisible="x_studio_booking_type != 'service'" readonly="x_studio_selection_1 != 'Draft'" domain="['|', ('x_studio_gender', '=', 'Unisex / Male / Female'), ('x_studio_gender', '=', x_studio_partner_gender)]"/>
           <field name="x_studio_service_package" required="x_studio_booking_type == 'package'" invisible="x_studio_booking_type != 'package'" readonly="x_studio_selection_1 != 'Draft'"/>
           <field name="x_studio_start_time" readonly="True"/>
           <field name="x_studio_duration" force_save="1" readonly="True"/>
@@ -368,7 +369,9 @@
           <attribute name="string">Price</attribute>
         </xpath>
         <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
-          <field name="x_studio_staff_beautician" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_service_category" invisible="1"/>
+          <field name="x_studio_allowed_staff_ids" invisible="1"/>
+          <field name="x_studio_staff_beautician" required="True" readonly="x_studio_selection_1 != 'Draft'" domain="x_studio_booking_type == 'package' and [('id', 'in', x_studio_allowed_staff_ids)] or (x_studio_service_category and [('x_studio_specialties', 'in', x_studio_service_category)] or [])"/>
           <xpath expr="/form//field[@name='x_studio_partner_email']" position="move"/>
           <xpath expr="/form//field[@name='x_studio_date']" position="move"/>
           <field name="x_studio_time_slot" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
@@ -397,6 +400,7 @@
       <list default_order="id desc">
         <field name="x_name" decoration-bf="1"/>
         <field name="x_studio_package_code"/>
+        <field name="x_studio_gender"/>
         <field name="x_studio_many2many_1" widget="many2many_tags"/>
         <field name="x_studio_value" sum="Total" decoration-bf="1"/>
         <field name="x_studio_end_date"/>
@@ -497,7 +501,9 @@
         </xpath>
         <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
           <field name="x_studio_package_code" required="True" readonly="x_studio_status == 'inactive'"/>
-          <field name="x_studio_many2many_1" widget="many2many_tags" string="Services" required="True" readonly="x_studio_status == 'inactive'"/>
+          <field name="x_studio_gender" required="True" readonly="x_studio_status == 'inactive'"/>
+          <field name="x_studio_many2many_1" widget="many2many_tags" string="Services" required="True" readonly="x_studio_status == 'inactive'" domain="x_studio_gender == 'Male' and [('x_studio_gender', 'in', ['Male', 'Unisex / Male / Female'])] or (x_studio_gender == 'Female' and [('x_studio_gender', 'in', ['Female', 'Unisex / Male / Female'])] or [])"/>
+          <field name="x_studio_staff_ids" widget="many2many_tags" string="Staff" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_end_date" required="x_studio_limited_time" invisible="not x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
         </xpath>
@@ -881,7 +887,7 @@
           <notebook>
             <page string="Bookings" name="page_bookings">
               <field name="x_studio_bookings" readonly="1"
-                     context="{'search_default_confirmed_completed': 1}">
+                     domain="[('x_studio_selection_1', 'in', ['Confirmed', 'Completed'])]">
                 <list>
                   <field name="x_name" string="Booking ID"/>
                   <field name="x_studio_partner_id" string="Customer"/>
@@ -892,12 +898,6 @@
                   <field name="x_studio_selection_1" string="Stage" widget="badge"/>
                   <field name="x_studio_value" string="Price"/>
                 </list>
-                <search>
-                  <filter name="confirmed_completed"
-                          string="Confirmed/Completed"
-                          invisible="1"
-                          domain="[('x_studio_selection_1', 'in', ['Confirmed', 'Completed'])]"/>
-                </search>
               </field>
             </page>
           </notebook>

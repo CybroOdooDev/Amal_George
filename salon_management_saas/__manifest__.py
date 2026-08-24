@@ -16,7 +16,8 @@
           'data/base_automation.xml',
           'data/ir_access.xml',
           'data/ir_sequence_data.xml',
-          'data/ir_default.xml'],
+          'data/ir_default.xml',
+          'data/report_booking.xml'],
  'demo': ['demo/salon_demo.xml'],
  'assets': {
      'web.assets_backend': [

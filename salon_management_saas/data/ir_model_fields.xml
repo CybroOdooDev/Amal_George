@@ -185,6 +185,26 @@
     <field name="on_delete" eval="False"/>
     <field name="tracking">2</field>
   </record>
+  <record id="field_x_appointment_x_studio_partner_gender" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="related">x_studio_partner_id.x_studio_gender</field>
+    <field name="field_description">Customer Gender</field>
+    <field name="model">x_appointment</field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">x_studio_partner_gender</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
+  </record>
+  <record id="field_x_appointment_x_studio_service_category" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="related">x_studio_service.x_studio_service_category</field>
+    <field name="field_description">Service Category</field>
+    <field name="model">x_appointment</field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">x_studio_service_category</field>
+    <field name="relation">x_service_category</field>
+    <field name="on_delete">set null</field>
+  </record>
   <record id="email_appointment_871d67aa-c3bf-430e-902d-a742123c107b" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="related">x_studio_partner_id.email</field>
@@ -366,6 +386,27 @@
     <field name="name">x_studio_service_package</field>
     <field name="relation">x_service_package</field>
   </record>
+  <record id="staff_ids_service_package_many2many" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Staff</field>
+    <field name="model">x_service_package</field>
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="name">x_studio_staff_ids</field>
+    <field name="on_delete" eval="False"/>
+    <field name="relation">hr.employee</field>
+    <field name="relation_table">x_hr_employee_x_service_package_rel</field>
+  </record>
+  <record id="allowed_staff_appointment_many2many" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Allowed Staff for Package</field>
+    <field name="model">x_appointment</field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">x_studio_allowed_staff_ids</field>
+    <field name="relation">hr.employee</field>
+    <field name="related">x_studio_service_package.x_studio_staff_ids</field>
+  </record>
   <record id="description_service__ebda5656-7e6f-423a-862d-a1ec635cf320" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="copied" eval="True"/>
@@ -431,6 +472,16 @@
     <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
     <field name="name">x_studio_package_code</field>
     <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_selection_package_gender" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Gender</field>
+    <field name="model">x_service_package</field>
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="name">x_studio_gender</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
   </record>
   <record id="new_multiline_text_s_55592ada-8d74-4c89-b535-bc4bda77ed2e" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">text</field>

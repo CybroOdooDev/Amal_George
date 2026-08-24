@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ─── Report Action ──────────────────────────────────────────── -->
+    <record id="action_report_salon_booking" model="ir.actions.report">
+        <field name="name">Salon Booking Report</field>
+        <field name="model">x_appointment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">salon_management_saas.report_salon_booking_document</field>
+        <field name="report_file">salon_management_saas.report_salon_booking_document</field>
+        <field name="binding_model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Salon Booking Report - ' + (object.x_name or '')</field>
+    </record>
+
+    <!-- ─── Report Template ───────────────────────────────────────── -->
+    <template id="report_salon_booking_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Title Banner -->
+                        <div style="background:#0f172a; border-radius:10px; padding:22px 28px; margin-bottom:24px; color:#fff;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.12em; color:rgba(255,255,255,0.55); font-weight:700; margin-bottom:4px;">Salon Management</div>
+                                    <div style="font-size:22px; font-weight:800; color:#ffffff;">Booking Confirmation</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:14px; font-weight:800; color:#06b6d4;"><span t-field="doc.x_name"/></div>
+                                    <div style="margin-top:6px;">
+                                        <t t-if="doc.x_studio_selection_1 == 'Confirmed'">
+                                            <span style="background:rgba(22,163,74,0.3); color:#4ade80; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">CONFIRMED</span>
+                                        </t>
+                                        <t t-elif="doc.x_studio_selection_1 == 'Completed'">
+                                            <span style="background:rgba(59,130,246,0.3); color:#93c5fd; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">COMPLETED</span>
+                                        </t>
+                                        <t t-elif="doc.x_studio_selection_1 == 'Cancelled'">
+                                            <span style="background:rgba(239,68,68,0.3); color:#fca5a5; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">CANCELLED</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span style="background:rgba(255,255,255,0.1); color:#cbd5e1; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">DRAFT</span>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Two-Column Info -->
+                        <div style="display:flex; gap:16px; margin-bottom:20px;">
+                            <!-- Customer Info -->
+                            <div style="flex:1; border:1px solid #e2e8f0; border-radius:10px; padding:16px 18px;">
+                                <div style="font-size:8px; text-transform:uppercase; letter-spacing:0.12em; font-weight:800; color:#8b5cf6; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:6px;">Customer Information</div>
+                                <table style="width:100%; font-size:11px; border-collapse:collapse;">
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0; width:38%;">Customer</td>
+                                        <td style="color:#1e293b; font-weight:700; padding:5px 0;"><span t-field="doc.x_studio_partner_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0;">Phone</td>
+                                        <td style="color:#1e293b; padding:5px 0;"><span t-field="doc.x_studio_partner_phone"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0;">Email</td>
+                                        <td style="color:#1e293b; padding:5px 0;"><span t-field="doc.x_studio_partner_email"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- Booking Details -->
+                            <div style="flex:1; border:1px solid #e2e8f0; border-radius:10px; padding:16px 18px;">
+                                <div style="font-size:8px; text-transform:uppercase; letter-spacing:0.12em; font-weight:800; color:#8b5cf6; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:6px;">Booking Details</div>
+                                <table style="width:100%; font-size:11px; border-collapse:collapse;">
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0; width:42%;">Booking No</td>
+                                        <td style="color:#1e293b; font-weight:700; padding:5px 0;"><span t-field="doc.x_name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0;">Appointment Date</td>
+                                        <td style="color:#1e293b; padding:5px 0;"><span t-field="doc.x_studio_date"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0;">Time Slot</td>
+                                        <td style="color:#1e293b; padding:5px 0;"><span t-field="doc.x_studio_time_slot"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0;">Duration</td>
+                                        <td style="color:#1e293b; padding:5px 0;"><span t-field="doc.x_studio_duration"/> mins</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:5px 0;">Booking Type</td>
+                                        <td style="color:#1e293b; padding:5px 0;">
+                                            <t t-if="doc.x_studio_booking_type == 'package'">Service Package</t>
+                                            <t t-else="">Service</t>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Service and Staff Table -->
+                        <div style="margin-bottom:20px;">
+                            <div style="font-size:8px; text-transform:uppercase; letter-spacing:0.12em; font-weight:800; color:#8b5cf6; margin-bottom:10px;">Service &amp; Staff Details</div>
+                            <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                                <thead>
+                                    <tr>
+                                        <th style="background:#0f172a; color:#fff; padding:9px 12px; text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:0.08em;">Service / Package</th>
+                                        <th style="background:#0f172a; color:#fff; padding:9px 12px; text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:0.08em;">Staff / Beautician</th>
+                                        <th style="background:#0f172a; color:#fff; padding:9px 12px; text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:0.08em;">Chair</th>
+                                        <th style="background:#0f172a; color:#fff; padding:9px 12px; text-align:right; font-size:9px; text-transform:uppercase; letter-spacing:0.08em;">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0;">
+                                        <td style="padding:11px 12px; color:#1e293b; font-weight:600;">
+                                            <t t-if="doc.x_studio_booking_type == 'package'">
+                                                <span t-field="doc.x_studio_service_package"></span>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="doc.x_studio_service"></span>
+                                            </t>
+                                        </td>
+                                        <td style="padding:11px 12px; color:#475569;"><span t-field="doc.x_studio_staff_beautician"></span></td>
+                                        <td style="padding:11px 12px; color:#475569;"><span t-field="doc.x_studio_chair_num"></span></td>
+                                        <td style="padding:11px 12px; text-align:right; color:#8b5cf6; font-weight:800; font-size:13px;"><span t-field="doc.x_studio_value"></span></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background:#1e1b4b;">
+                                        <td colspan="3" style="padding:11px 12px; color:#ffffff; font-weight:700; font-size:12px; text-align:right;">Total Amount</td>
+                                        <td style="padding:11px 12px; color:#06b6d4; font-weight:800; font-size:15px; text-align:right;"><span t-field="doc.x_studio_value"></span></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Payment + Times -->
+                        <div style="display:flex; gap:16px; margin-bottom:20px;">
+                            <div style="flex:1; border:1px solid #e2e8f0; border-radius:10px; padding:14px 18px;">
+                                <div style="font-size:8px; text-transform:uppercase; letter-spacing:0.12em; font-weight:800; color:#8b5cf6; margin-bottom:8px;">Payment Status</div>
+                                <div style="font-size:13px; font-weight:700;">
+                                    <t t-if="doc.x_studio_related_payment_state_1 == 'paid'"><span style="color:#16a34a;">Paid</span></t>
+                                    <t t-elif="doc.x_studio_related_payment_state_1 == 'partial'"><span style="color:#d97706;">Partially Paid</span></t>
+                                    <t t-elif="doc.x_studio_related_payment_state_1 == 'not_paid'"><span style="color:#dc2626;">Not Paid</span></t>
+                                    <t t-else=""><span style="color:#94a3b8;">N/A</span></t>
+                                </div>
+                            </div>
+                            <div style="flex:1; border:1px solid #e2e8f0; border-radius:10px; padding:14px 18px;">
+                                <div style="font-size:8px; text-transform:uppercase; letter-spacing:0.12em; font-weight:800; color:#8b5cf6; margin-bottom:8px;">Appointment Times</div>
+                                <table style="width:100%; font-size:11px; border-collapse:collapse;">
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; width:38%; padding:4px 0;">Start Time</td>
+                                        <td style="color:#1e293b; font-weight:700; padding:4px 0;"><span t-field="doc.x_studio_start_time"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color:#64748b; font-weight:600; padding:4px 0;">End Time</td>
+                                        <td style="color:#1e293b; font-weight:700; padding:4px 0;"><span t-field="doc.x_studio_end_time"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Footer line -->
+                        <div style="border-top:1.5px solid #e2e8f0; padding-top:12px; margin-top:8px; display:flex; justify-content:space-between;">
+                            <div style="font-size:9px; color:#94a3b8;">Generated by Salon Management System</div>
+                            <div style="font-size:9px; color:#94a3b8;">Booking Ref: <b><span t-field="doc.x_name"></span></b></div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

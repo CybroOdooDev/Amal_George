@@ -499,7 +499,7 @@ for chair in all_chairs:
     if not chair.x_studio_filter_date:
         vals['x_studio_filter_date'] = datetime.date.today()
         
-    chair.write(vals)
+    chair.with_context(onchange_self=None).write(vals)
 ]]></field>
   </record>
   <record id="action_chair_update_bookings" model="ir.actions.server" context="{'studio': True}">
@@ -586,5 +586,73 @@ for record in records:
                 day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
                 raise UserError("Cannot set %s as a weekly holiday because there is already a booking scheduled on that day (%s)." % (day_names[appt.x_studio_date.weekday()], appt.x_studio_date.strftime('%Y-%m-%d')))
 ]]></field>
+  </record>
+
+  <record id="action_appointment_reset_service" model="ir.actions.server" context="{'studio': True}">
+    <field name="code"><![CDATA[
+target_records = [env.context['onchange_self']] if env.context.get('onchange_self') else (records if records is not None else [record])
+for rec in target_records:
+    if rec:
+        rec.write({
+            'x_studio_service': False,
+            'x_studio_service_package': False,
+            'x_studio_staff_beautician': False,
+            'x_studio_value': 0.0,
+            'x_studio_duration': 0,
+        })
+]]></field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="state">code</field>
+    <field name="name">Reset Service and Package on Customer Change</field>
+    <field name="usage">base_automation</field>
+  </record>
+
+  <record id="action_appointment_reset_beautician" model="ir.actions.server" context="{'studio': True}">
+    <field name="code"><![CDATA[
+target_records = [env.context['onchange_self']] if env.context.get('onchange_self') else (records if records is not None else [record])
+for rec in target_records:
+    if rec:
+        rec.write({
+            'x_studio_staff_beautician': False,
+        })
+]]></field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="state">code</field>
+    <field name="name">Reset Beautician on Service or Package Change</field>
+    <field name="usage">base_automation</field>
+  </record>
+
+  <record id="action_appointment_reset_fields_on_booking_type_change" model="ir.actions.server" context="{'studio': True}">
+    <field name="code"><![CDATA[
+target_records = [env.context['onchange_self']] if env.context.get('onchange_self') else (records if records is not None else [record])
+for rec in target_records:
+    if rec:
+        rec.write({
+            'x_studio_service_package': False,
+            'x_studio_service': False,
+            'x_studio_staff_beautician': False,
+            'x_studio_duration': False,
+            'x_studio_value': False,
+        })
+]]></field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="state">code</field>
+    <field name="name">Reset Fields on Booking Type Change</field>
+    <field name="usage">base_automation</field>
+  </record>
+
+  <record id="action_service_package_reset_services_on_gender_change" model="ir.actions.server" context="{'studio': True}">
+    <field name="code"><![CDATA[
+target_records = [env.context['onchange_self']] if env.context.get('onchange_self') else (records if records is not None else [record])
+for rec in target_records:
+    if rec:
+        rec.write({
+            'x_studio_many2many_1': [(5, 0, 0)]
+        })
+]]></field>
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="state">code</field>
+    <field name="name">Reset Services on Gender Change</field>
+    <field name="usage">base_automation</field>
   </record>
 </odoo>

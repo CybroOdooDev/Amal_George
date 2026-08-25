@@ -503,7 +503,7 @@
           <field name="x_studio_package_code" required="True" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_gender" required="True" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_many2many_1" widget="many2many_tags" string="Services" required="True" readonly="x_studio_status == 'inactive'" domain="x_studio_gender == 'Male' and [('x_studio_gender', 'in', ['Male', 'Unisex / Male / Female'])] or (x_studio_gender == 'Female' and [('x_studio_gender', 'in', ['Female', 'Unisex / Male / Female'])] or [])"/>
-          <field name="x_studio_staff_ids" widget="many2many_tags" string="Staff" readonly="x_studio_status == 'inactive'"/>
+          <field name="x_studio_staff_ids" widget="many2many_tags" string="Staff" required="True" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_end_date" required="x_studio_limited_time" invisible="not x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
         </xpath>
@@ -1037,11 +1037,15 @@
             </setting>
           </block>
           <block title="Break Time Configuration" name="break_time_config">
-            <setting string="Break Start Time" help="Scheduled daily break start time.">
-              <field name="x_studio_break_start"/>
+            <setting string="Enable Break Time" help="Toggle daily break time.">
+              <field name="x_studio_allow_break"/>
             </setting>
-            <setting string="Break End Time" help="Scheduled daily break end time.">
-              <field name="x_studio_break_end"/>
+            <setting string="Break Interval" help="Scheduled daily break start and end hours." invisible="not x_studio_allow_break">
+              <div class="d-flex align-items-center" style="gap: 8px;">
+                <field name="x_studio_break_start" required="x_studio_allow_break" class="oe_inline"/>
+                <span class="mx-2">to</span>
+                <field name="x_studio_break_end" required="x_studio_allow_break" class="oe_inline"/>
+              </div>
             </setting>
           </block>
         </app>

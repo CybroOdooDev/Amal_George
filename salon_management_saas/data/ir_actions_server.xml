@@ -245,7 +245,7 @@ for record in records:
             raise UserError("Cannot book appointment on %s because Sundays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
             
         # 3. Daily Break Time Check
-        if record.x_studio_time_slot:
+        if record.x_studio_time_slot and env.company.x_studio_allow_break:
             break_start = env.company.x_studio_break_start
             break_end = env.company.x_studio_break_end
             if break_start and break_end:
@@ -558,16 +558,7 @@ for record in records:
     <field name="state">code</field>
     <field name="name">Prevent Weekly Holiday Overlapping Bookings</field>
     <field name="code"><![CDATA[for record in records:
-    # 1. Break Time Sanity Check
-    if record.x_studio_break_start and record.x_studio_break_end:
-        b_start_h, b_start_m = map(int, record.x_studio_break_start.split(':'))
-        b_end_h, b_end_m = map(int, record.x_studio_break_end.split(':'))
-        bs = b_start_h * 60 + b_start_m
-        be = b_end_h * 60 + b_end_m
-        if be <= bs:
-            raise UserError("Break End Time must be strictly later than Break Start Time.")
-
-    # 2. Weekly Holiday Conflict Check
+    # 1. Weekly Holiday Conflict Check
     checked_days = []
     if record.x_studio_holiday_monday: checked_days.append(0)
     if record.x_studio_holiday_tuesday: checked_days.append(1)
@@ -578,13 +569,64 @@ for record in records:
     if record.x_studio_holiday_sunday: checked_days.append(6)
     
     if checked_days:
+        today = datetime.date.today()
         active_appointments = env['x_appointment'].search([
-            ('x_studio_selection_1', 'not in', ['Cancelled'])
+            ('x_studio_selection_1', 'not in', ['Cancelled']),
+            ('x_studio_date', '>=', today)
         ])
         for appt in active_appointments:
             if appt.x_studio_date and appt.x_studio_date.weekday() in checked_days:
                 day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
                 raise UserError("Cannot set %s as a weekly holiday because there is already a booking scheduled on that day (%s)." % (day_names[appt.x_studio_date.weekday()], appt.x_studio_date.strftime('%Y-%m-%d')))
+]]></field>
+  </record>
+
+  <record id="action_config_settings_prevent_break_overlap" model="ir.actions.server" context="{'studio': True}">
+    <field name="model_id" ref="base.model_res_config_settings"/>
+    <field name="state">code</field>
+    <field name="name">Prevent Break Overlapping Bookings on Settings Save</field>
+    <field name="code"><![CDATA[for record in records:
+    # Reset settings fields if disabled
+    if not record.x_studio_allow_break:
+        record.write({
+            'x_studio_break_start': False,
+            'x_studio_break_end': False
+        })
+
+    # 1. Break Time Sanity Check
+    if record.x_studio_allow_break and record.x_studio_break_start and record.x_studio_break_end:
+        b_start_h, b_start_m = map(int, record.x_studio_break_start.split(':'))
+        b_end_h, b_end_m = map(int, record.x_studio_break_end.split(':'))
+        bs = b_start_h * 60 + b_start_m
+        be = b_end_h * 60 + b_end_m
+        if be <= bs:
+            raise UserError("Break End Time must be strictly later than Break Start Time.")
+
+        # Break Time Confirmed Bookings Overlap Check
+        today = datetime.date.today()
+        bookings = env['x_appointment'].search([
+            ('x_studio_selection_1', '=', 'Confirmed'),
+            ('x_studio_date', '>=', today)
+        ])
+        for appt in bookings:
+            if appt.x_studio_time_slot:
+                appt_start_h, appt_start_m = map(int, appt.x_studio_time_slot.split(':'))
+                as_min = appt_start_h * 60 + appt_start_m
+                ae_min = as_min + (appt.x_studio_duration or 30)
+                if as_min < be and bs < ae_min:
+                    # Format time slots nicely for the error message
+                    def format_time_label(val):
+                        h, m = map(int, val.split(':'))
+                        ampm = 'AM' if h < 12 else 'PM'
+                        display_h = h if h <= 12 else h - 12
+                        if display_h == 0: display_h = 12
+                        return "%02d:%02d %s" % (display_h, m, ampm)
+                    
+                    b_start_label = format_time_label(record.x_studio_break_start)
+                    b_end_label = format_time_label(record.x_studio_break_end)
+                    appt_time_label = format_time_label(appt.x_studio_time_slot)
+                    
+                    raise UserError("Conflict: Cannot save break time %s to %s. There is already a confirmed booking scheduled on %s starting at %s (%d mins). Please adjust the break time or the booking." % (b_start_label, b_end_label, appt.x_studio_date.strftime('%Y-%m-%d'), appt_time_label, appt.x_studio_duration or 30))
 ]]></field>
   </record>
 
@@ -653,6 +695,31 @@ for rec in target_records:
     <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
     <field name="state">code</field>
     <field name="name">Reset Services on Gender Change</field>
+    <field name="usage">base_automation</field>
+  </record>
+  <record id="action_appointment_auto_assign_chair" model="ir.actions.server" context="{'studio': True}">
+    <field name="code"><![CDATA[for record in records:
+    if not record.x_studio_chair_num and record.x_studio_start_time and record.x_studio_end_time:
+        # Find all chairs
+        all_chairs = env['x_chair'].search([])
+        # Find chairs that are busy during this time
+        busy_appointments = env['x_appointment'].search([
+            ('id', '!=', record.id),
+            ('x_studio_start_time', '<', record.x_studio_end_time),
+            ('x_studio_end_time', '>', record.x_studio_start_time),
+            ('x_studio_selection_1', 'in', ['Confirmed', 'Completed']),
+            ('x_studio_chair_num', '!=', False)
+        ])
+        busy_chair_ids = busy_appointments.mapped('x_studio_chair_num.id')
+        # Find first free chair
+        free_chairs = [c for c in all_chairs if c.id not in busy_chair_ids]
+        if free_chairs:
+            record.write({'x_studio_chair_num': free_chairs[0].id})
+        else:
+            raise UserError("Sorry, no free chairs are available at this time.")]]></field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="state">code</field>
+    <field name="name">Auto Assign Free Chair on Creation</field>
     <field name="usage">base_automation</field>
   </record>
 </odoo>

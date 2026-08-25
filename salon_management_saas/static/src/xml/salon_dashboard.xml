@@ -64,6 +64,65 @@
                 transform: translateY(-4px);
             }
 
+            /* Subtle Pastel Tint Modifiers for KPI cards */
+            .kpi-bookings {
+                background: #f8f6ff !important;
+                border: 1px solid #ebdfff !important;
+            }
+            .kpi-bookings .neumorphic-btn-circular {
+                background: #f0e6ff !important;
+                border: 1px solid #dfceff !important;
+                color: #7c3aed !important;
+            }
+
+            .kpi-revenue {
+                background: #f4fbf7 !important;
+                border: 1px solid #d3f2e4 !important;
+            }
+            .kpi-revenue .neumorphic-btn-circular {
+                background: #e6f7ef !important;
+                border: 1px solid #c4ecdb !important;
+                color: #0d9488 !important;
+            }
+
+            .kpi-beauticians {
+                background: #fff8f1 !important;
+                border: 1px solid #ffe3c9 !important;
+            }
+            .kpi-beauticians .neumorphic-btn-circular {
+                background: #ffeedb !important;
+                border: 1px solid #ffd2a1 !important;
+                color: #ea580c !important;
+            }
+
+            .kpi-services {
+                background: #f2f8ff !important;
+                border: 1px solid #d4e8fc !important;
+            }
+            .kpi-services .neumorphic-btn-circular {
+                background: #e5f1ff !important;
+                border: 1px solid #c2dfff !important;
+                color: #2563eb !important;
+            }
+
+            .kpi-chairs {
+                background: #fffcf0 !important;
+                border: 1px solid #ffeeb5 !important;
+            }
+            .kpi-chairs .neumorphic-btn-circular {
+                background: #fff6d1 !important;
+                border: 1px solid #ffe89e !important;
+                color: #ca8a04 !important;
+            }
+
+            .kpi-active-range {
+                background: #f2fdfd !important;
+                border: 1px solid #d1f7f7 !important;
+            }
+            .kpi-active-range .neumorphic-select, .kpi-active-range .neumorphic-input {
+                background-color: #ffffff !important;
+            }
+
             /* Navy Spotlight Card */
             .neumorphic-card-spotlight {
                 background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
@@ -258,49 +317,44 @@
                         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5">
                             <!-- Bookings -->
                             <div class="col mb-3 mb-lg-0">
-                                <div class="neumorphic-card d-flex flex-column justify-content-between" style="padding: 16px;">
+                                <div class="neumorphic-card kpi-bookings d-flex flex-column justify-content-center" style="padding: 16px; min-height: 110px;">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <div class="text-xs font-weight-bold text-uppercase mb-2" style="color: #64748b; font-size: 0.7rem; letter-spacing: 0.08em; font-weight: 700;">Bookings</div>
                                             <div class="h4 mb-0 font-weight-bold" style="font-size: 1.8rem; font-weight: 800; color: #1e293b;"><t t-esc="this.state.today_bookings"/></div>
                                         </div>
                                         <div class="neumorphic-btn-circular" style="pointer-events: none; width: 42px !important; height: 42px !important;">
-                                            <i class="fa fa-calendar" style="font-size: 1.1rem; color: #8b5cf6;"></i>
+                                            <i class="fa fa-calendar" style="font-size: 1.1rem;"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Revenue (Spotlight Navy Card) -->
+                            <!-- Revenue -->
                             <div class="col mb-3 mb-lg-0">
-                                <div class="neumorphic-card-spotlight d-flex flex-column justify-content-between" style="padding: 16px;">
+                                <div class="neumorphic-card kpi-revenue d-flex flex-column justify-content-center" style="padding: 16px; min-height: 110px;">
                                     <div class="d-flex align-items-center justify-content-between" style="position: relative; z-index: 2;">
                                         <div>
-                                            <div class="text-xs font-weight-bold text-uppercase mb-2" style="color: rgba(255, 255, 255, 0.6); font-size: 0.7rem; letter-spacing: 0.08em; font-weight: 700;">Revenue</div>
-                                            <div class="h4 mb-0 font-weight-bold" style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">$<t t-esc="this.state.monthly_revenue.toFixed(2)"/></div>
+                                            <div class="text-xs font-weight-bold text-uppercase mb-2" style="color: #64748b; font-size: 0.7rem; letter-spacing: 0.08em; font-weight: 700;">Revenue</div>
+                                            <div class="h4 mb-0 font-weight-bold" style="font-size: 1.8rem; font-weight: 800; color: #1e293b;">$<t t-esc="this.state.monthly_revenue.toFixed(2)"/></div>
                                         </div>
-                                        <div class="neumorphic-btn-circular" style="pointer-events: none; width: 42px !important; height: 42px !important; background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: #ffffff !important;">
-                                            <i class="fa fa-usd" style="font-size: 1.1rem; color: #ffffff;"></i>
+                                        <div class="neumorphic-btn-circular" style="pointer-events: none; width: 42px !important; height: 42px !important;">
+                                            <i class="fa fa-usd" style="font-size: 1.1rem;"></i>
                                         </div>
                                     </div>
-                                    <!-- Embedded Cyan Wave Line Path at the bottom -->
-                                    <svg viewBox="0 0 100 30" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 35px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; opacity: 0.85; pointer-events: none; z-index: 1;">
-                                        <path d="M0,20 Q25,5 50,20 T100,10 L100,30 L0,30 Z" fill="#06b6d4" opacity="0.15"/>
-                                        <path d="M0,20 Q25,5 50,20 T100,10" fill="none" stroke="#06b6d4" stroke-width="2"/>
-                                    </svg>
                                 </div>
                             </div>
 
                             <!-- Beauticians -->
                             <div class="col mb-3 mb-lg-0">
-                                <div class="neumorphic-card d-flex flex-column justify-content-between" style="padding: 16px;">
+                                <div class="neumorphic-card kpi-beauticians d-flex flex-column justify-content-center" style="padding: 16px; min-height: 110px;">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <div class="text-xs font-weight-bold text-uppercase mb-2" style="color: #64748b; font-size: 0.7rem; letter-spacing: 0.08em; font-weight: 700;">Beauticians</div>
                                             <div class="h4 mb-0 font-weight-bold" style="font-size: 1.8rem; font-weight: 800; color: #1e293b;"><t t-esc="this.state.employees ? this.state.employees.length : 0"/></div>
                                         </div>
                                         <div class="neumorphic-btn-circular" style="pointer-events: none; width: 42px !important; height: 42px !important;">
-                                            <i class="fa fa-users" style="font-size: 1.1rem; color: #8b5cf6;"></i>
+                                            <i class="fa fa-users" style="font-size: 1.1rem;"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -308,14 +362,14 @@
 
                             <!-- Services Rendered -->
                             <div class="col mb-3 mb-lg-0">
-                                <div class="neumorphic-card d-flex flex-column justify-content-between" style="padding: 16px;">
+                                <div class="neumorphic-card kpi-services d-flex flex-column justify-content-center" style="padding: 16px; min-height: 110px;">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <div class="text-xs font-weight-bold text-uppercase mb-2" style="color: #64748b; font-size: 0.7rem; letter-spacing: 0.08em; font-weight: 700;">Services</div>
                                             <div class="h4 mb-0 font-weight-bold" style="font-size: 1.8rem; font-weight: 800; color: #1e293b;"><t t-esc="this.state.services_rendered"/></div>
                                         </div>
                                         <div class="neumorphic-btn-circular" style="pointer-events: none; width: 42px !important; height: 42px !important;">
-                                            <i class="fa fa-cogs" style="font-size: 1.1rem; color: #8b5cf6;"></i>
+                                            <i class="fa fa-cogs" style="font-size: 1.1rem;"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -323,14 +377,14 @@
 
                             <!-- Active Chairs -->
                             <div class="col mb-3 mb-lg-0">
-                                <div class="neumorphic-card d-flex flex-column justify-content-between" style="padding: 16px;">
+                                <div class="neumorphic-card kpi-chairs d-flex flex-column justify-content-center" style="padding: 16px; min-height: 110px;">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <div class="text-xs font-weight-bold text-uppercase mb-2" style="color: #64748b; font-size: 0.7rem; letter-spacing: 0.08em; font-weight: 700;">Chairs</div>
                                             <div class="h4 mb-0 font-weight-bold" style="font-size: 1.8rem; font-weight: 800; color: #1e293b;"><t t-esc="this.state.active_chairs"/></div>
                                         </div>
                                         <div class="neumorphic-btn-circular" style="pointer-events: none; width: 42px !important; height: 42px !important;">
-                                            <i class="fa fa-scissors" style="font-size: 1.1rem; color: #8b5cf6;"></i>
+                                            <img src="/salon_management_saas/static/src/img/chair_active.svg" style="width: 22px; height: 22px;" alt="Chairs"/>
                                         </div>
                                     </div>
                                 </div>
@@ -340,7 +394,7 @@
 
                     <!-- Right: Small Filter Card -->
                     <div class="col-xl-3 col-lg-4">
-                        <div class="neumorphic-card d-flex flex-column justify-content-center" style="padding: 12px 20px;">
+                        <div class="neumorphic-card d-flex flex-column justify-content-center" style="padding: 12px 20px; min-height: 110px;">
                             <div class="d-flex flex-column" style="flex-grow: 1; justify-content: center;">
                                 <span class="text-muted small mb-1" style="font-weight: 700; color: #64748b; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;">Active Range</span>
                                 <select class="form-select neumorphic-select w-100" t-att-value="this.state.date_filter" t-on-change="(ev) => this.onDateFilterChange(ev)" style="padding: 6px 12px !important; font-size: 0.85rem !important; height: 38px !important;">
@@ -351,6 +405,7 @@
                                     <option value="all_time">All Time</option>
                                     <option value="custom">Custom</option>
                                 </select>
+
 
                                 <!-- Custom date pickers inline side-by-side -->
                                 <t t-if="this.state.date_filter == 'custom'">
@@ -442,7 +497,7 @@
                                                 <td style="font-weight: 700; color: #1e293b; padding: 10px 14px !important;"><t t-esc="booking.x_name"/></td>
                                                 <td style="padding: 10px 14px !important;"><span class="badge" style="background: #f1f5f9; color: #8b5cf6; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.03); border-radius: 8px; padding: 4px 8px; font-weight: 600;"><t t-esc="booking.x_studio_time_slot"/></span></td>
                                                 <td style="padding: 10px 14px !important;"><t t-esc="booking.x_studio_staff_beautician ? booking.x_studio_staff_beautician[1] : 'N/A'"/></td>
-                                                <td style="font-weight: 700; color: #8b5cf6; padding: 10px 14px !important;">$<t t-esc="booking.x_studio_value"/></td>
+                                                <td style="font-weight: 700; color: #8b5cf6; padding: 10px 14px !important;">$<t t-esc="(booking.x_studio_value || 0).toFixed(2)"/></td>
                                             </tr>
                                         </t>
                                         <t t-if="this.state.today_bookings_list.length == 0">
@@ -532,7 +587,7 @@
                                     
                                     <!-- Segments -->
                                     <t t-foreach="this.state.polar_paths" t-as="p" t-key="p.name">
-                                        <path t-att-d="p.path.replace('100 100', '100 95').replace(' 100 L', ' 95 L')" t-att-fill="p.color" fill-opacity="0.75">
+                                        <path t-att-d="p.path" t-att-fill="p.color" fill-opacity="0.75">
                                             <title><t t-esc="p.name"/>: <t t-esc="p.count"/> bookings</title>
                                         </path>
                                     </t>
@@ -585,10 +640,10 @@
                                     <polygon t-att-points="this.state.radar_points_2" fill="#8b5cf6" fill-opacity="0.15" stroke="#8b5cf6" stroke-width="2.5" stroke-dasharray="3,3" stroke-linejoin="round"/>
                                 </svg>
                                 <div class="mt-2 text-center" style="color: #64748b; font-size: 0.75rem; font-weight: 600;">
-                                    <span class="mr-3">
+                                    <span t-if="this.state.radar_employee_1_name" class="mr-3">
                                         <i class="fa fa-circle mr-1" style="color: #3b82f6;"></i> <t t-esc="this.state.radar_employee_1_name"/>
                                     </span>
-                                    <span>
+                                    <span t-if="this.state.radar_employee_2_name">
                                         <i class="fa fa-circle mr-1" style="color: #8b5cf6;"></i> <t t-esc="this.state.radar_employee_2_name"/>
                                     </span>
                                 </div>

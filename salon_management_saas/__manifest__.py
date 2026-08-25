@@ -5,7 +5,7 @@
                 'It contains the apps created with Studio and the '
                 'customizations of existing apps.',
  'author': 'YourCompany',
- 'depends': ['account_reports', 'hr', 'hr_skills', 'web_grid', 'web_studio'],
+ 'depends': ['account_reports', 'hr', 'hr_skills', 'web_grid', 'web_studio', 'website'],
  'data': ['data/ir_model.xml',
           'data/ir_model_fields.xml',
           'data/mail_templates.xml',
@@ -17,12 +17,16 @@
           'data/ir_access.xml',
           'data/ir_sequence_data.xml',
           'data/ir_default.xml',
-          'data/report_booking.xml'],
+          'data/report_booking.xml',
+          'data/website_booking_templates.xml'],
  'demo': ['demo/salon_demo.xml'],
  'assets': {
      'web.assets_backend': [
          'salon_management_saas/static/src/js/salon_dashboard.js',
          'salon_management_saas/static/src/xml/salon_dashboard.xml',
+     ],
+     'web.assets_frontend': [
+         'salon_management_saas/static/src/js/website_booking.js',
      ]
  },
  'license': 'OPL-1'}

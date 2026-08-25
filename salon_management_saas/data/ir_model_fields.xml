@@ -185,6 +185,16 @@
     <field name="on_delete" eval="False"/>
     <field name="tracking">2</field>
   </record>
+  <record id="field_res_partner_x_studio_gender" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Gender</field>
+    <field name="model">res.partner</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_studio_gender</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
+  </record>
   <record id="field_x_appointment_x_studio_partner_gender" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
     <field name="related">x_studio_partner_id.x_studio_gender</field>
@@ -194,6 +204,15 @@
     <field name="name">x_studio_partner_gender</field>
     <field name="on_delete" eval="False"/>
     <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
+  </record>
+  <record id="new_many2one_appoint_813909af-f255-47a7-a4d4-469c8d9f5ae0" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Service</field>
+    <field name="model">x_appointment</field>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">x_studio_service</field>
+    <field name="relation">x_service</field>
   </record>
   <record id="field_x_appointment_x_studio_service_category" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2one</field>
@@ -252,15 +271,6 @@
     <field name="on_delete" eval="False"/>
     <field name="tracking">1</field>
     <field name="currency_field">x_studio_currency_id</field>
-  </record>
-  <record id="new_many2one_appoint_813909af-f255-47a7-a4d4-469c8d9f5ae0" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Service</field>
-    <field name="model">x_appointment</field>
-    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
-    <field name="name">x_studio_service</field>
-    <field name="relation">x_service</field>
   </record>
   <record id="new_many2one_appoint_277843ef-cb86-43a1-89b3-0e2a2682f89f" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2one</field>
@@ -420,7 +430,7 @@
   </record>
   <record id="active_service_packa_c6d0e645-6116-446c-a93a-7088b49130fd" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
+    <field name="copied" eval="False"/>
     <field name="field_description">Active</field>
     <field name="model">x_service_package</field>
     <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
@@ -568,16 +578,6 @@
     <field name="name">x_studio_appointment_id</field>
     <field name="relation">x_appointment</field>
   </record>
-  <record id="field_res_partner_x_studio_gender" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">selection</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Gender</field>
-    <field name="model">res.partner</field>
-    <field name="model_id" ref="base.model_res_partner"/>
-    <field name="name">x_studio_gender</field>
-    <field name="on_delete" eval="False"/>
-    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
-  </record>
   <record id="field_res_partner_x_studio_birth_date" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">date</field>
     <field name="copied" eval="True"/>
@@ -707,7 +707,7 @@ for record in self:
   </record>
   <record id="field_x_appointment_x_studio_time_slot" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
-    <field name="copied" eval="True"/>
+    <field name="copied" eval="False"/>
     <field name="field_description">Time Slot</field>
     <field name="model">x_appointment</field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
@@ -880,6 +880,14 @@ for record in self:
     <field name="readonly" eval="False"/>
   </record>
   <!-- res.company fields -->
+  <record id="field_res_company_x_studio_allow_break" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Allow Break Time</field>
+    <field name="model">res.company</field>
+    <field name="model_id" ref="base.model_res_company"/>
+    <field name="name">x_studio_allow_break</field>
+  </record>
   <record id="field_res_company_x_studio_break_start" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
     <field name="copied" eval="True"/>
@@ -900,6 +908,16 @@ for record in self:
   </record>
 
   <!-- res.config.settings fields -->
+  <record id="field_res_config_settings_x_studio_allow_break" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Allow Break Time</field>
+    <field name="model">res.config.settings</field>
+    <field name="model_id" ref="base.model_res_config_settings"/>
+    <field name="name">x_studio_allow_break</field>
+    <field name="related">company_id.x_studio_allow_break</field>
+    <field name="readonly" eval="False"/>
+  </record>
   <record id="field_res_config_settings_x_studio_break_start" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
     <field name="copied" eval="True"/>

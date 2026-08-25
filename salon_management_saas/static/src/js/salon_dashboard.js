@@ -10,7 +10,7 @@ class SalonDashboard extends Component {
     setup() {
         super.setup();
         this.orm = useService("orm");
-        
+
         this.state = proxy({
             today_bookings: 0,
             monthly_revenue: 0,
@@ -26,6 +26,7 @@ class SalonDashboard extends Component {
             date_filter: "this_month",
             custom_start_date: "",
             custom_end_date: "",
+            staff_filter: "all",
 
             // Lookup records
             employees: [],
@@ -167,8 +168,8 @@ class SalonDashboard extends Component {
                 }
             }
 
-            // Filter for Confirmed bookings by default to show actual realized metrics
-            domain.push(["x_studio_selection_1", "=", "Confirmed"]);
+            // Filter for Confirmed & Completed bookings by default to show actual realized metrics
+            domain.push(["x_studio_selection_1", "in", ["Confirmed", "Completed"]]);
 
             // 1. Fetch all appointments matching filters
             let appointments;
@@ -176,25 +177,56 @@ class SalonDashboard extends Component {
                 appointments = await this.orm.searchRead(
                     "x_appointment",
                     domain,
-                    ["x_studio_value", "x_studio_service", "x_studio_date", "x_studio_time_slot", "x_studio_chair_num", "x_studio_staff_beautician", "x_studio_service_package"]
+                    ["x_studio_value", "x_studio_service", "x_studio_date", "x_studio_time_slot", "x_studio_chair_num", "x_studio_staff_beautician", "x_studio_service_package", "x_studio_invoice_1"]
                 );
             } catch (err) {
                 console.error("Failed to search x_appointment", err);
                 throw new Error(`Failed to load Appointments data: ${err.message || err.toString()}`);
             }
 
+            // Fetch related invoices
+            const invoiceIds = appointments.map(a => a.x_studio_invoice_1 ? a.x_studio_invoice_1[0] : null).filter(id => id !== null);
+            let invoices = [];
+            if (invoiceIds.length > 0) {
+                try {
+                    invoices = await this.orm.searchRead(
+                        "account.move",
+                        [["id", "in", invoiceIds]],
+                        ["id", "state", "payment_state", "amount_total"]
+                    );
+                } catch (err) {
+                    console.error("Failed to search account.move", err);
+                    throw new Error(`Failed to load Invoice data: ${err.message || err.toString()}`);
+                }
+            }
+            const invoiceMap = {};
+            for (const inv of invoices) {
+                invoiceMap[inv.id] = inv;
+            }
+
             // Calculate Bookings count
             this.state.today_bookings = appointments.length;
 
-            // Calculate Total Revenue
+            // Calculate Total Revenue from posted & paid invoices
             let totalRevenue = 0;
+            let paidBookingsCount = 0;
+            const paidInvoices = new Set();
             for (const appt of appointments) {
-                totalRevenue += appt.x_studio_value || 0;
+                if (appt.x_studio_invoice_1) {
+                    const inv = invoiceMap[appt.x_studio_invoice_1[0]];
+                    if (inv && inv.state === "posted" && inv.payment_state === "paid") {
+                        paidBookingsCount++;
+                        if (!paidInvoices.has(inv.id)) {
+                            paidInvoices.add(inv.id);
+                            totalRevenue += inv.amount_total || 0;
+                        }
+                    }
+                }
             }
             this.state.monthly_revenue = Math.round(totalRevenue * 100) / 100;
 
-            // Calculate Average Ticket Value (ATV)
-            this.state.avg_ticket_value = appointments.length > 0 ? Math.round(totalRevenue / appointments.length) : 0;
+            // Calculate Average Ticket Value (ATV) based on paid bookings
+            this.state.avg_ticket_value = paidBookingsCount > 0 ? Math.round(totalRevenue / paidBookingsCount) : 0;
 
             // Calculate Services (total registered services in lookups)
             this.state.services_rendered = this.services ? this.services.length : 0;
@@ -210,7 +242,15 @@ class SalonDashboard extends Component {
                         staffStats[staffId] = { name: staffName, bookings: 0, revenue: 0 };
                     }
                     staffStats[staffId].bookings++;
-                    staffStats[staffId].revenue += appt.x_studio_value || 0;
+                    
+                    let revVal = 0;
+                    if (appt.x_studio_invoice_1) {
+                        const inv = invoiceMap[appt.x_studio_invoice_1[0]];
+                        if (inv && inv.state === "posted" && inv.payment_state === "paid") {
+                            revVal = inv.amount_total || 0;
+                        }
+                    }
+                    staffStats[staffId].revenue += revVal;
                 }
             }
             this.state.beautician_rankings = Object.values(staffStats)
@@ -260,12 +300,19 @@ class SalonDashboard extends Component {
             const categoryBookings = {};
             let totalCategoryRev = 0;
             for (const appt of appointments) {
-                const val = appt.x_studio_value || 0;
                 const srv = appt.x_studio_service;
                 const catName = srv ? (serviceToCategory[srv[0]] || "Other Care") : "Other Care";
-                categoryRev[catName] = (categoryRev[catName] || 0) + val;
+                
+                let revVal = 0;
+                if (appt.x_studio_invoice_1) {
+                    const inv = invoiceMap[appt.x_studio_invoice_1[0]];
+                    if (inv && inv.state === "posted" && inv.payment_state === "paid") {
+                        revVal = inv.amount_total || 0;
+                    }
+                }
+                categoryRev[catName] = (categoryRev[catName] || 0) + revVal;
                 categoryBookings[catName] = (categoryBookings[catName] || 0) + 1;
-                totalCategoryRev += val;
+                totalCategoryRev += revVal;
             }
 
             const catRankings = Object.keys(categoryRev).map(cat => ({
@@ -309,7 +356,14 @@ class SalonDashboard extends Component {
             for (const appt of appointments) {
                 const dt = appt.x_studio_date;
                 if (dt) {
-                    dateMap[dt] = (dateMap[dt] || 0) + (appt.x_studio_value || 0);
+                    let revVal = 0;
+                    if (appt.x_studio_invoice_1) {
+                        const inv = invoiceMap[appt.x_studio_invoice_1[0]];
+                        if (inv && inv.state === "posted" && inv.payment_state === "paid") {
+                            revVal = inv.amount_total || 0;
+                        }
+                    }
+                    dateMap[dt] = (dateMap[dt] || 0) + revVal;
                 }
             }
 
@@ -368,13 +422,30 @@ class SalonDashboard extends Component {
 
             // Compute Radar Chart (Beautician Competency)
             const staffApptCounts = {};
+            const staffRevenues = {};
             for (const appt of appointments) {
                 const staff = appt.x_studio_staff_beautician;
                 if (staff) {
                     staffApptCounts[staff[0]] = (staffApptCounts[staff[0]] || 0) + 1;
+                    
+                    let revVal = 0;
+                    if (appt.x_studio_invoice_1) {
+                        const inv = invoiceMap[appt.x_studio_invoice_1[0]];
+                        if (inv && inv.state === "posted" && inv.payment_state === "paid") {
+                            revVal = inv.amount_total || 0;
+                        }
+                    }
+                    staffRevenues[staff[0]] = (staffRevenues[staff[0]] || 0) + revVal;
                 }
             }
-            const sortedStaffIds = Object.keys(staffApptCounts).sort((a, b) => staffApptCounts[b] - staffApptCounts[a]);
+            const sortedStaffIds = Object.keys(staffApptCounts).sort((a, b) => {
+                const revA = staffRevenues[a] || 0;
+                const revB = staffRevenues[b] || 0;
+                if (revB !== revA) {
+                    return revB - revA;
+                }
+                return staffApptCounts[b] - staffApptCounts[a];
+            });
 
             let emp1Id, emp2Id;
             let emp1Name = "";
@@ -400,37 +471,45 @@ class SalonDashboard extends Component {
             this.state.radar_employee_1_name = emp1Name;
             this.state.radar_employee_2_name = emp2Name;
 
-            const categories = ["Hair Care", "Skin Care", "Nail Care", "Massage Therapy", "Makeup & Styling"];
+            const categories = ["Hair Care", "Nail Care", "Makeup & Styling", "Skin Care", "Massage Therapy"];
             const emp1Data = [0, 0, 0, 0, 0];
             const emp2Data = [0, 0, 0, 0, 0];
 
             for (const appt of appointments) {
                 const srv = appt.x_studio_service;
-                const val = appt.x_studio_value || 0;
                 const staff = appt.x_studio_staff_beautician;
                 const catName = srv ? (serviceToCategory[srv[0]] || "Other Care") : "Other Care";
                 const catIdx = categories.indexOf(catName);
                 if (catIdx !== -1) {
                     if (staff) {
                         const staffId = staff[0];
+                        let revVal = 0;
+                        if (appt.x_studio_invoice_1) {
+                            const inv = invoiceMap[appt.x_studio_invoice_1[0]];
+                            if (inv && inv.state === "posted" && inv.payment_state === "paid") {
+                                revVal = inv.amount_total || 0;
+                            }
+                        }
                         if (this.state.staff_filter !== "all") {
                             if (staffId === emp1Id) {
-                                emp1Data[catIdx] += val;
+                                emp1Data[catIdx] += revVal;
                             } else {
-                                emp2Data[catIdx] += val;
+                                emp2Data[catIdx] += revVal;
                             }
                         } else {
-                            if (staffId === emp1Id) emp1Data[catIdx] += val;
-                            if (staffId === emp2Id) emp2Data[catIdx] += val;
+                            if (staffId === emp1Id) emp1Data[catIdx] += revVal;
+                            if (staffId === emp2Id) emp2Data[catIdx] += revVal;
                         }
                     }
                 }
             }
 
-            if (this.state.staff_filter !== "all" && sortedStaffIds.length > 1) {
-                const othersCount = sortedStaffIds.length - 1;
-                for (let i = 0; i < 5; i++) {
-                    emp2Data[i] = emp2Data[i] / othersCount;
+            if (this.state.staff_filter !== "all") {
+                const othersCount = sortedStaffIds.filter(id => parseInt(id) !== emp1Id).length;
+                if (othersCount > 0) {
+                    for (let i = 0; i < 5; i++) {
+                        emp2Data[i] = emp2Data[i] / othersCount;
+                    }
                 }
             }
 

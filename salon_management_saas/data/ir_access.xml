@@ -60,4 +60,28 @@
     <field name="name">Chair group_user</field>
     <field name="operation">cru</field>
   </record>
+  <record id="appointment_group_public" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_public"/>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">Appointment group_public</field>
+    <field name="operation">cr</field>
+  </record>
+  <record id="service_package_group_public" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_public"/>
+    <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
+    <field name="name">Service Package group_public</field>
+    <field name="operation">r</field>
+  </record>
+  <record id="service_group_public" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_public"/>
+    <field name="model_id" ref="service_5786dd1a-49e9-4766-9e35-0068d351443e"/>
+    <field name="name">Service group_public</field>
+    <field name="operation">r</field>
+  </record>
+  <record id="access_hr_employee_public" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_public"/>
+    <field name="model_id" ref="hr.model_hr_employee"/>
+    <field name="name">Employee group_public</field>
+    <field name="operation">r</field>
+  </record>
 </odoo>

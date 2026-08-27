@@ -1,300 +1,335 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Template for the Booking Page -->
-    <template id="salon_booking_page_template" name="Salon Booking Portal">
-        <t t-call="website.layout">
-            <div id="wrap" class="oe_structure oe_empty">
-                <!-- Custom booking container -->
-                <div class="container py-5">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8 col-md-10">
-                            <!-- Styled clean card with subtle premium accents -->
-                            <div class="card border shadow-sm transition-all duration-300 hover-shadow" style="border-radius: 20px; overflow: hidden; background: #ffffff; border-color: #e2e8f0;">
-                                <div class="p-5 text-center border-bottom" style="background: linear-gradient(135deg, #f5f3ff 0%, #fdf2f8 100%);">
-                                    <h2 class="mb-2 font-weight-bold" style="font-weight: 800; color: #4c1d95; font-size: 2rem; letter-spacing: -0.02em;">Book an Appointment</h2>
-                                    <p class="mb-0 text-muted" style="font-size: 1rem;">Select a service, date, and time slot to reserve your spot.</p>
-                                </div>
-                                <div class="card-body p-5">
-                                    <form action="/website/form/x_appointment" method="post" class="s_website_form container-fluid" enctype="multipart/form-data" data-model_name="x_appointment" data-success_page="/booking/success">
-                                        <!-- Step 1: Select Service Package -->
-                                        <div class="form-group mb-4">
-                                            <label for="x_studio_service_package" class="form-label font-weight-bold text-muted small text-uppercase" style="letter-spacing: 0.08em; font-weight: 700;">1. Select Service Package</label>
-                                            <select name="x_studio_service_package" id="x_studio_service_package" class="form-select form-control custom-select-styled" required="required">
-                                                <option value="">Choose a Service Package...</option>
-                                                <t t-foreach="request.env['x_service_package'].sudo().search([('x_studio_status', '=', 'active')])" t-as="pkg">
-                                                    <option t-att-value="pkg.id"><t t-out="pkg.x_name"/> - $<t t-out="pkg.x_studio_value"/></option>
-                                                </t>
-                                            </select>
-                                        </div>
+    <!-- ========== Booking Page Record (website.page) ========== -->
+    <record id="salon_booking_website_page" model="website.page">
+        <field name="name">Salon Booking Portal</field>
+        <field name="type">qweb</field>
+        <field name="url">/salon-booking</field>
+        <field name="website_indexed" eval="True"/>
+        <field name="is_published">True</field>
+        <field name="key">salon_management_saas.salon_booking_website_page</field>
+        <field name="arch" type="xml">
+            <t name="Salon Booking Portal" t-name="salon_management_saas.salon_booking_website_page">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <div class="container py-5">
+                            <div class="row">
+                                <!-- Left Column: Interactive Form -->
+                                <div class="col-lg-8">
+                                    <h2 class="font-weight-bold mb-4" style="font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">Book Appointment</h2>
 
-                                        <!-- Step 2: Select Beautician -->
-                                        <div class="form-group mb-4">
-                                            <label for="x_studio_staff_beautician" class="form-label font-weight-bold text-muted small text-uppercase" style="letter-spacing: 0.08em; font-weight: 700;">2. Select Beautician</label>
-                                            <select name="x_studio_staff_beautician" id="x_studio_staff_beautician" class="form-select form-control custom-select-styled" required="required">
-                                                <option value="">Choose a Beautician...</option>
-                                                <t t-foreach="request.env['hr.employee'].sudo().search([])" t-as="emp">
-                                                    <option t-att-value="emp.id"><t t-out="emp.name"/></option>
-                                                </t>
-                                            </select>
-                                        </div>
-
-                                        <!-- Step 3: Select Date -->
-                                        <div class="form-group mb-4">
-                                            <label for="x_studio_date" class="form-label font-weight-bold text-muted small text-uppercase" style="letter-spacing: 0.08em; font-weight: 700;">3. Select Date</label>
-                                            <input type="date" name="x_studio_date" id="x_studio_date" class="form-control custom-input-styled" required="required"/>
-                                        </div>
-
-                                        <!-- Step 4: Select Time Slot -->
-                                        <div class="form-group mb-4">
-                                            <label for="x_studio_time_slot" class="form-label font-weight-bold text-muted small text-uppercase" style="letter-spacing: 0.08em; font-weight: 700;">4. Select Time Slot</label>
-                                            <select name="x_studio_time_slot" id="x_studio_time_slot" class="form-select form-control custom-select-styled" required="required">
-                                                <option value="">Choose date/beautician first...</option>
-                                            </select>
-                                        </div>
-
-                                        <!-- Step 5: Customer Contact -->
-                                        <div class="form-group mb-4">
-                                            <label for="x_studio_partner_id" class="form-label font-weight-bold text-muted small text-uppercase" style="letter-spacing: 0.08em; font-weight: 700;">5. Customer Contact</label>
-                                            <select name="x_studio_partner_id" id="x_studio_partner_id" class="form-select form-control custom-select-styled" required="required">
-                                                <t t-foreach="request.env.user.partner_id" t-as="partner">
-                                                    <option t-att-value="partner.id" t-att-selected="true"><t t-out="partner.name"/></option>
-                                                </t>
-                                            </select>
-                                        </div>
-
-                                        <!-- Hidden input to confirm the booking directly -->
+                                    <form id="salon_booking_form" method="post" class="container-fluid p-0">
+                                        <!-- Hidden Inputs to bind selected values -->
+                                        <input type="hidden" name="x_studio_booking_type" id="x_studio_booking_type" value=""/>
+                                        <input type="hidden" name="x_studio_service" id="x_studio_service" value=""/>
+                                        <input type="hidden" name="x_studio_service_package" id="x_studio_service_package" value=""/>
+                                        <input type="hidden" name="x_studio_date" id="x_studio_date" value=""/>
+                                        <input type="hidden" name="x_studio_time_slot" id="x_studio_time_slot" value=""/>
+                                        <input type="hidden" name="x_studio_chair_num" id="x_studio_chair_num" value=""/>
+                                        <input type="hidden" name="x_studio_staff_beautician" id="x_studio_staff_beautician" value=""/>
+                                        <input type="hidden" name="x_studio_partner_id" id="x_studio_partner_id" t-att-value="request.env.user.partner_id.id"/>
                                         <input type="hidden" name="x_studio_selection_1" value="Confirmed"/>
 
+                                        <!-- Step 1: Booking Type Pills -->
+                                        <div class="mb-4">
+                                            <label class="salon-label">1. Booking Type</label>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-outline-primary booking-type-pill py-2 px-4" data-value="service" style="border-radius: 20px; font-weight: 600;">Service</button>
+                                                <button type="button" class="btn btn-outline-primary booking-type-pill py-2 px-4" data-value="package" style="border-radius: 20px; font-weight: 600;">Service Package</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2a: Services Grid (Conditional) -->
+                                        <div class="mb-4" id="service_group" style="display: none;">
+                                            <label class="salon-label">2. Select Service</label>
+                                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                                <t t-foreach="request.env['x_service'].sudo().search([('x_active', '=', True)])" t-as="srv">
+                                                    <div class="col">
+                                                        <div class="card h-100 service-card-pill border" t-att-data-id="srv.id"
+                                                             t-att-data-duration="srv.x_studio_duration_minutes"
+                                                             t-att-data-price="srv.x_studio_value"
+                                                             t-att-data-name="srv.x_name"
+                                                             t-att-data-category_id="srv.x_studio_service_category.id"
+                                                             style="cursor: pointer; border-radius: 12px; transition: all 0.2s;">
+                                                            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <h6 class="font-weight-bold mb-1" style="color: #334155;"><t t-out="srv.x_name"/></h6>
+                                                                    <span class="text-muted small"><t t-out="srv.x_studio_duration_minutes"/> mins</span>
+                                                                </div>
+                                                                <div class="text-primary font-weight-bold">$<t t-out="srv.x_studio_value"/></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2b: Packages Grid (Conditional) -->
+                                        <div class="mb-4" id="package_group" style="display: none;">
+                                            <label class="salon-label">2. Select Service Package</label>
+                                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                                <t t-foreach="request.env['x_service_package'].sudo().search([('x_studio_status', '=', 'active')])" t-as="pkg">
+                                                    <div class="col">
+                                                        <div class="card h-100 package-card-pill border" t-att-data-id="pkg.id"
+                                                             t-att-data-duration="sum(s.x_studio_duration_minutes or 0 for s in pkg.x_studio_many2many_1)"
+                                                             t-att-data-price="pkg.x_studio_value"
+                                                             t-att-data-name="pkg.x_name"
+                                                             t-att-data-staff_ids="','.join(map(str, pkg.x_studio_staff_ids.ids))"
+                                                             style="cursor: pointer; border-radius: 12px; transition: all 0.2s;">
+                                                            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <h6 class="font-weight-bold mb-1" style="color: #334155;"><t t-out="pkg.x_name"/></h6>
+                                                                    <span class="text-muted small">Package</span>
+                                                                </div>
+                                                                <div class="text-primary font-weight-bold">$<t t-out="pkg.x_studio_value"/></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2.5: Select Beautician (Dropdown) -->
+                                        <div class="mb-4" id="beautician_group" style="display: none;">
+                                            <label class="salon-label">2.5. Preferred Beautician</label>
+                                            <select class="form-control" id="beautician_select" style="border-radius: 10px; max-width: 480px; height: auto; padding: 10px;">
+                                                <option value="">Choose a Beautician...</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Step 3: Inline Date Picker Calendar -->
+                                        <div class="mb-4" id="calendar_group" style="display: none;">
+                                            <label class="salon-label">3. Select Date</label>
+                                            <div class="card border p-3 shadow-sm mx-0" style="border-radius: 15px; max-width: 480px;">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <button type="button" class="btn btn-sm btn-light" id="prev_month" style="border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">&lt;</button>
+                                                    <h5 class="mb-0 font-weight-bold text-dark" id="calendar_title">August 2026</h5>
+                                                    <button type="button" class="btn btn-sm btn-light" id="next_month" style="border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">&gt;</button>
+                                                </div>
+                                                <div class="calendar-grid">
+                                                    <div class="calendar-header-day">Sun</div>
+                                                    <div class="calendar-header-day">Mon</div>
+                                                    <div class="calendar-header-day">Tue</div>
+                                                    <div class="calendar-header-day">Wed</div>
+                                                    <div class="calendar-header-day">Thu</div>
+                                                    <div class="calendar-header-day">Fri</div>
+                                                    <div class="calendar-header-day">Sat</div>
+                                                    <!-- Dynamic calendar days -->
+                                                    <div id="calendar_days" class="d-contents"></div>
+                                                </div>
+                                                <small id="date_feedback" class="text-danger mt-2 d-block" style="display: none;"></small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 4: Pick a Time (Pills) -->
+                                        <div class="mb-4" id="slot_group" style="display: none;">
+                                            <label class="salon-label">4. Pick a Time</label>
+                                            <div class="d-flex flex-wrap gap-2" id="slot_pills_container">
+                                                <!-- Dynamic slot pills -->
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 5: Select Chair (Pills) -->
+                                        <div class="mb-4" id="chair_group" style="display: none;">
+                                            <label class="salon-label">5. Select Chair</label>
+                                            <div class="d-flex flex-wrap gap-2" id="chair_pills_container">
+                                                <!-- Dynamic chair pills -->
+                                            </div>
+                                        </div>
+
                                         <!-- Submit Button -->
-                                        <div class="text-center mt-5">
-                                            <button type="submit" class="btn btn-primary btn-lg btn-block btn-gradient-purple" style="border-radius: 12px; font-weight: 600; height: 52px; border: none; font-size: 1.1rem; box-shadow: 0 4px 6px -1px rgba(109, 40, 217, 0.2);">Confirm Booking</button>
+                                        <div class="mt-5">
+                                            <button type="submit" id="btn_confirm_booking" class="btn btn-primary btn-lg salon-btn-submit" disabled="disabled">Request Booking</button>
                                         </div>
                                     </form>
+                                </div>
+
+                                <!-- Right Column: Sidebar Info Panel -->
+                                <div class="col-lg-4 mt-5 mt-lg-0">
+                                    <div class="card border p-4 bg-light position-sticky" style="top: 100px; border-radius: 20px; border-color: #e2e8f0;">
+                                        <div class="mb-4">
+                                            <h5 class="font-weight-bold" style="color: #4c1d95;" id="sidebar_salon_title">Studio Salon</h5>
+                                            <p class="text-muted small mb-0 mt-1"><i class="fa fa-map-marker text-primary mr-2"/> 4141 Main Avenue, Saint-Louis, US</p>
+                                        </div>
+
+                                        <!-- Dynamic Summary Info -->
+                                        <div class="border-top pt-4 mb-4" id="sidebar_selection_info" style="display: none;">
+                                            <h6 class="font-weight-bold text-muted mb-3">Your Selection</h6>
+                                            <div class="mb-2 d-flex justify-content-between align-items-center">
+                                                <span class="font-weight-bold text-dark" id="sidebar_item_name">Service</span>
+                                                <span class="text-primary font-weight-bold" id="sidebar_item_price">$0.00</span>
+                                            </div>
+                                            <div class="text-muted small mb-2"><i class="fa fa-clock-o mr-2"/> <span id="sidebar_item_duration">0</span> mins</div>
+                                            <div class="text-muted small mb-2"><i class="fa fa-calendar mr-2"/> <span id="sidebar_item_date">-</span></div>
+                                            <div class="text-muted small"><i class="fa fa-chair mr-2"/> <span id="sidebar_item_chair">-</span></div>
+                                        </div>
+
+                                        <div class="border-top pt-4">
+                                            <h6 class="font-weight-bold text-muted mb-2">About Our Salon</h6>
+                                            <p class="text-muted small mb-0" style="line-height: 1.6;">
+                                                Easily reserve your groom, manicure, styling, and massage sessions anytime. Pick your preferred date, time, and chair to enjoy a premium, uninterrupted session.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <style>
-                .custom-select-styled, .custom-input-styled {
-                    border-radius: 10px;
-                    height: 48px;
-                    border-color: #cbd5e1;
-                    padding-left: 16px;
-                    transition: border-color 0.2s, box-shadow 0.2s;
-                }
-                .custom-select-styled:focus, .custom-input-styled:focus {
-                    border-color: #8b5cf6;
-                    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
-                }
-                .btn-gradient-purple {
-                    background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
-                    color: white;
-                    transition: opacity 0.2s, transform 0.2s;
-                }
-                .btn-gradient-purple:hover {
-                    opacity: 0.95;
-                    transform: translateY(-1px);
-                    color: white;
-                }
-                .hover-shadow:hover {
-                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
-                }
-            </style>
-        </t>
-    </template>
-
-    <!-- Success Confirmation Page -->
-    <template id="salon_booking_success_page" name="Booking Confirmed">
-        <t t-call="website.layout">
-            <div id="wrap" class="oe_structure oe_empty">
-                <div class="container py-5 text-center">
-                    <div class="card border mx-auto p-5 shadow-sm" style="max-width: 600px; border-radius: 20px; border-color: #e2e8f0; background: #ffffff;">
-                        <div class="mb-4">
-                            <span class="d-inline-flex align-items-center justify-content-center text-white rounded-circle btn-gradient-purple" style="width: 72px; height: 72px; font-size: 2.2rem; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);">✓</span>
-                        </div>
-                        <h2 class="mb-3 font-weight-bold" style="font-weight: 800; color: #4c1d95;">Booking Confirmed!</h2>
-                        <p class="text-muted mb-4 fs-6">Thank you for booking with us. Your appointment has been scheduled successfully.</p>
-                        <a href="/salon-booking" class="btn btn-outline-primary px-4 py-2" style="border-radius: 10px; font-weight: 600; border-color: #8b5cf6; color: #8b5cf6;">Book Another Appointment</a>
-                    </div>
-                </div>
-            </div>
-        </t>
-    </template>
-
-    <!-- Register Website Page Records -->
-    <record id="salon_booking_website_page" model="website.page">
-        <field name="name">Salon Booking Portal</field>
-        <field name="url">/salon-booking</field>
-        <field name="view_id" ref="salon_booking_page_template"/>
-        <field name="is_published">True</field>
-        <field name="website_indexed">True</field>
+                    <style>
+                        .salon-label {
+                            font-weight: 700;
+                            font-size: 0.85rem;
+                            text-transform: uppercase;
+                            letter-spacing: 0.08em;
+                            color: #64748b;
+                            margin-bottom: 12px;
+                            display: block;
+                        }
+                        .booking-type-pill {
+                            border-color: #cbd5e1;
+                            color: #475569;
+                        }
+                        .booking-type-pill.active {
+                            background-color: #8b5cf6 !important;
+                            border-color: #8b5cf6 !important;
+                            color: white !important;
+                        }
+                        .service-card-pill.active, .package-card-pill.active {
+                            border-color: #8b5cf6 !important;
+                            background-color: #faf5ff !important;
+                            box-shadow: 0 0 0 2px #8b5cf6;
+                        }
+                        .pill-button {
+                            border: 1px solid #cbd5e1;
+                            background: white;
+                            color: #334155;
+                            padding: 8px 18px;
+                            border-radius: 20px;
+                            cursor: pointer;
+                            font-weight: 500;
+                            transition: all 0.2s;
+                            font-size: 0.9rem;
+                        }
+                        .pill-button:hover:not(.disabled):not(.active) {
+                            border-color: #8b5cf6;
+                            color: #8b5cf6;
+                        }
+                        .pill-button.active {
+                            background-color: #8b5cf6;
+                            border-color: #8b5cf6;
+                            color: white;
+                            font-weight: 600;
+                        }
+                        .pill-button.disabled {
+                            background-color: #f1f5f9;
+                            border-color: #e2e8f0;
+                            color: #cbd5e1;
+                            cursor: not-allowed;
+                        }
+                        .calendar-grid {
+                            display: grid;
+                            grid-template-columns: repeat(7, 1fr);
+                            gap: 6px;
+                            text-align: center;
+                        }
+                        .calendar-header-day {
+                            font-weight: 700;
+                            font-size: 0.75rem;
+                            color: #94a3b8;
+                            padding-bottom: 6px;
+                            text-transform: uppercase;
+                        }
+                        .calendar-day {
+                            aspect-ratio: 1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border-radius: 50%;
+                            cursor: pointer;
+                            font-weight: 600;
+                            font-size: 0.9rem;
+                            transition: background-color 0.15s, color 0.15s;
+                            user-select: none;
+                            color: #334155;
+                        }
+                        .calendar-day:hover:not(.disabled):not(.selected) {
+                            background-color: #f1f5f9;
+                        }
+                        .calendar-day.selected {
+                            background-color: #8b5cf6;
+                            color: white;
+                        }
+                        .calendar-day.disabled {
+                            color: #cbd5e1;
+                            cursor: not-allowed;
+                            background-color: transparent;
+                            font-weight: 400;
+                        }
+                        .calendar-day.today {
+                            border: 2px solid #8b5cf6;
+                        }
+                        .d-contents {
+                            display: contents;
+                        }
+                        .salon-btn-submit {
+                            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 30px;
+                            font-weight: 600;
+                            padding: 12px 35px;
+                            font-size: 1rem;
+                            box-shadow: 0 4px 6px -1px rgba(109, 40, 217, 0.2);
+                            transition: opacity 0.2s, transform 0.2s;
+                        }
+                        .salon-btn-submit:hover:not(:disabled) {
+                            opacity: 0.95;
+                            transform: translateY(-1px);
+                            color: white;
+                        }
+                        .salon-btn-submit:disabled {
+                            opacity: 0.5;
+                            cursor: not-allowed;
+                        }
+                    </style>
+                </t>
+            </t>
+        </field>
     </record>
 
+    <!-- ========== Success Page Record (website.page) ========== -->
     <record id="salon_booking_success_website_page" model="website.page">
-        <field name="name">Booking Confirmed</field>
+        <field name="name">Booking Requested</field>
+        <field name="type">qweb</field>
         <field name="url">/booking/success</field>
-        <field name="view_id" ref="salon_booking_success_page"/>
+        <field name="website_indexed" eval="False"/>
         <field name="is_published">True</field>
-        <field name="website_indexed">False</field>
+        <field name="key">salon_management_saas.salon_booking_success_website_page</field>
+        <field name="arch" type="xml">
+            <t name="Booking Requested" t-name="salon_booking_success_website_page">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <div class="container py-5 text-center">
+                            <div class="card border mx-auto p-5 shadow-sm" style="max-width: 600px; border-radius: 20px; border-color: #e2e8f0; background: #ffffff;">
+                                <div class="mb-4">
+                                    <span class="d-inline-flex align-items-center justify-content-center text-white rounded-circle" style="width: 72px; height: 72px; font-size: 2.2rem; background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);">✓</span>
+                                </div>
+                                <h2 class="mb-3 font-weight-bold" style="font-weight: 800; color: #4c1d95;">Booking Requested!</h2>
+                                <p class="text-muted mb-4 fs-6">Your booking has been requested and is waiting for confirmation. If confirmed, you will get a confirmation mail.</p>
+                                <a href="/salon-booking" class="btn btn-outline-primary px-4 py-2" style="border-radius: 10px; font-weight: 600; border-color: #8b5cf6; color: #8b5cf6;">Book Another Appointment</a>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </field>
     </record>
 
-    <!-- Header Navigation Menu Item -->
+    <!-- ========== Header Navigation Menu Items ========== -->
     <record id="menu_salon_booking" model="website.menu">
         <field name="name">Book Appointment</field>
         <field name="url">/salon-booking</field>
         <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence" type="int">40</field>
-    </record>
-
-    <!-- Template for Services Page -->
-    <template id="salon_services_page_template" name="Our Services">
-        <t t-call="website.layout">
-            <div id="wrap" class="oe_structure oe_empty">
-                <div class="container py-5">
-                    <div class="text-center mb-5">
-                        <h1 class="font-weight-bold" style="color: #0f172a; font-weight: 800; font-size: 2.75rem; letter-spacing: -0.02em;">Our Services</h1>
-                        <p class="text-muted lead mx-auto" style="max-width: 600px; font-size: 1.1rem; line-height: 1.6;">Indulge in our range of premium beauty and styling services tailored just for you.</p>
-                        <div style="width: 50px; height: 4px; background: linear-gradient(90deg, #8b5cf6 0%, #d946ef 100%); margin: 20px auto; border-radius: 2px;"></div>
-                    </div>
-
-                    <!-- Loop through Categories -->
-                    <t t-foreach="request.env['x_service_category'].sudo().search([])" t-as="category">
-                        <!-- Fetch active services for this category -->
-                        <t t-set="services" t-value="request.env['x_service'].sudo().search([('x_active', '=', True), ('x_studio_service_category', '=', category.id)])"/>
-                        <t t-if="services">
-                            <div class="mb-5">
-                                <h3 class="mb-4 font-weight-bold text-uppercase tracking-wider pl-3" style="color: #4c1d95; font-size: 1.15rem; letter-spacing: 0.1em; border-left: 4px solid #8b5cf6;"><t t-out="category.x_name"/></h3>
-                                <div class="row">
-                                    <t t-foreach="services" t-as="service">
-                                        <div class="col-md-6 col-lg-4 mb-4">
-                                            <div class="card h-100 border shadow-sm hover-grow" style="border-radius: 16px; overflow: hidden; background: #ffffff; border-color: #e2e8f0; transition: transform 0.25s, box-shadow: 0.25s;">
-                                                <div class="card-body p-4 d-flex flex-column">
-                                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                                        <h5 class="card-title font-weight-bold mb-0 text-dark" style="font-weight: 700; font-size: 1.15rem; color: #0f172a;"><t t-out="service.x_name"/></h5>
-                                                        <span class="font-weight-bold px-2 py-1" style="font-size: 1.1rem; color: #8b5cf6; background: #f5f3ff; border-radius: 6px;">$<t t-out="service.x_studio_value"/></span>
-                                                    </div>
-                                                    
-                                                    <p class="card-text text-muted flex-grow-1 small" style="line-height: 1.6; font-size: 0.9rem;"><t t-out="service.x_studio_description"/></p>
-                                                    
-                                                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center text-muted small">
-                                                        <span>⏱ <t t-out="service.x_studio_duration_minutes"/> mins</span>
-                                                        <span class="badge" style="background-color: #f3e8ff; color: #6b21a8; border-radius: 6px; padding: 4px 8px; font-weight: 600;"><t t-out="service.x_studio_gender"/></span>
-                                                    </div>
-                                                    
-                                                    <div class="mt-4">
-                                                        <a href="/salon-booking" class="btn btn-outline-purple btn-block py-2" style="border-radius: 10px; font-weight: 600; font-size: 0.95rem; border-color: #8b5cf6; color: #8b5cf6; transition: all 0.2s;">Book Now</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </div>
-                            </div>
-                        </t>
-                    </t>
-                </div>
-            </div>
-            <style>
-                .hover-grow:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08), 0 8px 8px -6px rgba(0, 0, 0, 0.04) !important;
-                }
-                .btn-outline-purple {
-                    border-color: #8b5cf6;
-                    color: #8b5cf6;
-                    background: transparent;
-                }
-                .btn-outline-purple:hover {
-                    background: #8b5cf6;
-                    color: white;
-                }
-            </style>
-        </t>
-    </template>
-
-    <!-- Template for Service Packages Page -->
-    <template id="salon_packages_page_template" name="Service Packages">
-        <t t-call="website.layout">
-            <div id="wrap" class="oe_structure oe_empty">
-                <div class="container py-5">
-                    <div class="text-center mb-5">
-                        <h1 class="font-weight-bold" style="color: #0f172a; font-weight: 800; font-size: 2.75rem; letter-spacing: -0.02em;">Exclusive Packages</h1>
-                        <p class="text-muted lead mx-auto" style="max-width: 600px; font-size: 1.1rem; line-height: 1.6;">Save more and experience pure bliss with our curated wellness and beauty packages.</p>
-                        <div style="width: 50px; height: 4px; background: linear-gradient(90deg, #8b5cf6 0%, #d946ef 100%); margin: 20px auto; border-radius: 2px;"></div>
-                    </div>
-
-                    <div class="row">
-                        <t t-foreach="request.env['x_service_package'].sudo().search([('x_studio_status', '=', 'active')])" t-as="pkg">
-                            <div class="col-md-6 col-lg-4 mb-4">
-                                <div class="card h-100 border shadow-sm hover-grow" style="border-radius: 20px; overflow: hidden; background: #ffffff; border-color: #e2e8f0; transition: transform 0.25s, box-shadow: 0.25s;">
-                                    <div class="p-4 text-center border-bottom" style="background: #faf5ff;">
-                                        <h4 class="font-weight-bold mb-1" style="color: #4c1d95; font-weight: 700;"><t t-out="pkg.x_name"/></h4>
-                                        <div class="my-3">
-                                            <span class="h1 font-weight-bold" style="color: #8b5cf6;">$<t t-out="pkg.x_studio_value"/></span>
-                                        </div>
-                                        <div class="d-flex justify-content-center align-items-center flex-wrap" style="gap: 6px;">
-                                            <span class="badge text-white font-weight-bold" style="background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%); border-radius: 12px; font-size: 0.75rem; padding: 4px 10px;">Special Package</span>
-                                            <t t-if="pkg.x_studio_end_date">
-                                                <span class="badge font-weight-bold" style="background: #fef3c7; color: #b45309; border-radius: 12px; font-size: 0.75rem; padding: 4px 10px; border: 1px solid #fde68a;">Limited Time Offer: Expires <strong style="color: #dc2626; font-weight: 800; margin-left: 2px;"><t t-out="pkg.x_studio_end_date"/></strong></span>
-                                            </t>
-                                        </div>
-                                    </div>
-                                    <div class="card-body p-4 d-flex flex-column">
-                                        <p class="card-text text-muted mb-4 small" style="line-height: 1.6;"><t t-out="pkg.x_studio_description"/></p>
-                                        
-                                        <h6 class="font-weight-bold text-uppercase mb-3 small text-muted" style="letter-spacing: 0.05em; font-weight: 700;">Services Included:</h6>
-                                        <ul class="list-unstyled flex-grow-1 mb-4">
-                                            <t t-foreach="pkg.x_studio_many2many_1" t-as="srv">
-                                                <li class="mb-2 text-muted small d-flex align-items-center">
-                                                    <span class="text-success mr-2">✓</span> <t t-out="srv.x_name"/>
-                                                </li>
-                                            </t>
-                                        </ul>
-
-                                        <div>
-                                            <a href="/salon-booking" class="btn btn-primary btn-block py-2 btn-gradient-purple" style="border-radius: 10px; font-weight: 600; border: none; font-size: 0.95rem;">Book Package</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </t>
-                    </div>
-                </div>
-            </div>
-        </t>
-    </template>
-
-    <!-- Website Pages -->
-    <record id="salon_services_website_page" model="website.page">
-        <field name="name">Our Services</field>
-        <field name="url">/salon-services</field>
-        <field name="view_id" ref="salon_services_page_template"/>
-        <field name="is_published">True</field>
-        <field name="website_indexed">True</field>
-    </record>
-
-    <record id="salon_packages_website_page" model="website.page">
-        <field name="name">Service Packages</field>
-        <field name="url">/salon-packages</field>
-        <field name="view_id" ref="salon_packages_page_template"/>
-        <field name="is_published">True</field>
-        <field name="website_indexed">True</field>
-    </record>
-
-    <!-- Header Navigation Menu Items -->
-    <record id="menu_salon_services" model="website.menu">
-        <field name="name">Services</field>
-        <field name="url">/salon-services</field>
-        <field name="parent_id" ref="website.main_menu"/>
-        <field name="sequence" type="int">20</field>
-    </record>
-
-    <record id="menu_salon_packages" model="website.menu">
-        <field name="name">Packages</field>
-        <field name="url">/salon-packages</field>
-        <field name="parent_id" ref="website.main_menu"/>
-        <field name="sequence" type="int">30</field>
     </record>
 </odoo>

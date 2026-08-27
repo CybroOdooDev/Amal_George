@@ -18,7 +18,8 @@
           'data/ir_sequence_data.xml',
           'data/ir_default.xml',
           'data/report_booking.xml',
-          'data/website_booking_templates.xml'],
+          'data/website_booking_templates.xml',
+          'data/website_form_whitelist.xml'],
  'demo': ['demo/salon_demo.xml'],
  'assets': {
      'web.assets_backend': [

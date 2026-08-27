@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Allow public users to read employees (for selection dropdown) -->
+  <record id="hr_employee_group_public_read" model="ir.access">
+    <field name="group_id" ref="base.group_public"/>
+    <field name="model_id" ref="hr.model_hr_employee"/>
+    <field name="name">Employee group_public read</field>
+    <field name="operation">r</field>
+  </record>
+
+  <!-- Allow portal users to read employees (for selection dropdown) -->
+  <record id="hr_employee_group_portal_read" model="ir.access">
+    <field name="group_id" ref="base.group_portal"/>
+    <field name="model_id" ref="hr.model_hr_employee"/>
+    <field name="name">Employee group_portal read</field>
+    <field name="operation">r</field>
+  </record>
+
+  <!-- Allow portal users to read salon holidays -->
+  <record id="salon_holiday_group_portal_read" model="ir.access">
+    <field name="group_id" ref="base.group_portal"/>
+    <field name="model_id" ref="model_x_salon_holiday"/>
+    <field name="name">Salon Holiday group_portal read</field>
+    <field name="operation">r</field>
+  </record>
+
+  <!-- Allow portal users to read chairs -->
+  <record id="chair_group_portal_read" model="ir.access">
+    <field name="group_id" ref="base.group_portal"/>
+    <field name="model_id" ref="chair_x_chair"/>
+    <field name="name">Chair group_portal read</field>
+    <field name="operation">r</field>
+  </record>
+
+  <!-- Allow portal users to read appointments -->
+  <record id="appointment_group_portal_read" model="ir.access">
+    <field name="group_id" ref="base.group_portal"/>
+    <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
+    <field name="name">Appointment group_portal read</field>
+    <field name="operation">r</field>
+  </record>
+
+  <!-- Use Odoo's official built-in method to whitelist fields for the website form builder -->
+  <function model="ir.model.fields" name="formbuilder_whitelist">
+    <value>x_appointment</value>
+    <value eval="['x_studio_partner_id', 'x_studio_booking_type', 'x_studio_date', 'x_studio_time_slot', 'x_studio_chair_num', 'x_studio_service', 'x_studio_service_package', 'x_studio_selection_1', 'x_studio_staff_beautician']"/>
+  </function>
+</odoo>

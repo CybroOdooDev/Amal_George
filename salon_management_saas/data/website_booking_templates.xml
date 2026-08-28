@@ -18,7 +18,7 @@
                                 <div class="col-lg-8">
                                     <h2 class="font-weight-bold mb-4" style="font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">Book Appointment</h2>
 
-                                    <form id="salon_booking_form" method="post" class="container-fluid p-0">
+                                    <form id="salon_booking_form" method="post" class="container-fluid p-0" t-att-data-is-public="request.env.user._is_public()">
                                         <!-- Hidden Inputs to bind selected values -->
                                         <input type="hidden" name="x_studio_booking_type" id="x_studio_booking_type" value=""/>
                                         <input type="hidden" name="x_studio_service" id="x_studio_service" value=""/>
@@ -28,7 +28,64 @@
                                         <input type="hidden" name="x_studio_chair_num" id="x_studio_chair_num" value=""/>
                                         <input type="hidden" name="x_studio_staff_beautician" id="x_studio_staff_beautician" value=""/>
                                         <input type="hidden" name="x_studio_partner_id" id="x_studio_partner_id" t-att-value="request.env.user.partner_id.id"/>
-                                        <input type="hidden" name="x_studio_selection_1" value="Confirmed"/>
+
+                                        <!-- Pre-load all company, holiday, employee, chair and booking data to bypass guest RPC limitations -->
+                                        <t t-set="companies" t-value="request.env['res.company'].sudo().search([])"/>
+                                        <t t-set="active_co_for_h" t-value="companies.filtered(lambda c: c.x_studio_holiday_sunday or c.x_studio_holiday_monday or c.x_studio_holiday_tuesday or c.x_studio_holiday_wednesday or c.x_studio_holiday_thursday or c.x_studio_holiday_friday or c.x_studio_holiday_saturday or (c.x_studio_holiday_ids and len(c.x_studio_holiday_ids) &gt; 0))"/>
+                                        <t t-set="active_company" t-value="active_co_for_h[0] if len(active_co_for_h) &gt; 0 else request.env.company"/>
+                                        <t t-set="active_co_for_b" t-value="companies.filtered(lambda c: c.x_studio_allow_break)"/>
+                                        <t t-set="break_company" t-value="active_co_for_b[0] if len(active_co_for_b) &gt; 0 else request.env.company"/>
+
+                                        <div id="salon_company_settings" class="d-none"
+                                             t-att-data-holiday-sunday="'true' if active_company.x_studio_holiday_sunday else 'false'"
+                                             t-att-data-holiday-monday="'true' if active_company.x_studio_holiday_monday else 'false'"
+                                             t-att-data-holiday-tuesday="'true' if active_company.x_studio_holiday_tuesday else 'false'"
+                                             t-att-data-holiday-wednesday="'true' if active_company.x_studio_holiday_wednesday else 'false'"
+                                             t-att-data-holiday-thursday="'true' if active_company.x_studio_holiday_thursday else 'false'"
+                                             t-att-data-holiday-friday="'true' if active_company.x_studio_holiday_friday else 'false'"
+                                             t-att-data-holiday-saturday="'true' if active_company.x_studio_holiday_saturday else 'false'"
+                                             t-att-data-allow-break="'true' if break_company.x_studio_allow_break else 'false'"
+                                             t-att-data-break-start="break_company.x_studio_break_start or ''"
+                                             t-att-data-break-end="break_company.x_studio_break_end or ''"
+                                        />
+
+                                        <div id="salon_holidays_data" class="d-none">
+                                            <t t-if="active_company.x_studio_holiday_ids">
+                                                <t t-foreach="request.env['x_salon_holiday'].sudo().search([('id', 'in', active_company.x_studio_holiday_ids.ids)])" t-as="holiday">
+                                                    <span t-att-data-name="holiday.x_name" t-att-data-date="holiday.x_studio_date"/>
+                                                </t>
+                                            </t>
+                                        </div>
+
+                                        <div id="salon_employees_data" class="d-none">
+                                            <t t-foreach="request.env['hr.employee'].sudo().search([])" t-as="emp">
+                                                <span t-att-data-id="emp.id" t-att-data-name="emp.name">
+                                                    <t t-if="emp.x_studio_specialties">
+                                                        <t t-foreach="emp.x_studio_specialties" t-as="spec">
+                                                            <i t-att-data-spec-id="spec.id"/>
+                                                        </t>
+                                                    </t>
+                                                </span>
+                                            </t>
+                                        </div>
+
+                                        <div id="salon_chairs_data" class="d-none">
+                                            <t t-foreach="request.env['x_chair'].sudo().search([])" t-as="chair">
+                                                <span t-att-data-id="chair.id" t-att-data-name="chair.x_name"/>
+                                            </t>
+                                        </div>
+
+                                        <div id="salon_bookings_data" class="d-none">
+                                            <t t-set="today_str" t-value="datetime.date.today().strftime('%Y-%m-%d')"/>
+                                            <t t-foreach="request.env['x_appointment'].sudo().search([('x_studio_date', '&gt;=', today_str), ('x_studio_selection_1', 'in', ['Confirmed', 'Completed', 'In Progress', 'Checked In']), ('x_studio_chair_num', '!=', False)])" t-as="booking">
+                                                <span t-att-data-date="booking.x_studio_date"
+                                                      t-att-data-slot="booking.x_studio_time_slot"
+                                                      t-att-data-duration="booking.x_studio_duration or 30"
+                                                      t-att-data-chair-id="booking.x_studio_chair_num.id"
+                                                      t-att-data-chair-name="booking.x_studio_chair_num.x_name"
+                                                />
+                                            </t>
+                                        </div>
 
                                         <!-- Step 1: Booking Type Pills -->
                                         <div class="mb-4">
@@ -136,6 +193,28 @@
                                                 <!-- Dynamic chair pills -->
                                             </div>
                                         </div>
+
+                                         <!-- Guest Contact Information -->
+                                         <t t-if="request.env.user._is_public()">
+                                             <div class="mb-4 mt-5 p-4 border rounded bg-white shadow-sm" style="border-radius: 16px; border-color: #e2e8f0 !important;">
+                                                 <h5 class="mb-3 font-weight-bold" style="color: #1e293b; font-size: 1.15rem; letter-spacing: -0.01em;">Contact Information</h5>
+                                                 <p class="text-muted small mb-4">Please provide your details to receive your booking confirmation.</p>
+                                                 <div class="row">
+                                                     <div class="col-md-12 mb-3">
+                                                         <label class="salon-label" for="guest_name">Full Name <span class="text-danger">*</span></label>
+                                                         <input type="text" id="guest_name" name="x_studio_text_1" class="form-control salon-input" placeholder="e.g. John Doe" required="required" style="height: 48px; border-radius: 10px; border-color: #cbd5e1; padding: 12px 16px;"/>
+                                                     </div>
+                                                     <div class="col-md-6 mb-3">
+                                                         <label class="salon-label" for="guest_email">Email Address <span class="text-danger">*</span></label>
+                                                         <input type="email" id="guest_email" name="x_studio_partner_email" class="form-control salon-input" placeholder="e.g. john.doe@example.com" required="required" style="height: 48px; border-radius: 10px; border-color: #cbd5e1; padding: 12px 16px;"/>
+                                                     </div>
+                                                     <div class="col-md-6 mb-3">
+                                                         <label class="salon-label" for="guest_phone">Phone Number <span class="text-danger">*</span></label>
+                                                         <input type="tel" id="guest_phone" name="x_studio_partner_phone" class="form-control salon-input" placeholder="e.g. +1 555-555-5556" required="required" style="height: 48px; border-radius: 10px; border-color: #cbd5e1; padding: 12px 16px;"/>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </t>
 
                                         <!-- Submit Button -->
                                         <div class="mt-5">
@@ -325,7 +404,180 @@
         </field>
     </record>
 
+    <!-- ========== Services Portal Page ========== -->
+    <record id="salon_services_website_page" model="website.page">
+        <field name="name">Services</field>
+        <field name="type">qweb</field>
+        <field name="url">/services</field>
+        <field name="website_indexed" eval="True"/>
+        <field name="is_published">True</field>
+        <field name="key">salon_management_saas.salon_booking_services_website_page</field>
+        <field name="arch" type="xml">
+            <t name="Services" t-name="salon_management_saas.salon_booking_services_website_page">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty" style="background-color: #fcfaff;">
+                        <!-- Banner Section -->
+                        <div class="container py-5 text-center">
+                            <h1 class="display-4 font-weight-bold" style="font-weight: 800; color: #4c1d95; letter-spacing: -0.02em;">Our Services</h1>
+                            <p class="lead text-muted mx-auto" style="max-width: 600px; font-weight: 500;">
+                                Indulge in our range of premium beauty and styling services tailored just for you.
+                            </p>
+                            <div class="mx-auto my-3" style="width: 60px; height: 3px; background-color: #8b5cf6; border-radius: 2px;"></div>
+                        </div>
+
+                        <!-- Categories & Services Section -->
+                        <div class="container pb-5">
+                            <t t-foreach="request.env['x_service_category'].sudo().search([('x_active', '=', True)])" t-as="category">
+                                <t t-set="services" t-value="request.env['x_service'].sudo().search([('x_studio_service_category', '=', category.id), ('x_active', '=', True)])"/>
+                                <t t-if="services">
+                                    <div class="mb-5">
+                                        <h3 class="text-uppercase mb-4" style="font-weight: 800; color: #6b21a8; letter-spacing: 0.05em; font-size: 1.15rem;"><span t-out="category.x_name"/></h3>
+                                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                                            <t t-foreach="services" t-as="srv">
+                                                <div class="col">
+                                                    <div class="card h-100 border-0 shadow-sm p-3" style="border-radius: 16px; background: #ffffff; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #f3e8ff !important;">
+                                                        <div class="card-body d-flex flex-column justify-content-between p-2">
+                                                            <div>
+                                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                    <h5 class="card-title font-weight-bold mb-0 text-dark" style="font-weight: 700; font-size: 1.05rem;"><span t-out="srv.x_name"/></h5>
+                                                                    <span class="font-weight-bold text-primary" style="font-weight: 750; color: #7c3aed; font-size: 1.1rem;">
+                                                                        $<span t-out="float(srv.x_studio_value or 0.0)"/>
+                                                                    </span>
+                                                                </div>
+                                                                <hr style="border-top: 1px solid #f3e8ff; margin: 12px 0;"/>
+                                                                <div class="d-flex align-items-center text-muted mb-3 small" style="font-weight: 500;">
+                                                                    <i class="fa fa-clock-o me-2" style="color: #a78bfa;"></i>
+                                                                    <span><span t-out="srv.x_studio_duration_minutes or 30"/> mins</span>
+                                                                    <t t-if="srv.x_studio_gender">
+                                                                        <span class="mx-2">•</span>
+                                                                        <i class="fa fa-venus-mars me-2" style="color: #a78bfa;"></i>
+                                                                        <span><span t-out="srv.x_studio_gender"/></span>
+                                                                    </t>
+                                                                </div>
+                                                                <p t-if="srv.x_studio_description" class="text-muted small mb-3 text-start" style="line-height: 1.5; min-height: 45px;">
+                                                                    <span t-out="srv.x_studio_description"/>
+                                                                </p>
+                                                            </div>
+                                                            <div class="mt-auto">
+                                                                <a t-attf-href="/salon-booking?type=service&amp;service_id=#{srv.id}" class="btn btn-primary w-100 py-2 font-weight-bold" style="border-radius: 10px; background-color: #8b5cf6; border: none; font-weight: 600; font-size: 0.9rem; transition: background-color 0.2s;">
+                                                                    Book Now
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+
+    <!-- ========== Service Packages Portal Page ========== -->
+    <record id="salon_packages_website_page" model="website.page">
+        <field name="name">Service Packages</field>
+        <field name="type">qweb</field>
+        <field name="url">/service-packages</field>
+        <field name="website_indexed" eval="True"/>
+        <field name="is_published">True</field>
+        <field name="key">salon_management_saas.salon_booking_packages_website_page</field>
+        <field name="arch" type="xml">
+            <t name="Service Packages" t-name="salon_management_saas.salon_booking_packages_website_page">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty" style="background-color: #fcfaff;">
+                        <!-- Banner Section -->
+                        <div class="container py-5 text-center">
+                            <h1 class="display-4 font-weight-bold" style="font-weight: 800; color: #4c1d95; letter-spacing: -0.02em;">Exclusive Packages</h1>
+                            <p class="lead text-muted mx-auto" style="max-width: 600px; font-weight: 500;">
+                                Save more and experience pure bliss with our curated wellness and beauty packages.
+                            </p>
+                            <div class="mx-auto my-3" style="width: 60px; height: 3px; background-color: #8b5cf6; border-radius: 2px;"></div>
+                        </div>
+
+                        <!-- Packages Grid Section -->
+                        <div class="container pb-5">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+                                <t t-foreach="request.env['x_service_package'].sudo().search([('x_active', '=', True)])" t-as="pkg">
+                                    <div class="col">
+                                        <div class="card h-100 border-0 shadow-sm p-4 text-center d-flex flex-column justify-content-between" style="border-radius: 16px; background: #ffffff; border: 1px solid #f3e8ff !important;">
+                                            <div>
+                                                <t t-if="pkg.x_studio_limited_time">
+                                                    <div class="badge bg-warning-soft text-warning mb-3" style="background-color: #fef3c7; color: #d97706; border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.03em;">
+                                                        <i class="fa fa-clock-o mr-1"/> Limited Time Offer
+                                                    </div>
+                                                </t>
+                                                <h3 class="mb-2" style="font-weight: 800; color: #581c87; font-size: 1.35rem;"><span t-out="pkg.x_name"/></h3>
+                                                <div class="my-4 d-flex align-items-center justify-content-center flex-wrap">
+                                                    <t t-if="pkg.x_studio_discount_1">
+                                                        <span class="text-muted text-decoration-line-through me-2" style="font-size: 1.1rem; font-weight: 500;">
+                                                            $<span t-out="float(pkg.x_studio_original_value or 0.0)"/>
+                                                        </span>
+                                                        <span class="badge bg-danger-soft text-danger me-3" style="background-color: #fee2e2; color: #ef4444; border-radius: 6px; padding: 4px 8px; font-weight: 700; font-size: 0.8rem; border: 1px solid #fecaca;">
+                                                            <span t-out="int(pkg.x_studio_discount_1)"/>% OFF
+                                                        </span>
+                                                    </t>
+                                                    <span class="display-5 font-weight-bold" style="font-weight: 800; color: #8b5cf6; font-size: 2.2rem;">
+                                                        $<span t-out="float(pkg.x_studio_value or 0.0)"/>
+                                                    </span>
+                                                </div>
+                                                
+                                                <t t-if="pkg.x_studio_description">
+                                                    <p class="text-muted small text-center mb-4" style="line-height: 1.5;">
+                                                        <span t-out="pkg.x_studio_description"/>
+                                                    </p>
+                                                </t>
+
+                                                <t t-if="pkg.x_studio_many2many_1">
+                                                    <div class="text-start mt-4 mb-4" style="border-top: 1px solid #f3e8ff; pt-3">
+                                                        <h6 class="text-uppercase mb-3 mt-3" style="font-weight: 800; color: #6b21a8; font-size: 0.8rem; letter-spacing: 0.05em;">Services Included:</h6>
+                                                        <ul class="list-unstyled p-0 m-0 small">
+                                                            <t t-foreach="pkg.x_studio_many2many_1" t-as="srv">
+                                                                <li class="mb-2 d-flex align-items-center" style="font-weight: 500; color: #4b5563;">
+                                                                    <i class="fa fa-check me-2" style="color: #10b981;"></i>
+                                                                    <span><span t-out="srv.x_name"/></span>
+                                                                </li>
+                                                            </t>
+                                                        </ul>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                            
+                                            <div class="mt-auto">
+                                                <a t-attf-href="/salon-booking?type=package&amp;package_id=#{pkg.id}" class="btn btn-primary w-100 py-2.5 font-weight-bold" style="border-radius: 10px; background-color: #8b5cf6; border: none; font-weight: 600; font-size: 0.95rem; transition: background-color 0.2s;">
+                                                    Book Package
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+
     <!-- ========== Header Navigation Menu Items ========== -->
+    <record id="menu_salon_services" model="website.menu">
+        <field name="name">Services</field>
+        <field name="url">/services</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">20</field>
+    </record>
+
+    <record id="menu_salon_packages" model="website.menu">
+        <field name="name">Service Packages</field>
+        <field name="url">/service-packages</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">30</field>
+    </record>
+
     <record id="menu_salon_booking" model="website.menu">
         <field name="name">Book Appointment</field>
         <field name="url">/salon-booking</field>

@@ -50,6 +50,7 @@ class SalonBookingForm extends Interaction {
         // State variables
         this.currentDate = new Date();
         this.selectedDateStr = "";
+        this.isPublic = this.el.dataset.isPublic === 'true' || this.el.dataset.isPublic === 'True';
 
         // Cache settings
         this._holidays = null;
@@ -104,45 +105,73 @@ class SalonBookingForm extends Interaction {
         } catch (e) {
             console.warn("Failed to fetch initial settings", e);
         }
+
+        // Bind input event listeners for guest contact fields
+        if (this.isPublic) {
+            const guestName = this.el.querySelector('#guest_name');
+            const guestEmail = this.el.querySelector('#guest_email');
+            const guestPhone = this.el.querySelector('#guest_phone');
+            if (guestName) guestName.addEventListener('input', () => this._validateForm());
+            if (guestEmail) guestEmail.addEventListener('input', () => this._validateForm());
+            if (guestPhone) guestPhone.addEventListener('input', () => this._validateForm());
+        }
+
+        // Auto-select type and item if passed in URL query parameters (e.g. from Services/Packages pages)
+        const params = new URLSearchParams(window.location.search);
+        const type = params.get('type');
+        const serviceId = params.get('service_id');
+        const packageId = params.get('package_id');
+
+        if (type === 'service' && serviceId) {
+            const typePill = this.el.querySelector('.booking-type-pill[data-value="service"]');
+            if (typePill) {
+                this.onBookingTypeSelect({ currentTarget: typePill });
+                const card = this.el.querySelector(`.service-card-pill[data-id="${serviceId}"]`);
+                if (card) {
+                    await this.onServiceSelect({ currentTarget: card });
+                }
+            }
+        } else if (type === 'package' && packageId) {
+            const typePill = this.el.querySelector('.booking-type-pill[data-value="package"]');
+            if (typePill) {
+                this.onBookingTypeSelect({ currentTarget: typePill });
+                const card = this.el.querySelector(`.package-card-pill[data-id="${packageId}"]`);
+                if (card) {
+                    await this.onPackageSelect({ currentTarget: card });
+                }
+            }
+        }
     }
 
     async _fetchHolidaysAndBreaks() {
         if (!this._weeklyHolidays) {
-            const companies = await this.services.orm.searchRead(
-                'res.company', [], [
-                    'x_studio_holiday_sunday', 'x_studio_holiday_monday',
-                    'x_studio_holiday_tuesday', 'x_studio_holiday_wednesday',
-                    'x_studio_holiday_thursday', 'x_studio_holiday_friday',
-                    'x_studio_holiday_saturday', 'x_studio_holiday_ids'
-                ]
-            );
-            const activeCompany = companies.find(c =>
-                c.x_studio_holiday_sunday || c.x_studio_holiday_monday ||
-                c.x_studio_holiday_tuesday || c.x_studio_holiday_wednesday ||
-                c.x_studio_holiday_thursday || c.x_studio_holiday_friday ||
-                c.x_studio_holiday_saturday ||
-                (c.x_studio_holiday_ids && c.x_studio_holiday_ids.length > 0)
-            ) || companies[0];
-            this._weeklyHolidays = activeCompany || {};
-        }
-        if (!this._holidays) {
-            const holidayIds = this._weeklyHolidays?.x_studio_holiday_ids || [];
-            if (holidayIds.length > 0) {
-                this._holidays = await this.services.orm.searchRead(
-                    'x_salon_holiday',
-                    [['id', 'in', holidayIds]],
-                    ['x_name', 'x_studio_date']
-                );
+            const el = this.el.querySelector('#salon_company_settings');
+            if (el) {
+                this._weeklyHolidays = {
+                    x_studio_holiday_sunday: el.dataset.holidaySunday === 'true',
+                    x_studio_holiday_monday: el.dataset.holidayMonday === 'true',
+                    x_studio_holiday_tuesday: el.dataset.holidayTuesday === 'true',
+                    x_studio_holiday_wednesday: el.dataset.holidayWednesday === 'true',
+                    x_studio_holiday_thursday: el.dataset.holidayThursday === 'true',
+                    x_studio_holiday_friday: el.dataset.holidayFriday === 'true',
+                    x_studio_holiday_saturday: el.dataset.holidaySaturday === 'true',
+                };
+                this._breakSettings = {
+                    x_studio_allow_break: el.dataset.allowBreak === 'true',
+                    x_studio_break_start: el.dataset.breakStart || false,
+                    x_studio_break_end: el.dataset.breakEnd || false,
+                };
             } else {
-                this._holidays = [];
+                this._weeklyHolidays = {};
+                this._breakSettings = {};
             }
         }
-        if (!this._breakSettings) {
-            const companies = await this.services.orm.searchRead(
-                'res.company', [], ['x_studio_allow_break', 'x_studio_break_start', 'x_studio_break_end']
-            );
-            const activeCompany = companies.find(c => c.x_studio_allow_break) || companies[0];
-            this._breakSettings = activeCompany || {};
+        if (!this._holidays) {
+            const holidayElements = this.el.querySelectorAll('#salon_holidays_data span');
+            this._holidays = Array.from(holidayElements).map(span => ({
+                x_name: span.dataset.name,
+                x_studio_date: span.dataset.date
+            }));
         }
     }
 
@@ -207,19 +236,20 @@ class SalonBookingForm extends Interaction {
         this._hideSection(this.slotGroup);
         this._hideSection(this.chairGroup);
 
-        // Fetch same skilled employees based on category via ORM searchRead
+        // Fetch same skilled employees based on category
         const categoryId = parseInt(card.dataset.category_id);
         let employees = [];
         if (categoryId) {
-            try {
-                employees = await this.services.orm.searchRead(
-                    'hr.employee',
-                    [['x_studio_specialties', 'in', [categoryId]]],
-                    ['name']
-                );
-            } catch (e) {
-                console.error("Failed to fetch beauticians", e);
-            }
+            const employeeElements = this.el.querySelectorAll('#salon_employees_data span');
+            employees = Array.from(employeeElements).map(el => {
+                const specElements = el.querySelectorAll('i');
+                const specialties = Array.from(specElements).map(i => parseInt(i.dataset.specId));
+                return {
+                    id: parseInt(el.dataset.id),
+                    name: el.dataset.name,
+                    specialties: specialties
+                };
+            }).filter(emp => emp.specialties.includes(categoryId));
         }
         this._populateBeauticians(employees);
 
@@ -246,19 +276,15 @@ class SalonBookingForm extends Interaction {
         this._hideSection(this.slotGroup);
         this._hideSection(this.chairGroup);
 
-        // Fetch employees from package staff list via ORM searchRead
+        // Fetch employees from package staff list
         const staffIds = card.dataset.staff_ids ? card.dataset.staff_ids.split(',').map(Number).filter(Boolean) : [];
         let employees = [];
         if (staffIds.length > 0) {
-            try {
-                employees = await this.services.orm.searchRead(
-                    'hr.employee',
-                    [['id', 'in', staffIds]],
-                    ['name']
-                );
-            } catch (e) {
-                console.error("Failed to fetch beauticians", e);
-            }
+            const employeeElements = this.el.querySelectorAll('#salon_employees_data span');
+            employees = Array.from(employeeElements).map(el => ({
+                id: parseInt(el.dataset.id),
+                name: el.dataset.name
+            })).filter(emp => staffIds.includes(emp.id));
         }
         this._populateBeauticians(employees);
 
@@ -267,6 +293,12 @@ class SalonBookingForm extends Interaction {
     }
 
     _populateBeauticians(employees) {
+        if (this.isPublic) {
+            this._hideSection(this.beauticianGroup);
+            this._showSection(this.calendarGroup);
+            this._renderCalendar();
+            return;
+        }
         if (!employees || employees.length === 0) {
             this.beauticianSelect.innerHTML = '<option value="">No beauticians available for this selection</option>';
         } else {
@@ -314,7 +346,7 @@ class SalonBookingForm extends Interaction {
         const month = this.currentDate.getMonth();
 
         const monthNames = ["January", "February", "March", "April", "May", "June",
-                            "July", "August", "September", "October", "November", "December"];
+            "July", "August", "September", "October", "November", "December"];
         this.calendarTitle.textContent = `${monthNames[month]} ${year}`;
 
         // Clear existing days
@@ -426,6 +458,12 @@ class SalonBookingForm extends Interaction {
     }
 
     // ─── Time Slot Pills generator ──────────────────────────────
+    /**
+     * Renders available time slots (pills) for the selected date,
+     * filtering out slots that overlap with weekly holidays, date holidays,
+     * break times, and fully-booked chair capacities.
+     * @returns {Promise<void>}
+     */
     async _updateSlots() {
         const dateVal = this.dateInput.value;
         const duration = this._getSelectedDuration();
@@ -441,19 +479,21 @@ class SalonBookingForm extends Interaction {
                 breakEndMin = this._toMinutes(breakCfg.x_studio_break_end);
             }
 
-            // Fetch all chairs and active bookings to verify slot capacity
-            const allChairs = await this.services.orm.searchRead('x_chair', [], ['id']);
+            // Read chairs and bookings from DOM
+            const chairElements = this.el.querySelectorAll('#salon_chairs_data span');
+            const allChairs = Array.from(chairElements).map(el => ({
+                id: parseInt(el.dataset.id),
+                x_name: el.dataset.name
+            }));
             const totalChairsCount = allChairs.length || 1;
 
-            const bookings = await this.services.orm.searchRead(
-                'x_appointment',
-                [
-                    ['x_studio_date', '=', dateVal],
-                    ['x_studio_selection_1', 'in', ['Confirmed', 'Completed', 'In Progress', 'Checked In']],
-                    ['x_studio_chair_num', '!=', false],
-                ],
-                ['x_studio_time_slot', 'x_studio_duration', 'x_studio_chair_num']
-            );
+            const bookingElements = this.el.querySelectorAll('#salon_bookings_data span');
+            const bookings = Array.from(bookingElements).map(el => ({
+                x_studio_date: el.dataset.date,
+                x_studio_time_slot: el.dataset.slot,
+                x_studio_duration: parseInt(el.dataset.duration),
+                x_studio_chair_num: [parseInt(el.dataset.chairId), el.dataset.chairName]
+            })).filter(b => b.x_studio_date === dateVal);
 
             const slots = [];
             for (let startMin = 9 * 60; startMin <= 17 * 60 + 30; startMin += 30) {
@@ -508,13 +548,64 @@ class SalonBookingForm extends Interaction {
 
         this.slotInput.value = pill.dataset.value;
 
-        this._showSection(this.chairGroup);
-        this._updateChairs();
+        if (this.isPublic) {
+            this._hideSection(this.chairGroup);
+            this._autoAssignChair();
+        } else {
+            this._showSection(this.chairGroup);
+            this._updateChairs();
+        }
         this._updateSidebar();
         this._validateForm();
     }
 
+    _autoAssignChair() {
+        const dateVal = this.dateInput.value;
+        const slotVal = this.slotInput.value;
+        const duration = this._getSelectedDuration();
+        if (!dateVal || !slotVal) return;
+
+        const slotStartMin = this._toMinutes(slotVal);
+        const slotEndMin = slotStartMin + duration;
+
+        const chairElements = this.el.querySelectorAll('#salon_chairs_data span');
+        const allChairs = Array.from(chairElements).map(el => ({
+            id: parseInt(el.dataset.id),
+            x_name: el.dataset.name
+        }));
+
+        const bookingElements = this.el.querySelectorAll('#salon_bookings_data span');
+        const bookings = Array.from(bookingElements).map(el => ({
+            x_studio_date: el.dataset.date,
+            x_studio_time_slot: el.dataset.slot,
+            x_studio_duration: parseInt(el.dataset.duration),
+            x_studio_chair_num: [parseInt(el.dataset.chairId), el.dataset.chairName]
+        })).filter(b => b.x_studio_date === dateVal);
+
+        const busyChairIds = new Set();
+        for (const appt of bookings) {
+            if (!appt.x_studio_time_slot) continue;
+            const apptStart = this._toMinutes(appt.x_studio_time_slot);
+            const apptEnd = apptStart + (appt.x_studio_duration || 30);
+            if (slotStartMin < apptEnd && apptStart < slotEndMin && appt.x_studio_chair_num) {
+                busyChairIds.add(appt.x_studio_chair_num[0]);
+            }
+        }
+
+        const freeChairs = allChairs.filter(c => !busyChairIds.has(c.id));
+        if (freeChairs.length > 0) {
+            this.chairInput.value = freeChairs[0].id;
+        } else if (allChairs.length > 0) {
+            this.chairInput.value = allChairs[0].id;
+        }
+    }
+
     // ─── Chair Pills generator ──────────────────────────────────
+    /**
+     * Renders selectable chairs as pills, disabling those that are already
+     * occupied by other confirmed/completed bookings at the chosen time.
+     * @returns {Promise<void>}
+     */
     async _updateChairs() {
         const dateVal = this.dateInput.value;
         const slotVal = this.slotInput.value;
@@ -527,16 +618,20 @@ class SalonBookingForm extends Interaction {
             const slotStartMin = this._toMinutes(slotVal);
             const slotEndMin = slotStartMin + duration;
 
-            const allChairs = await this.services.orm.searchRead('x_chair', [], ['x_name']);
-            const bookings = await this.services.orm.searchRead(
-                'x_appointment',
-                [
-                    ['x_studio_date', '=', dateVal],
-                    ['x_studio_selection_1', 'in', ['Confirmed', 'Completed', 'In Progress', 'Checked In']],
-                    ['x_studio_chair_num', '!=', false],
-                ],
-                ['x_studio_time_slot', 'x_studio_duration', 'x_studio_chair_num']
-            );
+            // Read chairs and bookings from DOM
+            const chairElements = this.el.querySelectorAll('#salon_chairs_data span');
+            const allChairs = Array.from(chairElements).map(el => ({
+                id: parseInt(el.dataset.id),
+                x_name: el.dataset.name
+            }));
+
+            const bookingElements = this.el.querySelectorAll('#salon_bookings_data span');
+            const bookings = Array.from(bookingElements).map(el => ({
+                x_studio_date: el.dataset.date,
+                x_studio_time_slot: el.dataset.slot,
+                x_studio_duration: parseInt(el.dataset.duration),
+                x_studio_chair_num: [parseInt(el.dataset.chairId), el.dataset.chairName]
+            })).filter(b => b.x_studio_date === dateVal);
 
             const busyChairIds = new Set();
             for (const appt of bookings) {
@@ -665,11 +760,11 @@ class SalonBookingForm extends Interaction {
         const m = minutes % 60;
         const ampm = h < 12 ? 'AM' : 'PM';
         const dh = h === 0 ? 12 : h > 12 ? h - 12 : h;
-        return `${String(dh).padStart(2,'0')}:${String(m).padStart(2,'0')} ${ampm}`;
+        return `${String(dh).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
     }
 
     _formatValue(minutes) {
-        return `${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;
+        return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
     }
 
     // ─── Helpers ────────────────────────────────────────────────
@@ -699,6 +794,12 @@ class SalonBookingForm extends Interaction {
     }
 
     // ─── Form submission ────────────────────────────────────────
+    /**
+     * Validates and submits the booking form data using Odoo's website form builder
+     * protocol. Automatically collects and appends guest user details if in guest mode.
+     * @param {Event} ev
+     * @returns {Promise<void>}
+     */
     async onFormSubmit(ev) {
         if (this.submitBtn.disabled) return;
 
@@ -716,18 +817,38 @@ class SalonBookingForm extends Interaction {
                 formData.append('csrf_token', window.odoo.csrf_token);
             }
 
-            formData.append('x_studio_partner_id', partnerId || '');
+            if (this.isPublic) {
+                const guestNameInput = this.el.querySelector('#guest_name');
+                const guestEmailInput = this.el.querySelector('#guest_email');
+                const guestPhoneInput = this.el.querySelector('#guest_phone');
+                if (guestNameInput && guestNameInput.value) {
+                    formData.append('x_studio_text_1', guestNameInput.value);
+                }
+                if (guestEmailInput && guestEmailInput.value) {
+                    formData.append('x_studio_partner_email', guestEmailInput.value);
+                }
+                if (guestPhoneInput && guestPhoneInput.value) {
+                    formData.append('x_studio_partner_phone', guestPhoneInput.value);
+                }
+            } else {
+                if (partnerId) {
+                    formData.append('x_studio_partner_id', partnerId);
+                }
+            }
             formData.append('x_studio_booking_type', this.bookingTypeInput.value);
             formData.append('x_studio_date', this.dateInput.value);
             formData.append('x_studio_time_slot', this.slotInput.value);
-            formData.append('x_studio_chair_num', this.chairInput.value || '');
-            formData.append('x_studio_staff_beautician', this.beauticianInput.value || '');
-            formData.append('x_studio_selection_1', 'Confirmed');
+            if (this.chairInput.value) {
+                formData.append('x_studio_chair_num', this.chairInput.value);
+            }
+            if (this.beauticianInput.value) {
+                formData.append('x_studio_staff_beautician', this.beauticianInput.value);
+            }
 
-            if (this.bookingTypeInput.value === 'service') {
-                formData.append('x_studio_service', this.serviceInput.value || '');
-            } else if (this.bookingTypeInput.value === 'package') {
-                formData.append('x_studio_service_package', this.packageInput.value || '');
+            if (this.bookingTypeInput.value === 'service' && this.serviceInput.value) {
+                formData.append('x_studio_service', this.serviceInput.value);
+            } else if (this.bookingTypeInput.value === 'package' && this.packageInput.value) {
+                formData.append('x_studio_service_package', this.packageInput.value);
             }
 
             const resp = await fetch('/website/form/x_appointment', {
@@ -752,7 +873,8 @@ class SalonBookingForm extends Interaction {
                     } else if (data && data.error) {
                         errorMsg = data.error;
                     } else if (data && data.error_fields) {
-                        const fieldsStr = Object.keys(data.error_fields).join(', ');
+                        const fieldsList = Array.isArray(data.error_fields) ? data.error_fields : Object.values(data.error_fields);
+                        const fieldsStr = fieldsList.join(', ');
                         errorMsg = `Please correct the following fields: ${fieldsStr}`;
                     } else if (data === false) {
                         errorMsg = "Database rejected the booking (Integrity constraint check failed).";
@@ -770,7 +892,7 @@ class SalonBookingForm extends Interaction {
                     } else if (text && text.length < 200) {
                         detail = text.trim();
                     }
-                } catch (textErr) {}
+                } catch (textErr) { }
                 errorMsg = `Booking failed (Status ${resp.status})${detail ? ': ' + detail : '. Please check your input data.'}`;
             }
 
@@ -787,11 +909,19 @@ class SalonBookingForm extends Interaction {
         const type = this.bookingTypeInput.value;
         const hasService = type === 'service' && this.serviceInput.value;
         const hasPackage = type === 'package' && this.packageInput.value;
-        const valid = (hasService || hasPackage)
-            && !!this.beauticianInput.value
+        let valid = (hasService || hasPackage)
             && !!this.dateInput.value
-            && !!this.slotInput.value
-            && !!this.chairInput.value;
+            && !!this.slotInput.value;
+        if (this.isPublic) {
+            const guestName = this.el.querySelector('#guest_name')?.value;
+            const guestEmail = this.el.querySelector('#guest_email')?.value;
+            const guestPhone = this.el.querySelector('#guest_phone')?.value;
+            valid = valid && !!guestName && !!guestEmail && !!guestPhone;
+        } else {
+            valid = valid
+                && !!this.beauticianInput.value
+                && !!this.chairInput.value;
+        }
         this.submitBtn.disabled = !valid;
     }
 

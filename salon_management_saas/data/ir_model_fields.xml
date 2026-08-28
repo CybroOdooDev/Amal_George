@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+<!-- 
+  ==============================================================================
+  SALON MANAGEMENT CUSTOM FIELDS DEFINITIONS (ir.model.fields)
+  Defines all Studio-level fields for service categories, services, packages,
+  chairs, and appointment booking models in Odoo.
+  ==============================================================================
+-->
   <record id="description_service__55ba20b2-1319-4bf5-9e07-fee732a236ff" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="copied" eval="True"/>
@@ -263,7 +270,7 @@
   </record>
   <record id="value_appointment_3db2ed55-23af-4400-9331-9345ea649bc8" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">monetary</field>
-    <field name="copied" eval="True"/>
+    <field name="copied" eval="False"/>
     <field name="field_description">Price</field>
     <field name="model">x_appointment</field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
@@ -283,7 +290,7 @@
   </record>
   <record id="new_datetime_appoint_c6815ada-92b2-4fe0-b90a-43c5f715f62a" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">datetime</field>
-    <field name="copied" eval="True"/>
+    <field name="copied" eval="False"/>
     <field name="field_description">Start Time</field>
     <field name="model">x_appointment</field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
@@ -292,7 +299,7 @@
   </record>
   <record id="new_datetime_appoint_2bc8612f-7ced-4b91-8255-c365746d9fc6" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">datetime</field>
-    <field name="copied" eval="True"/>
+    <field name="copied" eval="False"/>
     <field name="field_description">End Time</field>
     <field name="model">x_appointment</field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
@@ -301,7 +308,7 @@
   </record>
   <record id="new_integer_appointm_4b8c3017-f685-4f1c-9d5d-5d03f360ed04" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">integer</field>
-    <field name="copied" eval="True"/>
+    <field name="copied" eval="False"/>
     <field name="field_description">Duration</field>
     <field name="model">x_appointment</field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
+<odoo>
   <record id="service_category_gro_c35e0758-e221-4d2e-b581-6ba1275006fd" model="ir.access" context="{'studio': True}">
     <field name="group_id" ref="base.group_system"/>
     <field name="model_id" ref="service_category_524a6824-0a30-4cff-bf93-7e89575929c3"/>
@@ -121,5 +121,23 @@
     <value model="ir.model.fields" search="[('model', '=', 'x_appointment'), ('name', 'in', ['x_studio_partner_id', 'x_studio_booking_type', 'x_studio_date', 'x_studio_time_slot', 'x_studio_chair_num', 'x_studio_service', 'x_studio_service_package', 'x_studio_selection_1', 'x_studio_staff_beautician'])]"/>
     <value eval="{'website_form_blacklisted': False}"/>
   </function>
+
+  <!-- Allow public users to read company holiday settings (for calendar display) -->
+  <record id="res_company_group_public_read" model="ir.access">
+    <field name="group_id" ref="base.group_public"/>
+    <field name="model_id" ref="base.model_res_company"/>
+    <field name="name">Company group_public read</field>
+    <field name="operation">r</field>
+    <field name="domain">[(1, '=', 1)]</field>
+  </record>
+
+  <!-- Allow portal users to read company holiday settings (for calendar display) -->
+  <record id="res_company_group_portal_read" model="ir.access">
+    <field name="group_id" ref="base.group_portal"/>
+    <field name="model_id" ref="base.model_res_company"/>
+    <field name="name">Company group_portal read</field>
+    <field name="operation">r</field>
+    <field name="domain">[(1, '=', 1)]</field>
+  </record>
 
 </odoo>

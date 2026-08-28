@@ -1,7 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+<!-- 
+  ==============================================================================
+  SALON MANAGEMENT AUTOMATED SERVER ACTIONS (ir.actions.server)
+  Contains all backend Python automated actions for validation, booking overlap 
+  checks, and invoicing automation.
+  ==============================================================================
+-->
   <record id="execute_code_c394bbfe-a3b0-41a9-84a8-00d93d4af8c9" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Check that category code is unique if provided
     if not record.x_studio_category_code:
         continue
 
@@ -22,6 +30,7 @@
   </record>
   <record id="execute_code_cf3a0428-d6bd-426f-94cb-f8203259b5eb" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Check that service code is unique if provided
     if not record.x_studio_service_code:
         continue
 
@@ -42,6 +51,7 @@
   </record>
   <record id="execute_code_15dcbf23-45e7-4fa3-8ae4-0281e7f922e0" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Check that package code is unique if provided
     if not record.x_studio_package_code:
         continue
 
@@ -63,6 +73,7 @@
   </record>
   <record id="execute_code_944f7f3c-cf9c-4356-86a6-fc6b89a31641" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Ensure package discount percentage is between 0 and 100
     if record.x_studio_discount_1 < 0 or record.x_studio_discount_1 > 100:
         raise UserError(
             "Discount must be between 0 and 100."
@@ -74,6 +85,7 @@
   </record>
   <record id="execute_code_f246619f-5099-4cca-91bc-d8543800bbb6" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Calculate and cache original total price based on included services
     total = 0.0
 
     for service in record.x_studio_many2many_1:
@@ -89,6 +101,7 @@
   </record>
   <record id="execute_code_b86f6fed-823f-4000-bfcf-49efb9778ea1" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Calculate package final value by subtracting the discount from original total value
     original_value = record.x_studio_original_value or 0.0
     discount = record.x_studio_discount_1 or 0
 
@@ -107,6 +120,7 @@
   <record id="create_invoice_a8248fb7-0a99-4237-bce2-13dfe7175916" model="ir.actions.server" context="{'studio': True}">
     <field name="binding_model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
     <field name="code"><![CDATA[for record in records:
+    # Server action to create a customer invoice dynamically from appointment data
 
     # Validate customer
     if not record.x_studio_partner_id:
@@ -155,20 +169,39 @@
 
   <record id="action_appointment_auto_populate_details" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Check if this is a website guest booking request (which writes to x_studio_text_1)
+    if record.x_studio_text_1:
+        partner = False
+        # Search for existing partner by email
+        if record.x_studio_partner_email:
+            partner = env['res.partner'].sudo().search([('email', '=', record.x_studio_partner_email)], limit=1)
+        # Create partner if not found
+        if not partner:
+            partner = env['res.partner'].sudo().create({
+                'name': record.x_studio_text_1,
+                'email': record.x_studio_partner_email or False,
+                'phone': record.x_studio_partner_phone or False,
+            })
+        # Set partner on the appointment
+        if record.x_studio_partner_id != partner:
+            record.sudo().write({'x_studio_partner_id': partner.id})
+
     vals = {}
+    # Generate unique sequence code if none is set
     if not record.x_name or record.x_name == 'New':
-        vals['x_name'] = env['ir.sequence'].next_by_code('salon.appointment') or 'New'
+        vals['x_name'] = env['ir.sequence'].sudo().next_by_code('salon.appointment') or 'New'
     
     price = 0.0
     duration = 0
     
+    # Auto populate price and duration based on selected service or package
     if record.x_studio_booking_type == 'service' and record.x_studio_service:
-        price = record.x_studio_service.x_studio_value or 0.0
-        duration = record.x_studio_service.x_studio_duration_minutes or 0
+        price = record.x_studio_service.sudo().x_studio_value or 0.0
+        duration = record.x_studio_service.sudo().x_studio_duration_minutes or 0
     elif record.x_studio_booking_type == 'package' and record.x_studio_service_package:
-        price = record.x_studio_service_package.x_studio_value or 0.0
-        if record.x_studio_service_package.x_studio_many2many_1:
-            duration = sum(s.x_studio_duration_minutes or 0 for s in record.x_studio_service_package.x_studio_many2many_1)
+        price = record.x_studio_service_package.sudo().x_studio_value or 0.0
+        if record.x_studio_service_package.sudo().x_studio_many2many_1:
+            duration = sum(s.x_studio_duration_minutes or 0 for s in record.x_studio_service_package.sudo().x_studio_many2many_1)
             
     if record.x_studio_value != price:
         vals['x_studio_value'] = price
@@ -176,7 +209,7 @@
         vals['x_studio_duration'] = duration
         
     if vals:
-        record.write(vals)]]></field>
+        record.sudo().write(vals)]]></field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
     <field name="state">code</field>
     <field name="name">Auto Populate Service Details &amp; Price</field>
@@ -184,17 +217,22 @@
   </record>
 
   <record id="action_appointment_calculate_end_time" model="ir.actions.server" context="{'studio': True}">
-    <field name="code"><![CDATA[seq = env.ref('salon_management_saas.seq_salon_appointment', raise_if_not_found=False)
+    <field name="code"><![CDATA[# Ensure appointment sequence has BKG/ prefix
+seq = env.ref('salon_management_saas.seq_salon_appointment', raise_if_not_found=False)
 if seq and seq.prefix != 'BKG/':
-    seq.write({'prefix': 'BKG/'})
+    seq.sudo().write({'prefix': 'BKG/'})
 
 for record in records:
+    # Compute UTC start and end datetimes based on local timezone and selected slot
     if record.x_studio_date and record.x_studio_time_slot:
         user_tz = env.context.get('tz') or env.user.tz or 'UTC'
         local_tz = timezone(user_tz)
         hour, minute = map(int, record.x_studio_time_slot.split(':'))
         naive_start = datetime.datetime.combine(record.x_studio_date, datetime.time(hour, minute))
-        local_start = naive_start.replace(tzinfo=local_tz)
+        try:
+            local_start = local_tz.localize(naive_start)
+        except Exception:
+            local_start = naive_start.replace(tzinfo=local_tz)
         utc_start = local_start.astimezone(timezone('UTC')).replace(tzinfo=None)
         
         duration_mins = record.x_studio_duration or 30
@@ -206,12 +244,12 @@ for record in records:
         if record.x_studio_end_time != utc_end:
             vals['x_studio_end_time'] = utc_end
         if vals:
-            record.write(vals)
+            record.sudo().write(vals)
     elif record.x_studio_start_time and record.x_studio_duration:
         duration_mins = record.x_studio_duration
         end_time = record.x_studio_start_time + datetime.timedelta(minutes=duration_mins)
         if record.x_studio_end_time != end_time:
-            record.write({'x_studio_end_time': end_time})]]></field>
+            record.sudo().write({'x_studio_end_time': end_time})]]></field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
     <field name="state">code</field>
     <field name="name">Calculate Appointment End Time</field>
@@ -220,34 +258,46 @@ for record in records:
 
   <record id="action_appointment_prevent_double_booking" model="ir.actions.server" context="{'studio': True}">
     <field name="code"><![CDATA[for record in records:
+    # Validation rule: Only allow completing appointments scheduled for today
+    if record.x_studio_selection_1 == 'Completed':
+        today = datetime.date.today()
+        if not record.x_studio_date or record.x_studio_date != today:
+            raise UserError("You can only complete appointments scheduled for today (%s)." % today.strftime('%Y-%m-%d'))
+
+    company = env.company.sudo()
     if record.x_studio_date and record.x_studio_selection_1 not in ['Cancelled']:
+        today = datetime.date.today()
+        # Avoid false errors: skip validation for past-dated appointments
+        if record.x_studio_date < today:
+            continue
+
         # 1. Date-specific Holiday Check
-        holiday_dates = env.company.x_studio_holiday_ids.mapped('x_studio_date')
+        holiday_dates = company.x_studio_holiday_ids.mapped('x_studio_date')
         if record.x_studio_date in holiday_dates:
-            holiday = env.company.x_studio_holiday_ids.filtered(lambda h: h.x_studio_date == record.x_studio_date)[0]
+            holiday = company.x_studio_holiday_ids.filtered(lambda h: h.x_studio_date == record.x_studio_date)[0]
             raise UserError("Cannot book appointment on %s because it is a holiday (%s)." % (record.x_studio_date.strftime('%Y-%m-%d'), holiday.x_name))
             
         # 2. Recurring Weekly Holiday Check
         wday = record.x_studio_date.weekday()
-        if wday == 0 and env.company.x_studio_holiday_monday:
+        if wday == 0 and company.x_studio_holiday_monday:
             raise UserError("Cannot book appointment on %s because Mondays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
-        elif wday == 1 and env.company.x_studio_holiday_tuesday:
+        elif wday == 1 and company.x_studio_holiday_tuesday:
             raise UserError("Cannot book appointment on %s because Tuesdays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
-        elif wday == 2 and env.company.x_studio_holiday_wednesday:
+        elif wday == 2 and company.x_studio_holiday_wednesday:
             raise UserError("Cannot book appointment on %s because Wednesdays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
-        elif wday == 3 and env.company.x_studio_holiday_thursday:
+        elif wday == 3 and company.x_studio_holiday_thursday:
             raise UserError("Cannot book appointment on %s because Thursdays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
-        elif wday == 4 and env.company.x_studio_holiday_friday:
+        elif wday == 4 and company.x_studio_holiday_friday:
             raise UserError("Cannot book appointment on %s because Fridays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
-        elif wday == 5 and env.company.x_studio_holiday_saturday:
+        elif wday == 5 and company.x_studio_holiday_saturday:
             raise UserError("Cannot book appointment on %s because Saturdays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
-        elif wday == 6 and env.company.x_studio_holiday_sunday:
+        elif wday == 6 and company.x_studio_holiday_sunday:
             raise UserError("Cannot book appointment on %s because Sundays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
             
         # 3. Daily Break Time Check
-        if record.x_studio_time_slot and env.company.x_studio_allow_break:
-            break_start = env.company.x_studio_break_start
-            break_end = env.company.x_studio_break_end
+        if record.x_studio_time_slot and company.x_studio_allow_break:
+            break_start = company.x_studio_break_start
+            break_end = company.x_studio_break_end
             if break_start and break_end:
                 b_start_h, b_start_m = map(int, break_start.split(':'))
                 b_end_h, b_end_m = map(int, break_end.split(':'))
@@ -269,9 +319,10 @@ for record in records:
             
             # 1. Beautician Overlap Check
             if record.x_studio_staff_beautician:
-                overlapping_beautician = env['x_appointment'].search([
+                overlapping_beautician = env['x_appointment'].sudo().search([
                     ('x_studio_staff_beautician', '=', record.x_studio_staff_beautician.id),
                     ('id', '!=', record.id),
+                    ('x_studio_date', '=', record.x_studio_date),
                     ('x_studio_start_time', '<', record.x_studio_end_time),
                     ('x_studio_end_time', '>', record.x_studio_start_time),
                     ('x_studio_selection_1', 'in', ['Confirmed', 'Completed']),
@@ -290,9 +341,10 @@ for record in records:
                     
             # 2. Chair Overlap Check
             if record.x_studio_chair_num:
-                overlapping_chair = env['x_appointment'].search([
+                overlapping_chair = env['x_appointment'].sudo().search([
                     ('x_studio_chair_num', '=', record.x_studio_chair_num.id),
                     ('id', '!=', record.id),
+                    ('x_studio_date', '=', record.x_studio_date),
                     ('x_studio_start_time', '<', record.x_studio_end_time),
                     ('x_studio_end_time', '>', record.x_studio_start_time),
                     ('x_studio_selection_1', 'in', ['Confirmed', 'Completed']),
@@ -471,17 +523,17 @@ for record in records:
     <field name="name">Update Chair Reserved Time &amp; Date</field>
     <field name="code"><![CDATA[
 # Collect all chairs that need to be updated
-chairs_to_update = env['x_chair']
+chairs_to_update = env['x_chair'].sudo()
 
 for record in records:
     if record.x_studio_chair_num:
-        chairs_to_update |= record.x_studio_chair_num
+        chairs_to_update |= record.x_studio_chair_num.sudo()
 
 # Also search for active ones to keep it simple and correct.
-all_chairs = env['x_chair'].search([])
+all_chairs = env['x_chair'].sudo().search([])
 for chair in all_chairs:
     # Search all corresponding confirmed appointments for this chair
-    all_appointments = env['x_appointment'].search([
+    all_appointments = env['x_appointment'].sudo().search([
         ('x_studio_chair_num', '=', chair.id),
         ('x_studio_selection_1', '=', 'Confirmed')
     ])
@@ -499,7 +551,7 @@ for chair in all_chairs:
     if not chair.x_studio_filter_date:
         vals['x_studio_filter_date'] = datetime.date.today()
         
-    chair.with_context(onchange_self=None).write(vals)
+    chair.sudo().with_context(onchange_self=None).write(vals)
 ]]></field>
   </record>
   <record id="action_chair_update_bookings" model="ir.actions.server" context="{'studio': True}">
@@ -701,9 +753,9 @@ for rec in target_records:
     <field name="code"><![CDATA[for record in records:
     if not record.x_studio_chair_num and record.x_studio_start_time and record.x_studio_end_time:
         # Find all chairs
-        all_chairs = env['x_chair'].search([])
+        all_chairs = env['x_chair'].sudo().search([])
         # Find chairs that are busy during this time
-        busy_appointments = env['x_appointment'].search([
+        busy_appointments = env['x_appointment'].sudo().search([
             ('id', '!=', record.id),
             ('x_studio_start_time', '<', record.x_studio_end_time),
             ('x_studio_end_time', '>', record.x_studio_start_time),
@@ -714,7 +766,7 @@ for rec in target_records:
         # Find first free chair
         free_chairs = [c for c in all_chairs if c.id not in busy_chair_ids]
         if free_chairs:
-            record.write({'x_studio_chair_num': free_chairs[0].id})
+            record.sudo().write({'x_studio_chair_num': free_chairs[0].id})
         else:
             raise UserError("Sorry, no free chairs are available at this time.")]]></field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>

@@ -66,6 +66,11 @@ class SalonDashboard extends Component {
         return `${greet}, ${user.name}!`;
     }
 
+    /**
+     * Preloads employee, chair, service, and category reference tables
+     * to avoid redundant calls during search filters.
+     * @returns {Promise<void>}
+     */
     async loadLookups() {
         try {
             if (!this.employeesLoaded) {
@@ -142,6 +147,11 @@ class SalonDashboard extends Component {
         };
     }
 
+    /**
+     * Fetches and compiles all main KPIs, charts, and table lists
+     * from Odoo ORM, applying selected date-range and staff filters.
+     * @returns {Promise<void>}
+     */
     async loadData() {
         try {
             this.state.error_message = "";

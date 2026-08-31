@@ -79,7 +79,7 @@
         <field name="x_name" decoration-bf="1"/>
         <field name="x_studio_service_category" widget="badge"/>
         <field name="x_studio_duration_minutes"/>
-        <field name="x_studio_gender" widget="badge" decoration-info="x_studio_gender == 'Male'" decoration-danger="x_studio_gender == 'Female'" decoration-success="x_studio_gender == 'Unisex / Male / Female'"/>
+        <field name="x_studio_gender" widget="badge" decoration-info="x_studio_gender == 'Male'" decoration-danger="x_studio_gender == 'Female'" decoration-success="x_studio_gender == 'Other'"/>
         <field name="x_studio_value" sum="Total" decoration-bf="1"/>
       </list>
     </field>
@@ -350,13 +350,12 @@
         <xpath expr="/form//field[@name='x_studio_partner_phone']" position="after">
           <field name="x_studio_partner_gender" invisible="1"/>
           <field name="x_studio_booking_type" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
-          <field name="x_studio_service" options="{'create_name_field': 'x_name'}" required="x_studio_booking_type == 'service'" invisible="x_studio_booking_type != 'service'" readonly="x_studio_selection_1 != 'Draft'" domain="['|', ('x_studio_gender', '=', 'Unisex / Male / Female'), ('x_studio_gender', '=', x_studio_partner_gender)]"/>
-          <field name="x_studio_service_package" required="x_studio_booking_type == 'package'" invisible="x_studio_booking_type != 'package'" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_chair_num" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
+          <field name="x_studio_service" options="{'create_name_field': 'x_name'}" required="x_studio_booking_type == 'service'" invisible="x_studio_booking_type != 'service'" readonly="x_studio_selection_1 != 'Draft'" domain="['|', ('x_studio_gender', 'in', ('Other', 'Unisex')), ('x_studio_gender', '=', x_studio_partner_gender)]"/>
+          <field name="x_studio_service_package" required="x_studio_booking_type == 'package'" invisible="x_studio_booking_type != 'package'" readonly="x_studio_selection_1 != 'Draft'" domain="['|', ('x_studio_gender', 'in', ('Unisex', 'Other')), ('x_studio_gender', '=', x_studio_partner_gender)]"/>
           <field name="x_studio_start_time" readonly="True"/>
-          <field name="x_studio_duration" force_save="1" readonly="True"/>
           <xpath expr="/form//field[@name='x_studio_value']" position="move"/>
           <field name="x_studio_invoice_1" force_save="1" readonly="True"/>
-          <field name="x_studio_chair_num" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
         </xpath>
         <xpath expr="/form//field[@name='x_studio_partner_id']" position="attributes">
           <attribute name="required">True</attribute>
@@ -374,6 +373,7 @@
           <field name="x_studio_staff_beautician" required="True" readonly="x_studio_selection_1 != 'Draft'" domain="x_studio_booking_type == 'package' and [('id', 'in', x_studio_allowed_staff_ids)] or (x_studio_service_category and [('x_studio_specialties', 'in', x_studio_service_category)] or [])"/>
           <xpath expr="/form//field[@name='x_studio_partner_email']" position="move"/>
           <xpath expr="/form//field[@name='x_studio_date']" position="move"/>
+          <field name="x_studio_duration" force_save="1" readonly="True"/>
           <field name="x_studio_time_slot" required="True" readonly="x_studio_selection_1 != 'Draft'"/>
           <field name="x_studio_end_time" readonly="True"/>
           <field name="x_studio_related_payment_state_1"/>
@@ -502,7 +502,7 @@
         <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
           <field name="x_studio_package_code" required="True" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_gender" required="True" readonly="x_studio_status == 'inactive'"/>
-          <field name="x_studio_many2many_1" widget="many2many_tags" string="Services" required="True" readonly="x_studio_status == 'inactive'" domain="x_studio_gender == 'Male' and [('x_studio_gender', 'in', ['Male', 'Unisex / Male / Female'])] or (x_studio_gender == 'Female' and [('x_studio_gender', 'in', ['Female', 'Unisex / Male / Female'])] or [])"/>
+          <field name="x_studio_many2many_1" widget="many2many_tags" string="Services" required="True" readonly="x_studio_status == 'inactive'" domain="x_studio_gender == 'Male' and [('x_studio_gender', 'in', ['Male', 'Other', 'Unisex'])] or (x_studio_gender == 'Female' and [('x_studio_gender', 'in', ['Female', 'Other', 'Unisex'])] or [])"/>
           <field name="x_studio_staff_ids" widget="many2many_tags" string="Staff" required="True" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
           <field name="x_studio_end_date" required="x_studio_limited_time" invisible="not x_studio_limited_time" readonly="x_studio_status == 'inactive'"/>
@@ -714,9 +714,9 @@
                       <i class="fa fa-venus" title="Female"/> Female
                     </span>
                   </t>
-                  <t t-if="record.x_studio_gender.raw_value == 'Unisex / Male / Female'">
+                  <t t-if="record.x_studio_gender.raw_value == 'Other' or record.x_studio_gender.raw_value == 'Unisex'">
                     <span class="badge rounded-pill px-2 py-0.5" style="background-color: #f5f3ff; color: #7c3aed; font-size: 0.72rem; font-weight: 500;">
-                      <i class="fa fa-transgender-alt" title="Unisex"/> Unisex
+                      <i class="fa fa-genderless" title="Unisex"/> Unisex
                     </span>
                   </t>
                 </div>

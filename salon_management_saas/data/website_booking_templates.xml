@@ -525,7 +525,7 @@
                                                         $<span t-out="float(pkg.x_studio_value or 0.0)"/>
                                                     </span>
                                                 </div>
-                                                
+
                                                 <t t-if="pkg.x_studio_description">
                                                     <p class="text-muted small text-center mb-4" style="line-height: 1.5;">
                                                         <span t-out="pkg.x_studio_description"/>
@@ -546,7 +546,7 @@
                                                     </div>
                                                 </t>
                                             </div>
-                                            
+
                                             <div class="mt-auto">
                                                 <a t-attf-href="/salon-booking?type=package&amp;package_id=#{pkg.id}" class="btn btn-primary w-100 py-2.5 font-weight-bold" style="border-radius: 10px; background-color: #8b5cf6; border: none; font-weight: 600; font-size: 0.95rem; transition: background-color 0.2s;">
                                                     Book Package

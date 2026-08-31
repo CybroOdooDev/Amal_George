@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-<!-- 
+<!--
   ==============================================================================
   SALON MANAGEMENT AUTOMATED SERVER ACTIONS (ir.actions.server)
-  Contains all backend Python automated actions for validation, booking overlap 
+  Contains all backend Python automated actions for validation, booking overlap
   checks, and invoicing automation.
   ==============================================================================
 -->
@@ -190,10 +190,10 @@
     # Generate unique sequence code if none is set
     if not record.x_name or record.x_name == 'New':
         vals['x_name'] = env['ir.sequence'].sudo().next_by_code('salon.appointment') or 'New'
-    
+
     price = 0.0
     duration = 0
-    
+
     # Auto populate price and duration based on selected service or package
     if record.x_studio_booking_type == 'service' and record.x_studio_service:
         price = record.x_studio_service.sudo().x_studio_value or 0.0
@@ -202,12 +202,12 @@
         price = record.x_studio_service_package.sudo().x_studio_value or 0.0
         if record.x_studio_service_package.sudo().x_studio_many2many_1:
             duration = sum(s.x_studio_duration_minutes or 0 for s in record.x_studio_service_package.sudo().x_studio_many2many_1)
-            
+
     if record.x_studio_value != price:
         vals['x_studio_value'] = price
     if record.x_studio_duration != duration:
         vals['x_studio_duration'] = duration
-        
+
     if vals:
         record.sudo().write(vals)]]></field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
@@ -234,10 +234,10 @@ for record in records:
         except Exception:
             local_start = naive_start.replace(tzinfo=local_tz)
         utc_start = local_start.astimezone(timezone('UTC')).replace(tzinfo=None)
-        
+
         duration_mins = record.x_studio_duration or 30
         utc_end = utc_start + datetime.timedelta(minutes=duration_mins)
-        
+
         vals = {}
         if record.x_studio_start_time != utc_start:
             vals['x_studio_start_time'] = utc_start
@@ -276,7 +276,7 @@ for record in records:
         if record.x_studio_date in holiday_dates:
             holiday = company.x_studio_holiday_ids.filtered(lambda h: h.x_studio_date == record.x_studio_date)[0]
             raise UserError("Cannot book appointment on %s because it is a holiday (%s)." % (record.x_studio_date.strftime('%Y-%m-%d'), holiday.x_name))
-            
+
         # 2. Recurring Weekly Holiday Check
         wday = record.x_studio_date.weekday()
         if wday == 0 and company.x_studio_holiday_monday:
@@ -293,7 +293,7 @@ for record in records:
             raise UserError("Cannot book appointment on %s because Saturdays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
         elif wday == 6 and company.x_studio_holiday_sunday:
             raise UserError("Cannot book appointment on %s because Sundays are weekly holidays." % record.x_studio_date.strftime('%Y-%m-%d'))
-            
+
         # 3. Daily Break Time Check
         if record.x_studio_time_slot and company.x_studio_allow_break:
             break_start = company.x_studio_break_start
@@ -303,20 +303,20 @@ for record in records:
                 b_end_h, b_end_m = map(int, break_end.split(':'))
                 bs = b_start_h * 60 + b_start_m
                 be = b_end_h * 60 + b_end_m
-                
+
                 if be > bs:
                     appt_start_h, appt_start_m = map(int, record.x_studio_time_slot.split(':'))
                     as_min = appt_start_h * 60 + appt_start_m
                     ae_min = as_min + (record.x_studio_duration or 30)
-                    
+
                     if as_min < be and bs < ae_min:
                         raise UserError("Cannot book appointment on %s starting at %s (duration %d mins) because it overlaps with the scheduled break time (%s to %s)." % (record.x_studio_date.strftime('%Y-%m-%d'), record.x_studio_time_slot, record.x_studio_duration or 30, break_start, break_end))
-            
+
     if record.x_studio_selection_1 in ['Confirmed', 'Completed']:
         if record.x_studio_start_time and record.x_studio_end_time:
             user_tz = env.context.get('tz') or env.user.tz or 'UTC'
             local_tz = timezone(user_tz)
-            
+
             # 1. Beautician Overlap Check
             if record.x_studio_staff_beautician:
                 overlapping_beautician = env['x_appointment'].sudo().search([
@@ -338,7 +338,7 @@ for record in records:
                         "Conflict: Beautician '%s' is already booked for another appointment ('%s') from %s to %s."
                         % (record.x_studio_staff_beautician.name, overlapping_beautician.x_name, start_str, end_str)
                     )
-                    
+
             # 2. Chair Overlap Check
             if record.x_studio_chair_num:
                 overlapping_chair = env['x_appointment'].sudo().search([
@@ -389,10 +389,15 @@ if record.x_studio_invoice_1:
     <field name="name">Confirm Appointment</field>
     <field name="code"><![CDATA[
 for record in records:
+    if not record.x_studio_date:
+        raise UserError("Appointment Date is not set.")
+    if record.x_studio_date < datetime.date.today():
+        raise UserError("Conflict: You cannot confirm an appointment for a past date (%s)." % record.x_studio_date)
+
     record.write({'x_studio_selection_1': 'Confirmed'})
-    
+
     note_subtype_id = env.ref('mail.mt_note').id
-    
+
     # Send email to Customer and log in chatter
     template_cust = env.ref('salon_management_saas.mail_template_appointment_confirm_customer', raise_if_not_found=False)
     if template_cust and record.x_studio_partner_email:
@@ -405,7 +410,7 @@ for record in records:
             mail = env['mail.mail'].browse(mail_id).exists()
             if mail and mail.mail_message_id:
                 mail.mail_message_id.write({'subtype_id': note_subtype_id})
-        
+
     # Send email to Staff and log in chatter
     template_staff = env.ref('salon_management_saas.mail_template_appointment_confirm_staff', raise_if_not_found=False)
     if template_staff and record.x_studio_staff_beautician and record.x_studio_staff_beautician.work_email:
@@ -550,7 +555,7 @@ for chair in all_chairs:
     }
     if not chair.x_studio_filter_date:
         vals['x_studio_filter_date'] = datetime.date.today()
-        
+
     chair.sudo().with_context(onchange_self=None).write(vals)
 ]]></field>
   </record>
@@ -571,7 +576,7 @@ for record in records:
             ('x_studio_chair_num', '=', record.id),
             ('x_studio_selection_1', '=', 'Confirmed')
         ])
-    
+
     record.write({
         'x_studio_bookings': [(6, 0, appointments.ids)]
     })
@@ -619,7 +624,7 @@ for record in records:
     if record.x_studio_holiday_friday: checked_days.append(4)
     if record.x_studio_holiday_saturday: checked_days.append(5)
     if record.x_studio_holiday_sunday: checked_days.append(6)
-    
+
     if checked_days:
         today = datetime.date.today()
         active_appointments = env['x_appointment'].search([
@@ -673,11 +678,11 @@ for record in records:
                         display_h = h if h <= 12 else h - 12
                         if display_h == 0: display_h = 12
                         return "%02d:%02d %s" % (display_h, m, ampm)
-                    
+
                     b_start_label = format_time_label(record.x_studio_break_start)
                     b_end_label = format_time_label(record.x_studio_break_end)
                     appt_time_label = format_time_label(appt.x_studio_time_slot)
-                    
+
                     raise UserError("Conflict: Cannot save break time %s to %s. There is already a confirmed booking scheduled on %s starting at %s (%d mins). Please adjust the break time or the booking." % (b_start_label, b_end_label, appt.x_studio_date.strftime('%Y-%m-%d'), appt_time_label, appt.x_studio_duration or 30))
 ]]></field>
   </record>

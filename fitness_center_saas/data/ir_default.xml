@@ -68,7 +68,7 @@
   </record>
   <record id="new_selection_member_3da8d32a-b772-42b3-ad0a-a0b7039fe670" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="new_selection_member_16c51bde-c08a-4d5e-8ce8-fa6c21449f10"/>
-    <field name="json_value">null</field>
+    <field name="json_value">"Active"</field>
   </record>
   <record id="new_selection_fitnes_a6ebc79e-3257-409c-a6fc-e39c1dd3e843" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="new_selection_fitnes_979dd224-c2d4-447d-bd1a-625446a6fc08"/>

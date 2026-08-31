@@ -64,10 +64,12 @@
     <field name="field_id" ref="status_service_package_selection"/>
     <field name="json_value">"active"</field>
   </record>
+
   <record id="default_service_package_gender" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="new_selection_package_gender"/>
-    <field name="json_value">"Unisex / Male / Female"</field>
+    <field name="json_value">"Unisex"</field>
   </record>
+
   <record id="action_salon_res_config_settings" model="ir.actions.act_window">
     <field name="name">Settings</field>
     <field name="res_model">res.config.settings</field>

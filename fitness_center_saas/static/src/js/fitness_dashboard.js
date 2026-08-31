@@ -14,17 +14,9 @@ export class FitnessDashboard extends Component {
     static template = "fitness_center_saas.FitnessDashboard";
 
     /**
-
-
      * Component initialization and setup lifecycle hook.
-
-
      * Registers services, configures OWL reactive state, and handles auto-refresh timers.
-
-
      */
-
-
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
@@ -103,14 +95,8 @@ export class FitnessDashboard extends Component {
     }
 
     /**
-
-
      * Safely destroys all Chart.js instances to avoid memory leaks.
-
-
      */
-
-
     _destroyCharts() {
         Object.values(this.charts).forEach((chart) => {
             if (chart) chart.destroy();
@@ -119,14 +105,8 @@ export class FitnessDashboard extends Component {
     }
 
     /**
-
-
      * Toggles the visibility state of advanced search filter panel.
-
-
      */
-
-
     toggleAdvancedFilters() {
         this.state.showAdvancedFilters = !this.state.showAdvancedFilters;
     }
@@ -136,20 +116,10 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
 
     /**
-
-
      * Handles date input changes and triggers reactive dashboard reloads.
-
-
      * @param {string} name - The filter state variable to update (e.g. dateStart, dateEnd).
-
-
      * @param {Event} ev - The input change event.
-
-
      */
-
-
     onFilterChange(name, ev) {
         let val = ev.target.value;
         this.state.filters[name] = val;
@@ -157,14 +127,8 @@ export class FitnessDashboard extends Component {
     }
 
     /**
-
-
      * Resets date filter states and triggers dashboard silent reloads.
-
-
      */
-
-
     clearFilters() {
         this.state.filters = proxy({
             dateStart: "",
@@ -172,7 +136,7 @@ export class FitnessDashboard extends Component {
         });
         const inputs = document.querySelectorAll(".fc_filter_item input, .fc_filter_item_vertical input");
         inputs.forEach(i => i.value = "");
-        
+
         this.loadDashboardData(true);
     }
 
@@ -181,20 +145,10 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
 
     /**
-
-
      * Combines base criteria with selected dates to build the enrollment search domain.
-
-
      * @param {Array} baseDomain - The base criteria array.
-
-
      * @returns {Array} Compiled Odoo search domain.
-
-
      */
-
-
     _getEnrollmentDomain(baseDomain = []) {
         const domain = [...baseDomain];
         if (this.state.filters.dateStart) {
@@ -207,20 +161,10 @@ export class FitnessDashboard extends Component {
     }
 
     /**
-
-
      * Combines base criteria with selected dates to build the training sessions search domain.
-
-
      * @param {Array} baseDomain - The base criteria array.
-
-
      * @returns {Array} Compiled Odoo search domain.
-
-
      */
-
-
     _getSessionsDomain(baseDomain = []) {
         const domain = [...baseDomain];
         if (this.state.filters.dateStart) {
@@ -245,17 +189,9 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
 
     /**
-
-
      * Main controller method to load all KPI, operational lists, and charts data from Odoo backend.
-
-
      * @param {boolean} [silent=false] - If true, skips loading overlay rendering.
-
-
      */
-
-
     async loadDashboardData(silent = false) {
         if (!silent) {
             this.state.loading = true;
@@ -282,23 +218,9 @@ export class FitnessDashboard extends Component {
         }
     }
 
-
-
     /**
-
-
-
-
      * Queries Odoo database to count active members, MRR, sessions, classes, and available equipment.
-
-
-
-
      */
-
-
-
-
     async _loadKPIs() {
         const todayStr = this._todayString();
 
@@ -348,7 +270,7 @@ export class FitnessDashboard extends Component {
             availEquip = availEquipList.length;
             availableIds = availEquipList.map(e => e.id);
             busyIdsList = Array.from(busyIds);
-        } catch (_) {}
+        } catch (_) { }
         this.state.availableEquipmentIds = availableIds;
         this.state.underMaintenanceIds = busyIdsList;
 
@@ -383,7 +305,7 @@ export class FitnessDashboard extends Component {
                 ["amount_total"]
             );
             monthlyRevenue = mrrInvoices.reduce((sum, inv) => sum + inv.amount_total, 0);
-        } catch (_) {}
+        } catch (_) { }
 
         // Attendance Rate
         let attendanceRate = 0;
@@ -407,7 +329,7 @@ export class FitnessDashboard extends Component {
                 attendanceRate = Math.round((attended / todaySessions.length) * 100);
             }
             trainerIds = [...new Set(trainerIds)];
-        } catch (_) {}
+        } catch (_) { }
 
         // Trainer Utilization
         let trainerUtilization = 0;
@@ -415,7 +337,7 @@ export class FitnessDashboard extends Component {
             let totalTrainers = await this.orm.searchCount("hr.employee", []);
             trainerUtilization = totalTrainers > 0 ? Math.round((trainerIds.length / totalTrainers) * 100) : 0;
             if (trainerUtilization > 100) trainerUtilization = 100;
-        } catch (_) {}
+        } catch (_) { }
 
         this.state.kpi = proxy({
             activeMembers: activeEnr,
@@ -475,14 +397,8 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
 
     /**
-
-
      * Queries active enrollments expiring in the next 30 days.
-
-
      */
-
-
     async _loadUpcomingExpiries() {
         const records = await this.orm.searchRead(
             "x_enrollment",
@@ -516,14 +432,8 @@ export class FitnessDashboard extends Component {
     }
 
     /**
-
-
-     * Loads today\'s training sessions schedule list.
-
-
+     * Loads today's training sessions schedule list.
      */
-
-
     async _loadTodaySchedule() {
         const todayStr = this._todayString();
         const records = await this.orm.searchRead(
@@ -571,14 +481,8 @@ export class FitnessDashboard extends Component {
     }
 
     /**
-
-
      * Queries hr.employee and maps active session counts to determine trainer workloads.
-
-
      */
-
-
     async _loadTrainerAvailability() {
         const todayStr = this._todayString();
         const sessions = await this.orm.searchRead(
@@ -649,14 +553,8 @@ export class FitnessDashboard extends Component {
     }
 
     /**
-
-
      * Loads equipment maintenance alerts and status alerts.
-
-
      */
-
-
     async _loadEquipmentAlerts() {
         let alerts = [];
         try {
@@ -688,20 +586,14 @@ export class FitnessDashboard extends Component {
                     message: r.name || "Under Maintenance",
                 };
             });
-        } catch (_) {}
+        } catch (_) { }
 
         this.state.equipmentAlerts = alerts;
     }
 
     /**
-
-
      * Prepares aggregated dataset metrics for the 5 dashboard charts.
-
-
      */
-
-
     async _loadChartsData() {
         const todayStr = this._todayString();
 
@@ -763,12 +655,12 @@ export class FitnessDashboard extends Component {
             const busyIds = new Set(busyEquipIds.map(r => r.equipment_id[0]));
             const busyCount = busyIds.size;
             const availCount = Math.max(0, allEquipCount - busyCount);
-            
+
             equipmentStatus = [
                 { status: "Available", count: availCount, type: "available" },
                 { status: "Under Maintenance", count: busyCount, type: "maintenance" }
             ];
-        } catch (_) {}
+        } catch (_) { }
 
         // 4. Trainer Workload Today (for Radar calculations/workload calculations)
         const sessionsToday = await this.orm.searchRead(
@@ -882,7 +774,7 @@ export class FitnessDashboard extends Component {
                     topTrainerId = sorted[0].id;
                 }
             }
-        } catch (_) {}
+        } catch (_) { }
 
         let highestPlanName = "—";
         let highestPlanId = false;
@@ -895,7 +787,7 @@ export class FitnessDashboard extends Component {
                     highestPlanId = sorted[0].id;
                 }
             }
-        } catch (_) {}
+        } catch (_) { }
 
         let renewalRate = 0;
         try {
@@ -907,7 +799,7 @@ export class FitnessDashboard extends Component {
             if (totalConcluded > 0) {
                 renewalRate = Math.round((renewed / totalConcluded) * 100);
             }
-        } catch (_) {}
+        } catch (_) { }
 
         let equipUtil = 0;
         try {
@@ -930,7 +822,7 @@ export class FitnessDashboard extends Component {
             if (totalEquip > 0) {
                 equipUtil = Math.round((availEquip / totalEquip) * 100);
             }
-        } catch (_) {}
+        } catch (_) { }
 
         this.state.insights = proxy({
             topTrainer: topTrainer,
@@ -985,23 +877,11 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
 
     /**
-
-
      * Triggers Odoo action client to open standard list/form views for clicked KPI cards.
-
-
      * @param {string} model - The database model to view.
-
-
      * @param {Array} domain - The filter domain array.
-
-
      * @param {string} title - The header title of the target list view.
-
-
      */
-
-
     onTileClick(model, domain, title) {
         // domain may be an array or a JSON string (backward-compat)
         const resolvedDomain = Array.isArray(domain) ? domain : JSON.parse(domain);
@@ -1069,7 +949,7 @@ export class FitnessDashboard extends Component {
     onClickTrainerSessions(trainer) {
         this.onTileClick("x_training_sessions",
             [["x_studio_trainer_1_1", "=", trainer.id],
-             ["x_studio_date", "=", this._todayString()]],
+            ["x_studio_date", "=", this._todayString()]],
             "Today's Sessions - " + trainer.name);
     }
 
@@ -1084,7 +964,6 @@ export class FitnessDashboard extends Component {
     onClickViewAllEquipment() {
         this.onTileClick("maintenance.equipment", [], "Equipment Registry");
     }
-
 
     exportChartPNG(chartId, title) {
         const canvas = document.getElementById(chartId);
@@ -1155,14 +1034,8 @@ export class FitnessDashboard extends Component {
     // ─────────────────────────────────────────────────────────────
 
     /**
-
-
      * Instantiates the 5 Chart.js objects (Radar, Line, Bar, Polar, Pie) on the template canvases.
-
-
      */
-
-
     _initCharts() {
         this._destroyCharts();
 

@@ -2,7 +2,7 @@
     :target: https://www.odoo.com/documentation/master/legal/licenses.html#odoo-apps
     :alt: License: OPL-1
 
-Fitness Center Management for Odoo Online
+Fitness Center for Odoo Online
 =========================================
 A comprehensive Fitness Center Management SaaS application developed for Odoo Online 19.4. It streamlines gym operations by managing membership plans,
 member profiles, fitness classes, personal training, equipment tracking, maintenance requests, invoicing, and automated session planning crons.

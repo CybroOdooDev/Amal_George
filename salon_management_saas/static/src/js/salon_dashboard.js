@@ -634,8 +634,6 @@ class SalonDashboard extends Component {
         await this.loadData();
     }
 
-
-
     async onCustomStartDateChange(ev) {
         this.state.custom_start_date = ev.target.value;
         await this.loadData();

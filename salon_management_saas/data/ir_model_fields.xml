@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-<!-- 
+<!--
   ==============================================================================
   SALON MANAGEMENT CUSTOM FIELDS DEFINITIONS (ir.model.fields)
   Defines all Studio-level fields for service categories, services, packages,
@@ -146,7 +146,7 @@
     <field name="model_id" ref="service_5786dd1a-49e9-4766-9e35-0068d351443e"/>
     <field name="name">x_studio_gender</field>
     <field name="on_delete" eval="False"/>
-    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
+    <field name="selection">[('Male', 'Male'), ('Female', 'Female'), ('Unisex', 'Unisex')]</field>
   </record>
 
   <record id="description_appointm_1cc7848b-a678-4c38-abbc-81e72ab3aaba" model="ir.model.fields" context="{'studio': True}">
@@ -200,7 +200,7 @@
     <field name="model_id" ref="base.model_res_partner"/>
     <field name="name">x_studio_gender</field>
     <field name="on_delete" eval="False"/>
-    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
+    <field name="selection">[('Male', 'Male'), ('Female', 'Female')]</field>
   </record>
   <record id="field_x_appointment_x_studio_partner_gender" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
@@ -210,7 +210,7 @@
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
     <field name="name">x_studio_partner_gender</field>
     <field name="on_delete" eval="False"/>
-    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
+    <field name="selection">[('Male', 'Male'), ('Female', 'Female')]</field>
   </record>
   <record id="new_many2one_appoint_813909af-f255-47a7-a4d4-469c8d9f5ae0" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2one</field>
@@ -490,6 +490,7 @@
     <field name="name">x_studio_package_code</field>
     <field name="on_delete" eval="False"/>
   </record>
+
   <record id="new_selection_package_gender" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
     <field name="copied" eval="True"/>
@@ -498,8 +499,9 @@
     <field name="model_id" ref="service_package_951f0d2f-a641-4327-bba5-df02164d574a"/>
     <field name="name">x_studio_gender</field>
     <field name="on_delete" eval="False"/>
-    <field name="selection">[('Unisex / Male / Female', 'Unisex'), ('Male', 'Male'), ('Female', 'Female')]</field>
+    <field name="selection">[('Male', 'Male'), ('Female', 'Female'), ('Unisex', 'Unisex')]</field>
   </record>
+
   <record id="new_multiline_text_s_55592ada-8d74-4c89-b535-bc4bda77ed2e" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">text</field>
     <field name="copied" eval="True"/>
@@ -687,7 +689,7 @@ for record in self:
   <record id="field_x_appointment_x_studio_chair_num" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
-    <field name="field_description">chair-num</field>
+    <field name="field_description">Chair</field>
     <field name="model">x_appointment</field>
     <field name="model_id" ref="appointment_1c04a4e6-1c00-4a1d-8352-0705be1bab9e"/>
     <field name="name">x_studio_chair_num</field>

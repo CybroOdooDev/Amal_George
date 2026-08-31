@@ -3,151 +3,20 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Fitness Center Management for Odoo Online - Odoo 19 App Index</title>
+    <title>Fitness Center for Odoo Online - Odoo 19 App Index</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-    <style>
-        body {
-            font-family: "Montserrat", sans-serif;
-            background-color: #3b82f608;
-        }
-        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-            background-color: #3b82f6 !important;
-            border-color: #3b82f6 !important;
-            color: #fff !important;
-        }
-        .nav-pills .nav-link {
-            color: #4b5563 !important;
-            border-color: #e9ecef !important;
-            background-color: #fff !important;
-        }
-        .nav-pills .nav-link:hover {
-            border-color: #3b82f6 !important;
-            color: #3b82f6 !important;
-        }
-        .hlx-card {
-            height: 100%;
-            background-color: #fff;
-            border: 1px solid #ece8f6;
-            border-radius: 16px;
-            padding: 28px 26px;
-            box-shadow: 0 6px 18px rgba(59,130,246,.07);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .hlx-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(59,130,246,.12);
-            border-color: #3b82f6;
-        }
-        .hlx-ic {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #eff6ff;
-            border: 1px solid #dbeafe;
-            margin-bottom: 20px;
-        }
-        /* Timeline steps */
-        .timeline-step {
-            position: relative;
-            background: #FFFFFF;
-            border: 1px solid #eceaf6;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.05);
-        }
-        .timeline-badge {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-            color: #FFFFFF;
-            font-weight: 800;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-        }
-        /* Flowchart Styling */
-        .flowchart-container {
-            background: #0F172A;
-            color: #F8FAFC;
-            border-radius: 24px;
-            padding: 40px;
-        }
-        .flow-node {
-            background: #1E293B;
-            border: 2px solid #3B82F6;
-            border-radius: 16px;
-            padding: 20px;
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        .flow-node strong {
-            color: #3B82F6;
-            font-size: 1.05rem;
-            margin-bottom: 6px;
-            display: block;
-        }
-        .flow-node p {
-            font-size: 0.85rem;
-            margin: 0;
-            opacity: 0.85;
-        }
-        .flow-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #3B82F6;
-            font-size: 1.8rem;
-        }
-        /* Related modules card */
-        .highlight-card {
-            background-color: white;
-            backdrop-filter: blur(20px);
-            border-radius: 10px;
-            padding: 32px;
-            border: 2px solid #3b82f61a;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: block;
-        }
-        .highlight-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(59,130,246,.08);
-            border-color: #3b82f6;
-        }
-        .highlight-card.high:hover {
-            background-color: #3b82f60d;
-        }
-    </style>
 </head>
 
-<body>
+<body style="font-family: 'Montserrat', sans-serif; background-color: #71639e08;">
 
 <!-- ===== Header ===== -->
 <div class="container-fluid cmpad">
-    <div style="background-color:#fff;border:1px solid #eceaf6;border-radius:16px;padding:18px 32px;box-shadow:0 6px 22px rgba(59,130,246,.05);margin:16px 0;">
+    <div style="background-color:#fff;border:1px solid #eceaf6;border-radius:16px;padding:18px 32px;box-shadow:0 6px 22px rgba(79,70,229,.07);margin:16px 0;">
         <div class="row justify-content-between align-items-center g-3">
             <div class="col-lg-3 col-md-4 text-center text-md-start">
                 <img src="//apps.odoocdn.com/apps/assets/17.0/theme_boec/images/Cybrosys.png?fcdde35"
@@ -157,14 +26,14 @@
                 <div class="d-flex flex-column align-items-center align-items-md-end gap-2">
                     <div class="d-flex align-items-center gap-2 flex-wrap justify-content-center justify-content-md-end">
                         <span style="font-weight:700;color:#334155;">Supports:</span>
-                        <span style="background-color:#3b82f6;color:#fff;font-weight:600;padding:8px 22px;border-radius:50px;font-size:.95rem;box-shadow:0 5px 14px rgba(59,130,246,.25);">Enterprise</span>
+                        <span style="background-color:#4f46e5;color:#fff;font-weight:600;padding:8px 22px;border-radius:50px;font-size:.95rem;box-shadow:0 5px 14px rgba(79,70,229,.30);">Enterprise</span>
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap justify-content-center justify-content-md-end">
                         <span style="font-weight:700;color:#334155;">Availability:</span>
                          <span class="hdr-avail"
-                              style="display:inline-block;padding:7px 15px;border-radius:30px;font-weight:600;font-size:.92rem;background-color:#ecfdf3;border:1px solid #bbf3d0;color:#15803d;">
+                               style="display:inline-block;padding:7px 15px;border-radius:30px;font-weight:600;font-size:.92rem;background-color:#ecfdf3;border:1px solid #bbf3d0;color:#15803d;">
                             <img src="./assets/tick.png" alt="" width="17" height="17"> Odoo Online
-                        </span>
+                         </span>
                     </div>
                 </div>
             </div>
@@ -175,16 +44,16 @@
 <!-- ===== Hero intro ===== --> 
 <div class="container-fluid cmpad text-center" style="padding-top:34px;padding-bottom:6px;">
     <br/>
-    <span style="display:inline-block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#3b82f6;font-weight:700;background-color:#eff6ff;border:1px solid #dbeafe;padding:7px 16px;border-radius:30px;margin-bottom:18px;">Fitness Center Management &middot; saas19.4</span>
+    <span style="display:inline-block;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#4f46e5;font-weight:700;background-color:#eef0fe;border:1px solid #dcdcfb;padding:7px 16px;border-radius:30px;margin-bottom:18px;">Fitness Center Management &middot; saas19.4</span>
     <h1 class="mainhead"
         style="font-size:2.6rem;font-weight:800;color:#0f172a;letter-spacing:-.02em;margin:0 0 12px;line-height:1.15;">
-        Fitness Center Management for Odoo Online</h1>
+        Fitness Center for Odoo Online</h1>
     <p class="para" style="font-size:1.2rem;color:#334155;max-width:850px;margin:0 auto 26px;line-height:1.6;">
         A complete gym management solution for managing members, memberships, fitness programs, training sessions, equipment, invoicing, and operational analytics from a centralized platform.
     </p>
     <div style="text-align:center;">
         <a href="mailto:odoo@cybrosys.com" class="hdr-btn"
-           style="display:inline-block;text-align:center;padding:14px 28px;border-radius:50px;font-size:15px;font-weight:600;text-decoration:none;color:#fff;min-width:210px;background-color:#3b82f6;margin:4px 6px;">
+           style="display:inline-block;text-align:center;padding:14px 28px;border-radius:50px;font-size:15px;font-weight:600;text-decoration:none;color:#fff;min-width:210px;background-color:#4f46e5;margin:4px 6px;">
             <img src="./assets/mail.png" alt="" width="23" height="23" style="vertical-align:middle;margin-right:8px;">
             Email Us
         </a>
@@ -204,7 +73,7 @@
                 class="fa fa-headphones" style="font-size:16px;"></i></span>
         <span style="display:inline-block;vertical-align:middle;color:#334155;font-weight:700;font-size:.98rem;">Instant Support</span>
         <span style="display:inline-block;vertical-align:middle;color:#c7c2e8;margin:0 8px;">|</span>
-        <span style="display:inline-block;vertical-align:middle;color:#3b82f6;font-weight:600;font-size:.95rem;word-break:break-all;">https://support.cybrosys.com/instant-support</span>
+        <span style="display:inline-block;vertical-align:middle;color:#4f46e5;font-weight:600;font-size:.95rem;word-break:break-all;">https://support.cybrosys.com/instant-support</span>
     </div>
 </div>
 
@@ -213,16 +82,16 @@
     <div class="highlights-section">
         <h2 class="text-center" style="font-size:2.1rem;font-weight:800;color:#1b2233;margin:0;letter-spacing:-0.01em;">
             Key Highlights</h2>
-        <div style="width:70px;height:4px;margin:16px auto 12px;border-radius:3px;background-color:#3b82f6;"></div>
+        <div style="width:70px;height:4px;margin:16px auto 12px;border-radius:3px;background-color:#4f46e5;"></div>
         <p class="text-center" style="color:#5b6472;font-size:1.08rem;max-width:65ch;margin:0 auto 30px;">
             Comprehensive features designed for fitness center operations, trainers, and management.
         </p>
 
         <div class="row">
             <div class="col-md-4 mb-4">
-                <div class="hlx-card">
-                    <div class="hlx-ic">
-                        <i class="fa fa-users" style="color:#3b82f6;font-size:22px;line-height:1;"></i>
+                <div class="hlx-card" style="height:100%;background-color:#fff;border:1px solid #ece8f6;border-radius:16px;padding:28px 26px;box-shadow:0 6px 18px rgba(79,70,229,.07);position:relative;overflow:hidden;">
+                    <div class="hlx-ic" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background-color:#eef0fe;border:1px solid #dcdcfb;margin-bottom:20px;">
+                        <i class="fa fa-users" style="color:#4f46e5;font-size:22px;line-height:1;"></i>
                     </div>
                     <h3 style="font-size:19px;font-weight:700;color:#1b2233;margin:0 0 8px;letter-spacing:-0.01em;">
                         Member &amp; Membership Plans</h3>
@@ -230,9 +99,9 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="hlx-card">
-                    <div class="hlx-ic">
-                        <i class="fa fa-calendar-check-o" style="color:#3b82f6;font-size:22px;line-height:1;"></i>
+                <div class="hlx-card" style="height:100%;background-color:#fff;border:1px solid #ece8f6;border-radius:16px;padding:28px 26px;box-shadow:0 6px 18px rgba(79,70,229,.07);position:relative;overflow:hidden;">
+                    <div class="hlx-ic" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background-color:#eef0fe;border:1px solid #dcdcfb;margin-bottom:20px;">
+                        <i class="fa fa-calendar-check-o" style="color:#4f46e5;font-size:22px;line-height:1;"></i>
                     </div>
                     <h3 style="font-size:19px;font-weight:700;color:#1b2233;margin:0 0 8px;letter-spacing:-0.01em;">
                         Fitness Classes &amp; Schedules</h3>
@@ -240,9 +109,9 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="hlx-card">
-                    <div class="hlx-ic">
-                        <i class="fa fa-handshake-o" style="color:#3b82f6;font-size:22px;line-height:1;"></i>
+                <div class="hlx-card" style="height:100%;background-color:#fff;border:1px solid #ece8f6;border-radius:16px;padding:28px 26px;box-shadow:0 6px 18px rgba(79,70,229,.07);position:relative;overflow:hidden;">
+                    <div class="hlx-ic" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background-color:#eef0fe;border:1px solid #dcdcfb;margin-bottom:20px;">
+                        <i class="fa fa-handshake-o" style="color:#4f46e5;font-size:22px;line-height:1;"></i>
                     </div>
                     <h3 style="font-size:19px;font-weight:700;color:#1b2233;margin:0 0 8px;letter-spacing:-0.01em;">
                         Personal Training Packages</h3>
@@ -250,9 +119,9 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="hlx-card">
-                    <div class="hlx-ic">
-                        <i class="fa fa-cogs" style="color:#3b82f6;font-size:22px;line-height:1;"></i>
+                <div class="hlx-card" style="height:100%;background-color:#fff;border:1px solid #ece8f6;border-radius:16px;padding:28px 26px;box-shadow:0 6px 18px rgba(79,70,229,.07);position:relative;overflow:hidden;">
+                    <div class="hlx-ic" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background-color:#eef0fe;border:1px solid #dcdcfb;margin-bottom:20px;">
+                        <i class="fa fa-cogs" style="color:#4f46e5;font-size:22px;line-height:1;"></i>
                     </div>
                     <h3 style="font-size:19px;font-weight:700;color:#1b2233;margin:0 0 8px;letter-spacing:-0.01em;">
                         Gym Equipment &amp; Maintenance</h3>
@@ -260,9 +129,9 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="hlx-card">
-                    <div class="hlx-ic">
-                        <i class="fa fa-clock-o" style="color:#3b82f6;font-size:22px;line-height:1;"></i>
+                <div class="hlx-card" style="height:100%;background-color:#fff;border:1px solid #ece8f6;border-radius:16px;padding:28px 26px;box-shadow:0 6px 18px rgba(79,70,229,.07);position:relative;overflow:hidden;">
+                    <div class="hlx-ic" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background-color:#eef0fe;border:1px solid #dcdcfb;margin-bottom:20px;">
+                        <i class="fa fa-clock-o" style="color:#4f46e5;font-size:22px;line-height:1;"></i>
                     </div>
                     <h3 style="font-size:19px;font-weight:700;color:#1b2233;margin:0 0 8px;letter-spacing:-0.01em;">
                         Automated Session Scheduling</h3>
@@ -270,9 +139,9 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="hlx-card">
-                    <div class="hlx-ic">
-                        <i class="fa fa-credit-card" style="color:#3b82f6;font-size:22px;line-height:1;"></i>
+                <div class="hlx-card" style="height:100%;background-color:#fff;border:1px solid #ece8f6;border-radius:16px;padding:28px 26px;box-shadow:0 6px 18px rgba(79,70,229,.07);position:relative;overflow:hidden;">
+                    <div class="hlx-ic" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background-color:#eef0fe;border:1px solid #dcdcfb;margin-bottom:20px;">
+                        <i class="fa fa-credit-card" style="color:#4f46e5;font-size:22px;line-height:1;"></i>
                     </div>
                     <h3 style="font-size:19px;font-weight:700;color:#1b2233;margin:0 0 8px;letter-spacing:-0.01em;">
                         Smart Invoicing &amp; Analytics</h3>
@@ -323,8 +192,8 @@
             <div class="tab-pane fade show active" id="screenshot" role="tabpanel">
                 <div class="p-3 py-md-5">
                     <h2 class="text-center" style="font-size:2rem;font-weight:800;color:#0f172a;margin:0;">App <span
-                            style="color:#3b82f6;">Screenshots</span></h2>
-                    <div style="width:66px;height:4px;background-color:#3b82f6;border-radius:3px;margin:14px auto 26px;"></div>
+                            style="color:#4f46e5;">Screenshots</span></h2>
+                    <div style="width:66px;height:4px;background-color:#4f46e5;border-radius:3px;margin:14px auto 26px;"></div>
 
                     <!-- Screenshot 1 -->
                     <h3 style="font-size:1.25rem;font-weight:700;color:#1b2233;margin:22px 0 6px;">1. Interactive Gym Dashboard</h3>
@@ -423,15 +292,15 @@
             <div class="tab-pane fade" id="features" role="tabpanel">
                 <div class="p-3 py-md-5">
                     <h2 class="text-center" style="font-size:2rem;font-weight:800;color:#0f172a;margin:0;">Detailed
-                        <span style="color:#3b82f6;">Features</span></h2>
-                    <div style="width:70px;height:4px;margin:14px auto 10px;border-radius:3px;background-color:#3b82f6;"></div>
+                        <span style="color:#4f46e5;">Features</span></h2>
+                    <div style="width:70px;height:4px;margin:14px auto 10px;border-radius:3px;background-color:#4f46e5;"></div>
                     <p class="text-center" style="color:#5b6472;font-size:1.05rem;max-width:64ch;margin:0 auto 28px;">
                         Complete feature breakdown for fitness center membership, classes, and gym operations.
                     </p>
                     <table style="width:100%;border-collapse:separate;border-spacing:14px;">
                         <tr>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     01
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -440,8 +309,8 @@
                                 <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Configure plans with flexible durations, monthly fees, and services like training or class access.
                                 </div>
                             </td>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     02
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -450,8 +319,8 @@
                                 <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Track personal contact details, physical metrics, emergency contacts, enrollments, and sessions.
                                 </div>
                             </td>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     03
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -462,8 +331,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     04
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -472,8 +341,8 @@
                                 <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Link members with personal trainers and define specific training session packages.
                                 </div>
                             </td>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     05
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -482,8 +351,8 @@
                                 <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Log equipment details, categories, vendors, warranty periods, acquisition costs, and maintenance logs.
                                 </div>
                             </td>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     06
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -494,8 +363,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     07
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -504,8 +373,8 @@
                                 <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Generate and link customer invoices directly from enrollments in Odoo Invoicing (account.move).
                                 </div>
                             </td>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     08
                                 </div>
                                 <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
@@ -514,14 +383,11 @@
                                 <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Background automation scheduler (cron) dynamically schedules sessions without bloating database size.
                                 </div>
                             </td>
-                            <td style="width:33.33%;vertical-align:top;background-color:#f3f7fe;border:1px solid #ececf6;border-left:4px solid #3b82f6;border-radius:14px;padding:22px;">
-                                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;background-color:#3b82f6;color:#fff;font-size:1rem;font-weight:700;text-align:center;line-height:44px;margin-bottom:12px;">
+                            <td style="width:33.33%;vertical-align:top;background-color:#f3f2fe;border:1px solid #ececf6;border-left:4px solid #4f46e5;border-radius:14px;padding:22px;">
+                                <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background-color:#4f46e5;color:#fff;font-size:1rem;font-weight:700;margin-bottom:12px;">
                                     09
                                 </div>
-                                <div style="font-size:1.08rem;font-weight:700;margin:0 0 6px;color:#0f172a;line-height:1.3;">
-                                    Odoo 19 Compatibility
-                                </div>
-                                <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Built and optimized for Odoo 19 SaaS, Enterprise, and Odoo.sh cloud environments.
+                                <div style="font-size:14px;color:#334155;margin:0;line-height:1.55;">Odoo 19 Compatibility
                                 </div>
                             </td>
                         </tr>
@@ -533,8 +399,8 @@
             <div class="tab-pane fade" id="faq" role="tabpanel">
                 <div class="p-3 py-md-5">
                     <h2 class="text-center" style="font-size:2rem;font-weight:800;color:#0f172a;">Frequently Asked <span
-                            style="color:#3b82f6;">Questions</span></h2>
-                    <div style="width:70px;height:4px;margin:14px auto 30px;border-radius:3px;background-color:#3b82f6;"></div>
+                            style="color:#4f46e5;">Questions</span></h2>
+                    <div style="width:70px;height:4px;margin:14px auto 30px;border-radius:3px;background-color:#4f46e5;"></div>
                     <div style="max-width:900px;margin:0 auto;">
                         <details
                                 style="background-color:#fff;border:1px solid #ece8f6;border-radius:14px;margin-bottom:14px;padding:2px 8px;"
@@ -579,13 +445,13 @@
                     <div class="row justify-content-center">
                         <div class="col-md-6 mb-4">
                             <div class="release-item h-100"
-                                 style="position: relative;padding: 30px;border: 2px solid #3b82f624;border-radius: 15px;">
+                                 style="position: relative;padding: 30px;border: 2px solid #71639e24;border-radius: 15px;">
                                 <div class="release-header d-flex align-items-center flex-wrap gap-3"
                                      style="margin-bottom: 0.75rem;">
                                     <div class="version" style="font-size: 1.25rem;font-weight: 700;color: #1a202c;">
                                         Version saas~19.4.1.0
                                     </div>
-                                    <div style="padding: 0.25rem 0.75rem;border-radius: 20px;font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.5px;background-color: #dbeafe;color: #1e40af;border: 2px solid #bfdbfe;"
+                                    <div style="padding: 0.25rem 0.75rem;border-radius: 20px;font-size: 0.75rem;font-weight: 600;text-transform: uppercase;letter-spacing: 0.5px;background-color: #eef0fe;color: #4f46e5;border: 2px solid #dcdcfb;"
                                          class="imp">IMP
                                     </div>
                                     <div class="date"
@@ -614,83 +480,81 @@
     </div>
 </div>
 
-
-
 <!-- ===== Automated Session Scheduling Section ===== -->
 <div class="container-fluid cmpad py-2 py-md-5">
     <div class="text-center mb-5">
         <h2 style="font-size:2.1rem;font-weight:800;color:#1b2233;margin:0;letter-spacing:-0.01em;">Automated Session Scheduling</h2>
-        <div style="width:70px;height:4px;margin:16px auto 12px;border-radius:3px;background-color:#3b82f6;"></div>
+        <div style="width:70px;height:4px;margin:16px auto 12px;border-radius:3px;background-color:#4f46e5;"></div>
         <p class="text-center mb-4" style="color:#5b6472;font-size:1.08rem;max-width:65ch;margin:0 auto;">The module utilizes an intelligent incremental generation logic to plan training sessions efficiently without overloading the database.</p>
     </div>
 
     <!-- Flowchart Container -->
-    <div class="flowchart-container shadow mb-5">
+    <div class="flowchart-container shadow mb-5" style="background:#0F172A;color:#F8FAFC;border-radius:24px;padding:40px;">
         <div class="row align-items-center g-4 text-center justify-content-center">
             <!-- Node 1 -->
             <div class="col-lg-2 col-md-4">
-                <div class="flow-node">
-                    <strong>Active Enrollment</strong>
-                    <p>Paid status triggered</p>
+                <div class="flow-node" style="background:#1E293B;border:2px solid #4f46e5;border-radius:16px;padding:20px;min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.1);position:relative;">
+                    <strong style="color:#4f46e5;font-size:1.05rem;margin-bottom:6px;display:block;">Active Enrollment</strong>
+                    <p style="font-size:0.85rem;margin:0;opacity:0.85;">Paid status triggered</p>
                 </div>
             </div>
             <!-- Arrow -->
-            <div class="col-lg-1 flow-arrow d-none d-lg-block">
+            <div class="col-lg-1 flow-arrow d-none d-lg-block" style="display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:1.8rem;">
                 <i class="fa fa-long-arrow-right"></i>
             </div>
             <!-- Node 2 -->
             <div class="col-lg-2 col-md-4">
-                <div class="flow-node">
-                    <strong>Generate Current Month Sessions</strong>
-                    <p>Initial schedule batch</p>
+                <div class="flow-node" style="background:#1E293B;border:2px solid #4f46e5;border-radius:16px;padding:20px;min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.1);position:relative;">
+                    <strong style="color:#4f46e5;font-size:1.05rem;margin-bottom:6px;display:block;">Generate Current Month Sessions</strong>
+                    <p style="font-size:0.85rem;margin:0;opacity:0.85;">Initial schedule batch</p>
                 </div>
             </div>
             <!-- Arrow -->
-            <div class="col-lg-1 flow-arrow d-none d-lg-block">
+            <div class="col-lg-1 flow-arrow d-none d-lg-block" style="display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:1.8rem;">
                 <i class="fa fa-long-arrow-right"></i>
             </div>
             <!-- Node 3 -->
             <div class="col-lg-2 col-md-4">
-                <div class="flow-node">
-                    <strong>Track Sessions Generated Until</strong>
-                    <p>Lock progress date</p>
+                <div class="flow-node" style="background:#1E293B;border:2px solid #4f46e5;border-radius:16px;padding:20px;min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.1);position:relative;">
+                    <strong style="color:#4f46e5;font-size:1.05rem;margin-bottom:6px;display:block;">Track Sessions Generated Until</strong>
+                    <p style="font-size:0.85rem;margin:0;opacity:0.85;">Lock progress date</p>
                 </div>
             </div>
             <!-- Arrow -->
-            <div class="col-lg-1 flow-arrow d-none d-lg-block">
+            <div class="col-lg-1 flow-arrow d-none d-lg-block" style="display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:1.8rem;">
                 <i class="fa fa-long-arrow-right"></i>
             </div>
             <!-- Node 4 -->
             <div class="col-lg-2 col-md-4">
-                <div class="flow-node">
-                    <strong>Daily Scheduled Action</strong>
-                    <p>Automated cron trigger</p>
+                <div class="flow-node" style="background:#1E293B;border:2px solid #4f46e5;border-radius:16px;padding:20px;min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.1);position:relative;">
+                    <strong style="color:#4f46e5;font-size:1.05rem;margin-bottom:6px;display:block;">Daily Scheduled Action</strong>
+                    <p style="font-size:0.85rem;margin:0;opacity:0.85;">Automated cron trigger</p>
                 </div>
             </div>
         </div>
         <div class="row align-items-center g-4 text-center justify-content-center mt-3">
             <!-- Down Arrow from Node 4 (conceptual) -->
-            <div class="col-lg-2 offset-lg-6 flow-arrow d-none d-lg-block" style="transform: rotate(90deg); height: 30px; margin-top: -15px; margin-bottom: 5px;">
+            <div class="col-lg-2 offset-lg-6 flow-arrow d-none d-lg-block" style="transform: rotate(90deg); height: 30px; margin-top: -15px; margin-bottom: 5px;display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:1.8rem;">
                 <i class="fa fa-long-arrow-right"></i>
             </div>
         </div>
         <div class="row align-items-center g-4 text-center justify-content-center">
             <!-- Node 5 -->
             <div class="col-lg-2 offset-lg-4 col-md-4">
-                <div class="flow-node">
-                    <strong>Generate Next Month</strong>
-                    <p>Incremental expansion</p>
+                <div class="flow-node" style="background:#1E293B;border:2px solid #4f46e5;border-radius:16px;padding:20px;min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.1);position:relative;">
+                    <strong style="color:#4f46e5;font-size:1.05rem;margin-bottom:6px;display:block;">Generate Next Month</strong>
+                    <p style="font-size:0.85rem;margin:0;opacity:0.85;">Incremental expansion</p>
                 </div>
             </div>
             <!-- Arrow -->
-            <div class="col-lg-1 flow-arrow d-none d-lg-block">
+            <div class="col-lg-1 flow-arrow d-none d-lg-block" style="display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:1.8rem;">
                 <i class="fa fa-long-arrow-right"></i>
             </div>
             <!-- Node 6 -->
             <div class="col-lg-2 col-md-4">
-                <div class="flow-node" style="border-color: #22C55E;">
-                    <strong style="color: #22C55E;">Prevent Duplicates</strong>
-                    <p>Session clash checks</p>
+                <div class="flow-node" style="background:#1E293B;border:2px solid #22C55E;border-radius:16px;padding:20px;min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.1);position:relative;">
+                    <strong style="color: #22C55E;font-size:1.05rem;margin-bottom:6px;display:block;">Prevent Duplicates</strong>
+                    <p style="font-size:0.85rem;margin:0;opacity:0.85;">Session clash checks</p>
                 </div>
             </div>
         </div>
@@ -708,12 +572,12 @@
 <!-- ===== Related Modules ===== -->
 <div class="container-fluid cmpad py-2 py-md-5">
     <div class="highlights-section">
-        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related <span style="color: #3b82f6;">Modules</span></h2>
-        <div style="width:70px;height:4px;margin:16px auto 30px;border-radius:3px;background-color:#3b82f6;"></div>
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Related <span style="color: #4f46e5;">Modules</span></h2>
+        <div style="width:70px;height:4px;margin:16px auto 30px;border-radius:3px;background-color:#4f46e5;"></div>
         <div class="row">
             <div class="col-md-4 mb-4">
-                <a href="https://apps.odoo.com/apps/modules/19.0/product_brand_saas" class="highlight-card h-100">
-                    <div class="card-image" style="border: 2px solid #3b82f61c;margin-bottom: 1rem;border-radius: 10px;overflow: hidden;">
+                <a href="https://apps.odoo.com/apps/modules/19.0/product_brand_saas" class="highlight-card h-100" style="background-color: white;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;text-decoration: none;display: block;height:100%;">
+                    <div class="card-image" style="border: 2px solid #71639e1c;margin-bottom: 1rem;border-radius: 10px;overflow: hidden;">
                         <img src="./assets/modules/brand.jpg" alt="" style="width: 100%;border-radius: 10px;">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;margin-top: 10px;">Odoo 19 Product Brand SaaS</h3>
@@ -721,8 +585,8 @@
                 </a>
             </div>
             <div class="col-md-4 mb-4">
-                <a href="https://apps.odoo.com/apps/modules/19.0/hotel_management_saas" class="highlight-card h-100">
-                    <div class="card-image" style="border: 2px solid #3b82f61c;margin-bottom: 1rem;border-radius: 10px;overflow: hidden;">
+                <a href="https://apps.odoo.com/apps/modules/19.0/hotel_management_saas" class="highlight-card h-100" style="background-color: white;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;text-decoration: none;display: block;height:100%;">
+                    <div class="card-image" style="border: 2px solid #71639e1c;margin-bottom: 1rem;border-radius: 10px;overflow: hidden;">
                         <img src="./assets/modules/hotel.jpg" alt="" style="width: 100%;border-radius: 10px;">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;margin-top: 10px;">Odoo 19 Hotel Management SaaS</h3>
@@ -730,8 +594,8 @@
                 </a>
             </div>
             <div class="col-md-4 mb-4">
-                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget" class="highlight-card h-100">
-                    <div class="card-image" style="border: 2px solid #3b82f61c;margin-bottom: 1rem;border-radius: 10px;overflow: hidden;">
+                <a href="https://apps.odoo.com/apps/modules/19.0/base_account_budget" class="highlight-card h-100" style="background-color: white;backdrop-filter: blur(20px);border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;text-decoration: none;display: block;height:100%;">
+                    <div class="card-image" style="border: 2px solid #71639e1c;margin-bottom: 1rem;border-radius: 10px;overflow: hidden;">
                         <img src="./assets/modules/module3.jpg" alt="" style="width: 100%;border-radius: 10px;">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;margin-top: 10px;">Odoo 19 Budget Management</h3>
@@ -745,68 +609,68 @@
 <!-- ===== Our Services ===== -->
 <div class="container-fluid cmpad py-2 py-md-5">
     <div class="highlights-section">
-        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our <span style="color: #3b82f6;">Services</span></h2>
-        <div style="width:70px;height:4px;margin:16px auto 30px;border-radius:3px;background-color:#3b82f6;"></div>
+        <h2 class="mainhead text-center" style="font-size: 2rem;font-weight: 700;color: black;">Our <span style="color: #4f46e5;">Services</span></h2>
+        <div style="width:70px;height:4px;margin:16px auto 30px;border-radius:3px;background-color:#4f46e5;"></div>
         <div class="row text-center justify-content-center">
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/setting.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo Customization</h3>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/imple.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo Implementation</h3>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/support.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo Support</h3>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/transfer.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo Migration</h3>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/idea.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo Integration</h3>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/chat.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo Consultancy</h3>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/chart.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Odoo Licensing</h3>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #3b82f61f;">
-                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #3b82f6;">
+                <div class="highlight-card h-100 high d-flex flex-column justify-content-center align-items-center" style="background-color: #8d76d51f;border-radius: 10px;padding: 32px;border: 2px solid #71639e1a;position: relative;overflow: hidden;display: flex;height:100%;">
+                    <div class="card-icon d-flex align-items-center justify-content-center gap-2" style="width: 60px;height: 60px;border-radius: 10px;margin-bottom: 24px;position: relative;overflow: hidden;background-color: #71639e;display: flex;">
                         <img src="./assets/people.png" alt="" width="30" height="30">
                     </div>
                     <h3 class="card-title" style="font-size: 20px;font-weight: 600;color: black;letter-spacing: -0.025em;">Hire Odoo Developer</h3>

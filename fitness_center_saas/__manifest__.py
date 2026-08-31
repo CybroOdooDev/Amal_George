@@ -19,7 +19,7 @@
 #
 ################################################################################
 {
-    'name': 'Fitness Center',
+    'name': 'Fitness Center for Odoo Online',
     'version': 'saas~19.4.1.0',
     'category': 'Services',
     'summary': 'Manage fitness center operations, membership plans, schedules, and analytics.',
@@ -64,6 +64,7 @@ Key Features:
             'fitness_center_saas/static/src/js/fitness_dashboard.js',
         ],
     },
+    'images': ['static/description/banner.jpg'],
     'license': 'OPL-1',
     'application': True,
     'installable': True,

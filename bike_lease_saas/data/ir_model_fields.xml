@@ -1,0 +1,1231 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="description_bikes_62e0b2a8-b124-4be2-b21d-50152b239154" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Bike Name</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_name</field>
+    <field name="on_delete" eval="False"/>
+    <field name="required" eval="True"/>
+    <field name="tracking">1</field>
+    <field name="translate">standard</field>
+  </record>
+  <record id="active_bikes_d7f35fa5-4233-498b-984c-ac862e873144" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_active</field>
+    <field name="on_delete" eval="False"/>
+    <field name="tracking">1</field>
+  </record>
+  <record id="notes_bikes_d4b60545-53ec-49e9-8df5-ae7021722550" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Notes</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_notes</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="currency_bikes_23a9ad05-c7e5-4e7a-8eea-833b5bd1e476" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Currency</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_currency_id</field>
+    <field name="relation">res.currency</field>
+  </record>
+  <record id="value_bikes_ed3c88a3-23b1-48e8-9f42-aa0887f082c5" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Purchase Cost</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_value</field>
+    <field name="on_delete" eval="False"/>
+    <field name="tracking">1</field>
+    <field name="currency_field">x_studio_currency_id</field>
+  </record>
+  <record id="image_bikes_bd1e5430-878d-43ff-b7d4-54df9a741584" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">binary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Bike Image</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_image</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_text_bikes_efd6a412-b6fc-4f8b-a218-b967c518c5ac" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Registration Number</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_registration_number</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_text_bikes_ccd65b4d-ee86-41de-a765-b8e893f256df" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">VIN / Chassis Number</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_vin_chassis_number</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_text_bikes_44c6afad-ca48-4fcd-a248-d971837014e6" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Engine Number</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_engine_number</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_date_bikes_2916c5ce-a69e-4934-8396-d8cca7ddd5cb" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Purchase Date</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_purchase_date</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_decimal_bikes_6221b57b-c4a5-4911-80d4-be259309752e" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">float</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Current Odometer</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_current_odometer</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_many2one_bikes_e4115b61-9a37-40ab-bf06-d6714c74bb39" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Location</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_location</field>
+    <field name="relation">stock.location</field>
+  </record>
+  <record id="new_selection_bikes_d9d50637-8698-4fb1-b996-702d9c12d0fa" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Status</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_status</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Available', 'Available'), ('Reserved', 'Reserved'), ('Leased', 'Leased'), ('Maintenance', 'Maintenance'), ('Retired', 'Retired')]</field>
+  </record>
+  <record id="new_date_bikes_c82e2e0f-292c-496b-a215-914298f4011a" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Insurance Expiry</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_insurance_expiry</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_date_bikes_075600f0-f01f-470b-9484-4d695dd85227" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Registration Expiry</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_registration_expiry</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="description_bike_mod_6de196d4-435e-4424-9795-42b9244aa111" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Model Name</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_name</field>
+    <field name="on_delete" eval="False"/>
+    <field name="required" eval="True"/>
+    <field name="translate">standard</field>
+  </record>
+  <record id="active_bike_models_6c9167d1-c6d4-403e-8c4c-82ca59daa2d6" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_active</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="notes_bike_models_5073e163-b9ed-4923-8c21-7c8d3c004c0e" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Notes</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_notes</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="currency_bike_models_862f87c0-92c1-44a1-b1c8-d195cf9c4540" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Currency</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_currency_id</field>
+    <field name="relation">res.currency</field>
+  </record>
+  <record id="value_bike_models_5832ca1c-39fb-43c2-b821-52f1934c2ee8" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Standard Price</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_value</field>
+    <field name="on_delete" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+  </record>
+  <record id="image_bike_models_c92999be-7aca-4cb5-b8d5-2d0e2c7411b8" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">binary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Image</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_image</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="sequence_bike_models_30930649-2bdc-4c73-9766-027ce4abec75" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Sequence</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_sequence</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_html_bikes_d93d6fbb-4c13-48d9-9a76-d276188163a4" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Note</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_notes_1</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_selection_bike_m_5f982327-2262-4305-83c1-f42856164ab8" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Bike Type</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_bike_type</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Scooter', 'Scooter'), ('Motorcycle', 'Motorcycle'), ('Electric Bike', 'Electric Bike'), ('Other', 'Other')]</field>
+  </record>
+  <record id="new_selection_bike_m_b9fd3889-7120-483d-9a95-9510b705b527" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Fuel Type</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_fuel_type</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Petrol', 'Petrol'), ('Electric', 'Electric'), ('Hybrid', 'Hybrid'), ('Other', 'Other')]</field>
+  </record>
+  <record id="new_multiline_text_b_601e6b82-fc2e-42e9-b78c-9b6c1974851d" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">text</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Description</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_text_1</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="description_manufact_2dab6a31-5f47-440e-bd46-002e289e65aa" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Manufacturer Name</field>
+    <field name="model">x_manufacturers</field>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">x_name</field>
+    <field name="on_delete" eval="False"/>
+    <field name="required" eval="True"/>
+    <field name="translate">standard</field>
+  </record>
+  <record id="active_manufacturers_9f8d6d9b-b126-4966-b95b-bd0ca927b121" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model">x_manufacturers</field>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">x_active</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="notes_manufacturers_685a0ac7-1dda-494e-aea6-8a05cc609205" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Notes</field>
+    <field name="model">x_manufacturers</field>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">x_studio_notes</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="image_manufacturers_03127a0e-5518-44fe-9075-41203840c043" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">binary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Logo</field>
+    <field name="model">x_manufacturers</field>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">x_studio_image</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="sequence_manufacture_0dc00898-4c61-49ed-9578-38e4148d20f9" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Sequence</field>
+    <field name="model">x_manufacturers</field>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">x_studio_sequence</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_multiline_text_m_c38a25a8-8c78-428d-b41d-13dafba764fe" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">text</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Description</field>
+    <field name="model">x_manufacturers</field>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">x_studio_description</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_many2one_bike_mo_beee80ee-44e2-4f48-968d-15198ff51812" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Manufacturer</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_manufacturer</field>
+    <field name="relation">x_manufacturers</field>
+  </record>
+  <record id="new_many2one_bikes_3ecc47ac-70e4-4f01-b48a-ffe1e51a5352" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Bike Model</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_bike_model</field>
+    <field name="relation">x_bike_models</field>
+  </record>
+  <record id="manufacturer_bikes_c0c039e8-dd88-4d4e-9413-49ed13c7db23" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="related">x_studio_bike_model.x_studio_manufacturer</field>
+    <field name="field_description">Manufacturer</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_related_manufacturer</field>
+    <field name="readonly" eval="True"/>
+    <field name="relation">x_manufacturers</field>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="bike_type_bikes_bb567738-a143-4ad7-abd8-9bbf836758ea" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="related">x_studio_bike_model.x_studio_bike_type</field>
+    <field name="field_description">Bike Type</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_related_x_studio_bike_type_1</field>
+    <field name="on_delete" eval="False"/>
+    <field name="readonly" eval="True"/>
+    <field name="selection">[('Scooter', 'Scooter'), ('Motorcycle', 'Motorcycle'), ('Electric Bike', 'Electric Bike'), ('Other', 'Other')]</field>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="new_integer_bike_mod_63315aca-4fee-4528-b16c-1a3fed5d1198" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Engine Capacity (CC)</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_engine_capacity_cc_</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="field_bike_models_bike_count" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Bike Count</field>
+    <field name="model">x_bike_models</field>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">x_studio_bike_count</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    rec['x_studio_bike_count'] = self.env['x_bikes'].search_count([('x_studio_bike_model', '=', rec.id)])]]></field>
+  </record>
+
+  <record id="field_manufacturers_model_count" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Model Count</field>
+    <field name="model">x_manufacturers</field>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">x_studio_model_count</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    rec['x_studio_model_count'] = self.env['x_bike_models'].search_count([('x_studio_manufacturer', '=', rec.id)])]]></field>
+  </record>
+  <record id="description_lease_pl_ca46e860-7f31-4c21-8ba0-638b0bc5b736" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Plan Name</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_name</field>
+    <field name="on_delete" eval="False"/>
+    <field name="required" eval="True"/>
+    <field name="translate">standard</field>
+  </record>
+  <record id="active_lease_plans_f5ddd644-00cd-4e6d-8e69-0bcce59d84fc" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_active</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="notes_lease_plans_b56da613-9dd6-41b9-a172-0e314de60775" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Notes</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_notes</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="currency_lease_plans_73d55607-1acf-4a82-a8fa-2029ea1a23a5" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Currency</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_currency_id</field>
+    <field name="relation">res.currency</field>
+  </record>
+  <record id="value_lease_plans_e72f8d21-95ec-400f-a829-7339f685232a" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Lease Amount</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_value</field>
+    <field name="on_delete" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+  </record>
+  <record id="sequence_lease_plans_12649831-3703-4563-ac1d-ced576372f40" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Sequence</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_sequence</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_integer_lease_pl_dcb0cded-7eb4-4f19-8131-1bb089d84c3b" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Lease Duration</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_lease_duration</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_selection_lease__aa0e4877-5082-4275-a39e-afacb5626eb7" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Duration Unit</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_duration_unit</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Days', 'Days'), ('Weeks', 'Weeks'), ('Months', 'Months'), ('Years', 'Years')]</field>
+  </record>
+  <record id="new_selection_lease__28bbb242-c5e3-4bb6-a054-2b51c607b023" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Payment Frequency</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_payment_frequency</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly'), ('Quarterly', 'Quarterly'), ('Yearly', 'Yearly')]</field>
+  </record>
+  <record id="new_monetary_lease_p_c9df29cf-be27-484f-b032-0a9b713703f0" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Security Deposit</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_security_deposit</field>
+    <field name="on_delete" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+  </record>
+  <record id="new_monetary_lease_p_4fe37bc1-0c6c-4ff0-9023-2f5dcfd49252" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Initial Payment</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_initial_payment</field>
+    <field name="on_delete" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+  </record>
+  <record id="new_monetary_lease_p_4c087d62-124a-4257-a4ef-34bba45f01c1" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Late Fee Amount</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_late_fee</field>
+    <field name="on_delete" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+  </record>
+  <record id="new_multiline_text_l_50fc1010-b113-478a-b486-9be8a0b47474" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">text</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Description</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_description</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_selection_lease__85139632-eaf8-47d4-b565-481c222da57a" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Late Fee Type</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_late_fee_type</field>
+    <field name="on_delete" eval="False"/>
+    <field name="selection">[('Fixed Amount', 'Fixed Amount'), ('Percentage', 'Percentage')]</field>
+  </record>
+  <record id="new_integer_lease_pl_93e08466-9ddf-4635-b8e3-c0ec449253d8" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Late Fee Percentage</field>
+    <field name="model">x_lease_plans</field>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">x_studio_late_fee_percentage</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="description_lease_ap_9b7c0c59-87ac-4818-bcc3-7f6923bd5370" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Application Number</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_name</field>
+    <field name="on_delete" eval="False"/>
+    <field name="readonly" eval="True"/>
+    <field name="required" eval="False"/>
+    <field name="translate">standard</field>
+  </record>
+  <record id="active_lease_applica_748d1ee8-86a7-4cd4-bf81-6f2536023526" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_active</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="contact_lease_applic_281736cc-55aa-4118-885c-24e8cdf90239" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Customer</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_partner_id</field>
+    <field name="relation">res.partner</field>
+  </record>
+  <record id="phone_lease_applicat_3beda29a-5514-4e1b-b355-be7696d1bd9a" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="related">x_studio_partner_id.phone</field>
+    <field name="field_description">Phone</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_partner_phone</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="email_lease_applicat_433b84d2-43bf-43f8-ae0e-3ae8fb533bf9" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="related">x_studio_partner_id.email</field>
+    <field name="field_description">Email</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_partner_email</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="notes_lease_applicat_91ada5b2-ea3e-4ca9-8319-8cb2a6cb41a1" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Notes</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_notes</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="date_lease_applicati_1a55060c-9869-4c56-8126-a801b6523863" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Application Date</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_date</field>
+    <field name="on_delete" eval="False"/>
+    <field name="readonly" eval="True"/>
+    <field name="required" eval="False"/>
+  </record>
+
+  <record id="new_many2one_lease_app_bike_model" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Bike Model</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_bike_model</field>
+    <field name="relation">x_bike_models</field>
+    <field name="required" eval="True"/>
+    <field name="on_delete">restrict</field>
+  </record>
+  <record id="new_many2one_lease_a_12fadf3b-6c76-410a-92a3-910b8cfcb59d" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Bike</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_bike</field>
+    <field name="relation">x_bikes</field>
+    <field name="required" eval="False"/>
+  </record>
+  <record id="new_many2one_lease_a_d0ea8d85-aa4e-436c-b7b1-f887cd0aa3fc" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Lease Plan</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_lease_plan</field>
+    <field name="relation">x_lease_plans</field>
+    <field name="required" eval="True"/>
+    <field name="on_delete">restrict</field>
+  </record>
+  <record id="new_date_lease_appli_c2283ab3-946e-4a0b-bc2d-01f0125e0341" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Lease Start Date</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_lease_start_date</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_file_lease_appli_fab623e3-2550-442b-9ac7-692dd5e177b2" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">binary</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Customer Documents</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_customer_documents</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="filename_for_x_studi_5c0e6661-2a50-455c-ba19-416ba164770f" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Filename for x_studio_binary_1</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_customer_documents_filename</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_multiline_text_l_761d88a2-34de-4ba6-8c9b-c4d65fae6ab9" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">text</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Reason</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_reason</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="contract_lease_application_5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Lease Contract</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_contract_id</field>
+    <field name="on_delete">set null</field>
+    <field name="readonly" eval="True"/>
+    <field name="relation">x_lease_contract</field>
+  </record>
+  <record id="description_lease_co_fa8904ac-827a-418d-81f3-9fd4816ee8e1" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Contract Number</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_name</field>
+    <field name="on_delete" eval="False"/>
+    <field name="readonly" eval="True"/>
+    <field name="required" eval="False"/>
+    <field name="translate">standard</field>
+  </record>
+  <record id="active_lease_contrac_df99e773-cc10-4218-ad90-7fb3547d7db5" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_active</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="contact_lease_contra_a1d559f0-d722-4672-840d-0a2ede78cd41" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Customer</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_partner_id</field>
+    <field name="relation">res.partner</field>
+  </record>
+  <record id="phone_lease_contract_88a3a7c4-1848-479a-86ea-d5cc2b5fa7e2" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="related">x_studio_partner_id.phone</field>
+    <field name="field_description">Phone</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_partner_phone</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="email_lease_contract_3bb080aa-3609-4326-b745-b1a60ca8e02c" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="related">x_studio_partner_id.email</field>
+    <field name="field_description">Email</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_partner_email</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="notes_lease_contract_89cb6b0d-07a5-419c-bcca-1f08d49e7b08" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Notes</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_notes</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="date_lease_contract_0095c1b4-cc8b-4017-bc58-ef934a97e560" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Start Date</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_date</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+
+  <record id="new_many2one_lease_contract_bike_model" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Vehicle Model</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_bike_model</field>
+    <field name="relation">x_bike_models</field>
+    <field name="on_delete">restrict</field>
+  </record>
+  <record id="new_many2one_lease_c_eba717d9-c76a-455d-a6ee-da544282bbc0" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Bike</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_bike</field>
+    <field name="relation">x_bikes</field>
+  </record>
+  <record id="new_many2one_lease_c_d04e1ccf-df21-4097-84ff-2df537b7a940" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Lease Plan</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_lease_plan</field>
+    <field name="relation">x_lease_plans</field>
+  </record>
+  <record id="new_date_lease_contr_7fcee175-6c2d-43ac-bf19-72678de73045" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">End Date</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_end_date</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="new_selection_lease__b1f5089d-0437-4de7-a183-717b39f25ba3" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Status</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_selection_1</field>
+    <field name="on_delete" eval="False"/>
+    <field name="readonly" eval="True"/>
+    <field name="selection">[('Draft', 'Draft'), ('Active', 'Active'), ('Completed', 'Completed'), ('Terminated', 'Terminated'), ('Cancelled', 'Cancelled')]</field>
+  </record>
+  <record id="new_selection_lease__418bc697-7ff8-4951-b06c-ed6a4035a5d2" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Status</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_selection_1</field>
+    <field name="on_delete" eval="False"/>
+    <field name="readonly" eval="True"/>
+    <field name="selection">[('Draft', 'Draft'), ('Submitted', 'Submitted'), ('Approved', 'Approved'), ('Rejected', 'Rejected'), ('Cancelled', 'Cancelled')]</field>
+  </record>
+  <record id="application_lease_contract_9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Lease Application</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_application_id</field>
+    <field name="on_delete">set null</field>
+    <field name="readonly" eval="True"/>
+    <field name="relation">x_lease_application</field>
+  </record>
+  <record id="field_reject_wizard_reason" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">text</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Rejection Reason</field>
+    <field name="model">x_lease_application_reject_wizard</field>
+    <field name="model_id" ref="model_lease_app_reject_wizard"/>
+    <field name="name">x_studio_reason</field>
+    <field name="on_delete" eval="False"/>
+    <field name="required" eval="False"/>
+  </record>
+  <record id="field_reject_wizard_app_id" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Application</field>
+    <field name="model">x_lease_application_reject_wizard</field>
+    <field name="model_id" ref="model_lease_app_reject_wizard"/>
+    <field name="name">x_studio_application_id</field>
+    <field name="on_delete">cascade</field>
+    <field name="relation">x_lease_application</field>
+  </record>
+  <record id="field_rejection_reason_name" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Reason</field>
+    <field name="model">x_rejection_reason</field>
+    <field name="model_id" ref="model_rejection_reason"/>
+    <field name="name">x_name</field>
+    <field name="on_delete" eval="False"/>
+    <field name="required" eval="True"/>
+  </record>
+  <record id="field_lease_app_rejection_reasons" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Rejection Reasons</field>
+    <field name="model">x_lease_application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">x_studio_rejection_reason_ids</field>
+    <field name="relation">x_rejection_reason</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="field_reject_wizard_reasons" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Rejection Reasons</field>
+    <field name="model">x_lease_application_reject_wizard</field>
+    <field name="model_id" ref="model_lease_app_reject_wizard"/>
+    <field name="name">x_studio_rejection_reason_ids</field>
+    <field name="relation">x_rejection_reason</field>
+    <field name="required" eval="True"/>
+  </record>
+
+  <!-- Fields for x_lease_installment -->
+  <record id="field_installment_name" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Reference</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_name</field>
+    <field name="required" eval="True"/>
+  </record>
+  <record id="field_installment_contract" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Lease Contract</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_contract_id</field>
+    <field name="on_delete">cascade</field>
+    <field name="relation">x_lease_contract</field>
+    <field name="required" eval="True"/>
+  </record>
+  <record id="field_installment_date" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Due Date</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_date</field>
+    <field name="required" eval="True"/>
+  </record>
+  <record id="field_installment_currency" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Currency</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_currency_id</field>
+    <field name="relation">res.currency</field>
+  </record>
+  <record id="field_installment_amount" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Amount</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_amount</field>
+    <field name="currency_field">x_studio_currency_id</field>
+  </record>
+  <record id="field_installment_status" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Status</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_status</field>
+    <field name="selection">[('Draft', 'Draft'), ('Invoiced', 'Invoiced'), ('Paid', 'Paid')]</field>
+  </record>
+  <record id="field_installment_invoice" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Customer Invoice</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_invoice_id</field>
+    <field name="on_delete">set null</field>
+    <field name="relation">account.move</field>
+  </record>
+  <record id="field_installment_payment_state" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="False"/>
+    <field name="related">x_studio_invoice_id.payment_state</field>
+    <field name="field_description">Payment Status</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_payment_state</field>
+    <field name="readonly" eval="True"/>
+    <field name="selection">[('not_paid', 'Not Paid'), ('in_payment', 'In Payment'), ('paid', 'Paid'), ('partial', 'Partially Paid'), ('reversed', 'Reversed'), ('blocked', 'Blocked')]</field>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="field_installment_is_overdue" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Is Overdue</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_is_overdue</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    is_paid = rec.x_studio_payment_state in ('paid', 'in_payment')
+    rec['x_studio_is_overdue'] = bool(rec.x_studio_date and rec.x_studio_date < datetime.date.today() and not is_paid)]]></field>
+  </record>
+  <record id="field_installment_late_fee_amount" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Late Fee</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_late_fee_amount</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    fee = 0.0
+    inv = rec.x_studio_invoice_id
+    if inv:
+        late_lines = inv.invoice_line_ids.filtered(lambda l: 'Late Payment' in (l.name or '') and (rec.x_name in (l.name or '') or len(rec.x_studio_contract_id.x_studio_installment_ids.filtered(lambda i: i.x_studio_invoice_id == inv)) == 1))
+        if late_lines:
+            fee = sum(l.price_unit for l in late_lines)
+        elif rec.x_studio_contract_id and rec.x_studio_contract_id.x_studio_lease_plan:
+            inv_date = inv.invoice_date or datetime.date.today()
+            if rec.x_studio_date and rec.x_studio_date < inv_date:
+                plan = rec.x_studio_contract_id.x_studio_lease_plan
+                fee_type = plan.x_studio_late_fee_type
+                if fee_type == 'Fixed Amount':
+                    fee = plan.x_studio_late_fee or 0.0
+                elif fee_type == 'Percentage':
+                    fee = (rec.x_studio_amount or 0.0) * ((plan.x_studio_late_fee_percentage or 0.0) / 100.0)
+    elif rec.x_studio_is_overdue and rec.x_studio_contract_id and rec.x_studio_contract_id.x_studio_lease_plan:
+        plan = rec.x_studio_contract_id.x_studio_lease_plan
+        fee_type = plan.x_studio_late_fee_type
+        if fee_type == 'Fixed Amount':
+            fee = plan.x_studio_late_fee or 0.0
+        elif fee_type == 'Percentage':
+            fee = (rec.x_studio_amount or 0.0) * ((plan.x_studio_late_fee_percentage or 0.0) / 100.0)
+    rec['x_studio_late_fee_amount'] = fee]]></field>
+  </record>
+  <record id="field_installment_total_amount" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Total Amount</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_total_amount</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    rec['x_studio_total_amount'] = (rec.x_studio_amount or 0.0) + (rec.x_studio_late_fee_amount or 0.0)]]></field>
+  </record>
+
+  <!-- Deposit Invoice fields and computed fields on x_lease_contract -->
+  <record id="field_lease_contract_deposit_invoice" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Deposit Invoice</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_deposit_invoice_id</field>
+    <field name="on_delete">set null</field>
+    <field name="relation">account.move</field>
+  </record>
+  <record id="field_lease_contract_deposit_paid" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Deposit Paid</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_deposit_paid</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    inv = rec.x_studio_deposit_invoice_id
+    rec['x_studio_deposit_paid'] = bool(inv and inv.payment_state in ('paid', 'in_payment'))]]></field>
+  </record>
+  <record id="field_lease_contract_has_draft_installments" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Has Draft Installments</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_has_draft_installments</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    drafts = rec.x_studio_installment_ids.filtered(lambda i: i.x_studio_status == 'Draft')
+    rec['x_studio_has_draft_installments'] = bool(drafts)]]></field>
+  </record>
+  <record id="field_lease_contract_all_invoices_paid" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">All Invoices Paid</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_all_invoices_paid</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    invoices = rec.x_studio_installment_ids.mapped('x_studio_invoice_id')
+    if rec.x_studio_deposit_invoice_id:
+        invoices |= rec.x_studio_deposit_invoice_id
+    if rec.x_studio_return_invoice_id:
+        invoices |= rec.x_studio_return_invoice_id
+    has_draft_inst = bool(rec.x_studio_installment_ids.filtered(lambda i: i.x_studio_status == 'Draft'))
+    unpaid_invs = invoices.filtered(lambda inv: inv.payment_state not in ('paid', 'in_payment'))
+    rec['x_studio_all_invoices_paid'] = bool(invoices and not has_draft_inst and not unpaid_invs)]]></field>
+  </record>
+  <record id="field_lease_contract_installments" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">one2many</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Installment Schedule</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_installment_ids</field>
+    <field name="readonly" eval="True"/>
+    <field name="relation">x_lease_installment</field>
+    <field name="relation_field">x_studio_contract_id</field>
+  </record>
+  <record id="field_lease_contract_currency" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Currency</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_currency_id</field>
+    <field name="relation">res.currency</field>
+  </record>
+  <record id="field_lease_contract_bike_returned" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Bike Returned &amp; Inspected</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_bike_returned</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="field_lease_contract_repair_charge" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Repair / Service Charge</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_repair_charge</field>
+  </record>
+  <record id="field_lease_contract_refund_amount" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Calculated Deposit Refund</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_refund_amount</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    dep = rec.x_studio_lease_plan.x_studio_security_deposit if rec.x_studio_lease_plan else 0.0
+    repair = rec.x_studio_repair_charge or 0.0
+    rec['x_studio_refund_amount'] = max(0.0, dep - repair)]]></field>
+  </record>
+  <record id="field_lease_contract_extra_charge" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Extra Damage Billed</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_extra_charge</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    dep = rec.x_studio_lease_plan.x_studio_security_deposit if rec.x_studio_lease_plan else 0.0
+    repair = rec.x_studio_repair_charge or 0.0
+    rec['x_studio_extra_charge'] = max(0.0, repair - dep)]]></field>
+  </record>
+  <record id="field_lease_contract_return_invoice" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Return Settlement Document</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_return_invoice_id</field>
+    <field name="on_delete">set null</field>
+    <field name="relation">account.move</field>
+  </record>
+  <record id="field_lease_contract_invoice_count" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Invoices Count</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_invoice_count</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    invoices = rec.x_studio_installment_ids.mapped('x_studio_invoice_id')
+    if rec.x_studio_deposit_invoice_id:
+        invoices |= rec.x_studio_deposit_invoice_id
+    if rec.x_studio_return_invoice_id:
+        invoices |= rec.x_studio_return_invoice_id
+    rec['x_studio_invoice_count'] = len(invoices)]]></field>
+  </record>
+  <record id="field_bike_issue_name" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">char</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Issue Description</field>
+    <field name="model">x_bike_issue</field>
+    <field name="model_id" ref="model_bike_issue"/>
+    <field name="name">x_name</field>
+    <field name="required" eval="True"/>
+  </record>
+  <record id="field_lease_contract_issue_ids" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Issues Found</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_issue_ids</field>
+    <field name="relation">x_bike_issue</field>
+  </record>
+  <record id="field_wizard_contract" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Contract</field>
+    <field name="model">x_bike_return_wizard</field>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">x_studio_contract_id</field>
+    <field name="relation">x_lease_contract</field>
+  </record>
+  <record id="field_wizard_bike_returned" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Bike Returned &amp; Inspected</field>
+    <field name="model">x_bike_return_wizard</field>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">x_studio_bike_returned</field>
+  </record>
+  <record id="field_wizard_issue_ids" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Issues Found</field>
+    <field name="model">x_bike_return_wizard</field>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">x_studio_issue_ids</field>
+    <field name="relation">x_bike_issue</field>
+  </record>
+  <record id="field_wizard_currency" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Currency</field>
+    <field name="model">x_bike_return_wizard</field>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">x_studio_currency_id</field>
+    <field name="relation">res.currency</field>
+  </record>
+  <record id="field_wizard_repair_charge" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Repair / Service Charge</field>
+    <field name="model">x_bike_return_wizard</field>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">x_studio_repair_charge</field>
+  </record>
+  <record id="field_wizard_service_needed" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Service Needed</field>
+    <field name="model">x_bike_return_wizard</field>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">x_studio_service_needed</field>
+  </record>
+  <record id="field_lease_contract_service_needed" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Service Needed</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_service_needed</field>
+    <field name="readonly" eval="True"/>
+  </record>
+</odoo>

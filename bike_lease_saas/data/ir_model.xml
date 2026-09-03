@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="is_mail_thread" eval="True"/>
+    <field name="is_mail_activity" eval="True"/>
+    <field name="model">x_bikes</field>
+    <field name="name">Bikes</field>
+  </record>
+  <record id="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Bike Models</field>
+  </record>
+  <record id="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="model">x_manufacturers</field>
+    <field name="name">Manufacturers</field>
+  </record>
+  <record id="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Lease Plans</field>
+  </record>
+  <record id="lease_application_036d2453-d3be-4130-a107-33eec67d96b0" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="is_mail_thread" eval="True"/>
+    <field name="is_mail_activity" eval="True"/>
+    <field name="model">x_lease_application</field>
+    <field name="name">Lease Application</field>
+  </record>
+  <record id="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83" model="ir.model" context="{'studio': True}">
+    <field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
+
+    Odoo models are created by inheriting from this class::
+
+        class ResUsers(Model):
+            ...
+
+    The system will later instantiate the class once per database (on
+    which the class' module is installed).
+    ]]></field>
+    <field name="is_mail_thread" eval="True"/>
+    <field name="is_mail_activity" eval="True"/>
+    <field name="model">x_lease_contract</field>
+    <field name="name">Lease Contract</field>
+  </record>
+  <record id="bikes_x_name_unique" model="ir.model.constraint">
+    <field name="name">x_bikes_x_name_unique</field>
+    <field name="model" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="module" ref="base.module_bike_lease_saas"/>
+    <field name="type">u</field>
+    <field name="definition">UNIQUE(x_name)</field>
+    <field name="message">The Bike Name must be unique!</field>
+  </record>
+  <record id="bike_models_x_name_unique" model="ir.model.constraint">
+    <field name="name">x_bike_models_x_name_unique</field>
+    <field name="model" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="module" ref="base.module_bike_lease_saas"/>
+    <field name="type">u</field>
+    <field name="definition">UNIQUE(x_name)</field>
+    <field name="message">The Model Name must be unique!</field>
+  </record>
+  <record id="manufacturers_x_name_unique" model="ir.model.constraint">
+    <field name="name">x_manufacturers_x_name_unique</field>
+    <field name="model" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="module" ref="base.module_bike_lease_saas"/>
+    <field name="type">u</field>
+    <field name="definition">UNIQUE(x_name)</field>
+    <field name="message">The Manufacturer Name must be unique!</field>
+  </record>
+  <record id="lease_plans_x_name_unique" model="ir.model.constraint">
+    <field name="name">x_lease_plans_x_name_unique</field>
+    <field name="model" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="module" ref="base.module_bike_lease_saas"/>
+    <field name="type">u</field>
+    <field name="definition">UNIQUE(x_name)</field>
+    <field name="message">The Plan Name must be unique!</field>
+  </record>
+  <record id="lease_application_x_name_unique" model="ir.model.constraint">
+    <field name="name">x_lease_application_x_name_unique</field>
+    <field name="model" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="module" ref="base.module_bike_lease_saas"/>
+    <field name="type">u</field>
+    <field name="definition">UNIQUE(x_name)</field>
+    <field name="message">The Application Number must be unique!</field>
+  </record>
+  <record id="lease_contract_x_name_unique" model="ir.model.constraint">
+    <field name="name">x_lease_contract_x_name_unique</field>
+    <field name="model" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="module" ref="base.module_bike_lease_saas"/>
+    <field name="type">u</field>
+    <field name="definition">UNIQUE(x_name)</field>
+    <field name="message">The Contract Number must be unique!</field>
+  </record>
+  <record id="model_lease_app_reject_wizard" model="ir.model" context="{'studio': True}">
+    <field name="model">x_lease_application_reject_wizard</field>
+    <field name="name">Reject Application Wizard</field>
+    <field name="transient" eval="True"/>
+  </record>
+  <record id="model_rejection_reason" model="ir.model" context="{'studio': True}">
+    <field name="model">x_rejection_reason</field>
+    <field name="name">Rejection Reason</field>
+  </record>
+  <record id="model_lease_installment" model="ir.model" context="{'studio': True}">
+    <field name="model">x_lease_installment</field>
+    <field name="name">Lease Installment</field>
+  </record>
+  <record id="model_bike_return_wizard" model="ir.model" context="{'studio': True}">
+    <field name="model">x_bike_return_wizard</field>
+    <field name="name">Bike Return &amp; Inspection Wizard</field>
+    <field name="transient" eval="True"/>
+  </record>
+  <record id="model_bike_issue" model="ir.model" context="{'studio': True}">
+    <field name="model">x_bike_issue</field>
+    <field name="name">Bike Inspection Issue</field>
+  </record>
+</odoo>

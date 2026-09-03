@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- Manufacturers -->
+    <record id="manufacturer_honda" model="x_manufacturers" context="{'studio': True}">
+        <field name="x_name">Honda</field>
+        <field name="x_studio_sequence">10</field>
+        <field name="x_studio_description">Honda Motor Co., Ltd. - Leading global manufacturer of reliable motorcycles and scooters.</field>
+    </record>
+
+    <record id="manufacturer_yamaha" model="x_manufacturers" context="{'studio': True}">
+        <field name="x_name">Yamaha</field>
+        <field name="x_studio_sequence">20</field>
+        <field name="x_studio_description">Yamaha Motor Co., Ltd. - Renowned manufacturer of performance motorcycles and sporty scooters.</field>
+    </record>
+
+    <record id="manufacturer_vespa" model="x_manufacturers" context="{'studio': True}">
+        <field name="x_name">Vespa</field>
+        <field name="x_studio_sequence">30</field>
+        <field name="x_studio_description">Piaggio &amp; C. SpA - Premium Italian luxury scooter brand.</field>
+    </record>
+
+    <record id="manufacturer_bmw" model="x_manufacturers" context="{'studio': True}">
+        <field name="x_name">BMW Motorrad</field>
+        <field name="x_studio_sequence">40</field>
+        <field name="x_studio_description">BMW Motorrad - Premium German motorcycles and cutting-edge electric urban mobility vehicles.</field>
+    </record>
+
+    <!-- Bike Models -->
+    <record id="model_activa_6g" model="x_bike_models" context="{'studio': True}">
+        <field name="x_name">Activa 6G</field>
+        <field name="x_studio_manufacturer" ref="manufacturer_honda"/>
+        <field name="x_studio_bike_type">Scooter</field>
+        <field name="x_studio_fuel_type">Petrol</field>
+        <field name="x_studio_engine_capacity_cc_">110</field>
+        <field name="x_studio_value">1200.0</field>
+        <field name="x_studio_sequence">10</field>
+        <field name="x_studio_text_1">Reliable and fuel-efficient 110cc urban commuter scooter.</field>
+    </record>
+
+    <record id="model_yamaha_r15" model="x_bike_models" context="{'studio': True}">
+        <field name="x_name">YZF-R15 V4</field>
+        <field name="x_studio_manufacturer" ref="manufacturer_yamaha"/>
+        <field name="x_studio_bike_type">Motorcycle</field>
+        <field name="x_studio_fuel_type">Petrol</field>
+        <field name="x_studio_engine_capacity_cc_">155</field>
+        <field name="x_studio_value">2500.0</field>
+        <field name="x_studio_sequence">20</field>
+        <field name="x_studio_text_1">Premium 155cc supersport bike with VVA technology.</field>
+    </record>
+
+    <record id="model_vespa_urban" model="x_bike_models" context="{'studio': True}">
+        <field name="x_name">Vespa Primavera 125</field>
+        <field name="x_studio_manufacturer" ref="manufacturer_vespa"/>
+        <field name="x_studio_bike_type">Scooter</field>
+        <field name="x_studio_fuel_type">Petrol</field>
+        <field name="x_studio_engine_capacity_cc_">125</field>
+        <field name="x_studio_value">3200.0</field>
+        <field name="x_studio_sequence">30</field>
+        <field name="x_studio_text_1">Iconic Italian luxury scooter for stylish city commuting.</field>
+    </record>
+
+    <record id="model_bmw_ce04" model="x_bike_models" context="{'studio': True}">
+        <field name="x_name">CE 04 Electric</field>
+        <field name="x_studio_manufacturer" ref="manufacturer_bmw"/>
+        <field name="x_studio_bike_type">Electric Bike</field>
+        <field name="x_studio_fuel_type">Electric</field>
+        <field name="x_studio_engine_capacity_cc_">0</field>
+        <field name="x_studio_value">12500.0</field>
+        <field name="x_studio_sequence">40</field>
+        <field name="x_studio_text_1">Futuristic high-performance zero-emission electric urban scooter.</field>
+    </record>
+
+    <!-- Bikes -->
+    <record id="bike_honda_01" model="x_bikes" context="{'studio': True}">
+        <field name="x_name">BK-2026-HND01</field>
+        <field name="x_studio_bike_model" ref="model_activa_6g"/>
+        <field name="x_studio_registration_number">NY-8842-BK</field>
+        <field name="x_studio_vin_chassis_number">ME4JK88210010091</field>
+        <field name="x_studio_engine_number">ENG-HND-992182</field>
+        <field name="x_studio_purchase_date">2025-01-15</field>
+        <field name="x_studio_value">1200.0</field>
+        <field name="x_studio_current_odometer">1250.5</field>
+        <field name="x_studio_status">Available</field>
+        <field name="x_studio_insurance_expiry">2027-01-15</field>
+        <field name="x_studio_registration_expiry">2027-01-15</field>
+    </record>
+
+    <record id="bike_yamaha_01" model="x_bikes" context="{'studio': True}">
+        <field name="x_name">BK-2026-YMH01</field>
+        <field name="x_studio_bike_model" ref="model_yamaha_r15"/>
+        <field name="x_studio_registration_number">CA-5521-MC</field>
+        <field name="x_studio_vin_chassis_number">JY4MC55920027712</field>
+        <field name="x_studio_engine_number">ENG-YMH-551239</field>
+        <field name="x_studio_purchase_date">2025-03-10</field>
+        <field name="x_studio_value">2500.0</field>
+        <field name="x_studio_current_odometer">4500.0</field>
+        <field name="x_studio_status">Leased</field>
+        <field name="x_studio_insurance_expiry">2027-03-10</field>
+        <field name="x_studio_registration_expiry">2027-03-10</field>
+    </record>
+
+    <record id="bike_vespa_01" model="x_bikes" context="{'studio': True}">
+        <field name="x_name">BK-2026-VSP01</field>
+        <field name="x_studio_bike_model" ref="model_vespa_urban"/>
+        <field name="x_studio_registration_number">TX-3319-VS</field>
+        <field name="x_studio_vin_chassis_number">ZAPM883010034412</field>
+        <field name="x_studio_engine_number">ENG-VSP-338104</field>
+        <field name="x_studio_purchase_date">2025-06-01</field>
+        <field name="x_studio_value">3200.0</field>
+        <field name="x_studio_current_odometer">800.0</field>
+        <field name="x_studio_status">Reserved</field>
+        <field name="x_studio_insurance_expiry">2027-06-01</field>
+        <field name="x_studio_registration_expiry">2027-06-01</field>
+    </record>
+
+    <record id="bike_bmw_01" model="x_bikes" context="{'studio': True}">
+        <field name="x_name">BK-2026-BMW01</field>
+        <field name="x_studio_bike_model" ref="model_bmw_ce04"/>
+        <field name="x_studio_registration_number">FL-9912-EV</field>
+        <field name="x_studio_vin_chassis_number">WB1CE04090048821</field>
+        <field name="x_studio_engine_number">ENG-BMW-901235</field>
+        <field name="x_studio_purchase_date">2025-08-20</field>
+        <field name="x_studio_value">12500.0</field>
+        <field name="x_studio_current_odometer">320.0</field>
+        <field name="x_studio_status">Available</field>
+        <field name="x_studio_insurance_expiry">2027-08-20</field>
+        <field name="x_studio_registration_expiry">2027-08-20</field>
+    </record>
+
+    <!-- Lease Plans -->
+    <record id="plan_daily_flex" model="x_lease_plans" context="{'studio': True}">
+        <field name="x_name">Daily Flex Lease Plan</field>
+        <field name="x_studio_value">25.0</field>
+        <field name="x_studio_lease_duration">1</field>
+        <field name="x_studio_duration_unit">Days</field>
+        <field name="x_studio_payment_frequency">Daily</field>
+        <field name="x_studio_security_deposit">100.0</field>
+        <field name="x_studio_late_fee_type">Fixed Amount</field>
+        <field name="x_studio_late_fee">10.0</field>
+        <field name="x_studio_description">Flexible short-term daily leasing for tourists and short trips.</field>
+    </record>
+
+    <record id="plan_weekly_standard" model="x_lease_plans" context="{'studio': True}">
+        <field name="x_name">Weekly Standard Plan</field>
+        <field name="x_studio_value">120.0</field>
+        <field name="x_studio_lease_duration">1</field>
+        <field name="x_studio_duration_unit">Weeks</field>
+        <field name="x_studio_payment_frequency">Weekly</field>
+        <field name="x_studio_security_deposit">250.0</field>
+        <field name="x_studio_late_fee_type">Fixed Amount</field>
+        <field name="x_studio_late_fee">25.0</field>
+        <field name="x_studio_description">Cost-effective weekly lease for gig workers and temporary staff.</field>
+    </record>
+
+    <record id="plan_monthly_pro" model="x_lease_plans" context="{'studio': True}">
+        <field name="x_name">Monthly Pro Commuter Plan</field>
+        <field name="x_studio_value">350.0</field>
+        <field name="x_studio_lease_duration">1</field>
+        <field name="x_studio_duration_unit">Months</field>
+        <field name="x_studio_payment_frequency">Monthly</field>
+        <field name="x_studio_security_deposit">500.0</field>
+        <field name="x_studio_late_fee_type">Percentage</field>
+        <field name="x_studio_late_fee_percentage">5</field>
+        <field name="x_studio_description">Comprehensive monthly lease package including routine maintenance.</field>
+    </record>
+
+    <record id="plan_annual_enterprise" model="x_lease_plans" context="{'studio': True}">
+        <field name="x_name">Annual Enterprise Fleet Plan</field>
+        <field name="x_studio_value">3600.0</field>
+        <field name="x_studio_lease_duration">1</field>
+        <field name="x_studio_duration_unit">Years</field>
+        <field name="x_studio_payment_frequency">Monthly</field>
+        <field name="x_studio_security_deposit">1000.0</field>
+        <field name="x_studio_late_fee_type">Percentage</field>
+        <field name="x_studio_late_fee_percentage">10</field>
+        <field name="x_studio_description">Long-term 12-month corporate leasing solution.</field>
+    </record>
+
+    <!-- Rejection Reasons -->
+    <record id="rejection_reason_docs" model="x_rejection_reason" context="{'studio': True}">
+        <field name="x_name">Incomplete Documentation</field>
+    </record>
+
+    <record id="rejection_reason_credit" model="x_rejection_reason" context="{'studio': True}">
+        <field name="x_name">Credit Check Failed</field>
+    </record>
+
+    <record id="rejection_reason_bike" model="x_rejection_reason" context="{'studio': True}">
+        <field name="x_name">Bike Unavailable</field>
+    </record>
+
+    <record id="rejection_reason_criteria" model="x_rejection_reason" context="{'studio': True}">
+        <field name="x_name">Unmet Eligibility Criteria</field>
+    </record>
+
+    <!-- Bike Inspection Issues -->
+    <record id="bike_issue_body_scratch" model="x_bike_issue" context="{'studio': True}">
+        <field name="x_name">Body Scratch / Paint Damage</field>
+    </record>
+    <record id="bike_issue_tire_puncture" model="x_bike_issue" context="{'studio': True}">
+        <field name="x_name">Tire Wear / Puncture</field>
+    </record>
+    <record id="bike_issue_brake_pad" model="x_bike_issue" context="{'studio': True}">
+        <field name="x_name">Brake Pad Worn</field>
+    </record>
+    <record id="bike_issue_mirror_broken" model="x_bike_issue" context="{'studio': True}">
+        <field name="x_name">Side Mirror Broken</field>
+    </record>
+    <record id="bike_issue_headlight_cracked" model="x_bike_issue" context="{'studio': True}">
+        <field name="x_name">Headlight / Indicator Cracked</field>
+    </record>
+    <record id="bike_issue_engine_noise" model="x_bike_issue" context="{'studio': True}">
+        <field name="x_name">Engine / Mechanical Issue</field>
+    </record>
+</odoo>

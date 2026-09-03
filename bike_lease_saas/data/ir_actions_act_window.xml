@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="bikes_27d7695f-da5f-4714-8a0d-33597178054d" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Bikes</field>
+    <field name="res_model">x_bikes</field>
+    <field name="view_mode">kanban,list,form,pivot,graph</field>
+  </record>
+  <record id="bike_models_2442ce82-781a-4c73-8f26-5d11cc30a084" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Bike Models</field>
+    <field name="res_model">x_bike_models</field>
+    <field name="view_mode">kanban,list,form,pivot,graph</field>
+  </record>
+  <record id="manufacturers_d44baa60-2720-4f2a-8c71-53a544f7890b" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Manufacturers</field>
+    <field name="res_model">x_manufacturers</field>
+    <field name="view_mode">kanban,list,form</field>
+  </record>
+  <record id="lease_plans_c293f381-610e-4d46-89fd-90935b09086b" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Lease Plans</field>
+    <field name="res_model">x_lease_plans</field>
+    <field name="view_mode">kanban,list,form,pivot,graph</field>
+  </record>
+  <record id="lease_application_fc19b91c-a16c-450b-a56a-d0c01e865e87" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Lease Application</field>
+    <field name="res_model">x_lease_application</field>
+    <field name="view_mode">list,form,calendar,map</field>
+  </record>
+  <record id="lease_contract_30a822ed-cae8-4326-93b7-b340d9ebce4d" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
+                    This is your new action.
+                </p>
+                <p>By default, it contains a list and a form view and possibly
+                    other view types depending on the options you chose for your model.
+                </p>
+                <p>
+                    You can start customizing these screens by clicking on the Studio icon on the
+                    top right corner (you can also customize this help message there).
+                </p>
+            ]]></field>
+    <field name="name">Lease Contract</field>
+    <field name="res_model">x_lease_contract</field>
+    <field name="view_mode">list,form,calendar,map</field>
+  </record>
+
+  <record id="action_bike_applications" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Lease Applications</field>
+    <field name="res_model">x_lease_application</field>
+    <field name="view_mode">list,form,calendar,map</field>
+    <field name="domain">[('x_studio_bike', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_bike': active_id}</field>
+  </record>
+
+  <record id="action_bike_contracts" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Lease Contracts</field>
+    <field name="res_model">x_lease_contract</field>
+    <field name="view_mode">list,form,calendar,map</field>
+    <field name="domain">[('x_studio_bike', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_bike': active_id}</field>
+  </record>
+
+  <record id="action_app_contracts" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Lease Contracts</field>
+    <field name="res_model">x_lease_contract</field>
+    <field name="view_mode">list,form,calendar,map</field>
+    <field name="domain">[('x_studio_application_id', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_application_id': active_id}</field>
+  </record>
+
+  <record id="action_plan_contracts" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Lease Contracts</field>
+    <field name="res_model">x_lease_contract</field>
+    <field name="view_mode">list,form,calendar,map</field>
+    <field name="domain">[('x_studio_lease_plan', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_lease_plan': active_id}</field>
+  </record>
+
+  <record id="action_open_reject_wizard" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Reject Application</field>
+    <field name="res_model">x_lease_application_reject_wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="context">{'default_x_studio_application_id': active_id}</field>
+  </record>
+
+  <record id="action_rejection_reasons" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Rejection Reasons</field>
+    <field name="res_model">x_rejection_reason</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="action_bike_model_bikes" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Bikes</field>
+    <field name="res_model">x_bikes</field>
+    <field name="view_mode">kanban,list,form,pivot,graph</field>
+    <field name="domain">[('x_studio_bike_model', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_bike_model': active_id}</field>
+  </record>
+
+  <record id="action_manufacturer_bike_models" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Bike Models</field>
+    <field name="res_model">x_bike_models</field>
+    <field name="view_mode">kanban,list,form,pivot,graph</field>
+    <field name="domain">[('x_studio_manufacturer', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_manufacturer': active_id}</field>
+  </record>
+</odoo>

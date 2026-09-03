@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Server Actions for Bikes -->
+  <record id="action_bike_set_available" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Set Available</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_status': 'Available'})
+    </field>
+  </record>
+
+  <record id="action_bike_send_maintenance" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Send to Maintenance</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_status': 'Maintenance'})
+    </field>
+  </record>
+
+  <record id="action_bike_retire" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Retire Bike</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_status': 'Retired'})
+    </field>
+  </record>
+
+  <!-- Automated Sync: Lease Contract Status -> Bike Status -->
+  <record id="server_action_sync_contract_bike" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Sync Bike Status from Contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if rec.x_studio_bike:
+        status = rec.x_studio_selection_1
+        if status == 'Active':
+            rec.x_studio_bike.write({'x_studio_status': 'Leased'})
+        elif status in ('Completed', 'Terminated', 'Cancelled'):
+            rec.x_studio_bike.write({'x_studio_status': 'Available'})
+    </field>
+  </record>
+
+  <record id="automation_sync_contract_bike" model="base.automation">
+    <field name="name">Automated Sync: Contract Status to Bike Status</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="action_server_ids" eval="[(4, ref('server_action_sync_contract_bike'))]"/>
+  </record>
+
+  <!-- Automated Sync: Lease Application Status -> Bike Status -->
+  <record id="server_action_sync_app_bike" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Sync Bike Status from Application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if rec.x_studio_selection_1 == 'Approved':
+        if not rec.x_studio_date:
+            rec.write({'x_studio_date': datetime.date.today()})
+        if rec.x_studio_bike:
+            rec.x_studio_bike.write({'x_studio_status': 'Reserved'})
+    </field>
+  </record>
+
+  <record id="automation_sync_app_bike" model="base.automation">
+    <field name="name">Automated Sync: Application Status to Bike Status</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="action_server_ids" eval="[(4, ref('server_action_sync_app_bike'))]"/>
+  </record>
+
+  <!-- Automated Sequence Generation for Lease Application -->
+  <record id="server_action_seq_lease_app" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Generate Lease Application Sequence</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if not rec.x_name or rec.x_name in ('New', 'new', 'NEW'):
+        seq = env['ir.sequence'].next_by_code('x_lease_application') or 'New'
+        rec.write({'x_name': seq})
+    </field>
+  </record>
+
+  <record id="automation_seq_lease_app" model="base.automation">
+    <field name="name">Automated Sequence Generation: Lease Application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="trigger">on_create</field>
+    <field name="action_server_ids" eval="[(4, ref('server_action_seq_lease_app'))]"/>
+  </record>
+
+  <!-- Automated Sequence Generation for Lease Contract -->
+  <record id="server_action_seq_lease_cnt" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Generate Lease Contract Sequence</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if not rec.x_name or rec.x_name in ('New', 'new', 'NEW'):
+        seq = env['ir.sequence'].next_by_code('x_lease_contract') or 'New'
+        rec.write({'x_name': seq})
+    </field>
+  </record>
+
+  <record id="automation_seq_lease_cnt" model="base.automation">
+    <field name="name">Automated Sequence Generation: Lease Contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="trigger">on_create</field>
+    <field name="action_server_ids" eval="[(4, ref('server_action_seq_lease_cnt'))]"/>
+  </record>
+
+  <!-- Server Actions for Lease Applications -->
+  <record id="action_app_submit" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Submit Application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_selection_1': 'Submitted'})
+    </field>
+  </record>
+
+  <record id="action_app_approve" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Approve Application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    today = datetime.date.today()
+    rec.write({
+        'x_studio_selection_1': 'Approved',
+        'x_studio_date': today,
+    })
+    if rec.x_studio_bike:
+        rec.x_studio_bike.write({'x_studio_status': 'Reserved'})
+    existing = rec.x_studio_contract_id or env['x_lease_contract'].search([('x_studio_application_id', '=', rec.id)], limit=1)
+    if not existing:
+        contract = env['x_lease_contract'].create({
+            'x_studio_partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+            'x_studio_bike_model': rec.x_studio_bike_model.id if rec.x_studio_bike_model else False,
+            'x_studio_bike': rec.x_studio_bike.id if rec.x_studio_bike else False,
+            'x_studio_lease_plan': rec.x_studio_lease_plan.id if rec.x_studio_lease_plan else False,
+            'x_studio_date': rec.x_studio_lease_start_date or today,
+            'x_studio_selection_1': 'Draft',
+            'x_studio_application_id': rec.id,
+        })
+        rec.write({'x_studio_contract_id': contract.id})
+    else:
+        rec.write({'x_studio_contract_id': existing.id})
+    # Send approval email to customer
+    template = env.ref('bike_lease_saas.mail_template_lease_app_approved', raise_if_not_found=False)
+    if template:
+        template.send_mail(rec.id, force_send=True)
+    </field>
+  </record>
+
+  <record id="action_app_reject" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Reject Application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_selection_1': 'Rejected'})
+    </field>
+  </record>
+
+  <record id="action_confirm_reject_app" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Confirm Rejection</field>
+    <field name="model_id" ref="model_lease_app_reject_wizard"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if rec.x_studio_application_id:
+        app = rec.x_studio_application_id
+        app.write({
+            'x_studio_selection_1': 'Rejected',
+            'x_studio_rejection_reason_ids': [(6, 0, rec.x_studio_rejection_reason_ids.ids)],
+        })
+        template = env.ref('bike_lease_saas.mail_template_lease_app_rejected', raise_if_not_found=False)
+        if template:
+            template.send_mail(app.id, force_send=True)
+    </field>
+  </record>
+
+  <record id="action_app_cancel" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Cancel Application</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_selection_1': 'Cancelled'})
+    </field>
+  </record>
+
+  <record id="action_app_reset_draft" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Reset to Draft</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({
+        'x_studio_selection_1': 'Draft',
+        'x_studio_reason': False,
+        'x_studio_rejection_reason_ids': [(5, 0, 0)],
+    })
+    </field>
+  </record>
+
+  <record id="action_reset_bike_on_model_change" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Reset Bike on Model Change</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if rec.x_studio_bike and rec.x_studio_bike.x_studio_bike_model != rec.x_studio_bike_model:
+        rec.update({'x_studio_bike': False})
+    </field>
+  </record>
+
+  <record id="rule_reset_bike_on_model_change" model="base.automation" context="{'studio': True}">
+    <field name="name">Reset Bike on Model Change</field>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="trigger_field_ids" eval="[(4, ref('new_many2one_lease_app_bike_model'))]"/>
+    <field name="action_server_ids" eval="[(4, ref('action_reset_bike_on_model_change'))]"/>
+  </record>
+  <!-- Server Actions for Lease Contracts -->
+  <record id="action_cnt_activate" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Activate Contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    inv = rec.x_studio_deposit_invoice_id
+    if not inv or inv.payment_state not in ('paid', 'in_payment'):
+        raise UserError("Cannot activate contract! The Security Deposit invoice must be paid before activating the contract and creating installment schedule.")
+        
+    plan = rec.x_studio_lease_plan
+    start_date = rec.x_studio_date or datetime.date.today()
+    
+    if plan:
+        duration = plan.x_studio_lease_duration or 1
+        unit = plan.x_studio_duration_unit or 'Months'
+        if unit == 'Days':
+            end_date = start_date + datetime.timedelta(days=duration)
+        elif unit == 'Weeks':
+            end_date = start_date + datetime.timedelta(days=7 * duration)
+        elif unit == 'Years':
+            end_date = start_date + dateutil.relativedelta.relativedelta(years=duration)
+        else:
+            end_date = start_date + dateutil.relativedelta.relativedelta(months=duration)
+    else:
+        end_date = start_date + dateutil.relativedelta.relativedelta(months=1)
+
+    rec.write({
+        'x_studio_selection_1': 'Active',
+        'x_studio_end_date': end_date,
+    })
+    
+    if rec.x_studio_bike:
+        rec.x_studio_bike.write({'x_studio_status': 'Leased'})
+        
+    if plan and not rec.x_studio_installment_ids:
+        freq = plan.x_studio_payment_frequency or 'Monthly'
+        current_date = start_date
+        idx = 1
+        while current_date < end_date:
+            env['x_lease_installment'].create({
+                'x_name': f"Installment #{idx}",
+                'x_studio_contract_id': rec.id,
+                'x_studio_date': current_date,
+                'x_studio_amount': plan.x_studio_value or 0.0,
+                'x_studio_status': 'Draft',
+                'x_studio_currency_id': plan.x_studio_currency_id.id if plan.x_studio_currency_id else False,
+            })
+            idx += 1
+            if freq == 'Daily':
+                current_date += datetime.timedelta(days=1)
+            elif freq == 'Weekly':
+                current_date += datetime.timedelta(days=7)
+            elif freq == 'Quarterly':
+                current_date += dateutil.relativedelta.relativedelta(months=3)
+            elif freq == 'Yearly':
+                current_date += dateutil.relativedelta.relativedelta(years=1)
+            else:
+                current_date += dateutil.relativedelta.relativedelta(months=1)
+]]></field>
+  </record>
+
+  <record id="action_open_return_wizard" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Open Return &amp; Inspect Wizard</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    wizard = env['x_bike_return_wizard'].create({
+        'x_studio_contract_id': rec.id,
+        'x_studio_bike_returned': True,
+        'x_studio_service_needed': rec.x_studio_service_needed or False,
+        'x_studio_repair_charge': rec.x_studio_repair_charge or 0.0,
+        'x_studio_currency_id': rec.x_studio_currency_id.id if rec.x_studio_currency_id else False,
+        'x_studio_issue_ids': [(6, 0, rec.x_studio_issue_ids.ids)],
+    })
+    
+    action = {
+        'name': 'Vehicle Return & Inspection',
+        'type': 'ir.actions.act_window',
+        'res_model': 'x_bike_return_wizard',
+        'res_id': wizard.id,
+        'view_mode': 'form',
+        'target': 'new',
+    }
+]]></field>
+  </record>
+
+  <record id="action_confirm_return_wizard" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Confirm Return &amp; Settlement</field>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for wiz in records:
+    rec = wiz.x_studio_contract_id
+    if not rec:
+        continue
+        
+    dep = rec.x_studio_lease_plan.x_studio_security_deposit if rec.x_studio_lease_plan else 0.0
+    need_service = wiz.x_studio_service_needed
+    repair = (wiz.x_studio_repair_charge or 0.0) if need_service else 0.0
+    refund_net = dep - repair
+    
+    created_move = False
+    if refund_net > 0:
+        created_move = env['account.move'].create({
+            'move_type': 'out_refund',
+            'partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+            'invoice_date': datetime.date.today(),
+            'invoice_line_ids': [(0, 0, {
+                'name': f"Security Deposit Refund (after ${repair:.2f} repair deduction) - Contract {rec.x_name}",
+                'quantity': 1,
+                'price_unit': refund_net,
+            })],
+        })
+    elif refund_net < 0:
+        extra_due = abs(refund_net)
+        created_move = env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+            'invoice_date': datetime.date.today(),
+            'invoice_line_ids': [(0, 0, {
+                'name': f"Excess Vehicle Repair / Service Fees (Deposit ${dep:.2f} absorbed) - Contract {rec.x_name}",
+                'quantity': 1,
+                'price_unit': extra_due,
+            })],
+        })
+        
+    vals = {
+        'x_studio_bike_returned': True,
+        'x_studio_service_needed': need_service,
+        'x_studio_repair_charge': repair,
+        'x_studio_issue_ids': [(6, 0, wiz.x_studio_issue_ids.ids)] if need_service else [(5, 0, 0)],
+    }
+    if created_move:
+        vals['x_studio_return_invoice_id'] = created_move.id
+    rec.write(vals)
+    
+    if rec.x_studio_bike:
+        bike_status = 'Maintenance' if need_service else 'Available'
+        rec.x_studio_bike.write({'x_studio_status': bike_status})
+        
+    # Send vehicle return & deposit settlement email to customer
+    template = env.ref('bike_lease_saas.mail_template_vehicle_return_settlement', raise_if_not_found=False)
+    if template:
+        template.send_mail(rec.id, force_send=True)
+        
+    if created_move:
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Return Settlement Document',
+            'res_model': 'account.move',
+            'res_id': created_move.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+]]></field>
+  </record>
+
+  <record id="action_cnt_complete" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Complete Contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    if not rec.x_studio_all_invoices_paid:
+        raise UserError("All contract installments and deposit invoices must be fully paid before completing the contract.")
+    rec.write({'x_studio_selection_1': 'Completed'})
+    rec.message_post(body="Lease contract completed. Vehicle is pending return inspection.")
+]]></field>
+  </record>
+
+  <record id="action_cnt_renew" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Renew Contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    today = datetime.date.today()
+    app = env['x_lease_application'].create({
+        'x_studio_partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+        'x_studio_bike_model': rec.x_studio_bike_model.id if rec.x_studio_bike_model else False,
+        'x_studio_bike': rec.x_studio_bike.id if rec.x_studio_bike else False,
+        'x_studio_lease_plan': rec.x_studio_lease_plan.id if rec.x_studio_lease_plan else False,
+        'x_studio_date': today,
+        'x_studio_lease_start_date': today,
+        'x_studio_selection_1': 'Draft',
+    })
+    
+    rec.message_post(body=f"Renewal Lease Application created: {app.x_name or 'Draft Application'}")
+    
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'Renewal Lease Application',
+        'res_model': 'x_lease_application',
+        'res_id': app.id,
+        'view_mode': 'form',
+        'target': 'current',
+    }
+]]></field>
+  </record>
+
+  <record id="action_cnt_terminate" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Terminate Contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+
+    today = datetime.date.today()
+
+    # Past draft installments up to today
+    past_due_draft_installments = rec.x_studio_installment_ids.filtered(
+        lambda i: i.x_studio_date <= today and i.x_studio_status == 'Draft'
+    )
+
+    # Past invoiced installments up to today with unpaid/open invoice
+    past_due_invoiced_installments = rec.x_studio_installment_ids.filtered(
+        lambda i: i.x_studio_date <= today and i.x_studio_invoice_id and i.x_studio_invoice_id.state != 'cancel' and i.x_studio_invoice_id.payment_state not in ('paid', 'in_payment')
+    )
+
+    past_unpaid_invoices = past_due_invoiced_installments.mapped('x_studio_invoice_id')
+    if rec.x_studio_deposit_invoice_id and rec.x_studio_deposit_invoice_id.state != 'cancel' and rec.x_studio_deposit_invoice_id.payment_state not in ('paid', 'in_payment'):
+        past_unpaid_invoices |= rec.x_studio_deposit_invoice_id
+
+    has_unpaid_past = bool(past_due_draft_installments or past_unpaid_invoices)
+
+    created_move = False
+    if has_unpaid_past:
+        invoice_lines = []
+
+        # 1. Consolidate previous unpaid invoice lines
+        for old_inv in past_unpaid_invoices:
+            for line in old_inv.invoice_line_ids:
+                line_name = line.name or "Arrears Line"
+                if not line_name.startswith("Arrears:"):
+                    line_name = f"Arrears: {line_name}"
+                invoice_lines.append((0, 0, {
+                    'name': line_name,
+                    'quantity': line.quantity or 1,
+                    'price_unit': line.price_unit,
+                }))
+
+        # 2. Add past due draft installments
+        for inst in past_due_draft_installments:
+            invoice_lines.append((0, 0, {
+                'name': f"Lease Installment (Termination Settlement) - {rec.x_name} ({inst.x_name})",
+                'quantity': 1,
+                'price_unit': inst.x_studio_amount,
+            }))
+            late_fee = inst.x_studio_late_fee_amount or 0.0
+            if late_fee > 0:
+                invoice_lines.append((0, 0, {
+                    'name': f"Late Payment Penalty Fee - {rec.x_name} ({inst.x_name})",
+                    'quantity': 1,
+                    'price_unit': late_fee,
+                }))
+
+        if invoice_lines:
+            created_move = env['account.move'].create({
+                'move_type': 'out_invoice',
+                'partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+                'invoice_date': today,
+                'invoice_line_ids': invoice_lines,
+            })
+
+            for inst in past_due_draft_installments:
+                inst.write({
+                    'x_studio_invoice_id': created_move.id,
+                    'x_studio_status': 'Invoiced',
+                })
+
+            for past_inst in past_due_invoiced_installments:
+                past_inst.write({'x_studio_invoice_id': created_move.id})
+
+            if rec.x_studio_deposit_invoice_id in past_unpaid_invoices:
+                rec.write({'x_studio_deposit_invoice_id': created_move.id})
+
+            for old_inv in past_unpaid_invoices:
+                try:
+                    if old_inv.state == 'posted':
+                        old_inv.button_draft()
+                    old_inv.button_cancel()
+                except Exception:
+                    old_inv.write({'state': 'cancel'})
+
+    # Transition status to Terminated
+    rec.write({'x_studio_selection_1': 'Terminated'})
+
+    # Unlink remaining draft installments
+    future_drafts = rec.x_studio_installment_ids.filtered(lambda i: i.x_studio_status == 'Draft')
+    if future_drafts:
+        future_drafts.unlink()
+
+    msg = "Lease contract terminated early. Vehicle pending return inspection."
+    if created_move:
+        msg += f" Final termination invoice ({created_move.name or 'Invoice'}) created for unpaid installments due up to today."
+    rec.message_post(body=msg)
+
+    if created_move:
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Termination Final Invoice',
+            'res_model': 'account.move',
+            'res_id': created_move.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+]]></field>
+  </record>
+
+  <record id="action_cnt_cancel" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Cancel Contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_selection_1': 'Cancelled'})
+    if rec.x_studio_bike:
+        rec.x_studio_bike.write({'x_studio_status': 'Available'})
+    </field>
+  </record>
+
+  <record id="action_cnt_reset_draft" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Reset to Draft</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    rec.write({'x_studio_selection_1': 'Draft'})
+    if rec.x_studio_bike:
+        rec.x_studio_bike.write({'x_studio_status': 'Reserved'})
+    </field>
+  </record>
+
+  <record id="action_cnt_open_application" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Open Related Application</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if rec.x_studio_application_id:
+        action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'x_lease_application',
+            'res_id': rec.x_studio_application_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+    </field>
+  </record>
+
+  <record id="action_cnt_open_bike" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Open Related Bike</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if rec.x_studio_bike:
+        action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'x_bikes',
+            'res_id': rec.x_studio_bike.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+    </field>
+  </record>
+
+  <!-- Auto-calculate End Date and Installment Schedule -->
+  <record id="action_calc_end_date_and_schedule" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Calculate End Date &amp; Installment Schedule</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    if rec.x_studio_date and rec.x_studio_lease_plan:
+        plan = rec.x_studio_lease_plan
+        start_date = rec.x_studio_date
+        duration = plan.x_studio_lease_duration or 1
+        unit = plan.x_studio_duration_unit or 'Months'
+        
+        # Calculate End Date
+        if unit == 'Days':
+            end_date = start_date + datetime.timedelta(days=duration)
+        elif unit == 'Weeks':
+            end_date = start_date + datetime.timedelta(days=7 * duration)
+        elif unit == 'Years':
+            end_date = start_date + dateutil.relativedelta.relativedelta(years=duration)
+        else:  # Months
+            end_date = start_date + dateutil.relativedelta.relativedelta(months=duration)
+            
+        rec.write({'x_studio_end_date': end_date})
+        
+        # Generate Installment Schedule ONLY if contract is Active and Security Deposit is paid
+        inv = rec.x_studio_deposit_invoice_id
+        is_paid = bool(inv and inv.payment_state in ('paid', 'in_payment'))
+        if rec.x_studio_selection_1 == 'Active' and is_paid:
+            if not rec.x_studio_installment_ids or any(i.x_studio_status == 'Draft' for i in rec.x_studio_installment_ids):
+                rec.x_studio_installment_ids.filtered(lambda i: i.x_studio_status == 'Draft').unlink()
+                
+                freq = plan.x_studio_payment_frequency or 'Monthly'
+                current_date = start_date
+                idx = 1
+                
+                while current_date < end_date:
+                    env['x_lease_installment'].create({
+                        'x_name': f"Installment #{idx}",
+                        'x_studio_contract_id': rec.id,
+                        'x_studio_date': current_date,
+                        'x_studio_amount': plan.x_studio_value or 0.0,
+                        'x_studio_status': 'Draft',
+                        'x_studio_currency_id': plan.x_studio_currency_id.id if plan.x_studio_currency_id else False,
+                    })
+                    idx += 1
+                    if freq == 'Daily':
+                        current_date += datetime.timedelta(days=1)
+                    elif freq == 'Weekly':
+                        current_date += datetime.timedelta(days=7)
+                    elif freq == 'Quarterly':
+                        current_date += dateutil.relativedelta.relativedelta(months=3)
+                    elif freq == 'Yearly':
+                        current_date += dateutil.relativedelta.relativedelta(years=1)
+                    else:  # Monthly
+                        current_date += dateutil.relativedelta.relativedelta(months=1)
+]]></field>
+  </record>
+
+  <!-- Base Automation rule to trigger End Date & Schedule Calculation on Create/Write -->
+  <record id="rule_calc_contract_end_date" model="base.automation" context="{'studio': True}">
+    <field name="name">Auto Calculate Contract End Date &amp; Schedule</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="trigger_field_ids" eval="[(4, ref('new_many2one_lease_c_d04e1ccf-df21-4097-84ff-2df537b7a940')), (4, ref('date_lease_contract_0095c1b4-cc8b-4017-bc58-ef934a97e560'))]"/>
+    <field name="action_server_ids" eval="[(4, ref('action_calc_end_date_and_schedule'))]"/>
+  </record>
+
+  <!-- Server Action: Create Customer Invoice for Contract / Installment -->
+  <record id="action_create_lease_invoice" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Pay Installment Amount</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    draft_installments = rec.x_studio_installment_ids.filtered(lambda i: i.x_studio_status == 'Draft')
+    if not draft_installments:
+        raise UserError("All installments for this lease contract have already been invoiced.")
+        
+    installments_to_invoice = draft_installments[:1]
+    created_move = False
+    if not installments_to_invoice and not rec.x_studio_installment_ids:
+        amount = rec.x_studio_lease_plan.x_studio_value if rec.x_studio_lease_plan else 0.0
+        created_move = env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+            'invoice_date': datetime.date.today(),
+            'invoice_line_ids': [(0, 0, {
+                'name': f"Lease Contract Payment - {rec.x_name}",
+                'quantity': 1,
+                'price_unit': amount,
+            })],
+        })
+    all_past_invoices = rec.x_studio_installment_ids.mapped('x_studio_invoice_id').filtered(
+        lambda inv: inv and inv.state != 'cancel' and inv.payment_state not in ('paid', 'in_payment')
+    )
+    if rec.x_studio_deposit_invoice_id and rec.x_studio_deposit_invoice_id.state != 'cancel' and rec.x_studio_deposit_invoice_id.payment_state not in ('paid', 'in_payment'):
+        all_past_invoices |= rec.x_studio_deposit_invoice_id
+
+    invoice_lines = []
+    for old_inv in all_past_invoices:
+        for line in old_inv.invoice_line_ids:
+            line_name = line.name or "Arrears Line"
+            if not line_name.startswith("Arrears:"):
+                line_name = f"Arrears: {line_name}"
+            invoice_lines.append((0, 0, {
+                'name': line_name,
+                'quantity': line.quantity or 1,
+                'price_unit': line.price_unit,
+            }))
+
+    for inst in installments_to_invoice:
+        invoice_lines.append((0, 0, {
+            'name': f"Lease Installment - {rec.x_name} ({inst.x_name})",
+            'quantity': 1,
+            'price_unit': inst.x_studio_amount,
+        }))
+        late_fee = inst.x_studio_late_fee_amount or 0.0
+        if late_fee > 0:
+            invoice_lines.append((0, 0, {
+                'name': f"Late Payment Penalty Fee - {rec.x_name} ({inst.x_name})",
+                'quantity': 1,
+                'price_unit': late_fee,
+            }))
+
+    created_move = env['account.move'].create({
+        'move_type': 'out_invoice',
+        'partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+        'invoice_date': datetime.date.today(),
+        'invoice_line_ids': invoice_lines,
+    })
+
+    for inst in installments_to_invoice:
+        inst.write({
+            'x_studio_invoice_id': created_move.id,
+            'x_studio_status': 'Invoiced',
+        })
+
+    for past_inst in rec.x_studio_installment_ids.filtered(lambda i: i.x_studio_invoice_id in all_past_invoices):
+        past_inst.write({'x_studio_invoice_id': created_move.id})
+
+    if rec.x_studio_deposit_invoice_id in all_past_invoices:
+        rec.write({'x_studio_deposit_invoice_id': created_move.id})
+
+    for old_inv in all_past_invoices:
+        try:
+            if old_inv.state == 'posted':
+                old_inv.button_draft()
+            old_inv.button_cancel()
+        except Exception:
+            old_inv.write({'state': 'cancel'})
+            
+    if created_move:
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Customer Invoice',
+            'res_model': 'account.move',
+            'res_id': created_move.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+]]></field>
+  </record>
+
+  <!-- Server Action: Pay Security Deposit -->
+  <record id="action_pay_security_deposit" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Pay Security Deposit</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    target_invoice = rec.x_studio_deposit_invoice_id
+    if not target_invoice and rec.x_studio_lease_plan:
+        plan = rec.x_studio_lease_plan
+        amt = plan.x_studio_security_deposit or 0.0
+        if amt <= 0:
+            amt = plan.x_studio_value or 0.0
+            
+        target_invoice = env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
+            'invoice_date': datetime.date.today(),
+            'invoice_line_ids': [(0, 0, {
+                'name': f"Security Deposit - Contract {rec.x_name}",
+                'quantity': 1,
+                'price_unit': amt,
+            })],
+        })
+        rec.write({'x_studio_deposit_invoice_id': target_invoice.id})
+        
+    if target_invoice:
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Security Deposit Invoice',
+            'res_model': 'account.move',
+            'res_id': target_invoice.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+]]></field>
+  </record>
+
+  <!-- Server Action: Open Customer Invoices for Contract -->
+  <record id="action_cnt_open_invoices" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Open Invoices</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    invoices = rec.x_studio_installment_ids.mapped('x_studio_invoice_id')
+    if rec.x_studio_deposit_invoice_id:
+        invoices |= rec.x_studio_deposit_invoice_id
+    if rec.x_studio_return_invoice_id:
+        invoices |= rec.x_studio_return_invoice_id
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'Customer Invoices',
+        'res_model': 'account.move',
+        'view_mode': 'list,form',
+        'domain': [('id', 'in', invoices.ids)],
+    }
+    if len(invoices) == 1:
+        action['res_id'] = invoices.id
+        action['view_mode'] = 'form'
+]]></field>
+  </record>
+
+  <!-- Server Action: Open Related Lease Contract from Invoice -->
+  <record id="action_invoice_open_lease_contract" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Open Lease Contract</field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    contracts = env['x_lease_contract'].search(['|', ('x_studio_deposit_invoice_id', '=', rec.id), ('x_studio_return_invoice_id', '=', rec.id)])
+    if not contracts:
+        installments = env['x_lease_installment'].search([('x_studio_invoice_id', '=', rec.id)])
+        contracts = installments.mapped('x_studio_contract_id')
+        
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'Lease Contract',
+        'res_model': 'x_lease_contract',
+        'view_mode': 'list,form',
+        'domain': [('id', 'in', contracts.ids)],
+    }
+    if len(contracts) == 1:
+        action['res_id'] = contracts.id
+        action['view_mode'] = 'form'
+]]></field>
+  </record>
+
+  <!-- Server Action: Open Customer Invoice for Installment Line -->
+  <record id="action_open_installment_invoice" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">View Invoice</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    if rec.x_studio_invoice_id:
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Customer Invoice',
+            'res_model': 'account.move',
+            'res_id': rec.x_studio_invoice_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+]]></field>
+  </record>
+</odoo>

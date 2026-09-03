@@ -1,0 +1,1218 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="default_list_view_fo_b7af5d8c-715a-4a7f-94e7-06b1ac8879f3" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list default_order="id desc">
+        <field name="x_name" string="Bike ID"/>
+        <field name="x_studio_bike_model" string="Model"/>
+        <field name="x_studio_registration_number" string="Registration No."/>
+        <field name="x_studio_vin_chassis_number" string="VIN / Chassis"/>
+        <field name="x_studio_current_odometer" string="Odometer (km)"/>
+        <field name="x_studio_currency_id" invisible="1"/>
+        <field name="x_studio_value" string="Cost" sum="Total Cost"/>
+        <field name="x_studio_status" widget="badge" decoration-success="x_studio_status == 'Available'" decoration-info="x_studio_status == 'Leased'" decoration-warning="x_studio_status in ('Reserved', 'Maintenance')" decoration-danger="x_studio_status == 'Retired'"/>
+      </list>
+    </field>
+    <field name="key">bike_lease_saas.default_list_view_fo_b7af5d8c-715a-4a7f-94e7-06b1ac8879f3</field>
+    <field name="model">x_bikes</field>
+    <field name="name">Default list view for x_bikes</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_kanban_view_fo_bikes" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <kanban default_order="id desc" class="o_kanban_small_column">
+        <field name="x_name"/>
+        <field name="x_studio_status"/>
+        <field name="x_studio_bike_model"/>
+        <field name="x_studio_registration_number"/>
+        <field name="x_studio_current_odometer"/>
+        <field name="x_studio_value"/>
+        <field name="x_studio_currency_id"/>
+        <field name="x_studio_image"/>
+        <templates>
+          <t t-name="card" class="oe_kanban_global_click p-3 border shadow-sm rounded-3 bg-white mb-2">
+            <div class="d-flex align-items-center gap-3">
+              <aside class="o_kanban_image flex-shrink-0 rounded-3 overflow-hidden border" style="width: 72px; height: 72px;">
+                <field name="x_studio_image" widget="image" options="{'zoom': true, 'preview_image': 'x_studio_image'}"/>
+              </aside>
+              <main class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-start gap-1 mb-1">
+                  <span class="fw-bold text-dark fs-6 text-truncate">
+                    <field name="x_name"/>
+                  </span>
+                  <field name="x_studio_status" widget="badge" decoration-success="x_studio_status == 'Available'" decoration-info="x_studio_status == 'Leased'" decoration-warning="x_studio_status in ('Reserved', 'Maintenance')" decoration-danger="x_studio_status == 'Retired'"/>
+                </div>
+                <div class="text-muted small text-truncate mb-1">
+                  <i class="fa fa-motorcycle me-1 text-primary"/>
+                  <field name="x_studio_bike_model"/>
+                </div>
+                <div class="text-muted small text-truncate mb-2" t-if="record.x_studio_registration_number.raw_value">
+                  <i class="fa fa-id-card-o me-1 text-secondary"/>
+                  <field name="x_studio_registration_number"/>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                  <span class="badge bg-light text-dark border fw-normal px-2 py-1">
+                    <i class="fa fa-dashboard me-1 text-info"/>
+                    <field name="x_studio_current_odometer"/> km
+                  </span>
+                  <span class="fw-bolder text-primary fs-6">
+                    <field name="x_studio_currency_id" invisible="1"/>
+                    <field name="x_studio_value"/>
+                  </span>
+                </div>
+              </main>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+    <field name="key">bike_lease_saas.default_kanban_view_fo_bikes</field>
+    <field name="model">x_bikes</field>
+    <field name="name">Default kanban view for x_bikes</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="default_form_view_fo_55021adf-79dc-4060-8f69-a04f67adbf6f" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="%(action_bike_set_available)d" type="action" string="Set Available" class="oe_highlight" invisible="x_studio_status != 'Maintenance'"/>
+          <button name="%(action_bike_send_maintenance)d" type="action" string="Send to Maintenance" invisible="x_studio_status != 'Available'"/>
+          <button name="%(action_bike_retire)d" type="action" string="Retire Bike" invisible="x_studio_status in ('Leased', 'Reserved', 'Retired')"/>
+          <field name="x_studio_status" widget="statusbar" statusbar_visible="Available,Reserved,Leased,Maintenance,Retired"/>
+        </header>
+        <sheet string="Bikes">
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_bike_contracts)d" type="action" class="oe_stat_button" icon="fa-book">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Contracts</span>
+              </div>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_a7e929">
+            <group name="studio_group_a7e929_left">
+              <field name="x_studio_currency_id" invisible="1"/>
+              <field name="x_studio_value"/>
+            </group>
+            <group name="studio_group_a7e929_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="key">bike_lease_saas.default_form_view_fo_55021adf-79dc-4060-8f69-a04f67adbf6f</field>
+    <field name="model">x_bikes</field>
+    <field name="name">Default form view for x_bikes</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__45f9bd96-4165-4d05-923d-7143fcdaba25" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <filter invisible="1" string="My Activities" name="filter_activities_my" domain="[['activity_user_id', '=', uid]]"/>
+        <separator/>
+        <filter invisible="1" string="Late Activities" name="activities_overdue" domain="[('my_activity_date_deadline', '&lt;', 'today')]"/>
+        <filter invisible="1" string="Today Activities" name="activities_today" domain="[('my_activity_date_deadline', '=', 'today')]"/>
+        <filter invisible="1" string="Future Activities" name="activities_upcoming_all" domain="[('my_activity_date_deadline', '&gt;', 'today')]"/>
+        <separator/>
+        <separator/>
+        <filter string="Archived" name="archived_x_bikes" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="key">bike_lease_saas.default_search_view__45f9bd96-4165-4d05-923d-7143fcdaba25</field>
+    <field name="model">x_bikes</field>
+    <field name="name">Default search view for x_bikes</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_pivot_view_f_46c5c77f-5da3-45a2-95b4-2b0da96e10ac" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <pivot sample="1">
+        <field name="x_studio_value" type="measure"/>
+      </pivot>
+    </field>
+    <field name="key">bike_lease_saas.default_pivot_view_f_46c5c77f-5da3-45a2-95b4-2b0da96e10ac</field>
+    <field name="model">x_bikes</field>
+    <field name="name">Default pivot view for x_bikes</field>
+    <field name="type">pivot</field>
+  </record>
+  <record id="default_graph_view_f_279e068f-e378-4d0c-b24b-5cd96150fadb" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <graph sample="1">
+        <field name="x_studio_value" type="measure"/>
+        <field name="create_date" type="row"/>
+      </graph>
+    </field>
+    <field name="key">bike_lease_saas.default_graph_view_f_279e068f-e378-4d0c-b24b-5cd96150fadb</field>
+    <field name="model">x_bikes</field>
+    <field name="name">Default graph view for x_bikes</field>
+    <field name="type">graph</field>
+  </record>
+  <record id="odoo_studio_default__9ee7b8ef-1aa2-4ea5-a466-0e34c5c2cfb3" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/sheet/group[2]" position="replace">
+          <notebook name="studio_notebook_nn_1k1e1sr6g">
+            <page string="Identification" name="studio_page_nn">
+              <group name="studio_group_nn">
+                <group name="studio_group_nn_left">
+                  <field name="x_studio_vin_chassis_number"/>
+                  <field name="x_studio_engine_number"/>
+                </group>
+                <group name="studio_group_nn_right"/>
+              </group>
+            </page>
+            <page string="Purchase information" name="studio_page_5at_1k1e1tu4v">
+              <group name="studio_group_5at">
+                <group name="studio_group_5at_left">
+                  <field name="x_studio_purchase_date"/>
+                  <field name="x_studio_current_odometer"/>
+                </group>
+                <group name="studio_group_5at_right">
+                  <field name="x_studio_location" help="Current bike location"/>
+                </group>
+              </group>
+            </page>
+            <page string="Document expiry" name="studio_page_9iv_1k1e1v9jm">
+              <group name="studio_group_9iv">
+                <group name="studio_group_9iv_left">
+                  <field name="x_studio_insurance_expiry"/>
+                  <field name="x_studio_registration_expiry"/>
+                </group>
+                <group name="studio_group_9iv_right"/>
+              </group>
+            </page>
+            <page string="Notes" name="studio_page_743_1k1e2mjpc">
+              <field name="x_studio_notes_1"/>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_location']" position="before">
+          <xpath expr="/form//field[@name='x_studio_value']" position="move"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_image']" position="attributes">
+          <attribute name="string">Bike Image</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="placeholder">Bike Name</attribute>
+          <attribute name="string">Bike Name</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
+          <field name="x_studio_bike_model" options="{'create_name_field': 'x_name'}" required="True"/>
+          <field name="x_studio_related_manufacturer" options="{'create_name_field': 'x_name'}" required="True"/>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_a7e929_right']" position="inside">
+          <field name="x_studio_related_x_studio_bike_type_1"/>
+          <field name="x_studio_registration_number" required="True"/>
+          <field name="x_active" invisible="True"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
+          <attribute name="string">Purchase Cost</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_55021adf-79dc-4060-8f69-a04f67adbf6f"/>
+    <field name="key">bike_lease_saas.odoo_studio_default__9ee7b8ef-1aa2-4ea5-a466-0e34c5c2cfb3</field>
+    <field name="mode">extension</field>
+    <field name="model">x_bikes</field>
+    <field name="name">Odoo Studio: Default form view for x_bikes customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_ba817cd6-8b21-4c47-ba97-038560b3860f" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name" string="Model Name"/>
+        <field name="x_studio_manufacturer" string="Manufacturer"/>
+        <field name="x_studio_bike_type" string="Bike Type"/>
+        <field name="x_studio_fuel_type" string="Fuel Type"/>
+        <field name="x_studio_engine_capacity_cc_" string="Engine (cc)"/>
+        <field name="x_studio_bike_count"/>
+        <field name="x_studio_currency_id" invisible="1"/>
+        <field name="x_studio_value" string="Standard Price" sum="Total Value"/>
+      </list>
+    </field>
+    <field name="key">bike_lease_saas.default_list_view_fo_ba817cd6-8b21-4c47-ba97-038560b3860f</field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Default list view for x_bike_models</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_kanban_view_fo_bike_models" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <kanban default_order="x_studio_sequence, id desc">
+        <field name="x_name"/>
+        <field name="x_studio_manufacturer"/>
+        <field name="x_studio_bike_type"/>
+        <field name="x_studio_fuel_type"/>
+        <field name="x_studio_engine_capacity_cc_"/>
+        <field name="x_studio_value"/>
+        <field name="x_studio_currency_id"/>
+        <field name="x_studio_image"/>
+        <templates>
+          <t t-name="card" class="oe_kanban_global_click p-3 border shadow-sm rounded-3 bg-white mb-2">
+            <div class="d-flex align-items-center gap-3">
+              <aside class="o_kanban_image flex-shrink-0 rounded-3 overflow-hidden border bg-light" style="width: 72px; height: 72px;">
+                <field name="x_studio_image" widget="image"/>
+              </aside>
+              <main class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-start gap-1 mb-1">
+                  <span class="fw-bold text-dark fs-6 text-truncate">
+                    <field name="x_name"/>
+                  </span>
+                  <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <field name="x_studio_bike_type"/>
+                  </span>
+                </div>
+                <div class="text-muted small text-truncate mb-1">
+                  <i class="fa fa-industry me-1 text-secondary"/>
+                  <field name="x_studio_manufacturer"/>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2 text-muted small" t-if="record.x_studio_fuel_type.raw_value">
+                  <span class="badge bg-light text-dark border fw-normal">
+                    <i class="fa fa-bolt me-1 text-warning" t-if="record.x_studio_fuel_type.raw_value == 'Electric'"/>
+                    <i class="fa fa-tint me-1 text-danger" t-if="record.x_studio_fuel_type.raw_value != 'Electric'"/>
+                    <field name="x_studio_fuel_type"/>
+                  </span>
+                  <span class="badge bg-light text-secondary border fw-normal" t-if="record.x_studio_engine_capacity_cc_.raw_value">
+                    <field name="x_studio_engine_capacity_cc_"/> cc
+                  </span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center pt-2 border-top">
+                  <span class="fw-bolder text-primary fs-6">
+                    <field name="x_studio_currency_id" invisible="1"/>
+                    <field name="x_studio_value"/>
+                  </span>
+                </div>
+              </main>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+    <field name="key">bike_lease_saas.default_kanban_view_fo_bike_models</field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Default kanban view for x_bike_models</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="default_form_view_fo_06442e0a-10d4-45a6-b22d-ddc32beb6d8d" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Bike Models">
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_bike_model_bikes)d" type="action" class="oe_stat_button" icon="fa-motorcycle">
+              <div class="o_stat_info">
+                <field name="x_studio_bike_count" class="o_stat_value"/>
+                <span class="o_stat_text">Bikes</span>
+              </div>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_a89bee">
+            <group name="studio_group_a89bee_left">
+              <field name="x_studio_currency_id" invisible="1"/>
+              <field name="x_studio_value"/>
+            </group>
+            <group name="studio_group_a89bee_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">bike_lease_saas.default_form_view_fo_06442e0a-10d4-45a6-b22d-ddc32beb6d8d</field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Default form view for x_bike_models</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__12815b39-7636-4d58-9b4e-2e6ffc593728" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_bike_models" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="key">bike_lease_saas.default_search_view__12815b39-7636-4d58-9b4e-2e6ffc593728</field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Default search view for x_bike_models</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_pivot_view_f_bbf7309d-a2b4-4049-8db4-36f5f6149f0d" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <pivot sample="1">
+        <field name="x_studio_value" type="measure"/>
+      </pivot>
+    </field>
+    <field name="key">bike_lease_saas.default_pivot_view_f_bbf7309d-a2b4-4049-8db4-36f5f6149f0d</field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Default pivot view for x_bike_models</field>
+    <field name="type">pivot</field>
+  </record>
+  <record id="default_graph_view_f_09219e04-9382-4419-80d4-254a724bf0ca" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <graph sample="1">
+        <field name="x_studio_value" type="measure"/>
+        <field name="create_date" type="row"/>
+      </graph>
+    </field>
+    <field name="key">bike_lease_saas.default_graph_view_f_09219e04-9382-4419-80d4-254a724bf0ca</field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Default graph view for x_bike_models</field>
+    <field name="type">graph</field>
+  </record>
+  <record id="odoo_studio_default__c6f378e3-9cd0-472a-bda7-7537a7066f5b" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/sheet/group[2]" position="replace">
+          <notebook name="studio_notebook_5if_1k1e3uf8l">
+            <page string="Description" name="studio_page_5if">
+              <group name="studio_group_5if">
+                <field name="x_studio_text_1"/>
+              </group>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="placeholder">Model Name</attribute>
+          <attribute name="string">Model Name</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
+          <field name="x_studio_manufacturer" options="{'create_name_field': 'x_name'}"/>
+          <field name="x_studio_bike_type" required="True"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
+          <attribute name="string">Standard Price</attribute>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_a89bee_right']" position="inside">
+          <field name="x_studio_engine_capacity_cc_"/>
+          <field name="x_studio_fuel_type"/>
+          <field name="x_studio_bike_count" readonly="1"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_06442e0a-10d4-45a6-b22d-ddc32beb6d8d"/>
+    <field name="key">bike_lease_saas.odoo_studio_default__c6f378e3-9cd0-472a-bda7-7537a7066f5b</field>
+    <field name="mode">extension</field>
+    <field name="model">x_bike_models</field>
+    <field name="name">Odoo Studio: Default form view for x_bike_models customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_0581d7d3-c031-4dbc-a428-1354ea36e107" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name" string="Manufacturer Name"/>
+        <field name="x_studio_description" string="Description"/>
+      </list>
+    </field>
+    <field name="key">bike_lease_saas.default_list_view_fo_0581d7d3-c031-4dbc-a428-1354ea36e107</field>
+    <field name="model">x_manufacturers</field>
+    <field name="name">Default list view for x_manufacturers</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_19250902-015a-487f-939b-e03ab7684adf" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Manufacturers">
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_manufacturer_bike_models)d" type="action" class="oe_stat_button" icon="fa-motorcycle">
+              <div class="o_stat_info">
+                <field name="x_studio_model_count" class="o_stat_value"/>
+                <span class="o_stat_text">Bike Models</span>
+              </div>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_2f89b8">
+            <group name="studio_group_2f89b8_left"/>
+            <group name="studio_group_2f89b8_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">bike_lease_saas.default_form_view_fo_19250902-015a-487f-939b-e03ab7684adf</field>
+    <field name="model">x_manufacturers</field>
+    <field name="name">Default form view for x_manufacturers</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__2e3e424d-d847-4114-b890-9d2bcb169e95" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_manufacturers" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="key">bike_lease_saas.default_search_view__2e3e424d-d847-4114-b890-9d2bcb169e95</field>
+    <field name="model">x_manufacturers</field>
+    <field name="name">Default search view for x_manufacturers</field>
+    <field name="type">search</field>
+  </record>
+  <record id="odoo_studio_default__a5e00c73-d87a-425c-b04e-81a93621d286" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/sheet/group[2]" position="replace"/>
+        <xpath expr="/form//field[@name='x_studio_image']" position="attributes">
+          <attribute name="string">Logo</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="placeholder">Manufacturer Name</attribute>
+          <attribute name="string">Manufacturer Name</attribute>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_2f89b8_left']" position="inside">
+          <field name="x_studio_description"/>
+          <field name="x_studio_model_count" readonly="1"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_19250902-015a-487f-939b-e03ab7684adf"/>
+    <field name="key">bike_lease_saas.odoo_studio_default__a5e00c73-d87a-425c-b04e-81a93621d286</field>
+    <field name="mode">extension</field>
+    <field name="model">x_manufacturers</field>
+    <field name="name">Odoo Studio: Default form view for x_manufacturers customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_default__a1bd2bd6-576a-4fbe-a483-4bd32aa34178" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/list//field[@name='x_name']" position="after">
+          <field name="x_studio_model_count"/>
+          <field name="x_studio_notes" optional="show"/>
+          <field name="x_studio_image" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_list_view_fo_0581d7d3-c031-4dbc-a428-1354ea36e107"/>
+    <field name="key">bike_lease_saas.odoo_studio_default__a1bd2bd6-576a-4fbe-a483-4bd32aa34178</field>
+    <field name="mode">extension</field>
+    <field name="model">x_manufacturers</field>
+    <field name="name">Odoo Studio: Default list view for x_manufacturers customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_kanban_view_fo_cc8a849e-cd15-4df7-a92f-5d3e4acf6a9d" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <kanban default_order="x_studio_sequence, id desc">
+        <field name="x_name"/>
+        <field name="x_studio_image"/>
+        <field name="x_studio_description"/>
+        <templates>
+          <t t-name="card" class="oe_kanban_global_click p-3 border shadow-sm rounded-3 bg-white mb-2">
+            <div class="d-flex align-items-center gap-3">
+              <aside class="o_kanban_image flex-shrink-0 rounded-3 overflow-hidden border bg-light d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                <field name="x_studio_image" widget="image"/>
+              </aside>
+              <main class="flex-grow-1 min-w-0">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-bold text-dark fs-5 text-truncate">
+                    <field name="x_name"/>
+                  </span>
+                  <i class="fa fa-chevron-right text-muted small"/>
+                </div>
+                <div class="text-muted small text-truncate-2" t-if="record.x_studio_description.raw_value">
+                  <field name="x_studio_description"/>
+                </div>
+              </main>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+    <field name="key">bike_lease_saas.default_kanban_view_fo_cc8a849e-cd15-4df7-a92f-5d3e4acf6a9d</field>
+    <field name="model">x_manufacturers</field>
+    <field name="name">Default kanban view for x_manufacturers</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="default_list_view_fo_381bdd24-b43e-4031-89bc-7ddf49cfa428" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name" string="Plan Name"/>
+        <field name="x_studio_lease_duration" string="Duration"/>
+        <field name="x_studio_duration_unit" string="Unit"/>
+        <field name="x_studio_payment_frequency" string="Payment Frequency"/>
+        <field name="x_studio_currency_id" invisible="1"/>
+        <field name="x_studio_value" string="Lease Amount"/>
+        <field name="x_studio_security_deposit" string="Security Deposit"/>
+      </list>
+    </field>
+    <field name="key">bike_lease_saas.default_list_view_fo_381bdd24-b43e-4031-89bc-7ddf49cfa428</field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Default list view for x_lease_plans</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_kanban_view_fo_lease_plans" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <kanban default_order="x_studio_sequence, id desc">
+        <field name="x_name"/>
+        <field name="x_studio_payment_frequency"/>
+        <field name="x_studio_value"/>
+        <field name="x_studio_lease_duration"/>
+        <field name="x_studio_duration_unit"/>
+        <field name="x_studio_security_deposit"/>
+        <field name="x_studio_description"/>
+        <field name="x_studio_currency_id"/>
+        <templates>
+          <t t-name="card" class="oe_kanban_global_click p-3 border shadow-sm rounded-3 bg-white mb-2 position-relative">
+            <main class="w-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bolder fs-5 text-primary text-truncate">
+                  <field name="x_name"/>
+                </span>
+                <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-2 py-1">
+                  <i class="fa fa-calendar me-1"/>
+                  <field name="x_studio_payment_frequency"/>
+                </span>
+              </div>
+              <div class="p-3 bg-light rounded-3 text-center mb-3 border">
+                <div class="fs-3 fw-bolder text-dark">
+                  <field name="x_studio_currency_id" invisible="1"/>
+                  <field name="x_studio_value"/>
+                </div>
+                <div class="text-muted small fw-medium">
+                  per <field name="x_studio_lease_duration"/> <field name="x_studio_duration_unit"/>
+                </div>
+              </div>
+              <div class="row g-2 text-muted small mb-2">
+                <div class="col-12">
+                  <div class="p-2 bg-body-tertiary rounded border text-center">
+                    <div class="text-uppercase micro-text fw-semibold text-muted">Security Deposit</div>
+                    <div class="fw-bold text-dark">
+                      <field name="x_studio_security_deposit"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-muted small pt-2 border-top text-truncate" t-if="record.x_studio_description.raw_value">
+                <i class="fa fa-info-circle me-1 text-primary"/>
+                <field name="x_studio_description"/>
+              </div>
+            </main>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+    <field name="key">bike_lease_saas.default_kanban_view_fo_lease_plans</field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Default kanban view for x_lease_plans</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="default_form_view_fo_09980e10-dddd-4466-bfbe-df5287bfcf21" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Lease Plans">
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_plan_contracts)d" type="action" class="oe_stat_button" icon="fa-book">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Contracts</span>
+              </div>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_c1e05a">
+            <group name="studio_group_c1e05a_left">
+              <field name="x_studio_currency_id" invisible="1"/>
+              <field name="x_studio_value"/>
+            </group>
+            <group name="studio_group_c1e05a_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">bike_lease_saas.default_form_view_fo_09980e10-dddd-4466-bfbe-df5287bfcf21</field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Default form view for x_lease_plans</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__dd808b97-8dc5-42f0-a311-ff9b087ba104" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_lease_plans" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="key">bike_lease_saas.default_search_view__dd808b97-8dc5-42f0-a311-ff9b087ba104</field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Default search view for x_lease_plans</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_pivot_view_f_a64cfb41-c38e-4691-94ae-065d265e2957" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <pivot sample="1">
+        <field name="x_studio_value" type="measure"/>
+      </pivot>
+    </field>
+    <field name="key">bike_lease_saas.default_pivot_view_f_a64cfb41-c38e-4691-94ae-065d265e2957</field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Default pivot view for x_lease_plans</field>
+    <field name="type">pivot</field>
+  </record>
+  <record id="default_graph_view_f_bbf849b4-cd21-49cf-9bf8-cc092597b5bc" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <graph sample="1">
+        <field name="x_studio_value" type="measure"/>
+        <field name="create_date" type="row"/>
+      </graph>
+    </field>
+    <field name="key">bike_lease_saas.default_graph_view_f_bbf849b4-cd21-49cf-9bf8-cc092597b5bc</field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Default graph view for x_lease_plans</field>
+    <field name="type">graph</field>
+  </record>
+  <record id="odoo_studio_default__4a7697e5-e015-49d2-9bed-f290e74f4710" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/sheet/group[2]" position="replace">
+          <notebook name="studio_notebook_3g2_1k1e6ptli">
+            <page string="Description" name="studio_page_3g2">
+              <group name="studio_group_3g2">
+                <group name="studio_group_3g2_left">
+                  <field name="x_studio_description"/>
+                </group>
+                <group name="studio_group_3g2_right"/>
+              </group>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="placeholder">Plan Name</attribute>
+          <attribute name="string">Plan Name</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_currency_id']" position="after">
+          <field name="x_studio_lease_duration" required="True"/>
+          <field name="x_studio_duration_unit" required="True"/>
+          <field name="x_studio_payment_frequency" required="True"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_value']" position="after">
+          <field name="x_studio_security_deposit" required="True"/>
+          <field name="x_studio_currency_id" invisible="True"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
+          <attribute name="required">True</attribute>
+          <attribute name="string">Lease Amount</attribute>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_c1e05a_right']" position="inside">
+          <field name="x_studio_late_fee_type"/>
+          <field name="x_studio_late_fee" string="Late Fee Amount" invisible="x_studio_late_fee_type != &quot;Fixed Amount&quot;"/>
+          <field name="x_studio_late_fee_percentage" invisible="x_studio_late_fee_type != &quot;Percentage&quot;"/>
+          <field name="x_active" invisible="True"/>
+          <field name="x_studio_currency_id" invisible="True"/>
+          <field name="x_studio_currency_id" invisible="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_09980e10-dddd-4466-bfbe-df5287bfcf21"/>
+    <field name="key">bike_lease_saas.odoo_studio_default__4a7697e5-e015-49d2-9bed-f290e74f4710</field>
+    <field name="mode">extension</field>
+    <field name="model">x_lease_plans</field>
+    <field name="name">Odoo Studio: Default form view for x_lease_plans customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_7d1d391a-a194-46c6-8f03-7bc61616a08a" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list default_order="id desc">
+        <field name="x_name"/>
+        <field name="x_studio_partner_id"/>
+        <field name="x_studio_contract_id"/>
+      </list>
+    </field>
+    <field name="key">bike_lease_saas.default_list_view_fo_7d1d391a-a194-46c6-8f03-7bc61616a08a</field>
+    <field name="model">x_lease_application</field>
+    <field name="name">Default list view for x_lease_application</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_93718075-a5ae-4049-b638-eec8e8f59ba9" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="%(action_app_submit)d" type="action" string="Submit" class="oe_highlight" invisible="x_studio_selection_1 not in ('Draft', False)"/>
+          <button name="%(action_app_approve)d" type="action" string="Approve" class="oe_highlight" invisible="x_studio_selection_1 != 'Submitted'"/>
+          <button name="%(action_open_reject_wizard)d" type="action" string="Reject" invisible="x_studio_selection_1 != 'Submitted'"/>
+          <button name="%(action_app_cancel)d" type="action" string="Cancel" invisible="x_studio_selection_1 in ('Approved', 'Rejected', 'Cancelled')"/>
+                    <button name="%(action_app_reset_draft)d" type="action" string="Reset to Draft" invisible="x_studio_selection_1 not in ('Rejected', 'Cancelled')"/>
+          <field name="x_studio_selection_1" widget="statusbar" readonly="1" statusbar_visible="Draft,Submitted,Approved"/>
+        </header>
+        <sheet string="Lease Application">
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_app_contracts)d" type="action" class="oe_stat_button" icon="fa-book" domain="[('id', '=', x_studio_contract_id)]" invisible="not x_studio_contract_id">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Contract</span>
+              </div>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="0" placeholder="Application Number..." readonly="1"/>
+            </h1>
+          </div>
+          <group name="studio_group_25c44f">
+            <group name="studio_group_25c44f_left">
+              <field name="x_studio_partner_id"/>
+              <field name="x_studio_partner_phone" widget="phone" options="{'enable_sms': True}"/>
+              <field name="x_studio_partner_email" widget="email"/>
+              <field name="x_studio_date"/>
+            </group>
+            <group name="studio_group_25c44f_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2" readonly="x_studio_selection_1 != 'Draft'"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">bike_lease_saas.default_form_view_fo_93718075-a5ae-4049-b638-eec8e8f59ba9</field>
+    <field name="model">x_lease_application</field>
+    <field name="name">Default form view for x_lease_application</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__eb38eaf0-a0e1-4dfb-a948-b47a1546ba24" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <field name="x_studio_partner_id" operator="child_of"/>
+        <separator/>
+        <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_lease_application" domain="[['x_active', '=', False]]"/>
+        <separator/>
+        <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
+        <filter name="groupby_status" string="Status" context="{'group_by': 'x_studio_selection_1'}" domain="[]"/>
+      </search>
+    </field>
+    <field name="key">bike_lease_saas.default_search_view__eb38eaf0-a0e1-4dfb-a948-b47a1546ba24</field>
+    <field name="model">x_lease_application</field>
+    <field name="name">Default search view for x_lease_application</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_calendar_vie_a40f8475-49e6-4be3-8f5a-1c4f76c91e4a" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <calendar date_start="x_studio_date" create_name_field="x_name"/>
+    </field>
+    <field name="key">bike_lease_saas.default_calendar_vie_a40f8475-49e6-4be3-8f5a-1c4f76c91e4a</field>
+    <field name="model">x_lease_application</field>
+    <field name="name">Default calendar view for x_lease_application</field>
+    <field name="type">calendar</field>
+  </record>
+  <record id="default_map_view_for_7af871ad-3496-4c75-836a-a8b3e6619a05" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <map res_partner="x_studio_partner_id">
+        <field name="x_studio_partner_id" string="Partner"/>
+      </map>
+    </field>
+    <field name="key">bike_lease_saas.default_map_view_for_7af871ad-3496-4c75-836a-a8b3e6619a05</field>
+    <field name="model">x_lease_application</field>
+    <field name="name">Default map view for x_lease_application</field>
+    <field name="type">map</field>
+  </record>
+  <record id="odoo_studio_default__3f2a076f-a819-487a-94e5-edd5bf587776" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/sheet/group[2]" position="replace">
+          <notebook name="studio_notebook_98h_1k1e8lkk1">
+            <page string="Customer Documents" name="studio_page_98h">
+              <group>
+                <field name="x_studio_customer_documents_filename" invisible="1"/>
+                <field widget="binary" filename="x_studio_customer_documents_filename" name="x_studio_customer_documents" string="Document" placeholder="Upload your file" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
+              </group>
+            </page>
+            <page string="Notes" name="studio_page_notes">
+              <group>
+                <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
+              </group>
+            </page>
+            <page string="Rejection Reason" name="studio_page_6bj_1k1e9lbbn" invisible="x_studio_selection_1 != 'Rejected'">
+              <group name="studio_group_6bj">
+                <group name="studio_group_6bj_left">
+                  <field name="x_studio_rejection_reason_ids" widget="many2many_tags" readonly="1" string="Rejection Reasons"/>
+                </group>
+                <group name="studio_group_6bj_right"/>
+              </group>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="placeholder">Application Number</attribute>
+          <attribute name="string">Application Number</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_email']" position="after">
+          <field name="x_studio_lease_start_date" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_id']" position="attributes">
+          <attribute name="required">True</attribute>
+          <attribute name="string">Customer</attribute>
+          <attribute name="readonly">x_studio_selection_1 not in ('Draft', 'Submitted')</attribute>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_25c44f_right']" position="inside">
+          <field name="x_studio_bike_model" options="{'create_name_field': 'x_name'}" required="True" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
+          <field name="x_studio_bike" options="{'create_name_field': 'x_name'}" required="x_studio_selection_1 not in ('Draft', False)" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')" domain="[('x_studio_status', '=', 'Available'), ('x_studio_bike_model', '=', x_studio_bike_model)] if x_studio_bike_model else [('x_studio_status', '=', 'Available')]"/>
+          <field name="x_studio_lease_plan" options="{'create_name_field': 'x_name'}" required="True" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
+          <field name="x_studio_contract_id" readonly="1" invisible="not x_studio_contract_id"/>
+          <xpath expr="/form//field[@name='x_studio_date']" position="move"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_date']" position="attributes">
+          <attribute name="required">False</attribute>
+          <attribute name="string">Application Date</attribute>
+          <attribute name="readonly">1</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_phone']" position="attributes">
+          <attribute name="readonly">x_studio_selection_1 not in ('Draft', 'Submitted')</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_email']" position="attributes">
+          <attribute name="readonly">x_studio_selection_1 not in ('Draft', 'Submitted')</attribute>
+        </xpath>
+        <xpath expr="/form/sheet" position="after">
+          <chatter/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_93718075-a5ae-4049-b638-eec8e8f59ba9"/>
+    <field name="key">bike_lease_saas.odoo_studio_default__3f2a076f-a819-487a-94e5-edd5bf587776</field>
+    <field name="mode">extension</field>
+    <field name="model">x_lease_application</field>
+    <field name="name">Odoo Studio: Default form view for x_lease_application customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_370eed15-3321-461b-af4c-8d39c24c181e" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list default_order="id desc" create="false" duplicate="false">
+        <field name="x_name"/>
+        <field name="x_studio_partner_id"/>
+        <field name="x_studio_application_id"/>
+        <field name="x_studio_bike_model"/>
+        <field name="x_studio_bike"/>
+      </list>
+    </field>
+    <field name="key">bike_lease_saas.default_list_view_fo_370eed15-3321-461b-af4c-8d39c24c181e</field>
+    <field name="model">x_lease_contract</field>
+    <field name="name">Default list view for x_lease_contract</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_f435bcb4-a2a4-4663-aba7-37af6f30a4f7" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form create="false" duplicate="false">
+        <header>
+          <button name="%(action_pay_security_deposit)d" type="action" string="Pay Security Deposit" class="oe_highlight" invisible="x_studio_selection_1 != 'Draft' or x_studio_deposit_invoice_id"/>
+          <button name="%(action_cnt_activate)d" type="action" string="Activate Contract" class="oe_highlight" invisible="x_studio_selection_1 != 'Draft' or not x_studio_deposit_paid"/>
+          <button name="%(action_create_lease_invoice)d" type="action" string="Pay Installment Amount" class="oe_highlight" invisible="x_studio_selection_1 != 'Active' or not x_studio_has_draft_installments"/>
+          <button name="%(action_cnt_complete)d" type="action" string="Complete Contract" class="oe_highlight" invisible="x_studio_selection_1 != 'Active' or not x_studio_all_invoices_paid"/>
+          <button name="%(action_cnt_terminate)d" type="action" string="Terminate" invisible="x_studio_selection_1 != 'Active'"/>
+          <button name="%(action_open_return_wizard)d" type="action" string="Return &amp; Inspect Bike" class="oe_highlight" invisible="x_studio_selection_1 not in ('Completed', 'Terminated')"/>
+          <button name="%(action_cnt_cancel)d" type="action" string="Cancel" invisible="x_studio_selection_1 in ('Active', 'Completed', 'Terminated', 'Cancelled')"/>
+          <field name="x_studio_selection_1" widget="statusbar" readonly="1" statusbar_visible="Draft,Active,Completed"/>
+        </header>
+        <sheet string="Lease Contract">
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_cnt_open_application)d" type="action" class="oe_stat_button" icon="fa-file-text-o" invisible="not x_studio_application_id">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Application</span>
+              </div>
+            </button>
+            <button name="%(action_cnt_open_bike)d" type="action" class="oe_stat_button" icon="fa-motorcycle" invisible="not x_studio_bike">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Bike</span>
+              </div>
+            </button>
+            <button name="%(action_cnt_open_invoices)d" type="action" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not x_studio_invoice_count">
+              <div class="o_stat_info">
+                <field name="x_studio_invoice_count" class="o_stat_value"/>
+                <span class="o_stat_text">Invoices</span>
+              </div>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="0" placeholder="Contract Number..." readonly="1"/>
+            </h1>
+          </div>
+          <group name="studio_group_e01819">
+            <group name="studio_group_e01819_left">
+              <field name="x_studio_partner_id"/>
+              <field name="x_studio_application_id" readonly="1"/>
+              <field name="x_studio_partner_phone" widget="phone" options="{'enable_sms': True}"/>
+              <field name="x_studio_partner_email" widget="email"/>
+              <field name="x_studio_date"/>
+            </group>
+            <group name="studio_group_e01819_right"/>
+          </group>
+          <group>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="key">bike_lease_saas.default_form_view_fo_f435bcb4-a2a4-4663-aba7-37af6f30a4f7</field>
+    <field name="model">x_lease_contract</field>
+    <field name="name">Default form view for x_lease_contract</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__59b75b2a-2e50-4abe-b366-51e87a923f46" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <field name="x_studio_partner_id" operator="child_of"/>
+        <field name="x_studio_bike_model"/>
+        <separator/>
+        <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_lease_contract" domain="[['x_active', '=', False]]"/>
+        <separator/>
+        <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
+        <filter name="groupby_bike_model" string="Vehicle Model" context="{'group_by': 'x_studio_bike_model'}" domain="[]"/>
+        <filter name="groupby_status" string="Status" context="{'group_by': 'x_studio_selection_1'}" domain="[]"/>
+      </search>
+    </field>
+    <field name="key">bike_lease_saas.default_search_view__59b75b2a-2e50-4abe-b366-51e87a923f46</field>
+    <field name="model">x_lease_contract</field>
+    <field name="name">Default search view for x_lease_contract</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_calendar_vie_7a2a665d-2b72-4493-ba00-f2929da50a4b" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <calendar date_start="x_studio_date" create_name_field="x_name"/>
+    </field>
+    <field name="key">bike_lease_saas.default_calendar_vie_7a2a665d-2b72-4493-ba00-f2929da50a4b</field>
+    <field name="model">x_lease_contract</field>
+    <field name="name">Default calendar view for x_lease_contract</field>
+    <field name="type">calendar</field>
+  </record>
+  <record id="default_map_view_for_775f24bf-9b6a-491f-aeaf-2dccae8e0f7d" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <map res_partner="x_studio_partner_id">
+        <field name="x_studio_partner_id" string="Partner"/>
+      </map>
+    </field>
+    <field name="key">bike_lease_saas.default_map_view_for_775f24bf-9b6a-491f-aeaf-2dccae8e0f7d</field>
+    <field name="model">x_lease_contract</field>
+    <field name="name">Default map view for x_lease_contract</field>
+    <field name="type">map</field>
+  </record>
+  <record id="odoo_studio_default__25385a59-86e6-4258-afae-e7116c56947f" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form" position="attributes">
+          <attribute name="create">false</attribute>
+          <attribute name="duplicate">false</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_name']" position="attributes">
+          <attribute name="placeholder">Contract Number</attribute>
+          <attribute name="string">Contract Number</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_id']" position="after">
+          <xpath expr="/form//field[@name='x_studio_partner_email']" position="move"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_phone']" position="after">
+          <field name="x_studio_bike_model" options="{'create_name_field': 'x_name'}"/>
+          <field name="x_studio_bike" options="{'create_name_field': 'x_name'}" required="True" domain="[('x_studio_status', '=', 'Available')]"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_id']" position="attributes">
+          <attribute name="required">True</attribute>
+          <attribute name="string">Customer</attribute>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_e01819_right']" position="inside">
+          <field name="x_studio_lease_plan" options="{'create_name_field': 'x_name'}" required="True"/>
+          <xpath expr="/form//field[@name='x_studio_date']" position="move"/>
+          <field name="x_studio_end_date" readonly="1"/>
+          <field name="x_studio_deposit_invoice_id" readonly="1" invisible="not x_studio_deposit_invoice_id"/>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_date']" position="attributes">
+          <attribute name="required">True</attribute>
+          <attribute name="string">Start Date</attribute>
+        </xpath>
+        <xpath expr="/form//group[@name='studio_group_e01819']" position="after">
+          <notebook name="contract_notebook">
+            <page string="Installment Schedule" name="installment_schedule_tab">
+              <field name="x_studio_installment_ids" readonly="1">
+                <list create="0" edit="0" delete="0" decoration-danger="x_studio_is_overdue">
+                  <field name="x_name"/>
+                  <field name="x_studio_date"/>
+                  <field name="x_studio_currency_id" column_invisible="1"/>
+                  <field name="x_studio_amount"/>
+                  <field name="x_studio_late_fee_amount" string="Late Fee"/>
+                  <field name="x_studio_total_amount" string="Total Amount" class="fw-bold"/>
+                  <field name="x_studio_is_overdue" column_invisible="1"/>
+                  <field name="x_studio_status" widget="badge" decoration-info="x_studio_status == 'Draft'" decoration-success="x_studio_status in ('Invoiced', 'Paid')"/>
+                  <field name="x_studio_invoice_id" readonly="1"/>
+                  <field name="x_studio_payment_state" widget="badge" decoration-success="x_studio_payment_state == 'paid'" decoration-info="x_studio_payment_state == 'in_payment'" decoration-warning="x_studio_payment_state in ('not_paid', 'partial')"/>
+                  <button name="%(action_open_installment_invoice)d" type="action" icon="fa-file-text-o" title="View Invoice" invisible="not x_studio_invoice_id"/>
+                </list>
+              </field>
+            </page>
+            <page string="Vehicle Return &amp; Deposit Settlement" name="return_settlement_tab" invisible="x_studio_selection_1 == 'Draft'">
+              <group name="group_return_settlement">
+                <group name="group_return_left">
+                  <field name="x_studio_bike_returned" widget="boolean_toggle" readonly="1"/>
+                  <field name="x_studio_service_needed" widget="boolean_toggle" readonly="1"/>
+                  <field name="x_studio_repair_charge" readonly="1" invisible="not x_studio_service_needed"/>
+                  <field name="x_studio_issue_ids" widget="many2many_tags" readonly="1" invisible="not x_studio_service_needed"/>
+                </group>
+                <group name="group_return_right">
+                  <field name="x_studio_refund_amount" readonly="1" invisible="x_studio_refund_amount &lt;= 0"/>
+                  <field name="x_studio_extra_charge" readonly="1" invisible="x_studio_extra_charge &lt;= 0"/>
+                  <field name="x_studio_return_invoice_id" readonly="1" invisible="not x_studio_return_invoice_id"/>
+                </group>
+              </group>
+            </page>
+          </notebook>
+        </xpath>
+        <xpath expr="/form/sheet" position="after">
+          <chatter/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_f435bcb4-a2a4-4663-aba7-37af6f30a4f7"/>
+    <field name="key">bike_lease_saas.odoo_studio_default__25385a59-86e6-4258-afae-e7116c56947f</field>
+    <field name="mode">extension</field>
+    <field name="model">x_lease_contract</field>
+    <field name="name">Odoo Studio: Default form view for x_lease_contract customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+
+  <record id="view_lease_installment_list" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">Lease Installment List View</field>
+    <field name="model">x_lease_installment</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list string="Installment Schedule" editable="bottom" decoration-danger="x_studio_is_overdue">
+        <field name="x_name"/>
+        <field name="x_studio_contract_id"/>
+        <field name="x_studio_date"/>
+        <field name="x_studio_amount"/>
+        <field name="x_studio_late_fee_amount" string="Late Fee"/>
+        <field name="x_studio_total_amount" string="Total Amount" class="fw-bold"/>
+        <field name="x_studio_is_overdue" column_invisible="1"/>
+        <field name="x_studio_status" widget="badge" decoration-info="x_studio_status == 'Draft'" decoration-success="x_studio_status in ('Invoiced', 'Paid')"/>
+        <field name="x_studio_invoice_id"/>
+        <field name="x_studio_payment_state" widget="badge" decoration-success="x_studio_payment_state == 'paid'" decoration-info="x_studio_payment_state == 'in_payment'" decoration-warning="x_studio_payment_state in ('not_paid', 'partial')"/>
+        <button name="%(action_open_installment_invoice)d" type="action" icon="fa-file-text-o" title="View Invoice" invisible="not x_studio_invoice_id"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_lease_app_reject_wizard_form" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">Reject Application Wizard Form View</field>
+    <field name="model">x_lease_application_reject_wizard</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form string="Reject Application">
+        <field name="x_studio_application_id" invisible="1"/>
+        <group>
+          <field name="x_studio_rejection_reason_ids" widget="many2many_tags" string="Rejection Reasons" placeholder="Select rejection reasons..." required="1"/>
+        </group>
+        <footer>
+          <button name="%(action_confirm_reject_app)d" type="action" string="Confirm Reject" class="btn-primary" data-hotkey="q"/>
+          <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+  <record id="view_rejection_reason_list" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">x_rejection_reason.list</field>
+    <field name="model">x_rejection_reason</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_name" string="Reason"/>
+      </list>
+    </field>
+  </record>
+  <record id="odoo_studio_account_move_lease_contract_inherit" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button name="%(action_invoice_open_lease_contract)d" type="action" class="oe_stat_button" icon="fa-book">
+            <div class="o_stat_info">
+              <span class="o_stat_text">Lease Contract</span>
+            </div>
+          </button>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="key">bike_lease_saas.odoo_studio_account_move_lease_contract_inherit</field>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="name">Odoo Studio: account.move.form customization for Lease Contract</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="view_bike_return_wizard_form" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">x_bike_return_wizard.form</field>
+    <field name="model">x_bike_return_wizard</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form string="Vehicle Return &amp; Inspection">
+        <group>
+          <group>
+            <field name="x_studio_contract_id" readonly="1"/>
+            <field name="x_studio_bike_returned" widget="boolean_toggle" readonly="1"/>
+          </group>
+          <group>
+            <field name="x_studio_currency_id" invisible="1"/>
+            <field name="x_studio_service_needed" widget="boolean_toggle"/>
+            <field name="x_studio_repair_charge" invisible="not x_studio_service_needed" required="x_studio_service_needed"/>
+          </group>
+        </group>
+        <group string="Select Issues Found in Bike" invisible="not x_studio_service_needed">
+          <field name="x_studio_issue_ids" widget="many2many_tags" placeholder="Select issues (e.g. Body Scratch, Brake Pad Worn)..." nolabel="1" required="x_studio_service_needed"/>
+        </group>
+        <footer>
+          <button name="%(action_confirm_return_wizard)d" type="action" string="Confirm Return &amp; Settlement" class="oe_highlight"/>
+          <button string="Cancel" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+</odoo>

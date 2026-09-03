@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="active_bikes_5837838a-b5f2-4660-9afc-51902f87df03" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_bikes_d7f35fa5-4233-498b-984c-ac862e873144"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="currency_bikes_2e5e29cf-5dcb-4627-ad94-6fd65b71a6f5" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_bikes_23a9ad05-c7e5-4e7a-8eea-833b5bd1e476"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="new_selection_bikes_770845a2-6be3-4c19-8eac-7a3c94050526" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_selection_bikes_d9d50637-8698-4fb1-b996-702d9c12d0fa"/>
+    <field name="json_value">"Available"</field>
+  </record>
+  <record id="active_bikes_beeddd69-5a1a-419d-bdec-373ef1cf34d4" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_bikes_d7f35fa5-4233-498b-984c-ac862e873144"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="active_bike_models_bdd4c9ab-7f9b-4176-a7a2-b6ed25243eed" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_bike_models_6c9167d1-c6d4-403e-8c4c-82ca59daa2d6"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="currency_bike_models_54376965-b5fb-4f57-88e0-c2a98b63f574" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_bike_models_862f87c0-92c1-44a1-b1c8-d195cf9c4540"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="currency_bike_models_04585ab7-054c-4785-b36d-75c5aa0a4732" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_bike_models_862f87c0-92c1-44a1-b1c8-d195cf9c4540"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="sequence_bike_models_9f601e55-3d7d-41c1-bb83-a67d77b42d1b" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="sequence_bike_models_30930649-2bdc-4c73-9766-027ce4abec75"/>
+    <field name="json_value">10</field>
+  </record>
+  <record id="active_manufacturers_661d699b-47cc-475d-8986-25bd270c92be" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_manufacturers_9f8d6d9b-b126-4966-b95b-bd0ca927b121"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="sequence_manufacture_64c1744e-8499-44ce-b7e4-7561c793d431" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="sequence_manufacture_0dc00898-4c61-49ed-9578-38e4148d20f9"/>
+    <field name="json_value">10</field>
+  </record>
+  <record id="new_integer_bike_mod_c6ca9a8d-ee2d-45e7-8913-97ae0c789e46" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_integer_bike_mod_63315aca-4fee-4528-b16c-1a3fed5d1198"/>
+    <field name="json_value">"0"</field>
+  </record>
+  <record id="active_lease_plans_2e98476c-7397-4495-95f6-0071ec63bafd" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_lease_plans_f5ddd644-00cd-4e6d-8e69-0bcce59d84fc"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="currency_lease_plans_c17761c6-06d2-447b-a3b2-3770d825d632" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_lease_plans_73d55607-1acf-4a82-a8fa-2029ea1a23a5"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="currency_lease_plans_27c423be-6a3d-40a0-8d01-c3ad9ecf261b" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="currency_lease_plans_73d55607-1acf-4a82-a8fa-2029ea1a23a5"/>
+    <field name="json_value">1</field>
+  </record>
+  <record id="sequence_lease_plans_9deb0914-c6b8-4a8d-a13a-4fe136fac03b" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="sequence_lease_plans_12649831-3703-4563-ac1d-ced576372f40"/>
+    <field name="json_value">10</field>
+  </record>
+  <record id="new_integer_lease_pl_c989ff33-99cc-45df-b6ed-068aa18e35e3" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_integer_lease_pl_dcb0cded-7eb4-4f19-8131-1bb089d84c3b"/>
+    <field name="json_value">"0"</field>
+  </record>
+  <record id="active_lease_plans_b51359e4-66a2-4de9-8e2a-6873221cfebb" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_lease_plans_f5ddd644-00cd-4e6d-8e69-0bcce59d84fc"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="new_integer_lease_pl_ca2716fd-1ec4-4bea-8375-7ae48578a177" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_integer_lease_pl_93e08466-9ddf-4635-b8e3-c0ec449253d8"/>
+    <field name="json_value">"0"</field>
+  </record>
+  <record id="active_lease_applica_ccea04b2-a087-47fa-b155-6a6e78481097" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_lease_applica_748d1ee8-86a7-4cd4-bf81-6f2536023526"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="active_lease_contrac_96d157ca-8f3c-4c04-91d5-b0e201c8e474" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="active_lease_contrac_df99e773-cc10-4218-ad90-7fb3547d7db5"/>
+    <field name="json_value">true</field>
+  </record>
+  <record id="new_selection_lease__776c05a9-b1ba-41a2-a6d7-91c8591dd873" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_selection_lease__b1f5089d-0437-4de7-a183-717b39f25ba3"/>
+    <field name="json_value">"Draft"</field>
+  </record>
+  <record id="new_selection_lease__8c54fa15-eb52-47c7-82d8-f11522f30050" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="new_selection_lease__418bc697-7ff8-4951-b06c-ed6a4035a5d2"/>
+    <field name="json_value">"Draft"</field>
+  </record>
+  <record id="default_x_name_lease_application" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="description_lease_ap_9b7c0c59-87ac-4818-bcc3-7f6923bd5370"/>
+    <field name="json_value">"New"</field>
+  </record>
+  <record id="default_x_name_lease_contract" model="ir.default" context="{'studio': True}">
+    <field name="field_id" ref="description_lease_co_fa8904ac-827a-418d-81f3-9fd4816ee8e1"/>
+    <field name="json_value">"New"</field>
+  </record>
+</odoo>

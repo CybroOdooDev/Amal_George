@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+  <record id="bikes_group_system_2e55027a-a713-4e52-800d-2930518536b9" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">Bikes group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="bikes_group_user_a4fc462c-3bd2-4249-8fc9-fec330d38d92" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">Bikes group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="bike_models_group_sy_0cd5514c-7b4f-4454-a380-3cbe6471eca3" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">Bike Models group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="bike_models_group_us_01525779-82c9-4ce6-acb3-4c1a865085b1" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="name">Bike Models group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="manufacturers_group__0a4ae6d2-a20f-4ea7-94b2-f39849a4636d" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">Manufacturers group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="manufacturers_group__32a5ebc5-c937-45f7-a075-89ab3b964e6d" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="name">Manufacturers group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="lease_plans_group_sy_b6a60e4e-5eed-4ac0-98d4-9c4a96f847f0" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">Lease Plans group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="lease_plans_group_us_0299ae62-e033-4382-b1f5-0191b2b4b558" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
+    <field name="name">Lease Plans group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="lease_application_gr_9f534cce-c5c9-4ec1-b131-0448be0cf445" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">Lease Application group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="lease_application_gr_af43aa18-5fa0-4a55-aaa0-f0fb7ae74d31" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
+    <field name="name">Lease Application group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="lease_contract_group_f2d227e5-9c50-42e9-a3f7-f48d9077e882" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">Lease Contract group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="lease_contract_group_896735a0-835d-4771-b244-1730b1601770" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">Lease Contract group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="lease_app_reject_wizard_group_system" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="model_lease_app_reject_wizard"/>
+    <field name="name">Reject Application Wizard group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="lease_app_reject_wizard_group_user" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="model_lease_app_reject_wizard"/>
+    <field name="name">Reject Application Wizard group_user</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="rejection_reason_group_system" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="model_rejection_reason"/>
+    <field name="name">Rejection Reason group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="rejection_reason_group_user" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="model_rejection_reason"/>
+    <field name="name">Rejection Reason group_user</field>
+    <field name="operation">cru</field>
+  </record>
+  <record id="lease_installment_group_system" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">Lease Installment group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="lease_installment_group_user" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">Lease Installment group_user</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="bike_return_wizard_group_system" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">Bike Return Wizard group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="bike_return_wizard_group_user" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="model_bike_return_wizard"/>
+    <field name="name">Bike Return Wizard group_user</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="bike_issue_group_system" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_system"/>
+    <field name="model_id" ref="model_bike_issue"/>
+    <field name="name">Bike Issue group_system</field>
+    <field name="operation">crud</field>
+  </record>
+  <record id="bike_issue_group_user" model="ir.access" context="{'studio': True}">
+    <field name="group_id" ref="base.group_user"/>
+    <field name="model_id" ref="model_bike_issue"/>
+    <field name="name">Bike Issue group_user</field>
+    <field name="operation">crud</field>
+  </record>
+</odoo>

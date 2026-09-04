@@ -16,6 +16,11 @@
     <field name="res_model">x_bikes</field>
     <field name="view_mode">kanban,list,form,pivot,graph</field>
   </record>
+  <record id="action_bike_lease_dashboard" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Dashboard</field>
+    <field name="res_model">x_bikes</field>
+    <field name="view_mode">kanban,graph,pivot,list,form</field>
+  </record>
   <record id="bike_models_2442ce82-781a-4c73-8f26-5d11cc30a084" model="ir.actions.act_window" context="{'studio': True}">
     <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
                     This is your new action.
@@ -157,5 +162,18 @@
     <field name="view_mode">kanban,list,form,pivot,graph</field>
     <field name="domain">[('x_studio_manufacturer', '=', active_id)]</field>
     <field name="context">{'default_x_studio_manufacturer': active_id}</field>
+  </record>
+  <record id="action_bike_maintenance_requests" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Maintenance Requests</field>
+    <field name="res_model">maintenance.request</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="domain">[('x_studio_bike_id', '=', active_id)]</field>
+    <field name="context">{'default_x_studio_bike_id': active_id}</field>
+  </record>
+  <record id="action_all_bike_maintenance_requests" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Maintenance Requests</field>
+    <field name="res_model">maintenance.request</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="domain">[('x_studio_bike_id', '!=', False)]</field>
   </record>
 </odoo>

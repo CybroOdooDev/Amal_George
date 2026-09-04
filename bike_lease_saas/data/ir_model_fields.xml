@@ -142,6 +142,25 @@
     <field name="name">x_studio_registration_expiry</field>
     <field name="on_delete" eval="False"/>
   </record>
+  <record id="field_bikes_has_additional_charge" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Has Additional Daily Charge</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_has_additional_charge</field>
+    <field name="on_delete" eval="False"/>
+  </record>
+  <record id="field_bikes_additional_daily_charge" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Additional Daily Charge</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_additional_daily_charge</field>
+    <field name="on_delete" eval="False"/>
+  </record>
   <record id="description_bike_mod_6de196d4-435e-4424-9795-42b9244aa111" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="copied" eval="False"/>
@@ -1227,5 +1246,29 @@
     <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
     <field name="name">x_studio_service_needed</field>
     <field name="readonly" eval="True"/>
+  </record>
+  <record id="field_maintenance_request_bike_id" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Bike</field>
+    <field name="model">maintenance.request</field>
+    <field name="model_id" ref="maintenance.model_maintenance_request"/>
+    <field name="name">x_studio_bike_id</field>
+    <field name="on_delete">set null</field>
+    <field name="relation">x_bikes</field>
+    <field name="domain">[('x_studio_status', 'in', ['Available', 'Maintenance','Retired'])]</field>
+    <field name="required" eval="False"/>
+  </record>
+  <record id="field_bikes_maintenance_count" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Maintenance Count</field>
+    <field name="model">x_bikes</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="name">x_studio_maintenance_count</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    rec['x_studio_maintenance_count'] = self.env['maintenance.request'].search_count([('x_studio_bike_id', '=', rec.id)])]]></field>
   </record>
 </odoo>

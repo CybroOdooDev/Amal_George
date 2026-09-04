@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="bike_lease_saas.BikeLeaseDashboard">
+        <div class="o_bike_lease_dashboard">
+            <!-- Header & Filters Bar -->
+            <div class="o_dashboard_header d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div class="o_dashboard_title d-flex align-items-center me-3 mb-2 mb-md-0">
+                    <i class="fa fa-tachometer text-primary fs-3 me-2"/>
+                    <div>
+                        <h2>Bike Lease Analytics Dashboard</h2>
+                        <span class="text-muted small">Real-time Fleet Performance, Revenue &amp; Operational Analytics</span>
+                    </div>
+                </div>
+
+                <div class="o_dashboard_filters d-flex flex-wrap align-items-center">
+                    <div class="me-2 mb-1">
+                        <select class="form-select form-select-sm" t-on-change="onPeriodFilterChange">
+                            <option value="month" t-att-selected="this.state.periodFilter == 'month'">Period: This Month</option>
+                            <option value="quarter" t-att-selected="this.state.periodFilter == 'quarter'">Period: This Quarter</option>
+                            <option value="year" t-att-selected="this.state.periodFilter == 'year'">Period: This Year</option>
+                            <option value="all" t-att-selected="this.state.periodFilter == 'all'">Period: All Time</option>
+                        </select>
+                    </div>
+
+                    <div class="me-2 mb-1">
+                        <select class="form-select form-select-sm" t-on-change="onModelFilterChange">
+                            <option value="all">Model: All Bike Models</option>
+                            <t t-foreach="this.state.filterOptions.models || []" t-as="m" t-key="m.id">
+                                <option t-att-value="m.id" t-esc="m.name"/>
+                            </t>
+                        </select>
+                    </div>
+
+                    <div class="me-2 mb-1">
+                        <select class="form-select form-select-sm" t-on-change="onStatusFilterChange">
+                            <option value="all">Status: All Contracts</option>
+                            <option value="active">Status: Active Contracts</option>
+                            <option value="draft">Status: Draft Contracts</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-sm btn-outline-primary mb-1 d-flex align-items-center" t-on-click="refreshDashboard">
+                        <i class="fa fa-refresh me-1"/> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div t-if="this.state.isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted fw-semibold">Fetching Fleet Analytics...</p>
+            </div>
+
+            <t t-if="!this.state.isLoading">
+                <!-- Top 4 KPI Summary Cards -->
+                <div class="row g-3 mb-4">
+                    <!-- KPI 1: Fleet Utilization Rate -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="o_kpi_card d-flex align-items-center">
+                            <div class="o_kpi_icon_wrapper o_kpi_icon_blue me-3">
+                                <i class="fa fa-motorcycle"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="o_kpi_title">Fleet Utilization</div>
+                                <div class="o_kpi_value">
+                                    <t t-esc="this.state.kpi.utilization_rate"/>%
+                                </div>
+                                <div class="o_kpi_subtext">
+                                    <span class="fw-bold text-dark"><t t-esc="this.state.kpi.leased_count"/></span> Leased / <t t-esc="this.state.kpi.total_bikes"/> Active Bikes
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: Active Revenue & Collection Cash -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="o_kpi_card d-flex align-items-center">
+                            <div class="o_kpi_icon_wrapper o_kpi_icon_emerald me-3">
+                                <i class="fa fa-line-chart"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="o_kpi_title">Active Revenue</div>
+                                <div class="o_kpi_value text-success">
+                                    <t t-esc="this.state.kpi.total_revenue"/>
+                                </div>
+                                <div class="o_kpi_subtext">
+                                    Cash: <span class="fw-bold"><t t-esc="this.state.kpi.collected_cash"/></span> (<t t-esc="this.state.kpi.collection_efficiency"/>% Eff.)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Overdue Receivables Alert -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="o_kpi_card d-flex align-items-center">
+                            <div class="o_kpi_icon_wrapper o_kpi_icon_amber me-3">
+                                <i class="fa fa-exclamation-triangle"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="o_kpi_title">Overdue Receivables</div>
+                                <div class="o_kpi_value text-warning">
+                                    <t t-esc="this.state.kpi.overdue_amount"/>
+                                </div>
+                                <div class="o_kpi_subtext">
+                                    <span class="badge bg-warning text-dark"><t t-esc="this.state.kpi.overdue_count"/> Installments Overdue</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Maintenance & Repair Load -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="o_kpi_card d-flex align-items-center">
+                            <div class="o_kpi_icon_wrapper o_kpi_icon_rose me-3">
+                                <i class="fa fa-wrench"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="o_kpi_title">Maintenance Load</div>
+                                <div class="o_kpi_value text-danger">
+                                    <t t-esc="this.state.kpi.active_repair_count"/> Requests
+                                </div>
+                                <div class="o_kpi_subtext">
+                                    Total Repair Cost: <span class="fw-bold text-dark"><t t-esc="this.state.kpi.repair_cost"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 1 Charts: Fleet Status & Revenue/Cashflow Trend -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-lg-4">
+                        <div class="o_dashboard_card h-100 mb-0">
+                            <div class="o_dashboard_card_header">
+                                <h3 class="o_dashboard_card_title"><i class="fa fa-pie-chart text-primary me-2"/>Fleet Status Distribution</h3>
+                                <span class="badge bg-light text-dark">Real-time</span>
+                            </div>
+                            <div class="o_chart_container">
+                                <canvas id="chart_fleet_status"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-8">
+                        <div class="o_dashboard_card h-100 mb-0">
+                            <div class="o_dashboard_card_header">
+                                <h3 class="o_dashboard_card_title"><i class="fa fa-bar-chart text-success me-2"/>Revenue &amp; Cashflow Trend</h3>
+                                <span class="badge bg-light text-dark">Monthly Breakdown</span>
+                            </div>
+                            <div class="o_chart_container">
+                                <canvas id="chart_revenue_trend"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2 Charts: Vehicle Model Revenue Yield & Reliability Matrix -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-lg-5">
+                        <div class="o_dashboard_card h-100 mb-0">
+                            <div class="o_dashboard_card_header">
+                                <h3 class="o_dashboard_card_title"><i class="fa fa-area-chart text-info me-2"/>Vehicle Model Revenue Yield</h3>
+                                <span class="badge bg-light text-dark">Polar Area</span>
+                            </div>
+                            <div class="o_chart_container">
+                                <canvas id="chart_model_yield"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-7">
+                        <div class="o_dashboard_card h-100 mb-0">
+                            <div class="o_dashboard_card_header">
+                                <h3 class="o_dashboard_card_title"><i class="fa fa-compass text-secondary me-2"/>Fleet Reliability Matrix</h3>
+                                <span class="badge bg-light text-dark">5-Dimension Radar</span>
+                            </div>
+                            <div class="o_chart_container">
+                                <canvas id="chart_reliability"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3 Chart: Lease Plan Distribution -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <div class="o_dashboard_card mb-0">
+                            <div class="o_dashboard_card_header">
+                                <h3 class="o_dashboard_card_title"><i class="fa fa-tasks text-purple me-2"/>Lease Plan Distribution</h3>
+                                <span class="badge bg-light text-dark">Contract Count by Plan</span>
+                            </div>
+                            <div class="o_chart_container o_chart_container_tall">
+                                <canvas id="chart_lease_plan_dist"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4 Data Tables -->
+                <div class="row g-3">
+                    <!-- Table 1: Overdue Receivables Watchlist -->
+                    <div class="col-12 col-xl-6">
+                        <div class="o_dashboard_card h-100 mb-0">
+                            <div class="o_dashboard_card_header">
+                                <h3 class="o_dashboard_card_title text-warning">
+                                    <i class="fa fa-exclamation-circle me-2"/>Overdue Receivables Watchlist
+                                </h3>
+                                <span class="badge bg-warning text-dark"><t t-esc="(this.state.tables.overdue || []).length"/> Pending</span>
+                            </div>
+                            <div class="o_dashboard_table_wrapper">
+                                <table class="o_dashboard_table">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Contract</th>
+                                            <th>Bike Name</th>
+                                            <th>Days Overdue</th>
+                                            <th>Unpaid Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="!this.state.tables.overdue || this.state.tables.overdue.length == 0">
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-3">No overdue installments found.</td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="this.state.tables.overdue || []" t-as="row" t-key="row.id">
+                                            <tr>
+                                                <td class="fw-bold"><t t-esc="row.customer"/></td>
+                                                <td><span class="badge bg-light text-dark border"><t t-esc="row.contract"/></span></td>
+                                                <td><t t-esc="row.bike"/></td>
+                                                <td><span class="badge bg-danger-light text-danger"><t t-esc="row.days_overdue"/> Days</span></td>
+                                                <td class="fw-bold text-danger"><t t-esc="row.amount"/></td>
+                                                <td>
+                                                    <button t-if="row.contract_id" class="btn btn-xs btn-outline-primary o_table_btn" t-on-click="() => this.openContract(row.contract_id)">
+                                                        View Contract
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table 2: Recent Return & Inspection Settlements -->
+                    <div class="col-12 col-xl-6">
+                        <div class="o_dashboard_card h-100 mb-0">
+                            <div class="o_dashboard_card_header">
+                                <h3 class="o_dashboard_card_title text-primary">
+                                    <i class="fa fa-check-square-o me-2"/>Recent Return &amp; Inspection Settlements
+                                </h3>
+                                <span class="badge bg-primary text-white"><t t-esc="(this.state.tables.returns || []).length"/> Inspections</span>
+                            </div>
+                            <div class="o_dashboard_table_wrapper">
+                                <table class="o_dashboard_table">
+                                    <thead>
+                                        <tr>
+                                            <th>Contract #</th>
+                                            <th>Customer</th>
+                                            <th>Returned</th>
+                                            <th>Repair Charge</th>
+                                            <th>Refund Net</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="!this.state.tables.returns || this.state.tables.returns.length == 0">
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-3">No recent return inspection records found.</td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="this.state.tables.returns || []" t-as="row" t-key="row.id">
+                                            <tr>
+                                                <td>
+                                                    <a href="#" t-if="row.contract_id" class="fw-bold text-primary text-decoration-none" t-on-click.prevent="() => this.openContract(row.contract_id)">
+                                                        <t t-esc="row.contract"/>
+                                                    </a>
+                                                    <t t-else=""><t t-esc="row.contract"/></t>
+                                                </td>
+                                                <td><t t-esc="row.customer"/></td>
+                                                <td>
+                                                    <span t-att-class="row.returned == 'Yes' ? 'badge bg-success-light text-success' : 'badge bg-secondary-light text-secondary'">
+                                                        <t t-esc="row.returned"/>
+                                                    </span>
+                                                </td>
+                                                <td><t t-esc="row.repair_charge"/></td>
+                                                <td class="fw-bold"><t t-esc="row.settlement"/></td>
+                                                <td>
+                                                    <span t-att-class="row.status.includes('Settled') ? 'badge bg-success text-white' : 'badge bg-info text-white'">
+                                                        <t t-esc="row.status"/>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

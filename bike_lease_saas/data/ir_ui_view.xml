@@ -87,6 +87,9 @@
                 <span class="o_stat_text">Contracts</span>
               </div>
             </button>
+            <button name="%(action_bike_maintenance_requests)d" type="action" class="oe_stat_button" icon="fa-wrench">
+              <field name="x_studio_maintenance_count" widget="statinfo" string="Maintenance"/>
+            </button>
           </div>
           <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
           <field name="x_active" invisible="1"/>
@@ -218,6 +221,10 @@
         </xpath>
         <xpath expr="/form//field[@name='x_studio_value']" position="attributes">
           <attribute name="string">Purchase Cost</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_related_manufacturer']" position="after">
+          <field name="x_studio_has_additional_charge" widget="boolean_toggle"/>
+          <field name="x_studio_additional_daily_charge" invisible="not x_studio_has_additional_charge"/>
         </xpath>
       </data>
     </field>
@@ -979,16 +986,16 @@
           </div>
           <group name="studio_group_e01819">
             <group name="studio_group_e01819_left">
-              <field name="x_studio_partner_id"/>
+              <field name="x_studio_partner_id" readonly="1"/>
               <field name="x_studio_application_id" readonly="1"/>
-              <field name="x_studio_partner_phone" widget="phone" options="{'enable_sms': True}"/>
-              <field name="x_studio_partner_email" widget="email"/>
-              <field name="x_studio_date"/>
+              <field name="x_studio_partner_phone" widget="phone" options="{'enable_sms': True}" readonly="1"/>
+              <field name="x_studio_partner_email" widget="email" readonly="1"/>
+              <field name="x_studio_date" readonly="x_studio_selection_1 not in ('Draft', False)"/>
             </group>
             <group name="studio_group_e01819_right"/>
           </group>
           <group>
-            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+            <field name="x_studio_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2" readonly="x_studio_selection_1 not in ('Draft', False)"/>
           </group>
         </sheet>
       </form>
@@ -1054,15 +1061,22 @@
           <xpath expr="/form//field[@name='x_studio_partner_email']" position="move"/>
         </xpath>
         <xpath expr="/form//field[@name='x_studio_partner_phone']" position="after">
-          <field name="x_studio_bike_model" options="{'create_name_field': 'x_name'}"/>
-          <field name="x_studio_bike" options="{'create_name_field': 'x_name'}" required="True" domain="[('x_studio_status', '=', 'Available')]"/>
+          <field name="x_studio_bike_model" options="{'create_name_field': 'x_name'}" readonly="1"/>
+          <field name="x_studio_bike" options="{'create_name_field': 'x_name'}" required="True" readonly="1" domain="['&amp;', ('x_studio_bike_model', '=', x_studio_bike_model), '|', ('x_studio_status', '=', 'Available'), ('id', '=', x_studio_bike)] if x_studio_bike_model else ['|', ('x_studio_status', '=', 'Available'), ('id', '=', x_studio_bike)]"/>
         </xpath>
         <xpath expr="/form//field[@name='x_studio_partner_id']" position="attributes">
           <attribute name="required">True</attribute>
           <attribute name="string">Customer</attribute>
+          <attribute name="readonly">1</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_phone']" position="attributes">
+          <attribute name="readonly">1</attribute>
+        </xpath>
+        <xpath expr="/form//field[@name='x_studio_partner_email']" position="attributes">
+          <attribute name="readonly">1</attribute>
         </xpath>
         <xpath expr="/form//group[@name='studio_group_e01819_right']" position="inside">
-          <field name="x_studio_lease_plan" options="{'create_name_field': 'x_name'}" required="True"/>
+          <field name="x_studio_lease_plan" options="{'create_name_field': 'x_name'}" required="True" readonly="x_studio_selection_1 not in ('Draft', False)"/>
           <xpath expr="/form//field[@name='x_studio_date']" position="move"/>
           <field name="x_studio_end_date" readonly="1"/>
           <field name="x_studio_deposit_invoice_id" readonly="1" invisible="not x_studio_deposit_invoice_id"/>
@@ -1070,6 +1084,7 @@
         <xpath expr="/form//field[@name='x_studio_date']" position="attributes">
           <attribute name="required">True</attribute>
           <attribute name="string">Start Date</attribute>
+          <attribute name="readonly">x_studio_selection_1 not in ('Draft', False)</attribute>
         </xpath>
         <xpath expr="/form//group[@name='studio_group_e01819']" position="after">
           <notebook name="contract_notebook">
@@ -1214,5 +1229,90 @@
         </footer>
       </form>
     </field>
+  </record>
+  <record id="view_bike_maintenance_request_form" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">maintenance.request.form.bike</field>
+    <field name="model">maintenance.request</field>
+    <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+    <field name="mode">primary</field>
+    <field name="priority">999</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='equipment_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+        <attribute name="required">0</attribute>
+      </xpath>
+      <xpath expr="//field[@name='category_id']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='equipment_id']" position="after">
+        <field name="x_studio_bike_id" required="1" domain="[('x_studio_status', 'in', ['Available', 'Maintenance','Retired'])]" options="{'no_create': True}"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_bike_maintenance_request_list" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">maintenance.request.list.bike</field>
+    <field name="model">maintenance.request</field>
+    <field name="inherit_id" ref="maintenance.hr_equipment_request_view_tree"/>
+    <field name="mode">primary</field>
+    <field name="priority">999</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='category_id']" position="attributes">
+        <attribute name="column_invisible">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='name']" position="after">
+        <field name="x_studio_bike_id"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_bike_maintenance_request_kanban" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">maintenance.request.kanban.bike</field>
+    <field name="model">maintenance.request</field>
+    <field name="inherit_id" ref="maintenance.hr_equipment_request_view_kanban"/>
+    <field name="mode">primary</field>
+    <field name="priority">999</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <xpath expr="//progressbar" position="after">
+        <field name="x_studio_bike_id"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="action_bike_maintenance_requests_kanban_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="1"/>
+    <field name="view_mode">kanban</field>
+    <field name="view_id" ref="view_bike_maintenance_request_kanban"/>
+    <field name="act_window_id" ref="action_bike_maintenance_requests"/>
+  </record>
+  <record id="action_bike_maintenance_requests_list_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="2"/>
+    <field name="view_mode">list</field>
+    <field name="view_id" ref="view_bike_maintenance_request_list"/>
+    <field name="act_window_id" ref="action_bike_maintenance_requests"/>
+  </record>
+  <record id="action_bike_maintenance_requests_form_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="3"/>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="view_bike_maintenance_request_form"/>
+    <field name="act_window_id" ref="action_bike_maintenance_requests"/>
+  </record>
+  <record id="action_all_bike_maintenance_requests_kanban_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="1"/>
+    <field name="view_mode">kanban</field>
+    <field name="view_id" ref="view_bike_maintenance_request_kanban"/>
+    <field name="act_window_id" ref="action_all_bike_maintenance_requests"/>
+  </record>
+  <record id="action_all_bike_maintenance_requests_list_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="2"/>
+    <field name="view_mode">list</field>
+    <field name="view_id" ref="view_bike_maintenance_request_list"/>
+    <field name="act_window_id" ref="action_all_bike_maintenance_requests"/>
+  </record>
+  <record id="action_all_bike_maintenance_requests_form_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="3"/>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="view_bike_maintenance_request_form"/>
+    <field name="act_window_id" ref="action_all_bike_maintenance_requests"/>
   </record>
 </odoo>

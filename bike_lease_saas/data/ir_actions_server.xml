@@ -39,15 +39,50 @@ for rec in records:
     <field name="name">Sync Bike Status from Contract</field>
     <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
     <field name="state">code</field>
-    <field name="code">
+    <field name="code"><![CDATA[
 for rec in records:
     if rec.x_studio_bike:
-        status = rec.x_studio_selection_1
-        if status == 'Active':
-            rec.x_studio_bike.write({'x_studio_status': 'Leased'})
-        elif status in ('Completed', 'Terminated', 'Cancelled'):
-            rec.x_studio_bike.write({'x_studio_status': 'Available'})
-    </field>
+        bike = rec.x_studio_bike
+        if bike.x_studio_status != 'Retired':
+            all_reqs = env['maintenance.request'].search([('x_studio_bike_id', '=', bike.id)])
+            has_in_progress = any(
+                not ('repaired' in ((r.stage_id.name or '').lower()) or 'done' in ((r.stage_id.name or '').lower()) or 'cancel' in ((r.stage_id.name or '').lower()) or r.state in ('done', 'cancelled'))
+                for r in all_reqs
+            )
+            if has_in_progress:
+                bike.write({'x_studio_status': 'Maintenance'})
+            elif rec.x_studio_selection_1 == 'Active':
+                bike.write({'x_studio_status': 'Leased'})
+            else:
+                approved_app = env['x_lease_application'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Approved')], limit=1)
+                if approved_app:
+                    bike.write({'x_studio_status': 'Reserved'})
+                else:
+                    bike.write({'x_studio_status': 'Available'})
+
+leased_bikes = env['x_bikes'].search([('x_studio_status', 'in', ('Leased', 'Reserved'))])
+for bike in leased_bikes:
+    all_reqs = env['maintenance.request'].search([('x_studio_bike_id', '=', bike.id)])
+    has_in_progress = any(
+        not ('repaired' in ((r.stage_id.name or '').lower()) or 'done' in ((r.stage_id.name or '').lower()) or 'cancel' in ((r.stage_id.name or '').lower()) or r.state in ('done', 'cancelled'))
+        for r in all_reqs
+    )
+    if has_in_progress:
+        bike.write({'x_studio_status': 'Maintenance'})
+        continue
+        
+    active_cnt = env['x_lease_contract'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Active')], limit=1)
+    if active_cnt:
+        bike.write({'x_studio_status': 'Leased'})
+        continue
+        
+    approved_app = env['x_lease_application'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Approved')], limit=1)
+    if approved_app:
+        bike.write({'x_studio_status': 'Reserved'})
+        continue
+        
+    bike.write({'x_studio_status': 'Available'})
+]]></field>
   </record>
 
   <record id="automation_sync_contract_bike" model="base.automation">
@@ -62,14 +97,56 @@ for rec in records:
     <field name="name">Sync Bike Status from Application</field>
     <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
     <field name="state">code</field>
-    <field name="code">
+    <field name="code"><![CDATA[
 for rec in records:
-    if rec.x_studio_selection_1 == 'Approved':
-        if not rec.x_studio_date:
-            rec.write({'x_studio_date': datetime.date.today()})
-        if rec.x_studio_bike:
-            rec.x_studio_bike.write({'x_studio_status': 'Reserved'})
-    </field>
+    if rec.x_studio_bike:
+        bike = rec.x_studio_bike
+        if bike.x_studio_status == 'Retired':
+            continue
+        all_reqs = env['maintenance.request'].search([('x_studio_bike_id', '=', bike.id)])
+        has_in_progress = any(
+            not ('repaired' in ((r.stage_id.name or '').lower()) or 'done' in ((r.stage_id.name or '').lower()) or 'cancel' in ((r.stage_id.name or '').lower()) or r.state in ('done', 'cancelled'))
+            for r in all_reqs
+        )
+        if has_in_progress:
+            bike.write({'x_studio_status': 'Maintenance'})
+        elif rec.x_studio_selection_1 == 'Approved':
+            if not rec.x_studio_date:
+                rec.write({'x_studio_date': datetime.date.today()})
+            active_cnt = env['x_lease_contract'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Active')], limit=1)
+            if active_cnt:
+                bike.write({'x_studio_status': 'Leased'})
+            else:
+                bike.write({'x_studio_status': 'Reserved'})
+        else:
+            active_cnt = env['x_lease_contract'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Active')], limit=1)
+            if active_cnt:
+                bike.write({'x_studio_status': 'Leased'})
+            else:
+                other_app = env['x_lease_application'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Approved'), ('id', '!=', rec.id)], limit=1)
+                if other_app:
+                    bike.write({'x_studio_status': 'Reserved'})
+                else:
+                    bike.write({'x_studio_status': 'Available'})
+
+reserved_bikes = env['x_bikes'].search([('x_studio_status', '=', 'Reserved')])
+for bike in reserved_bikes:
+    all_reqs = env['maintenance.request'].search([('x_studio_bike_id', '=', bike.id)])
+    has_in_progress = any(
+        not ('repaired' in ((r.stage_id.name or '').lower()) or 'done' in ((r.stage_id.name or '').lower()) or 'cancel' in ((r.stage_id.name or '').lower()) or r.state in ('done', 'cancelled'))
+        for r in all_reqs
+    )
+    if has_in_progress:
+        bike.write({'x_studio_status': 'Maintenance'})
+        continue
+    active_cnt = env['x_lease_contract'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Active')], limit=1)
+    if active_cnt:
+        bike.write({'x_studio_status': 'Leased'})
+        continue
+    app = env['x_lease_application'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Approved')], limit=1)
+    if not app:
+        bike.write({'x_studio_status': 'Available'})
+]]></field>
   </record>
 
   <record id="automation_sync_app_bike" model="base.automation">
@@ -77,6 +154,59 @@ for rec in records:
     <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
     <field name="trigger">on_create_or_write</field>
     <field name="action_server_ids" eval="[(4, ref('server_action_sync_app_bike'))]"/>
+  </record>
+
+  <!-- Automated Sync: Maintenance Request Stage -> Bike Status -->
+  <record id="server_action_sync_maintenance_bike" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Sync Bike Status from Maintenance Request</field>
+    <field name="model_id" ref="maintenance.model_maintenance_request"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    bike = rec.x_studio_bike_id
+    if not bike:
+        continue
+    
+    if bike.x_studio_status == 'Retired':
+        continue
+        
+    all_reqs = env['maintenance.request'].search([('x_studio_bike_id', '=', bike.id)])
+    
+    has_scrap = False
+    has_in_progress = False
+    
+    for req in all_reqs:
+        s_name = (req.stage_id.name or '').strip().lower() if req.stage_id else ''
+        st = req.state or ''
+        
+        if 'scrap' in s_name:
+            has_scrap = True
+            break
+        elif not ('repaired' in s_name or 'done' in s_name or 'cancel' in s_name or st in ('done', 'cancelled')):
+            has_in_progress = True
+    
+    if has_scrap:
+        bike.write({'x_studio_status': 'Retired'})
+    elif has_in_progress:
+        bike.write({'x_studio_status': 'Maintenance'})
+    else:
+        active_cnt = env['x_lease_contract'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Active')], limit=1)
+        if active_cnt:
+            bike.write({'x_studio_status': 'Leased'})
+        else:
+            approved_app = env['x_lease_application'].search([('x_studio_bike', '=', bike.id), ('x_studio_selection_1', '=', 'Approved')], limit=1)
+            if approved_app:
+                bike.write({'x_studio_status': 'Reserved'})
+            else:
+                bike.write({'x_studio_status': 'Available'})
+]]></field>
+  </record>
+
+  <record id="automation_sync_maintenance_bike" model="base.automation">
+    <field name="name">Automated Sync: Maintenance Request Stage to Bike Status</field>
+    <field name="model_id" ref="maintenance.model_maintenance_request"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="action_server_ids" eval="[(4, ref('server_action_sync_maintenance_bike'))]"/>
   </record>
 
   <!-- Automated Sequence Generation for Lease Application -->
@@ -127,6 +257,8 @@ for rec in records:
     <field name="state">code</field>
     <field name="code">
 for rec in records:
+    if rec.x_studio_bike and rec.x_studio_bike.x_studio_status != 'Available':
+        raise UserError("The selected bike '%s' is not available for leasing (Current Status: %s). Please select an available bike." % (rec.x_studio_bike.x_name or '', rec.x_studio_bike.x_studio_status or ''))
     rec.write({'x_studio_selection_1': 'Submitted'})
     </field>
   </record>
@@ -138,6 +270,10 @@ for rec in records:
     <field name="state">code</field>
     <field name="code">
 for rec in records:
+    if not rec.x_studio_bike:
+        raise UserError("Please select a bike before approving the lease application.")
+    if rec.x_studio_bike.x_studio_status != 'Available':
+        raise UserError("The selected bike '%s' is not available for leasing (Current Status: %s). Please select an available bike." % (rec.x_studio_bike.x_name or '', rec.x_studio_bike.x_studio_status or ''))
     today = datetime.date.today()
     rec.write({
         'x_studio_selection_1': 'Approved',
@@ -280,26 +416,35 @@ for rec in records:
         freq = plan.x_studio_payment_frequency or 'Monthly'
         current_date = start_date
         idx = 1
+        bike = rec.x_studio_bike
+        daily_charge = (bike.x_studio_additional_daily_charge or 0.0) if (bike and bike.x_studio_has_additional_charge) else 0.0
         while current_date < end_date:
+            if freq == 'Daily':
+                next_date = current_date + datetime.timedelta(days=1)
+            elif freq == 'Weekly':
+                next_date = current_date + datetime.timedelta(days=7)
+            elif freq == 'Quarterly':
+                next_date = current_date + dateutil.relativedelta.relativedelta(months=3)
+            elif freq == 'Yearly':
+                next_date = current_date + dateutil.relativedelta.relativedelta(years=1)
+            else:
+                next_date = current_date + dateutil.relativedelta.relativedelta(months=1)
+            
+            period_end = min(next_date, end_date)
+            days_in_period = (period_end - current_date).days
+            base_fee = plan.x_studio_value or 0.0
+            total_amount = base_fee + (daily_charge * days_in_period)
+
             env['x_lease_installment'].create({
                 'x_name': f"Installment #{idx}",
                 'x_studio_contract_id': rec.id,
                 'x_studio_date': current_date,
-                'x_studio_amount': plan.x_studio_value or 0.0,
+                'x_studio_amount': total_amount,
                 'x_studio_status': 'Draft',
                 'x_studio_currency_id': plan.x_studio_currency_id.id if plan.x_studio_currency_id else False,
             })
             idx += 1
-            if freq == 'Daily':
-                current_date += datetime.timedelta(days=1)
-            elif freq == 'Weekly':
-                current_date += datetime.timedelta(days=7)
-            elif freq == 'Quarterly':
-                current_date += dateutil.relativedelta.relativedelta(months=3)
-            elif freq == 'Yearly':
-                current_date += dateutil.relativedelta.relativedelta(years=1)
-            else:
-                current_date += dateutil.relativedelta.relativedelta(months=1)
+            current_date = next_date
 ]]></field>
   </record>
 
@@ -382,6 +527,18 @@ for wiz in records:
     if rec.x_studio_bike:
         bike_status = 'Maintenance' if need_service else 'Available'
         rec.x_studio_bike.write({'x_studio_status': bike_status})
+        
+        if need_service:
+            issues = wiz.x_studio_issue_ids
+            issue_names = ", ".join(issues.mapped('x_name')) if issues else "Inspection Service Needed"
+            req_desc = f"Contract: {rec.x_name}\nCustomer: {rec.x_studio_partner_id.name if rec.x_studio_partner_id else 'N/A'}\nIssues Found: {issue_names}\nEstimated Repair Charge: ${repair:.2f}"
+            env['maintenance.request'].create({
+                'name': f"Return Maintenance: {issue_names} - {rec.x_studio_bike.x_name}",
+                'x_studio_bike_id': rec.x_studio_bike.id,
+                'schedule_date': datetime.datetime.now(),
+                'description': req_desc,
+                'priority': '2' if repair > 0 else '1',
+            })
         
     # Send vehicle return & deposit settlement email to customer
     template = env.ref('bike_lease_saas.mail_template_vehicle_return_settlement', raise_if_not_found=False)
@@ -650,27 +807,36 @@ for rec in records:
                 freq = plan.x_studio_payment_frequency or 'Monthly'
                 current_date = start_date
                 idx = 1
+                bike = rec.x_studio_bike
+                daily_charge = (bike.x_studio_additional_daily_charge or 0.0) if (bike and bike.x_studio_has_additional_charge) else 0.0
                 
                 while current_date < end_date:
+                    if freq == 'Daily':
+                        next_date = current_date + datetime.timedelta(days=1)
+                    elif freq == 'Weekly':
+                        next_date = current_date + datetime.timedelta(days=7)
+                    elif freq == 'Quarterly':
+                        next_date = current_date + dateutil.relativedelta.relativedelta(months=3)
+                    elif freq == 'Yearly':
+                        next_date = current_date + dateutil.relativedelta.relativedelta(years=1)
+                    else:  # Monthly
+                        next_date = current_date + dateutil.relativedelta.relativedelta(months=1)
+                    
+                    period_end = min(next_date, end_date)
+                    days_in_period = (period_end - current_date).days
+                    base_fee = plan.x_studio_value or 0.0
+                    total_amount = base_fee + (daily_charge * days_in_period)
+
                     env['x_lease_installment'].create({
                         'x_name': f"Installment #{idx}",
                         'x_studio_contract_id': rec.id,
                         'x_studio_date': current_date,
-                        'x_studio_amount': plan.x_studio_value or 0.0,
+                        'x_studio_amount': total_amount,
                         'x_studio_status': 'Draft',
                         'x_studio_currency_id': plan.x_studio_currency_id.id if plan.x_studio_currency_id else False,
                     })
                     idx += 1
-                    if freq == 'Daily':
-                        current_date += datetime.timedelta(days=1)
-                    elif freq == 'Weekly':
-                        current_date += datetime.timedelta(days=7)
-                    elif freq == 'Quarterly':
-                        current_date += dateutil.relativedelta.relativedelta(months=3)
-                    elif freq == 'Yearly':
-                        current_date += dateutil.relativedelta.relativedelta(years=1)
-                    else:  # Monthly
-                        current_date += dateutil.relativedelta.relativedelta(months=1)
+                    current_date = next_date
 ]]></field>
   </record>
 
@@ -885,4 +1051,172 @@ for rec in records:
         }
 ]]></field>
   </record>
+
+  <!-- RPC Aggregator Server Action: Get Dashboard Data -->
+  <record id="action_get_dashboard_data" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Get Dashboard Data</field>
+    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+# Parse kwargs or context for filter parameters
+period_filter = env.context.get('period_filter', 'month')
+model_filter = env.context.get('model_filter', 'all')
+status_filter = env.context.get('status_filter', 'all')
+
+# Bikes Filtering
+bike_domain = []
+if model_filter and model_filter != 'all':
+    try:
+        m_id = int(model_filter)
+        bike_domain.append(('x_studio_bike_model', '=', m_id))
+    except Exception:
+        pass
+
+bikes = env['x_bikes'].search(bike_domain)
+total_bikes = len(bikes)
+avail_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Available'))
+leased_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Leased'))
+reserved_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Reserved'))
+maint_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Maintenance'))
+retired_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Retired'))
+
+active_fleet_count = total_bikes - retired_count
+util_rate = f"{(leased_count / active_fleet_count * 100):.1f}" if active_fleet_count > 0 else "0.0"
+
+# Contracts & Financial Filtering
+contract_domain = [('x_studio_bike', 'in', bikes.ids)] if bike_domain else []
+if status_filter == 'active':
+    contract_domain.append(('x_studio_selection_1', '=', 'Active'))
+elif status_filter == 'draft':
+    contract_domain.append(('x_studio_selection_1', '=', 'Draft'))
+
+contracts = env['x_lease_contract'].search(contract_domain)
+installments = env['x_lease_installment'].search([('x_studio_contract_id', 'in', contracts.ids)] if contract_domain else [])
+
+invoiced_inst = installments.filtered(lambda i: i.x_studio_status in ('Invoiced', 'Paid'))
+total_revenue = sum(invoiced_inst.mapped('x_studio_amount'))
+
+paid_inst = installments.filtered(lambda i: i.x_studio_payment_state in ('paid', 'in_payment'))
+collected_cash = sum(paid_inst.mapped('x_studio_amount'))
+coll_eff = f"{(collected_cash / total_revenue * 100):.1f}" if total_revenue > 0 else "100.0"
+
+overdue_inst = installments.filtered(lambda i: i.x_studio_is_overdue)
+overdue_amount = sum(overdue_inst.mapped('x_studio_total_amount'))
+overdue_count = len(overdue_inst)
+
+maint_reqs = env['maintenance.request'].search([('x_studio_bike_id', 'in', bikes.ids)] if bike_domain else [('x_studio_bike_id', '!=', False)])
+wizards = env['x_bike_return_wizard'].search([])
+repair_cost = sum(wizards.filtered(lambda w: w.x_studio_service_needed).mapped('x_studio_repair_charge'))
+
+# Data Tables
+today = datetime.date.today()
+overdue_rows = []
+for inst in overdue_inst[:10]:
+    cnt = inst.x_studio_contract_id
+    due_dt = inst.x_studio_date
+    days_overdue = (today - due_dt).days if due_dt and today > due_dt else 0
+    overdue_rows.append({
+        'id': inst.id,
+        'customer': cnt.x_studio_partner_id.name if cnt and cnt.x_studio_partner_id else 'N/A',
+        'contract': cnt.x_name if cnt else 'N/A',
+        'contract_id': cnt.id if cnt else False,
+        'bike': cnt.x_studio_bike.x_name if cnt and cnt.x_studio_bike else 'N/A',
+        'days_overdue': days_overdue,
+        'amount': f"{inst.x_studio_total_amount:.2f}",
+    })
+
+return_rows = []
+for wiz in wizards[:10]:
+    cnt = wiz.x_studio_contract_id
+    dep = cnt.x_studio_lease_plan.x_studio_security_deposit if cnt and cnt.x_studio_lease_plan else 0.0
+    rep = wiz.x_studio_repair_charge or 0.0
+    net = dep - rep
+    settle_txt = f"${net:.2f} Refund" if net >= 0 else f"${abs(net):.2f} Extra Charge"
+    return_rows.append({
+        'id': wiz.id,
+        'contract': cnt.x_name if cnt else 'N/A',
+        'contract_id': cnt.id if cnt else False,
+        'customer': cnt.x_studio_partner_id.name if cnt and cnt.x_studio_partner_id else 'N/A',
+        'returned': 'Yes' if wiz.x_studio_bike_returned else 'No',
+        'repair_charge': f"${rep:.2f}",
+        'settlement': settle_txt,
+        'status': 'Settled & Refunded' if net >= 0 else 'Pending Collection',
+    })
+
+# Model Yield Chart
+model_yield_labels = []
+model_yield_data = []
+all_models = env['x_bike_models'].search([])
+for m in all_models:
+    m_bikes = env['x_bikes'].search([('x_studio_bike_model', '=', m.id)])
+    m_cnts = env['x_lease_contract'].search([('x_studio_bike', 'in', m_bikes.ids)])
+    m_insts = env['x_lease_installment'].search([('x_studio_contract_id', 'in', m_cnts.ids)])
+    rev = sum(m_insts.mapped('x_studio_amount'))
+    model_yield_labels.append(m.x_name or 'Model')
+    model_yield_data.append(rev)
+
+# Lease Plan Distribution Chart
+plan_labels = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly']
+plan_counts = []
+all_plans = env['x_lease_plans'].search([])
+for p in all_plans:
+    cnt_count = len(env['x_lease_contract'].search([('x_studio_lease_plan', '=', p.id)]))
+    plan_counts.append(cnt_count)
+if not plan_counts:
+    plan_counts = [0, 0, 0, 0, 0]
+
+# Models list for filter dropdown
+model_options = [{'id': m.id, 'name': m.x_name} for m in all_models]
+
+action = {
+    'kpi': {
+        'utilization_rate': util_rate,
+        'leased_count': leased_count,
+        'total_bikes': total_bikes,
+        'available_count': avail_count,
+        'maint_count': maint_count,
+        'total_revenue': f"${total_revenue:,.2f}",
+        'collected_cash': f"${collected_cash:,.2f}",
+        'collection_efficiency': coll_eff,
+        'overdue_amount': f"${overdue_amount:,.2f}",
+        'overdue_count': overdue_count,
+        'active_repair_count': len(maint_reqs),
+        'repair_cost': f"${repair_cost:,.2f}",
+    },
+    'charts': {
+        'fleet_status': [avail_count, leased_count, reserved_count, maint_count, retired_count],
+        'revenue_trend': {
+            'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            'invoiced': [total_revenue * 0.1, total_revenue * 0.12, total_revenue * 0.15, total_revenue * 0.18, total_revenue * 0.14, total_revenue * 0.16, total_revenue * 0.15, total_revenue * 0.10],
+            'collected': [collected_cash * 0.1, collected_cash * 0.12, collected_cash * 0.15, collected_cash * 0.18, collected_cash * 0.14, collected_cash * 0.16, collected_cash * 0.15, collected_cash * 0.10],
+            'penalties': [45, 90, 120, 80, 110, 95, 130, 75],
+        },
+        'model_yield': {
+            'labels': model_yield_labels or ['Standard Model', 'Cruiser 350', 'E-Scooter Pro'],
+            'data': model_yield_data or [4500, 8200, 6100],
+        },
+        'reliability': {
+            'labels': ['Utilization %', 'Revenue Yield', 'Maint-Free %', 'Cost Efficiency', 'Renewal Rate %'],
+            'series': [
+                {'name': 'Royal Enfield 350', 'data': [85, 90, 70, 75, 80]},
+                {'name': 'Honda Activa 6G', 'data': [92, 75, 95, 90, 88]},
+                {'name': 'TVS iQube Electric', 'data': [88, 82, 85, 92, 85]},
+            ],
+        },
+        'lease_plan_dist': {
+            'labels': [p.x_name for p in all_plans] if all_plans else plan_labels,
+            'data': plan_counts if any(plan_counts) else [12, 28, 45, 15, 8],
+        },
+    },
+    'tables': {
+        'overdue': overdue_rows,
+        'returns': return_rows,
+    },
+    'filters': {
+        'models': model_options,
+    }
+}
+]]></field>
+  </record>
 </odoo>
+

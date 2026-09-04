@@ -4,6 +4,12 @@
     <field name="name">&#160;&#160;Bike Lease Management for Odoo Online</field>
     <field name="web_icon">fa fa-motorcycle,#262c34,#FFFFFF</field>
   </record>
+  <record id="menu_bike_lease_dashboard" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="action_bike_lease_dashboard_client"/>
+    <field name="name">Dashboard</field>
+    <field name="parent_id" ref="bike_lease_managemen_ed788dd6-dc94-40bd-b333-d343b6124e0e"/>
+    <field name="sequence">0</field>
+  </record>
   <record id="bike_lease_managemen_f9c77707-0668-4336-ba2c-de1be168ff0f" model="ir.ui.menu" context="{'studio': True}">
     <field name="action" ref="bikes_27d7695f-da5f-4714-8a0d-33597178054d"/>
     <field name="name">Bikes</field>
@@ -67,5 +73,17 @@
     <field name="name">Rejection Reasons</field>
     <field name="parent_id" ref="bike_lease_managemen_cbaef4c9-805f-44bb-a849-432287446272"/>
     <field name="sequence">1</field>
+  </record>
+  <record id="menu_maintenance_stages" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="maintenance.hr_equipment_stage_action"/>
+    <field name="name">Maintenance Stages</field>
+    <field name="parent_id" ref="bike_lease_managemen_cbaef4c9-805f-44bb-a849-432287446272"/>
+    <field name="sequence">2</field>
+  </record>
+  <record id="menu_bike_maintenance_requests" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="action_all_bike_maintenance_requests"/>
+    <field name="name">Maintenance Requests</field>
+    <field name="parent_id" ref="bike_lease_managemen_f9c77707-0668-4336-ba2c-de1be168ff0f"/>
+    <field name="sequence">4</field>
   </record>
 </odoo>

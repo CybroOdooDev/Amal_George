@@ -5,16 +5,24 @@
                 'It contains the apps created with Studio and the '
                 'customizations of existing apps.',
  'author': 'YourCompany',
- 'depends': ['mail', 'web_grid', 'web_studio', 'stock', 'base_automation', 'account'],
+ 'depends': ['mail', 'web_grid', 'web_studio', 'stock', 'base_automation', 'account', 'maintenance'],
  'data': ['data/ir_sequence.xml',
           'data/ir_model.xml',
           'data/ir_model_fields.xml',
           'data/mail_templates.xml',
           'data/ir_actions_act_window.xml',
+          'data/ir_actions_client.xml',
           'data/ir_actions_server.xml',
           'data/ir_ui_view.xml',
           'data/ir_ui_menu.xml',
           'data/ir_access.xml',
           'data/ir_default.xml'],
+ 'assets': {
+     'web.assets_backend': [
+         'bike_lease_saas/static/src/css/dashboard.css',
+         'bike_lease_saas/static/src/xml/dashboard.xml',
+         'bike_lease_saas/static/src/js/dashboard.js',
+     ],
+ },
  'demo': ['demo/demo_data.xml'],
  'license': 'OPL-1'}

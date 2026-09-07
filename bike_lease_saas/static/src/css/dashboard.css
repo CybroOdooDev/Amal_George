@@ -1,144 +1,387 @@
-/* Bike Lease SaaS Analytics Dashboard Styling */
+/* ==========================================================================
+   Bike Lease SaaS Analytics Dashboard - Light Liquid Glass Theme
+   ========================================================================== */
 
+/* Main Container with Luminous Aqua & Purple Liquid Mist Gradient */
 .o_bike_lease_dashboard {
-    background-color: #f8fafc;
+    background: radial-gradient(circle at 10% 15%, rgba(56, 189, 248, 0.35) 0%, transparent 50%),
+                radial-gradient(circle at 90% 85%, rgba(192, 132, 252, 0.35) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.15) 0%, transparent 70%),
+                linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 45%, #f3e8ff 100%);
+    background-attachment: fixed;
     height: 100%;
     min-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 1.5rem;
+    padding: 2rem;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #1e293b;
+    position: relative;
 }
 
-/* Header & Filters */
+/* Ambient Light Glass Glow Orbs */
+.o_bike_lease_dashboard::before {
+    content: "";
+    position: fixed;
+    top: -120px;
+    left: -120px;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.45) 0%, rgba(56, 189, 248, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(50px);
+}
+
+.o_bike_lease_dashboard::after {
+    content: "";
+    position: fixed;
+    bottom: -120px;
+    right: -120px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(192, 132, 252, 0.45) 0%, rgba(168, 85, 247, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(50px);
+}
+
+/* Base Light Liquid Glass Card Styling */
+.o_liquid_glass_card,
+.o_dashboard_header,
+.o_kpi_card,
+.o_dashboard_card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(24px) saturate(190%);
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-top: 1.5px solid rgba(255, 255, 255, 0.95);
+    border-left: 1.5px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 20px 40px rgba(14, 165, 233, 0.12),
+                0 0 25px rgba(255, 255, 255, 0.8),
+                inset 0 1.5px 1.5px rgba(255, 255, 255, 0.95),
+                inset 0 -1.5px 1.5px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Header Bar - Asymmetric Capsule Curve */
 .o_dashboard_header {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    margin-bottom: 1.5rem;
-    border: 1px solid #e2e8f0;
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 36px 16px 36px 16px;
 }
 
 .o_dashboard_title h2 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: #0f172a;
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     margin: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0284c7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
+.o_dashboard_title .text-muted {
+    color: #64748b !important;
+    font-size: 0.875rem;
+}
+
+.o_dashboard_title i.fa-tachometer {
+    color: #0284c7 !important;
+    filter: drop-shadow(0 0 10px rgba(2, 132, 199, 0.4));
+}
+
+/* Glass Select & Controls - Pill Shapes */
 .o_dashboard_filters {
     gap: 0.75rem;
 }
 
 .o_dashboard_filters select {
-    background-color: #f8fafc;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    padding: 0.45rem 0.85rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #334155;
-    transition: all 0.2s ease-in-out;
+    background: rgba(255, 255, 255, 0.85) !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(56, 189, 248, 0.4) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.95) !important;
+    border-radius: 24px !important;
+    padding: 0.5rem 1.2rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.o_dashboard_filters select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    outline: none;
+.o_dashboard_filters select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
 }
 
-/* Top KPI Cards */
+.o_dashboard_filters select:focus,
+.o_dashboard_filters select:hover {
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 20px rgba(2, 132, 199, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+    outline: none !important;
+}
+
+/* Glowing Refresh Button - Pill Shape */
+.o_dashboard_filters .btn-outline-primary {
+    background: linear-gradient(135deg, #9333ea 0%, #2563eb 50%, #0284c7 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    border-radius: 24px !important;
+    padding: 0.5rem 1.35rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.03em !important;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(16px) !important;
+    transition: all 0.3s ease !important;
+}
+
+.o_dashboard_filters .btn-outline-primary:hover {
+    background: linear-gradient(135deg, #a855f7 0%, #1d4ed8 50%, #0369a1 100%) !important;
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+
+/* KPI Summary Cards - Asymmetrical Organic Fluid Shapes */
 .o_kpi_card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 1.25rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 1.05rem 1.15rem;
     height: 100%;
+    border-radius: 24px 12px 20px 12px;
+}
+
+/* Alternating Card Shapes for Flow */
+.row > div:nth-child(2) .o_kpi_card {
+    border-radius: 12px 24px 12px 20px;
+}
+
+.row > div:nth-child(3) .o_kpi_card {
+    border-radius: 20px 12px 24px 12px;
+}
+
+.row > div:nth-child(4) .o_kpi_card {
+    border-radius: 12px 20px 12px 24px;
 }
 
 .o_kpi_card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px) scale(1.02);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(56, 189, 248, 0.6);
+    box-shadow: 0 20px 40px rgba(14, 165, 233, 0.18),
+                0 0 25px rgba(255, 255, 255, 0.9),
+                inset 0 1.5px 1.5px rgba(255, 255, 255, 1);
 }
 
 .o_kpi_icon_wrapper {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 14px 6px 14px 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: transform 0.3s ease;
 }
 
-.o_kpi_icon_blue { background: #eff6ff; color: #2563eb; }
-.o_kpi_icon_emerald { background: #ecfdf5; color: #059669; }
-.o_kpi_icon_amber { background: #fffbebf; color: #d97706; }
-.o_kpi_icon_rose { background: #fff1f2; color: #e11d48; }
+.o_kpi_card:hover .o_kpi_icon_wrapper {
+    transform: scale(1.12) rotate(6deg);
+    border-radius: 8px 20px 8px 20px;
+}
+
+.o_kpi_icon_blue {
+    background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+}
+
+.o_kpi_icon_cyan {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+}
+
+.o_kpi_icon_indigo {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+}
+
+.o_kpi_icon_purple {
+    background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+.o_kpi_icon_emerald {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.o_kpi_icon_teal {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
+}
+
+.o_kpi_icon_orange {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+}
+
+.o_kpi_icon_amber {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+.o_kpi_icon_rose {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+}
 
 .o_kpi_title {
-    font-size: 0.825rem;
-    font-weight: 600;
+    font-size: 0.73rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     color: #64748b;
+    margin-bottom: 0.15rem;
 }
 
 .o_kpi_value {
-    font-size: 1.75rem;
+    font-size: 1.55rem;
     font-weight: 800;
     color: #0f172a;
-    line-height: 1.2;
+    line-height: 1.15;
+}
+
+.o_kpi_value.text-success {
+    color: #059669 !important;
+}
+
+.o_kpi_value.text-cyan {
+    color: #0891b2 !important;
+}
+
+.o_kpi_value.text-indigo {
+    color: #4f46e5 !important;
+}
+
+.o_kpi_value.text-purple {
+    color: #7e22ce !important;
+}
+
+.o_kpi_value.text-teal {
+    color: #0d9488 !important;
+}
+
+.o_kpi_value.text-orange {
+    color: #c2410c !important;
+}
+
+.o_kpi_value.text-warning {
+    color: #d97706 !important;
+}
+
+.o_kpi_value.text-danger {
+    color: #e11d48 !important;
 }
 
 .o_kpi_subtext {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: #64748b;
+    margin-top: 0.2rem;
 }
 
-/* Charts Containers */
+.o_kpi_subtext .fw-bold.text-dark {
+    color: #0f172a !important;
+}
+
+/* Glass Dashboard Charts Card - Organic Rounded Cutouts */
 .o_dashboard_card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 1.25rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    padding: 1.35rem 1.5rem;
     margin-bottom: 1.5rem;
+    border-radius: 32px 16px 32px 16px;
+}
+
+/* Unique Shapes for Chart Sections */
+.row > div:nth-child(2) .o_dashboard_card {
+    border-radius: 16px 32px 16px 32px;
 }
 
 .o_dashboard_card_header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .o_dashboard_card_title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
     margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.o_dashboard_card_header .badge {
+    background: rgba(224, 242, 254, 0.8) !important;
+    color: #0369a1 !important;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    border-radius: 14px;
+    padding: 0.35rem 0.75rem;
+    font-weight: 700;
+    backdrop-filter: blur(12px);
 }
 
 .o_chart_container {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 310px;
 }
 
 .o_chart_container_tall {
-    height: 340px;
+    height: 350px;
 }
 
-/* Data Tables */
+/* Glass Data Tables - Scrollable Container & Sticky Header */
 .o_dashboard_table_wrapper {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 380px;
+    border-radius: 20px 10px 20px 10px;
+}
+
+.o_dashboard_table_wrapper::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.o_dashboard_table_wrapper::-webkit-scrollbar-track {
+    background: rgba(224, 242, 254, 0.4);
+}
+
+.o_dashboard_table_wrapper::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.5);
+    border-radius: 3px;
+}
+
+.o_dashboard_table_wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(2, 132, 199, 0.7);
 }
 
 .o_dashboard_table {
@@ -148,21 +391,26 @@
 }
 
 .o_dashboard_table th {
-    background-color: #f8fafc;
-    color: #475569;
-    font-size: 0.75rem;
-    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(224, 242, 254, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #0369a1;
+    font-size: 0.775rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #e2e8f0;
+    letter-spacing: 0.07em;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .o_dashboard_table td {
-    padding: 0.85rem 1rem;
+    padding: 0.9rem 1rem;
     font-size: 0.875rem;
-    color: #334155;
-    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
     vertical-align: middle;
 }
 
@@ -171,13 +419,201 @@
 }
 
 .o_dashboard_table tr:hover td {
-    background-color: #f8fafc;
+    background: rgba(56, 189, 248, 0.08);
+}
+
+/* Translucent Glass Badges - Capsule Shapes */
+.badge.bg-warning-light {
+    background: rgba(243, 232, 255, 0.9) !important;
+    color: #7c3aed !important;
+    border: 1px solid rgba(168, 85, 247, 0.4) !important;
+    border-radius: 12px !important;
+}
+
+.badge.bg-danger-light {
+    background: rgba(ffe4e6, 0.9) !important;
+    color: #e11d48 !important;
+    border: 1px solid rgba(244, 63, 94, 0.4) !important;
+    border-radius: 12px !important;
+}
+
+.badge.bg-success-light {
+    background: rgba(d1fae5, 0.9) !important;
+    color: #059669 !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+    border-radius: 12px !important;
+}
+
+.badge.bg-secondary-light {
+    background: rgba(f1f5f9, 0.9) !important;
+    color: #475569 !important;
+    border: 1px solid rgba(148, 163, 184, 0.4) !important;
+    border-radius: 12px !important;
 }
 
 .o_table_btn {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.65rem;
-    border-radius: 6px;
-    text-decoration: none;
+    font-size: 0.775rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 14px;
+    background: linear-gradient(90deg, #9333ea 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
+    transition: all 0.25s ease;
 }
+
+.o_table_btn:hover {
+    background: linear-gradient(90deg, #a855f7 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+/* Custom Scrollbar for Glass Aesthetic */
+.o_bike_lease_dashboard::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.o_bike_lease_dashboard::-webkit-scrollbar-track {
+    background: rgba(224, 242, 254, 0.5);
+}
+
+.o_bike_lease_dashboard::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.5);
+    border-radius: 4px;
+    border: 2px solid transparent;
+}
+
+.o_bike_lease_dashboard::-webkit-scrollbar-thumb:hover {
+    background: rgba(2, 132, 199, 0.7);
+}
+
+/* ==========================================================================
+   Big Featured Fleet Hero Card (Skot Inspired Design)
+   ========================================================================== */
+.o_hero_featured_card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.75) 100%);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 36px 14px 32px 14px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.05), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.o_hero_featured_card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 55px rgba(15, 23, 42, 0.08), inset 0 2px 0 rgba(255, 255, 255, 1);
+}
+
+.o_hero_headline {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.o_hero_img_container {
+    background: radial-gradient(circle at 50% 50%, rgba(224, 242, 254, 0.7) 0%, rgba(241, 245, 249, 0.5) 100%);
+    border-radius: 20px 10px 18px 10px;
+    padding: 1rem 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+    min-height: 120px;
+}
+
+.o_hero_action_icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: rgba(224, 242, 254, 0.8);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: transform 0.35s ease, background 0.35s ease;
+}
+
+.o_hero_featured_card:hover .o_hero_action_icon {
+    transform: scale(1.1) rotate(-4deg);
+    background: rgba(186, 230, 253, 0.95);
+}
+
+.o_floating_model_badge {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 18px 8px 16px 8px !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1) !important;
+    z-index: 3;
+}
+
+.pulse-dot {
+    animation: pulseGlow 1.8s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.extra-small {
+    font-size: 0.75rem;
+}
+
+.badge.bg-purple-light {
+    background: rgba(243, 232, 255, 0.9) !important;
+    color: #7e22ce !important;
+    border: 1px solid rgba(168, 85, 247, 0.3) !important;
+    border-radius: 12px !important;
+}
+
+.text-purple {
+    color: #7e22ce !important;
+}
+
+/* Interactive Create Application Action Card */
+.o_create_app_card {
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 249, 255, 0.85) 100%);
+    border: 2px solid rgba(56, 189, 248, 0.3);
+}
+
+.o_create_app_card:hover {
+    border-color: rgba(37, 99, 235, 0.6);
+    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.12), inset 0 2px 0 rgba(255, 255, 255, 1);
+}
+
+.o_create_app_moped_img {
+    max-height: 135px;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.18));
+    transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.45s ease;
+}
+
+.o_create_app_card:hover .o_create_app_moped_img {
+    transform: scale(1.08) rotate(-2deg) translateY(-6px);
+    filter: drop-shadow(0 25px 35px rgba(37, 99, 235, 0.25));
+}
+
+.o_btn_create_app {
+    background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
+    border: none !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35) !important;
+    transition: all 0.3s ease !important;
+}
+
+.o_btn_create_app:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5) !important;
+    transform: scale(1.05) translateY(-2px) !important;
+}
+

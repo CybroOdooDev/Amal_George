@@ -14,7 +14,7 @@
 
                 <div class="o_dashboard_filters d-flex flex-wrap align-items-center">
                     <div class="me-2 mb-1">
-                        <select class="form-select form-select-sm" t-on-change="onPeriodFilterChange">
+                        <select class="form-select form-select-sm" t-on-change="this.onPeriodFilterChange">
                             <option value="month" t-att-selected="this.state.periodFilter == 'month'">Period: This Month</option>
                             <option value="quarter" t-att-selected="this.state.periodFilter == 'quarter'">Period: This Quarter</option>
                             <option value="year" t-att-selected="this.state.periodFilter == 'year'">Period: This Year</option>
@@ -22,24 +22,7 @@
                         </select>
                     </div>
 
-                    <div class="me-2 mb-1">
-                        <select class="form-select form-select-sm" t-on-change="onModelFilterChange">
-                            <option value="all">Model: All Bike Models</option>
-                            <t t-foreach="this.state.filterOptions.models || []" t-as="m" t-key="m.id">
-                                <option t-att-value="m.id" t-esc="m.name"/>
-                            </t>
-                        </select>
-                    </div>
-
-                    <div class="me-2 mb-1">
-                        <select class="form-select form-select-sm" t-on-change="onStatusFilterChange">
-                            <option value="all">Status: All Contracts</option>
-                            <option value="active">Status: Active Contracts</option>
-                            <option value="draft">Status: Draft Contracts</option>
-                        </select>
-                    </div>
-
-                    <button class="btn btn-sm btn-outline-primary mb-1 d-flex align-items-center" t-on-click="refreshDashboard">
+                    <button class="btn btn-sm btn-outline-primary mb-1 d-flex align-items-center" t-on-click="this.refreshDashboard">
                         <i class="fa fa-refresh me-1"/> Refresh
                     </button>
                 </div>
@@ -54,75 +37,199 @@
             </div>
 
             <t t-if="!this.state.isLoading">
-                <!-- Top 4 KPI Summary Cards -->
-                <div class="row g-3 mb-4">
-                    <!-- KPI 1: Fleet Utilization Rate -->
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="o_kpi_card d-flex align-items-center">
-                            <div class="o_kpi_icon_wrapper o_kpi_icon_blue me-3">
-                                <i class="fa fa-motorcycle"/>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="o_kpi_title">Fleet Utilization</div>
-                                <div class="o_kpi_value">
-                                    <t t-esc="this.state.kpi.utilization_rate"/>%
+                <!-- Hero Featured Card & KPI Grid Section -->
+                <div class="row g-3 mb-4 align-items-stretch">
+                    <!-- Big Action Hero Card (Left Side - Create New Application Action Card) -->
+                    <div class="col-12 col-lg-4 col-xl-3">
+                        <div class="o_hero_featured_card o_create_app_card h-100 position-relative p-3 d-flex flex-column justify-content-between" t-on-click="this.onCreateApplication" role="button" title="Click to Create New Lease Application">
+                            <div class="o_hero_top_bar d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="o_hero_badge mb-1">
+                                        <span class="badge rounded-pill bg-primary text-white shadow-sm px-2 py-1 fw-semibold extra-small">
+                                            <i class="fa fa-plus-circle me-1"/> Quick Action
+                                        </span>
+                                    </div>
+                                    <h3 class="o_hero_headline mb-1">Create New<br/>Lease Application <span class="fs-5">🚀</span></h3>
+                                    <p class="text-muted extra-small mb-0">Onboard customer &amp; issue contract</p>
                                 </div>
-                                <div class="o_kpi_subtext">
-                                    <span class="fw-bold text-dark"><t t-esc="this.state.kpi.leased_count"/></span> Leased / <t t-esc="this.state.kpi.total_bikes"/> Active Bikes
+
+                                <div class="o_hero_rating_pill bg-white shadow-sm rounded-3 p-1.5 px-2 text-end d-none d-sm-block border border-light ms-1">
+                                    <div class="d-flex align-items-center mb-0.5 extra-small">
+                                        <i class="fa fa-folder-open-o text-purple me-1"/>
+                                        <span class="fw-bold text-dark me-1"><t t-esc="this.state.kpi.pending_apps_count"/></span>
+                                        <span class="text-muted">Pending</span>
+                                    </div>
+                                    <span class="badge bg-purple-light text-purple fw-semibold extra-small"><t t-esc="this.state.kpi.app_approval_rate"/>% Approval</span>
+                                </div>
+                            </div>
+
+                            <!-- Central Action Display Container -->
+                            <div class="o_hero_img_container position-relative my-2 flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center p-2">
+                                <div class="o_hero_action_icon mb-2">
+                                    <i class="fa fa-file-text-o text-primary fs-2"/>
+                                </div>
+                                <div class="fw-bold extra-small text-dark">+ Start Application</div>
+                                <div class="text-muted extra-small">Click anywhere to open form</div>
+                            </div>
+
+                            <!-- Hero Footer Action Button Bar -->
+                            <div class="o_hero_footer d-flex justify-content-between align-items-center pt-2 border-top border-light">
+                                <div class="pe-1">
+                                    <span class="badge bg-dark text-white extra-small mb-0">Instant Onboarding</span>
+                                </div>
+                                <div class="text-nowrap">
+                                    <button class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm o_btn_create_app" t-on-click.stop="this.onCreateApplication">
+                                        <i class="fa fa-plus-circle me-1"/> Create Now
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- KPI 2: Active Revenue & Collection Cash -->
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="o_kpi_card d-flex align-items-center">
-                            <div class="o_kpi_icon_wrapper o_kpi_icon_emerald me-3">
-                                <i class="fa fa-line-chart"/>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="o_kpi_title">Active Revenue</div>
-                                <div class="o_kpi_value text-success">
-                                    <t t-esc="this.state.kpi.total_revenue"/>
+                    <!-- Right Side: Grid of 8 KPI Cards (2 Lines of 4 Cards Each) -->
+                    <div class="col-12 col-lg-8 col-xl-9">
+                        <div class="row g-3 h-100">
+                            <!-- KPI 1: Fleet Utilization Rate -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_blue me-2">
+                                        <i class="fa fa-motorcycle"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Fleet Utilization</div>
+                                        <div class="o_kpi_value text-truncate">
+                                            <t t-esc="this.state.kpi.utilization_rate"/>%
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            <span class="fw-bold text-dark"><t t-esc="this.state.kpi.leased_count"/></span> Leased / <t t-esc="this.state.kpi.total_bikes"/> Active
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="o_kpi_subtext">
-                                    Cash: <span class="fw-bold"><t t-esc="this.state.kpi.collected_cash"/></span> (<t t-esc="this.state.kpi.collection_efficiency"/>% Eff.)
-                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- KPI 3: Overdue Receivables Alert -->
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="o_kpi_card d-flex align-items-center">
-                            <div class="o_kpi_icon_wrapper o_kpi_icon_amber me-3">
-                                <i class="fa fa-exclamation-triangle"/>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="o_kpi_title">Overdue Receivables</div>
-                                <div class="o_kpi_value text-warning">
-                                    <t t-esc="this.state.kpi.overdue_amount"/>
+                            <!-- KPI 2: Available Ready Fleet -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_cyan me-2">
+                                        <i class="fa fa-check-circle"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Available Fleet</div>
+                                        <div class="o_kpi_value text-cyan text-truncate">
+                                            <t t-esc="this.state.kpi.available_count"/> <span class="fs-6 fw-normal text-muted">Bikes</span>
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            <span class="fw-bold text-dark"><t t-esc="this.state.kpi.avail_rate"/>%</span> Ready for Lease
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="o_kpi_subtext">
-                                    <span class="badge bg-warning text-dark"><t t-esc="this.state.kpi.overdue_count"/> Installments Overdue</span>
-                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- KPI 4: Maintenance & Repair Load -->
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="o_kpi_card d-flex align-items-center">
-                            <div class="o_kpi_icon_wrapper o_kpi_icon_rose me-3">
-                                <i class="fa fa-wrench"/>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="o_kpi_title">Maintenance Load</div>
-                                <div class="o_kpi_value text-danger">
-                                    <t t-esc="this.state.kpi.active_repair_count"/> Requests
+                            <!-- KPI 3: Active Lease Contracts -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_indigo me-2">
+                                        <i class="fa fa-handshake-o"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Active Contracts</div>
+                                        <div class="o_kpi_value text-indigo text-truncate">
+                                            <t t-esc="this.state.kpi.active_contracts_count"/> <span class="fs-6 fw-normal text-muted">Active</span>
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            <span class="fw-bold text-dark"><t t-esc="this.state.kpi.expiring_contracts_count"/></span> Expiring (<t t-esc="this.state.kpi.total_contracts"/> Total)
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="o_kpi_subtext">
-                                    Total Repair Cost: <span class="fw-bold text-dark"><t t-esc="this.state.kpi.repair_cost"/></span>
+                            </div>
+
+                            <!-- KPI 4: Lease Applications Funnel -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_purple me-2">
+                                        <i class="fa fa-folder-open-o"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Applications Funnel</div>
+                                        <div class="o_kpi_value text-purple text-truncate">
+                                            <t t-esc="this.state.kpi.pending_apps_count"/> <span class="fs-6 fw-normal text-muted">Pending</span>
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            <span class="fw-bold text-dark"><t t-esc="this.state.kpi.app_approval_rate"/>%</span> Approval Rate
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KPI 5: Active Invoiced Revenue -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_emerald me-2">
+                                        <i class="fa fa-line-chart"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Invoiced Revenue</div>
+                                        <div class="o_kpi_value text-success text-truncate">
+                                            <t t-esc="this.state.kpi.total_revenue"/>
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            Collected: <span class="fw-bold"><t t-esc="this.state.kpi.collected_cash"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KPI 6: Cash Collection Efficiency -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_teal me-2">
+                                        <i class="fa fa-percent"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Collection Efficiency</div>
+                                        <div class="o_kpi_value text-teal text-truncate">
+                                            <t t-esc="this.state.kpi.collection_efficiency"/>%
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            <span class="fw-bold text-dark"><t t-esc="this.state.kpi.paid_invoices_count"/></span> Paid Invoices
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KPI 7: Overdue Receivables Alert -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_orange me-2">
+                                        <i class="fa fa-exclamation-triangle"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Overdue Receivables</div>
+                                        <div class="o_kpi_value text-orange text-truncate">
+                                            <t t-esc="this.state.kpi.overdue_amount"/>
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            <span class="badge bg-warning text-dark"><t t-esc="this.state.kpi.overdue_count"/> Overdue</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KPI 8: Maintenance & Repair Load -->
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="o_kpi_card d-flex align-items-center h-100">
+                                    <div class="o_kpi_icon_wrapper o_kpi_icon_rose me-2">
+                                        <i class="fa fa-wrench"/>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="o_kpi_title text-truncate">Maintenance Load</div>
+                                        <div class="o_kpi_value text-danger text-truncate">
+                                            <t t-esc="this.state.kpi.active_repair_count"/> <span class="fs-6 fw-normal text-muted">In Repair</span>
+                                        </div>
+                                        <div class="o_kpi_subtext text-truncate">
+                                            Repair Cost: <span class="fw-bold text-dark"><t t-esc="this.state.kpi.repair_cost"/></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -146,8 +253,8 @@
                     <div class="col-12 col-lg-8">
                         <div class="o_dashboard_card h-100 mb-0">
                             <div class="o_dashboard_card_header">
-                                <h3 class="o_dashboard_card_title"><i class="fa fa-bar-chart text-success me-2"/>Revenue &amp; Cashflow Trend</h3>
-                                <span class="badge bg-light text-dark">Monthly Breakdown</span>
+                                <h3 class="o_dashboard_card_title"><i class="fa fa-line-chart text-primary me-2"/>Revenue Trend (Paid Invoices)</h3>
+                                <span class="badge bg-light text-dark">Posted &amp; Paid Invoices</span>
                             </div>
                             <div class="o_chart_container">
                                 <canvas id="chart_revenue_trend"/>
@@ -173,8 +280,8 @@
                     <div class="col-12 col-lg-7">
                         <div class="o_dashboard_card h-100 mb-0">
                             <div class="o_dashboard_card_header">
-                                <h3 class="o_dashboard_card_title"><i class="fa fa-compass text-secondary me-2"/>Fleet Reliability Matrix</h3>
-                                <span class="badge bg-light text-dark">5-Dimension Radar</span>
+                                <h3 class="o_dashboard_card_title"><i class="fa fa-bar-chart text-indigo me-2"/>Fleet Reliability Matrix</h3>
+                                <span class="badge bg-light text-dark">Metric Comparison (0-100%)</span>
                             </div>
                             <div class="o_chart_container">
                                 <canvas id="chart_reliability"/>

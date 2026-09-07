@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="active_bikes_5837838a-b5f2-4660-9afc-51902f87df03" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="active_bikes_d7f35fa5-4233-498b-984c-ac862e873144"/>
-    <field name="json_value">true</field>
-  </record>
   <record id="currency_bikes_2e5e29cf-5dcb-4627-ad94-6fd65b71a6f5" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="currency_bikes_23a9ad05-c7e5-4e7a-8eea-833b5bd1e476"/>
     <field name="json_value">1</field>
@@ -11,10 +7,6 @@
   <record id="new_selection_bikes_770845a2-6be3-4c19-8eac-7a3c94050526" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="new_selection_bikes_d9d50637-8698-4fb1-b996-702d9c12d0fa"/>
     <field name="json_value">"Available"</field>
-  </record>
-  <record id="active_bikes_beeddd69-5a1a-419d-bdec-373ef1cf34d4" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="active_bikes_d7f35fa5-4233-498b-984c-ac862e873144"/>
-    <field name="json_value">true</field>
   </record>
   <record id="active_bike_models_bdd4c9ab-7f9b-4176-a7a2-b6ed25243eed" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="active_bike_models_6c9167d1-c6d4-403e-8c4c-82ca59daa2d6"/>

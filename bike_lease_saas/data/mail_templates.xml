@@ -51,7 +51,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td style="border: 1px solid #e7e7e7; font-weight: bold;">Bike</td>
-                                                    <td style="border: 1px solid #e7e7e7;"><t t-out="object.x_studio_bike.x_name if object.x_studio_bike else ''">BK-2026-VSP01</t></td>
+                                                    <td style="border: 1px solid #e7e7e7;"><t t-out="(object.x_studio_bike.display_name or object.x_studio_bike.license_plate) if object.x_studio_bike else ''">BK-2026-VSP01</t></td>
                                                 </tr>
                                                 <tr style="background-color: #f8f9fa;">
                                                     <td style="border: 1px solid #e7e7e7; font-weight: bold;">Lease Plan</td>
@@ -181,7 +181,7 @@
                                         <td valign="middle" align="right">
                                             <span style="font-size: 10px;">Bike</span><br/>
                                             <span style="font-size: 14px; font-weight: bold;">
-                                                <t t-out="object.x_studio_bike.x_name if object.x_studio_bike else ''">BK-2026-VSP01</t>
+                                                <t t-out="(object.x_studio_bike.display_name or object.x_studio_bike.license_plate) if object.x_studio_bike else ''">BK-2026-VSP01</t>
                                             </span>
                                         </td>
                                     </tr>

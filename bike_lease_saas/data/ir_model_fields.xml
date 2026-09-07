@@ -1,125 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="description_bikes_62e0b2a8-b124-4be2-b21d-50152b239154" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="False"/>
-    <field name="field_description">Bike Name</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_name</field>
-    <field name="on_delete" eval="False"/>
-    <field name="required" eval="True"/>
-    <field name="tracking">1</field>
-    <field name="translate">standard</field>
-  </record>
-  <record id="active_bikes_d7f35fa5-4233-498b-984c-ac862e873144" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Active</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_active</field>
-    <field name="on_delete" eval="False"/>
-    <field name="tracking">1</field>
-  </record>
-  <record id="notes_bikes_d4b60545-53ec-49e9-8df5-ae7021722550" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">html</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Notes</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_notes</field>
-    <field name="on_delete" eval="False"/>
-  </record>
   <record id="currency_bikes_23a9ad05-c7e5-4e7a-8eea-833b5bd1e476" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Currency</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_currency_id</field>
     <field name="relation">res.currency</field>
-  </record>
-  <record id="value_bikes_ed3c88a3-23b1-48e8-9f42-aa0887f082c5" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">monetary</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Purchase Cost</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_value</field>
-    <field name="on_delete" eval="False"/>
-    <field name="tracking">1</field>
-    <field name="currency_field">x_studio_currency_id</field>
-  </record>
-  <record id="image_bikes_bd1e5430-878d-43ff-b7d4-54df9a741584" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">binary</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Bike Image</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_image</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_text_bikes_efd6a412-b6fc-4f8b-a218-b967c518c5ac" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Registration Number</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_registration_number</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_text_bikes_ccd65b4d-ee86-41de-a765-b8e893f256df" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">VIN / Chassis Number</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_vin_chassis_number</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_text_bikes_44c6afad-ca48-4fcd-a248-d971837014e6" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Engine Number</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_engine_number</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_date_bikes_2916c5ce-a69e-4934-8396-d8cca7ddd5cb" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">date</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Purchase Date</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_purchase_date</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_decimal_bikes_6221b57b-c4a5-4911-80d4-be259309752e" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">float</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Current Odometer</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_current_odometer</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_many2one_bikes_e4115b61-9a37-40ab-bf06-d6714c74bb39" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Location</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_location</field>
-    <field name="relation">stock.location</field>
   </record>
   <record id="new_selection_bikes_d9d50637-8698-4fb1-b996-702d9c12d0fa" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Status</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_status</field>
     <field name="on_delete" eval="False"/>
     <field name="selection">[('Available', 'Available'), ('Reserved', 'Reserved'), ('Leased', 'Leased'), ('Maintenance', 'Maintenance'), ('Retired', 'Retired')]</field>
@@ -128,8 +23,8 @@
     <field name="ttype">date</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Insurance Expiry</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_insurance_expiry</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -137,8 +32,8 @@
     <field name="ttype">date</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Registration Expiry</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_registration_expiry</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -146,8 +41,8 @@
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Has Additional Daily Charge</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_has_additional_charge</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -156,8 +51,8 @@
     <field name="copied" eval="True"/>
     <field name="currency_field">x_studio_currency_id</field>
     <field name="field_description">Additional Daily Charge</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_additional_daily_charge</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -165,8 +60,8 @@
     <field name="ttype">char</field>
     <field name="copied" eval="False"/>
     <field name="field_description">Model Name</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_name</field>
     <field name="on_delete" eval="False"/>
     <field name="required" eval="True"/>
@@ -176,8 +71,8 @@
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Active</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_active</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -185,8 +80,8 @@
     <field name="ttype">html</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Notes</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_notes</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -194,8 +89,8 @@
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Currency</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_currency_id</field>
     <field name="relation">res.currency</field>
   </record>
@@ -203,8 +98,8 @@
     <field name="ttype">monetary</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Standard Price</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_value</field>
     <field name="on_delete" eval="False"/>
     <field name="currency_field">x_studio_currency_id</field>
@@ -213,8 +108,8 @@
     <field name="ttype">binary</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Image</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_image</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -222,26 +117,17 @@
     <field name="ttype">integer</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Sequence</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_sequence</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_html_bikes_d93d6fbb-4c13-48d9-9a76-d276188163a4" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">html</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Note</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_notes_1</field>
     <field name="on_delete" eval="False"/>
   </record>
   <record id="new_selection_bike_m_5f982327-2262-4305-83c1-f42856164ab8" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">selection</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Bike Type</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_bike_type</field>
     <field name="on_delete" eval="False"/>
     <field name="selection">[('Scooter', 'Scooter'), ('Motorcycle', 'Motorcycle'), ('Electric Bike', 'Electric Bike'), ('Other', 'Other')]</field>
@@ -250,8 +136,8 @@
     <field name="ttype">selection</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Fuel Type</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_fuel_type</field>
     <field name="on_delete" eval="False"/>
     <field name="selection">[('Petrol', 'Petrol'), ('Electric', 'Electric'), ('Hybrid', 'Hybrid'), ('Other', 'Other')]</field>
@@ -260,8 +146,8 @@
     <field name="ttype">text</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Description</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_text_1</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -269,8 +155,8 @@
     <field name="ttype">char</field>
     <field name="copied" eval="False"/>
     <field name="field_description">Manufacturer Name</field>
-    <field name="model">x_manufacturers</field>
-    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="model">fleet.vehicle.model.brand</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
     <field name="name">x_name</field>
     <field name="on_delete" eval="False"/>
     <field name="required" eval="True"/>
@@ -280,8 +166,8 @@
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Active</field>
-    <field name="model">x_manufacturers</field>
-    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="model">fleet.vehicle.model.brand</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
     <field name="name">x_active</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -289,8 +175,8 @@
     <field name="ttype">html</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Notes</field>
-    <field name="model">x_manufacturers</field>
-    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="model">fleet.vehicle.model.brand</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
     <field name="name">x_studio_notes</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -298,8 +184,8 @@
     <field name="ttype">binary</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Logo</field>
-    <field name="model">x_manufacturers</field>
-    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="model">fleet.vehicle.model.brand</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
     <field name="name">x_studio_image</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -307,8 +193,8 @@
     <field name="ttype">integer</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Sequence</field>
-    <field name="model">x_manufacturers</field>
-    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="model">fleet.vehicle.model.brand</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
     <field name="name">x_studio_sequence</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -316,8 +202,8 @@
     <field name="ttype">text</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Description</field>
-    <field name="model">x_manufacturers</field>
-    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="model">fleet.vehicle.model.brand</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
     <field name="name">x_studio_description</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -325,49 +211,18 @@
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Manufacturer</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_manufacturer</field>
-    <field name="relation">x_manufacturers</field>
+    <field name="relation">fleet.vehicle.model.brand</field>
   </record>
-  <record id="new_many2one_bikes_3ecc47ac-70e4-4f01-b48a-ffe1e51a5352" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Bike Model</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_bike_model</field>
-    <field name="relation">x_bike_models</field>
-  </record>
-  <record id="manufacturer_bikes_c0c039e8-dd88-4d4e-9413-49ed13c7db23" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="related">x_studio_bike_model.x_studio_manufacturer</field>
-    <field name="field_description">Manufacturer</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_related_manufacturer</field>
-    <field name="readonly" eval="True"/>
-    <field name="relation">x_manufacturers</field>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="bike_type_bikes_bb567738-a143-4ad7-abd8-9bbf836758ea" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">selection</field>
-    <field name="related">x_studio_bike_model.x_studio_bike_type</field>
-    <field name="field_description">Bike Type</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
-    <field name="name">x_studio_related_x_studio_bike_type_1</field>
-    <field name="on_delete" eval="False"/>
-    <field name="readonly" eval="True"/>
-    <field name="selection">[('Scooter', 'Scooter'), ('Motorcycle', 'Motorcycle'), ('Electric Bike', 'Electric Bike'), ('Other', 'Other')]</field>
-    <field name="store" eval="False"/>
-  </record>
+
   <record id="new_integer_bike_mod_63315aca-4fee-4528-b16c-1a3fed5d1198" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">integer</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Engine Capacity (CC)</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_engine_capacity_cc_</field>
     <field name="on_delete" eval="False"/>
   </record>
@@ -375,26 +230,26 @@
     <field name="ttype">integer</field>
     <field name="copied" eval="False"/>
     <field name="field_description">Bike Count</field>
-    <field name="model">x_bike_models</field>
-    <field name="model_id" ref="bike_models_8be2b76d-5077-47b8-aa4d-91587ebbf3cf"/>
+    <field name="model">fleet.vehicle.model</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
     <field name="name">x_studio_bike_count</field>
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
     <field name="compute"><![CDATA[for rec in self:
-    rec['x_studio_bike_count'] = self.env['x_bikes'].search_count([('x_studio_bike_model', '=', rec.id)])]]></field>
+    rec['x_studio_bike_count'] = self.env['fleet.vehicle'].search_count([('model_id', '=', rec.id)])]]></field>
   </record>
 
   <record id="field_manufacturers_model_count" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">integer</field>
     <field name="copied" eval="False"/>
     <field name="field_description">Model Count</field>
-    <field name="model">x_manufacturers</field>
-    <field name="model_id" ref="manufacturers_8dbfd35d-366b-4d18-b258-db83ab8e4bd8"/>
+    <field name="model">fleet.vehicle.model.brand</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
     <field name="name">x_studio_model_count</field>
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
     <field name="compute"><![CDATA[for rec in self:
-    rec['x_studio_model_count'] = self.env['x_bike_models'].search_count([('x_studio_manufacturer', '=', rec.id)])]]></field>
+    rec['x_studio_model_count'] = self.env['fleet.vehicle.model'].search_count([('x_studio_manufacturer', '=', rec.id)])]]></field>
   </record>
   <record id="description_lease_pl_ca46e860-7f31-4c21-8ba0-638b0bc5b736" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
@@ -616,7 +471,7 @@
     <field name="model">x_lease_application</field>
     <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
     <field name="name">x_studio_bike_model</field>
-    <field name="relation">x_bike_models</field>
+    <field name="relation">fleet.vehicle.model</field>
     <field name="required" eval="True"/>
     <field name="on_delete">restrict</field>
   </record>
@@ -627,7 +482,7 @@
     <field name="model">x_lease_application</field>
     <field name="model_id" ref="lease_application_036d2453-d3be-4130-a107-33eec67d96b0"/>
     <field name="name">x_studio_bike</field>
-    <field name="relation">x_bikes</field>
+    <field name="relation">fleet.vehicle</field>
     <field name="required" eval="False"/>
   </record>
   <record id="new_many2one_lease_a_d0ea8d85-aa4e-436c-b7b1-f887cd0aa3fc" model="ir.model.fields" context="{'studio': True}">
@@ -762,7 +617,7 @@
     <field name="model">x_lease_contract</field>
     <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
     <field name="name">x_studio_bike_model</field>
-    <field name="relation">x_bike_models</field>
+    <field name="relation">fleet.vehicle.model</field>
     <field name="on_delete">restrict</field>
   </record>
   <record id="new_many2one_lease_c_eba717d9-c76a-455d-a6ee-da544282bbc0" model="ir.model.fields" context="{'studio': True}">
@@ -772,7 +627,7 @@
     <field name="model">x_lease_contract</field>
     <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
     <field name="name">x_studio_bike</field>
-    <field name="relation">x_bikes</field>
+    <field name="relation">fleet.vehicle</field>
   </record>
   <record id="new_many2one_lease_c_d04e1ccf-df21-4097-84ff-2df537b7a940" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2one</field>
@@ -1255,7 +1110,7 @@
     <field name="model_id" ref="maintenance.model_maintenance_request"/>
     <field name="name">x_studio_bike_id</field>
     <field name="on_delete">set null</field>
-    <field name="relation">x_bikes</field>
+    <field name="relation">fleet.vehicle</field>
     <field name="domain">[('x_studio_status', 'in', ['Available', 'Maintenance','Retired'])]</field>
     <field name="required" eval="False"/>
   </record>
@@ -1263,8 +1118,8 @@
     <field name="ttype">integer</field>
     <field name="copied" eval="False"/>
     <field name="field_description">Maintenance Count</field>
-    <field name="model">x_bikes</field>
-    <field name="model_id" ref="bikes_6852880f-3a21-4e40-bb59-106eb4e4a3ea"/>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_maintenance_count</field>
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>

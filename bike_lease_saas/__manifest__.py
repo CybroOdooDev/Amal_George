@@ -5,7 +5,7 @@
                 'It contains the apps created with Studio and the '
                 'customizations of existing apps.',
  'author': 'YourCompany',
- 'depends': ['mail', 'web_grid', 'web_studio', 'stock', 'base_automation', 'account', 'maintenance'],
+ 'depends': ['mail', 'web_grid', 'web_studio', 'stock', 'base_automation', 'account', 'maintenance', 'fleet'],
  'data': ['data/ir_sequence.xml',
           'data/ir_model.xml',
           'data/ir_model_fields.xml',

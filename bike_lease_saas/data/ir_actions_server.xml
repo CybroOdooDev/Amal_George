@@ -6,10 +6,20 @@
     <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="binding_model_id" eval="False"/>
     <field name="state">code</field>
-    <field name="code">
+    <field name="code"><![CDATA[
 for rec in records:
+    # Check Fleet Vehicle Log Services (fleet.vehicle.log.services)
+    if 'fleet.vehicle.log.services' in env:
+        running_services = env['fleet.vehicle.log.services'].search([
+            ('vehicle_id', '=', rec.id),
+            ('state', 'in', ['new', 'running'])
+        ])
+        if running_services:
+            srv_names = ", ".join(running_services.mapped('description') or running_services.mapped('name') or ['Vehicle Service'])
+            raise UserError(f"Cannot set bike '{rec.display_name}' to Available because there are active vehicle services in progress: {srv_names}. Please complete or cancel all running vehicle services first.")
+
     rec.write({'x_studio_status': 'Available'})
-    </field>
+]]></field>
   </record>
 
   <record id="action_bike_send_maintenance" model="ir.actions.server" context="{'studio': True}">
@@ -366,7 +376,7 @@ for wiz in records:
             'partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
             'invoice_date': datetime.date.today(),
             'invoice_line_ids': [(0, 0, {
-                'name': f"Excess Vehicle Repair / Service Fees (Deposit ${dep:.2f} absorbed) - Contract {rec.x_name}",
+                'name': f"Excess Bike Repair / Service Fees (Deposit ${dep:.2f} absorbed) - Contract {rec.x_name}",
                 'quantity': 1,
                 'price_unit': extra_due,
             })],
@@ -390,12 +400,11 @@ for wiz in records:
             issues = wiz.x_studio_issue_ids
             issue_names = ", ".join(issues.mapped('x_name')) if issues else "Inspection Service Needed"
             req_desc = f"Contract: {rec.x_name}\nCustomer: {rec.x_studio_partner_id.name if rec.x_studio_partner_id else 'N/A'}\nIssues Found: {issue_names}\nEstimated Repair Charge: ${repair:.2f}"
-            env['maintenance.request'].create({
-                'name': f"Return Maintenance: {issue_names} - {rec.x_studio_bike.display_name}",
-                'x_studio_bike_id': rec.x_studio_bike.id,
-                'schedule_date': datetime.datetime.now(),
-                'description': req_desc,
-                'priority': '2' if repair > 0 else '1',
+            env['fleet.vehicle.log.services'].create({
+                'vehicle_id': rec.x_studio_bike.id,
+                'description': f"Return Maintenance: {issue_names}\n{req_desc}",
+                'amount': repair,
+                'state': 'running',
             })
         
     # Send vehicle return & deposit settlement email to customer
@@ -425,7 +434,10 @@ for rec in records:
     if not rec.x_studio_all_invoices_paid:
         raise UserError("All contract installments and deposit invoices must be fully paid before completing the contract.")
     rec.write({'x_studio_selection_1': 'Completed'})
-    rec.message_post(body="Lease contract completed. Vehicle is pending return inspection.")
+    try:
+        rec.message_post(body="Lease contract completed. Vehicle is pending return inspection.")
+    except Exception:
+        pass
 ]]></field>
   </record>
 
@@ -447,7 +459,10 @@ for rec in records:
         'x_studio_selection_1': 'Draft',
     })
     
-    rec.message_post(body=f"Renewal Lease Application created: {app.x_name or 'Draft Application'}")
+    try:
+        rec.message_post(body=f"Renewal Lease Application created: {app.x_name or 'Draft Application'}")
+    except Exception:
+        pass
     
     action = {
         'type': 'ir.actions.act_window',
@@ -556,7 +571,10 @@ for rec in records:
     msg = "Lease contract terminated early. Vehicle pending return inspection."
     if created_move:
         msg += f" Final termination invoice ({created_move.name or 'Invoice'}) created for unpaid installments due up to today."
-    rec.message_post(body=msg)
+    try:
+        rec.message_post(body=msg)
+    except Exception:
+        pass
 
     if created_move:
         action = {
@@ -1053,7 +1071,7 @@ model_filter = env.context.get('model_filter', 'all')
 status_filter = env.context.get('status_filter', 'all')
 
 # Bikes Filtering
-bike_domain = []
+bike_domain = [('vehicle_type', '=', 'bike')]
 if model_filter and model_filter != 'all':
     try:
         m_id = int(model_filter)
@@ -1063,7 +1081,7 @@ if model_filter and model_filter != 'all':
 
 bikes = env['fleet.vehicle'].search(bike_domain)
 total_bikes = len(bikes)
-avail_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Available'))
+avail_count = len(bikes.filtered(lambda b: b.x_studio_status in ('Available', False, '')))
 leased_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Leased'))
 reserved_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Reserved'))
 maint_count = len(bikes.filtered(lambda b: b.x_studio_status == 'Maintenance'))
@@ -1081,7 +1099,7 @@ approved_apps = len(apps.filtered(lambda a: a.x_studio_selection_1 in ('Approved
 app_approval_rate = f"{(approved_apps / total_apps * 100):.1f}" if total_apps > 0 else "0.0"
 
 # Contracts & Financial Filtering
-contract_domain = [('x_studio_bike', 'in', bikes.ids)] if bike_domain else []
+contract_domain = [('x_studio_bike', 'in', bikes.ids)]
 if status_filter == 'active':
     contract_domain.append(('x_studio_selection_1', '=', 'Active'))
 elif status_filter == 'draft':
@@ -1163,7 +1181,7 @@ overdue_inst = period_installments.filtered(lambda i: i.x_studio_is_overdue)
 overdue_amount = sum(overdue_inst.mapped('x_studio_total_amount'))
 overdue_count = len(overdue_inst)
 
-maint_reqs = env['maintenance.request'].search([('x_studio_bike_id', 'in', bikes.ids)] if bike_domain else [('x_studio_bike_id', '!=', False)])
+maint_reqs = env['fleet.vehicle.log.services'].search([('vehicle_id', 'in', bikes.ids)] if bike_domain else [('vehicle_id.vehicle_type', '=', 'bike')])
 wizards = env['x_bike_return_wizard'].search([])
 repair_cost = sum(wizards.filtered(lambda w: w.x_studio_service_needed).mapped('x_studio_repair_charge'))
 
@@ -1226,7 +1244,7 @@ if not any(collected_monthly):
 # Model Yield Chart
 model_yield_labels = []
 model_yield_data = []
-all_models = env['fleet.vehicle.model'].search([])
+all_models = env['fleet.vehicle.model'].search([('vehicle_type', '=', 'bike')])
 for m in all_models:
     m_bikes = env['fleet.vehicle'].search([('model_id', '=', m.id)])
     m_cnts = env['x_lease_contract'].search([('x_studio_bike', 'in', m_bikes.ids)])
@@ -1283,7 +1301,7 @@ action = {
         'paid_invoices_count': paid_invoices_count,
         'overdue_amount': f"${overdue_amount:,.2f}",
         'overdue_count': overdue_count,
-        'active_repair_count': len(maint_reqs),
+        'active_repair_count': len(maint_reqs.filtered(lambda s: s.state in ('new', 'running'))),
         'repair_cost': f"${repair_cost:,.2f}",
     },
     'charts': {
@@ -1333,7 +1351,10 @@ for rec in records:
         'x_studio_lease_start_date': datetime.date.today(),
         'x_studio_selection_1': 'Draft',
     })
-    rec.message_post(body=f"Renewal Application created: {app.x_name or 'New Application'}")
+    try:
+        rec.message_post(body=f"Renewal Application created: {app.x_name or 'New Application'}")
+    except Exception:
+        pass
     action = {
         'type': 'ir.actions.act_window',
         'name': 'Renewal Lease Application',
@@ -1370,29 +1391,30 @@ for move in records:
     <field name="action_server_ids" eval="[(4, ref('action_on_installment_invoice_paid'))]"/>
   </record>
 
-  <!-- Automated Action: Reset Bike Status to Available when Maintenance Request is Done -->
-  <record id="action_on_maintenance_done" model="ir.actions.server" context="{'studio': True}">
-    <field name="name">Reset Bike Status to Available when Maintenance Done</field>
-    <field name="model_id" ref="maintenance.model_maintenance_request"/>
+  <!-- Automated Action: Reset Bike Status to Available when Vehicle Service is Done or Cancelled -->
+  <record id="action_on_service_done" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Reset Bike Status to Available when Service Done</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
     <field name="state">code</field>
     <field name="code"><![CDATA[
-for req in records:
-    if req.stage_id and (req.stage_id.done or req.stage_id.name in ('Repaired', 'Done', 'Completed')):
-        bike = False
-        if hasattr(req, 'vehicle_id') and req.vehicle_id:
-            bike = req.vehicle_id
-        elif hasattr(req, 'x_studio_bike_id') and req.x_studio_bike_id:
-            bike = req.x_studio_bike_id
-        if bike and bike.x_studio_status == 'Maintenance':
-            bike.write({'x_studio_status': 'Available'})
+for srv in records:
+    if srv.state in ('done', 'cancelled') and srv.vehicle_id:
+        bike = srv.vehicle_id
+        if bike.x_studio_status == 'Maintenance':
+            running_services = env['fleet.vehicle.log.services'].search_count([
+                ('vehicle_id', '=', bike.id),
+                ('state', 'in', ['new', 'running'])
+            ])
+            if not running_services:
+                bike.write({'x_studio_status': 'Available'})
 ]]></field>
   </record>
 
-  <record id="rule_on_maintenance_done" model="base.automation" context="{'studio': True}">
-    <field name="name">Reset Bike Status to Available when Maintenance Done</field>
-    <field name="model_id" ref="maintenance.model_maintenance_request"/>
+  <record id="rule_on_service_done" model="base.automation" context="{'studio': True}">
+    <field name="name">Reset Bike Status to Available when Service Done</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
     <field name="trigger">on_create_or_write</field>
-    <field name="action_server_ids" eval="[(4, ref('action_on_maintenance_done'))]"/>
+    <field name="action_server_ids" eval="[(4, ref('action_on_service_done'))]"/>
   </record>
 </odoo>
 

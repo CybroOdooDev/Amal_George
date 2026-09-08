@@ -172,4 +172,27 @@
     <record id="bike_issue_engine_noise" model="x_bike_issue" context="{'studio': True}">
         <field name="x_name">Engine / Mechanical Issue</field>
     </record>
+
+    <!-- Demo Fleet Vehicles (Bikes) -->
+    <record id="vehicle_activa_1" model="fleet.vehicle" context="{'studio': True}">
+        <field name="model_id" ref="model_activa_6g"/>
+        <field name="license_plate">KL-46-A-1001</field>
+        <field name="x_studio_status">Available</field>
+    </record>
+    <record id="vehicle_yamaha_1" model="fleet.vehicle" context="{'studio': True}">
+        <field name="model_id" ref="model_yamaha_r15"/>
+        <field name="license_plate">KL-46-B-2002</field>
+        <field name="x_studio_status">Available</field>
+    </record>
+    <record id="vehicle_vespa_1" model="fleet.vehicle" context="{'studio': True}">
+        <field name="model_id" ref="model_vespa_urban"/>
+        <field name="license_plate">KL-46-C-3003</field>
+        <field name="x_studio_status">Available</field>
+    </record>
+    <record id="vehicle_bmw_1" model="fleet.vehicle" context="{'studio': True}">
+        <field name="model_id" ref="model_bmw_ce04"/>
+        <field name="license_plate">KL-46-E-4004</field>
+        <field name="x_studio_status">Available</field>
+    </record>
 </odoo>
+

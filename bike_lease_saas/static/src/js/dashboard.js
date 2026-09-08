@@ -103,10 +103,21 @@ export class BikeLeaseDashboard extends Component {
     }
 
     async fetchFallbackData() {
-        // Query models directly via ORM
-        const bikes = await this.orm.searchRead("fleet.vehicle", [], ["display_name", "license_plate", "vin_sn", "x_studio_status", "model_id", "car_value"]).catch(() => []);
-        const models = await this.orm.searchRead("fleet.vehicle.model", [], ["name", "x_name", "display_name", "brand_id"]).catch(() => []);
-        const contracts = await this.orm.searchRead("x_lease_contract", [], ["x_name", "x_studio_partner_id", "x_studio_bike", "x_studio_lease_plan", "x_studio_selection_1", "x_studio_end_date", "x_studio_date", "x_studio_deposit_invoice_id", "x_studio_return_invoice_id"]).catch(() => []);
+        // Query bikes and bike models directly via ORM strictly filtering by vehicle_type = 'bike'
+        const bikeDomain = [["vehicle_type", "=", "bike"]];
+        if (this.state.modelFilter && this.state.modelFilter !== 'all') {
+            try {
+                const mId = parseInt(this.state.modelFilter);
+                if (!isNaN(mId)) {
+                    bikeDomain.push(["model_id", "=", mId]);
+                }
+            } catch (e) {}
+        }
+        const bikes = await this.orm.searchRead("fleet.vehicle", bikeDomain, ["display_name", "license_plate", "vin_sn", "x_studio_status", "model_id", "car_value"]).catch(() => []);
+        const models = await this.orm.searchRead("fleet.vehicle.model", [["vehicle_type", "=", "bike"]], ["name", "x_name", "display_name", "brand_id"]).catch(() => []);
+        const bikeIds = bikes.map(b => b.id);
+        const contractDomain = bikeIds.length > 0 ? [["x_studio_bike", "in", bikeIds]] : [["id", "=", 0]];
+        const contracts = await this.orm.searchRead("x_lease_contract", contractDomain, ["x_name", "x_studio_partner_id", "x_studio_bike", "x_studio_lease_plan", "x_studio_selection_1", "x_studio_end_date", "x_studio_date", "x_studio_deposit_invoice_id", "x_studio_return_invoice_id"]).catch(() => []);
         const installments = await this.orm.searchRead("x_lease_installment", [], ["x_studio_amount", "x_studio_total_amount", "x_studio_status", "x_studio_payment_state", "x_studio_is_overdue", "x_studio_contract_id", "x_studio_date", "x_studio_late_fee_amount", "x_studio_invoice_id"]).catch(() => []);
         const wizards = await this.orm.searchRead("x_bike_return_wizard", [], ["x_studio_contract_id", "x_studio_bike_returned", "x_studio_service_needed", "x_studio_repair_charge"]).catch(() => []);
         const applications = await this.orm.searchRead("x_lease_application", [], ["x_name", "x_studio_selection_1"]).catch(() => []);
@@ -119,8 +130,8 @@ export class BikeLeaseDashboard extends Component {
         const maintCount = bikes.filter(b => b.x_studio_status === "Maintenance").length;
         const retiredCount = bikes.filter(b => b.x_studio_status === "Retired").length;
         const activeFleet = totalBikes - retiredCount;
-        const utilRate = activeFleet > 0 ? ((leasedCount / activeFleet) * 100).toFixed(1) : "25.0";
-        const availRate = totalBikes > 0 ? ((availCount / totalBikes) * 100).toFixed(1) : "50.0";
+        const utilRate = activeFleet > 0 ? ((leasedCount / activeFleet) * 100).toFixed(1) : "0.0";
+        const availRate = totalBikes > 0 ? ((availCount / totalBikes) * 100).toFixed(1) : "0.0";
 
         const totalApps = applications.length;
         const pendingApps = applications.filter(a => ["Draft", "Under Review", "Submitted", false].includes(a.x_studio_selection_1)).length;

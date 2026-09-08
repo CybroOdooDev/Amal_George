@@ -17,6 +17,7 @@
     <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_status</field>
     <field name="on_delete" eval="False"/>
+    <field name="readonly" eval="True"/>
     <field name="selection">[('Available', 'Available'), ('Reserved', 'Reserved'), ('Leased', 'Leased'), ('Maintenance', 'Maintenance'), ('Retired', 'Retired')]</field>
   </record>
   <record id="new_date_bikes_c82e2e0f-292c-496b-a215-914298f4011a" model="ir.model.fields" context="{'studio': True}">
@@ -1023,6 +1024,19 @@
         invoices |= rec.x_studio_return_invoice_id
     rec['x_studio_invoice_count'] = len(invoices)]]></field>
   </record>
+  <record id="field_lease_contract_all_installments_invoiced" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">All Installments Invoiced</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_all_installments_invoiced</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    insts = rec.x_studio_installment_ids
+    rec['x_studio_all_installments_invoiced'] = bool(insts) and not any(i.x_studio_status == 'Draft' for i in insts)]]></field>
+  </record>
   <record id="field_bike_issue_name" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="copied" eval="True"/>
@@ -1102,18 +1116,6 @@
     <field name="name">x_studio_service_needed</field>
     <field name="readonly" eval="True"/>
   </record>
-  <record id="field_maintenance_request_bike_id" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="False"/>
-    <field name="field_description">Bike</field>
-    <field name="model">maintenance.request</field>
-    <field name="model_id" ref="maintenance.model_maintenance_request"/>
-    <field name="name">x_studio_bike_id</field>
-    <field name="on_delete">set null</field>
-    <field name="relation">fleet.vehicle</field>
-    <field name="domain">[('x_studio_status', 'in', ['Available', 'Maintenance','Retired'])]</field>
-    <field name="required" eval="False"/>
-  </record>
   <record id="field_bikes_maintenance_count" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">integer</field>
     <field name="copied" eval="False"/>
@@ -1124,6 +1126,6 @@
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
     <field name="compute"><![CDATA[for rec in self:
-    rec['x_studio_maintenance_count'] = self.env['maintenance.request'].search_count([('x_studio_bike_id', '=', rec.id)])]]></field>
+    rec['x_studio_maintenance_count'] = self.env['fleet.vehicle.log.services'].search_count([('vehicle_id', '=', rec.id)])]]></field>
   </record>
 </odoo>

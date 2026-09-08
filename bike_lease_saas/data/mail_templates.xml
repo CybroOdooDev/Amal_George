@@ -155,12 +155,12 @@
     </field>
   </record>
   <record id="mail_template_vehicle_return_settlement" model="mail.template">
-    <field name="name">Lease Contract: Vehicle Return &amp; Deposit Settlement</field>
+    <field name="name">Lease Contract: Bike Return &amp; Deposit Settlement</field>
     <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
     <field name="email_from">{{ user.email_formatted }}</field>
     <field name="email_to">{{ object.x_studio_partner_email or (object.x_studio_partner_id and object.x_studio_partner_id.email) }}</field>
-    <field name="subject">Vehicle Return &amp; Settlement Statement - {{ object.x_name }}</field>
-    <field name="description">Sent to customer when vehicle return and deposit settlement is confirmed</field>
+    <field name="subject">Bike Return &amp; Settlement Statement - {{ object.x_name }}</field>
+    <field name="description">Sent to customer when bike return and deposit settlement is confirmed</field>
     <field name="body_html" type="html">
 <div style="margin: 0px; padding: 0px; font-size: 13px;">
     <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;">
@@ -194,7 +194,7 @@
                                     <tr>
                                         <td>
                                             <p>Dear <t t-out="object.x_studio_partner_id.name or 'Valued Customer'">Customer Name</t>,</p>
-                                            <p>Your vehicle return inspection and deposit settlement for contract <strong><t t-out="object.x_name or ''">CNT/2026/0001</t></strong> has been processed successfully.</p>
+                                            <p>Your bike return inspection and deposit settlement for contract <strong><t t-out="object.x_name or ''">CNT/2026/0001</t></strong> has been processed successfully.</p>
                                             
                                             <p><strong>Inspection Details:</strong></p>
                                             <table border="0" cellpadding="4" cellspacing="0" style="width: 100%; border: 1px solid #e7e7e7; border-collapse: collapse;">

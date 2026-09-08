@@ -10,6 +10,13 @@
     <field name="model">fleet.vehicle</field>
     <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
     <field name="arch" type="xml">
+      <xpath expr="//field[@name='state_id']" position="replace">
+        <field name="state_id" widget="statusbar" options="{'clickable': '1'}" invisible="context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly')"/>
+        <button name="%(action_bike_set_available)d" type="action" string="Set Available" class="btn-success" invisible="not (context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly')) or x_studio_status != 'Maintenance'"/>
+        <button name="%(action_bike_send_maintenance)d" type="action" string="Send to Maintenance" class="btn-warning" invisible="not (context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly')) or x_studio_status not in ('Available', 'Retired')"/>
+        <button name="%(action_bike_retire)d" type="action" string="Retire Bike" class="btn-danger" invisible="not (context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly')) or x_studio_status == 'Retired'"/>
+        <field name="x_studio_status" widget="statusbar" options="{'clickable': '0'}" statusbar_visible="Available,Reserved,Leased,Maintenance,Retired" readonly="1" invisible="not (context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly'))"/>
+      </xpath>
       <xpath expr="//field[@name='model_id']" position="attributes">
         <attribute name="domain">[('vehicle_type', '=', 'bike')] if context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly') else []</attribute>
         <attribute name="context">{'default_vehicle_type': 'bike' if (context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly')) else False, 'bike_lease_readonly': bool(context.get('bike_lease_readonly'))}</attribute>
@@ -43,14 +50,14 @@
         </button>
       </xpath>
       <xpath expr="//notebook" position="inside">
-        <page string="Lease Information &amp; Documents" name="lease_info">
+        <page string="Lease Information &amp; Documents" name="lease_info" invisible="not (context.get('default_vehicle_type') == 'bike' or context.get('bike_lease_readonly'))">
           <group>
             <group string="Lease Expiries">
               <field name="x_studio_insurance_expiry"/>
               <field name="x_studio_registration_expiry"/>
             </group>
             <group string="Surcharges &amp; Availability">
-              <field name="x_studio_status" widget="badge" decoration-success="x_studio_status == 'Available'" decoration-info="x_studio_status == 'Leased'" decoration-warning="x_studio_status in ('Reserved', 'Maintenance')" decoration-danger="x_studio_status == 'Retired'"/>
+              <field name="x_studio_status" widget="badge" readonly="1" decoration-success="x_studio_status == 'Available'" decoration-info="x_studio_status == 'Leased'" decoration-warning="x_studio_status in ('Reserved', 'Maintenance')" decoration-danger="x_studio_status == 'Retired'"/>
               <field name="x_studio_has_additional_charge" widget="boolean_toggle"/>
               <field name="x_studio_additional_daily_charge" invisible="not x_studio_has_additional_charge"/>
             </group>
@@ -167,7 +174,7 @@
         <field name="x_studio_partner_id" string="Customer"/>
         <field name="x_studio_date" string="Application Date"/>
         <field name="x_studio_bike_model" string="Model"/>
-        <field name="x_studio_bike" string="Vehicle"/>
+        <field name="x_studio_bike" string="Bike"/>
         <field name="x_studio_lease_plan" string="Plan"/>
         <field name="x_studio_selection_1" widget="badge" decoration-info="x_studio_selection_1 in ('Draft', 'Submitted', 'Under Review')" decoration-success="x_studio_selection_1 in ('Approved', 'Converted to Contract')" decoration-danger="x_studio_selection_1 == 'Rejected'" decoration-muted="x_studio_selection_1 == 'Cancelled'"/>
       </list>
@@ -181,10 +188,17 @@
       <form string="Lease Application">
         <header>
           <button name="%(action_app_approve)d" type="action" string="Approve Application" class="oe_highlight" invisible="x_studio_selection_1 not in ('Draft', 'Submitted', 'Under Review')"/>
-          <button name="%(action_open_reject_wizard)d" type="action" string="Reject Application" invisible="x_studio_selection_1 in ('Converted to Contract', 'Rejected', 'Cancelled')"/>
+          <button name="%(action_open_reject_wizard)d" type="action" string="Reject Application" invisible="x_studio_selection_1 in ('Approved', 'Converted to Contract', 'Rejected', 'Cancelled')"/>
           <field name="x_studio_selection_1" widget="statusbar" statusbar_visible="Draft,Submitted,Under Review,Approved,Converted to Contract,Rejected"/>
         </header>
         <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_app_contracts)d" type="action" class="oe_stat_button" icon="fa-book" invisible="not x_studio_contract_id">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Lease Contract</span>
+              </div>
+            </button>
+          </div>
           <div class="oe_title">
             <h1>
               <field name="x_name" readonly="1"/>
@@ -197,9 +211,9 @@
               <field name="x_studio_partner_email"/>
               <field name="x_studio_date" required="1" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
             </group>
-            <group string="Vehicle &amp; Plan Selection">
+            <group string="Bike &amp; Plan Selection">
               <field name="x_studio_bike_model" required="1" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')" domain="[('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
-              <field name="x_studio_bike" options="{'no_create': True}" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')" domain="[('vehicle_type', '=', 'bike'), ('model_id', '=', x_studio_bike_model)] if x_studio_bike_model else [('vehicle_type', '=', 'bike')]"/>
+              <field name="x_studio_bike" options="{'no_create': True}" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')" domain="[('vehicle_type', '=', 'bike'), ('model_id', '=', x_studio_bike_model)] if x_studio_bike_model else [('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
               <field name="x_studio_lease_plan" required="1" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
               <field name="x_studio_lease_start_date" readonly="x_studio_selection_1 not in ('Draft', 'Submitted')"/>
             </group>
@@ -292,7 +306,7 @@
         <field name="x_studio_partner_id" string="Customer"/>
         <field name="x_studio_date" string="Start Date"/>
         <field name="x_studio_end_date" string="End Date"/>
-        <field name="x_studio_bike" string="Vehicle"/>
+        <field name="x_studio_bike" string="Bike"/>
         <field name="x_studio_lease_plan" string="Plan"/>
         <field name="x_studio_deposit_paid" string="Deposit Paid"/>
         <field name="x_studio_selection_1" widget="badge" decoration-info="x_studio_selection_1 == 'Draft'" decoration-success="x_studio_selection_1 == 'Active'" decoration-muted="x_studio_selection_1 in ('Closed', 'Cancelled')"/>
@@ -308,11 +322,22 @@
         <header>
           <button name="%(action_pay_security_deposit)d" type="action" string="Create Security Deposit Invoice" class="oe_highlight" invisible="x_studio_selection_1 != 'Draft'"/>
           <button name="%(action_cnt_cancel)d" type="action" string="Cancel Contract" class="btn-secondary" invisible="x_studio_selection_1 != 'Draft'"/>
-          <button name="%(action_open_return_wizard)d" type="action" string="Return &amp; Inspect Vehicle" class="btn-warning" invisible="x_studio_selection_1 != 'Active'"/>
-          <button name="%(action_cnt_renew)d" type="action" string="Renew Contract" class="btn-info" invisible="x_studio_selection_1 not in ('Active', 'Closed')"/>
+          <button name="%(action_create_lease_invoice)d" type="action" string="Create Installment Invoice" class="oe_highlight" invisible="x_studio_selection_1 != 'Active' or x_studio_all_installments_invoiced"/>
+          <button name="%(action_cnt_complete)d" type="action" string="Complete Contract" class="btn-primary" invisible="x_studio_selection_1 != 'Active'"/>
+          <button name="%(action_open_return_wizard)d" type="action" string="Return &amp; Inspect Bike" class="btn-warning" invisible="x_studio_selection_1 != 'Completed' or x_studio_bike_returned"/>
+          <button name="%(action_cnt_renew)d" type="action" string="Renew Contract" class="btn-info" invisible="x_studio_selection_1 != 'Completed' or not x_studio_bike_returned"/>
           <field name="x_studio_selection_1" widget="statusbar" statusbar_visible="Draft,Active,Completed,Cancelled"/>
         </header>
         <sheet>
+          <field name="x_studio_all_installments_invoiced" invisible="1"/>
+          <field name="x_studio_bike_returned" invisible="1"/>
+          <div class="oe_button_box" name="button_box">
+            <button name="%(action_cnt_open_invoices)d" type="action" class="oe_stat_button" icon="fa-pencil-square-o">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Invoices</span>
+              </div>
+            </button>
+          </div>
           <div class="oe_title">
             <h1>
               <field name="x_name" readonly="1"/>
@@ -325,26 +350,26 @@
               <field name="x_studio_partner_email"/>
               <field name="x_studio_application_id" readonly="1"/>
             </group>
-            <group string="Lease Dates &amp; Vehicle">
+            <group string="Lease Dates &amp; Bike">
               <field name="x_studio_date" required="1" readonly="x_studio_selection_1 != 'Draft'"/>
               <field name="x_studio_end_date" required="1"/>
-              <field name="x_studio_bike_model" readonly="1" domain="[('vehicle_type', '=', 'bike')]"/>
-              <field name="x_studio_bike" required="1" options="{'no_create': True}" readonly="x_studio_selection_1 != 'Draft'" domain="[('vehicle_type', '=', 'bike')]"/>
+              <field name="x_studio_bike_model" readonly="1" domain="[('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
+              <field name="x_studio_bike" required="1" options="{'no_create': True}" readonly="x_studio_selection_1 != 'Draft'" domain="[('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
               <field name="x_studio_lease_plan" required="1" readonly="x_studio_selection_1 != 'Draft'"/>
             </group>
           </group>
           <notebook>
             <page string="Installments &amp; Invoices" name="installments">
-              <field name="x_studio_installment_ids" readonly="x_studio_selection_1 == 'Closed'">
-                <list string="Installments" editable="bottom">
+              <field name="x_studio_installment_ids" readonly="1">
+                <list string="Installments" decoration-danger="x_studio_is_overdue">
                   <field name="x_name"/>
                   <field name="x_studio_date"/>
                   <field name="x_studio_amount"/>
                   <field name="x_studio_late_fee_amount"/>
                   <field name="x_studio_total_amount"/>
                   <field name="x_studio_invoice_id" readonly="1"/>
-                  <field name="x_studio_payment_state" widget="badge"/>
-                  <field name="x_studio_is_overdue" widget="boolean_toggle"/>
+                  <field name="x_studio_payment_state" widget="badge" decoration-success="x_studio_payment_state in ('paid', 'Paid')" decoration-info="x_studio_payment_state in ('in_payment', 'In Payment', 'partial')" decoration-warning="x_studio_payment_state in ('not_paid', 'Not Paid', 'Draft', 'Invoiced')"/>
+                  <field name="x_studio_is_overdue" column_invisible="True"/>
                 </list>
               </field>
             </page>
@@ -430,7 +455,7 @@
     <field name="name">x_lease_installment.list</field>
     <field name="model">x_lease_installment</field>
     <field name="arch" type="xml">
-      <list string="Lease Installments" default_order="x_studio_date asc">
+      <list string="Lease Installments" default_order="x_studio_date asc" decoration-danger="x_studio_is_overdue">
         <field name="x_name"/>
         <field name="x_studio_contract_id"/>
         <field name="x_studio_date"/>
@@ -438,8 +463,8 @@
         <field name="x_studio_late_fee_amount"/>
         <field name="x_studio_total_amount"/>
         <field name="x_studio_invoice_id"/>
-        <field name="x_studio_payment_state" widget="badge"/>
-        <field name="x_studio_is_overdue" widget="boolean_toggle"/>
+        <field name="x_studio_payment_state" widget="badge" decoration-success="x_studio_payment_state in ('paid', 'Paid')" decoration-info="x_studio_payment_state in ('in_payment', 'In Payment', 'partial')" decoration-warning="x_studio_payment_state in ('not_paid', 'Not Paid', 'Draft', 'Invoiced')"/>
+        <field name="x_studio_is_overdue" column_invisible="True"/>
       </list>
     </field>
   </record>
@@ -518,10 +543,10 @@
             </group>
             <group string="Service &amp; Repair Charges">
               <field name="x_studio_service_needed" widget="boolean_toggle"/>
-              <field name="x_studio_repair_charge"/>
+              <field name="x_studio_repair_charge" invisible="not x_studio_service_needed"/>
             </group>
           </group>
-          <group string="Inspection Issues Checklist">
+          <group string="Inspection Issues Checklist" invisible="not x_studio_service_needed">
             <field name="x_studio_issue_ids" widget="many2many_checkboxes"/>
           </group>
         </sheet>

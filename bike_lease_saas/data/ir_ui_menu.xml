@@ -23,14 +23,14 @@
 
   <record id="bike_lease_managemen_75cfab6e-46f3-4ad6-a915-3ba03f268b9a" model="ir.ui.menu" context="{'studio': True}">
     <field name="action" ref="bikes_27d7695f-da5f-4714-8a0d-33597178054d"/>
-    <field name="name">Vehicles</field>
+    <field name="name">Bikes</field>
     <field name="parent_id" ref="bike_lease_managemen_f9c77707-0668-4336-ba2c-de1be168ff0f"/>
     <field name="sequence">1</field>
   </record>
 
   <record id="bike_lease_managemen_75a99566-75c5-4e66-a1ad-88485a9bc5d3" model="ir.ui.menu" context="{'studio': True}">
     <field name="action" ref="bike_models_2442ce82-781a-4c73-8f26-5d11cc30a084"/>
-    <field name="name">Vehicle Models</field>
+    <field name="name">Bike Models</field>
     <field name="parent_id" ref="bike_lease_managemen_f9c77707-0668-4336-ba2c-de1be168ff0f"/>
     <field name="sequence">2</field>
   </record>
@@ -44,7 +44,7 @@
 
   <record id="menu_bike_maintenance_requests" model="ir.ui.menu" context="{'studio': True}">
     <field name="action" ref="action_all_bike_maintenance_requests"/>
-    <field name="name">Maintenance Requests</field>
+    <field name="name">Bike Services</field>
     <field name="parent_id" ref="bike_lease_managemen_f9c77707-0668-4336-ba2c-de1be168ff0f"/>
     <field name="sequence">4</field>
   </record>
@@ -91,10 +91,4 @@
     <field name="sequence">1</field>
   </record>
 
-  <record id="menu_maintenance_stages" model="ir.ui.menu" context="{'studio': True}">
-    <field name="action" ref="maintenance.hr_equipment_stage_action"/>
-    <field name="name">Maintenance Stages</field>
-    <field name="parent_id" ref="bike_lease_managemen_cbaef4c9-805f-44bb-a849-432287446272"/>
-    <field name="sequence">2</field>
-  </record>
 </odoo>

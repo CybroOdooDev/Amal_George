@@ -1,5 +1,38 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+  <!-- Custom Bike Vehicle Kanban View (Grid view, not pipeline grouped by state) -->
+  <record id="view_fleet_vehicle_bike_kanban" model="ir.ui.view">
+    <field name="name">fleet.vehicle.bike.kanban</field>
+    <field name="model">fleet.vehicle</field>
+    <field name="priority">20</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile" sample="1">
+        <field name="id"/>
+        <field name="name"/>
+        <field name="model_id"/>
+        <field name="license_plate"/>
+        <field name="x_studio_status"/>
+        <field name="x_studio_additional_daily_charge"/>
+        <field name="x_studio_has_additional_charge"/>
+        <templates>
+          <t t-name="card" class="oe_kanban_global_click p-3 border shadow-sm rounded-3 bg-white mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <strong class="text-primary fs-6"><field name="name"/></strong>
+              <field name="x_studio_status" widget="badge" readonly="1" decoration-success="x_studio_status == 'Available'" decoration-info="x_studio_status == 'Leased'" decoration-warning="x_studio_status in ('Reserved', 'Maintenance')" decoration-danger="x_studio_status == 'Retired'"/>
+            </div>
+            <div class="text-dark fw-bold mb-1"><field name="model_id"/></div>
+            <div class="text-muted small mb-2">License Plate: <field name="license_plate"/></div>
+            <t t-if="record.x_studio_has_additional_charge.raw_value">
+              <div class="text-success small fw-semibold">
+                Daily Charge: $<field name="x_studio_additional_daily_charge"/>
+              </div>
+            </t>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
   <record id="bikes_27d7695f-da5f-4714-8a0d-33597178054d" model="ir.actions.act_window">
     <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
                     This is your new action.
@@ -17,6 +50,13 @@
     <field name="view_mode">kanban,list,form,pivot,graph</field>
     <field name="domain">[('vehicle_type', '=', 'bike')]</field>
     <field name="context">{'default_vehicle_type': 'bike', 'bike_lease_readonly': True, 'studio': True}</field>
+  </record>
+
+  <record id="action_bikes_kanban_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="1"/>
+    <field name="view_mode">kanban</field>
+    <field name="view_id" ref="view_fleet_vehicle_bike_kanban"/>
+    <field name="act_window_id" ref="bikes_27d7695f-da5f-4714-8a0d-33597178054d"/>
   </record>
   <record id="action_bike_lease_dashboard" model="ir.actions.act_window" context="{'studio': True}">
     <field name="name">Dashboard</field>
@@ -87,7 +127,7 @@
             ]]></field>
     <field name="name">Lease Application</field>
     <field name="res_model">x_lease_application</field>
-    <field name="view_mode">kanban,list,form,calendar</field>
+    <field name="view_mode">list,kanban,form,calendar</field>
   </record>
   <record id="lease_contract_30a822ed-cae8-4326-93b7-b340d9ebce4d" model="ir.actions.act_window" context="{'studio': True}">
     <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
@@ -103,13 +143,13 @@
             ]]></field>
     <field name="name">Lease Contract</field>
     <field name="res_model">x_lease_contract</field>
-    <field name="view_mode">kanban,list,form,calendar</field>
+    <field name="view_mode">list,kanban,form,calendar</field>
   </record>
 
   <record id="action_bike_applications" model="ir.actions.act_window" context="{'studio': True}">
     <field name="name">Lease Applications</field>
     <field name="res_model">x_lease_application</field>
-    <field name="view_mode">kanban,list,form,calendar</field>
+    <field name="view_mode">list,kanban,form,calendar</field>
     <field name="domain">[('x_studio_bike', '=', active_id)]</field>
     <field name="context">{'default_x_studio_bike': active_id}</field>
   </record>
@@ -117,7 +157,7 @@
   <record id="action_bike_contracts" model="ir.actions.act_window" context="{'studio': True}">
     <field name="name">Lease Contracts</field>
     <field name="res_model">x_lease_contract</field>
-    <field name="view_mode">kanban,list,form,calendar</field>
+    <field name="view_mode">list,kanban,form,calendar</field>
     <field name="domain">[('x_studio_bike', '=', active_id)]</field>
     <field name="context">{'default_x_studio_bike': active_id}</field>
   </record>
@@ -125,7 +165,7 @@
   <record id="action_app_contracts" model="ir.actions.act_window" context="{'studio': True}">
     <field name="name">Lease Contracts</field>
     <field name="res_model">x_lease_contract</field>
-    <field name="view_mode">kanban,list,form,calendar</field>
+    <field name="view_mode">list,kanban,form,calendar</field>
     <field name="domain">[('x_studio_application_id', '=', active_id)]</field>
     <field name="context">{'default_x_studio_application_id': active_id}</field>
   </record>
@@ -133,7 +173,7 @@
   <record id="action_plan_contracts" model="ir.actions.act_window" context="{'studio': True}">
     <field name="name">Lease Contracts</field>
     <field name="res_model">x_lease_contract</field>
-    <field name="view_mode">kanban,list,form,calendar</field>
+    <field name="view_mode">list,kanban,form,calendar</field>
     <field name="domain">[('x_studio_lease_plan', '=', active_id)]</field>
     <field name="context">{'default_x_studio_lease_plan': active_id}</field>
   </record>
@@ -160,6 +200,13 @@
     <field name="context">{'default_model_id': active_id}</field>
   </record>
 
+  <record id="action_bike_model_bikes_kanban_view" model="ir.actions.act_window.view">
+    <field name="sequence" eval="1"/>
+    <field name="view_mode">kanban</field>
+    <field name="view_id" ref="view_fleet_vehicle_bike_kanban"/>
+    <field name="act_window_id" ref="action_bike_model_bikes"/>
+  </record>
+
   <record id="action_manufacturer_bike_models" model="ir.actions.act_window" context="{'studio': True}">
     <field name="name">Bike Models</field>
     <field name="res_model">fleet.vehicle.model</field>
@@ -167,17 +214,24 @@
     <field name="domain">[('vehicle_type', '=', 'bike'), '|', ('brand_id', '=', active_id), ('x_studio_manufacturer', '=', active_id)]</field>
     <field name="context">{'default_brand_id': active_id, 'default_x_studio_manufacturer': active_id, 'default_vehicle_type': 'bike', 'bike_lease_readonly': True}</field>
   </record>
+  <!-- Override native Fleet Services action to default to Kanban (Pipeline) view -->
+  <record id="fleet.fleet_vehicle_log_services_action" model="ir.actions.act_window">
+    <field name="view_mode">kanban,list,form,graph,pivot,activity</field>
+    <field name="context">{'default_group_by': 'state'}</field>
+  </record>
+
   <record id="action_bike_maintenance_requests" model="ir.actions.act_window" context="{'studio': True}">
-    <field name="name">Maintenance Requests</field>
-    <field name="res_model">maintenance.request</field>
+    <field name="name">Bike Services</field>
+    <field name="res_model">fleet.vehicle.log.services</field>
     <field name="view_mode">kanban,list,form</field>
-    <field name="domain">['|', ('vehicle_id', '=', active_id), ('x_studio_bike_id', '=', active_id)]</field>
-    <field name="context">{'default_vehicle_id': active_id, 'default_x_studio_bike_id': active_id}</field>
+    <field name="domain">[('vehicle_id', '=', active_id)]</field>
+    <field name="context">{'default_vehicle_id': active_id, 'default_group_by': 'state'}</field>
   </record>
   <record id="action_all_bike_maintenance_requests" model="ir.actions.act_window" context="{'studio': True}">
-    <field name="name">Maintenance Requests</field>
-    <field name="res_model">maintenance.request</field>
+    <field name="name">Bike Services</field>
+    <field name="res_model">fleet.vehicle.log.services</field>
     <field name="view_mode">kanban,list,form</field>
-    <field name="domain">['|', ('vehicle_id', '!=', False), ('x_studio_bike_id', '!=', False)]</field>
+    <field name="domain">[('vehicle_id.vehicle_type', '=', 'bike')]</field>
+    <field name="context">{'default_group_by': 'state', 'studio': True}</field>
   </record>
 </odoo>

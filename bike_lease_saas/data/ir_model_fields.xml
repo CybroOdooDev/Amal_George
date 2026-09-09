@@ -9,17 +9,6 @@
     <field name="name">x_studio_currency_id</field>
     <field name="relation">res.currency</field>
   </record>
-  <record id="new_selection_bikes_d9d50637-8698-4fb1-b996-702d9c12d0fa" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">selection</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Status</field>
-    <field name="model">fleet.vehicle</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
-    <field name="name">x_studio_status</field>
-    <field name="on_delete" eval="False"/>
-    <field name="readonly" eval="True"/>
-    <field name="selection">[('Available', 'Available'), ('Reserved', 'Reserved'), ('Leased', 'Leased'), ('Maintenance', 'Maintenance'), ('Retired', 'Retired')]</field>
-  </record>
   <record id="new_date_bikes_c82e2e0f-292c-496b-a215-914298f4011a" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">date</field>
     <field name="copied" eval="True"/>
@@ -838,13 +827,36 @@
     fee = 0.0
     inv = rec.x_studio_invoice_id
     if inv:
-        late_lines = inv.invoice_line_ids.filtered(lambda l: 'Late Payment' in (l.name or '') and (rec.x_name in (l.name or '') or len(rec.x_studio_contract_id.x_studio_installment_ids.filtered(lambda i: i.x_studio_invoice_id == inv)) == 1))
-        if late_lines:
-            fee = sum(l.price_unit for l in late_lines)
-        elif rec.x_studio_contract_id and rec.x_studio_contract_id.x_studio_lease_plan:
+        rec_name = rec.x_name or ''
+        cnt = rec.x_studio_contract_id
+        inst_list = cnt.x_studio_installment_ids if cnt else []
+        inv_inst_count = 0
+        other_names = []
+        for i in inst_list:
+            if i.x_studio_invoice_id == inv:
+                inv_inst_count += 1
+            if i != rec and i.x_name:
+                other_names.append(i.x_name)
+        matching_lines = []
+        for line in inv.invoice_line_ids:
+            lname = line.name or ''
+            if 'Late Payment' in lname:
+                if rec_name and rec_name in lname:
+                    matching_lines.append(line)
+                elif inv_inst_count == 1:
+                    has_other = False
+                    for oname in other_names:
+                        if oname in lname:
+                            has_other = True
+                            break
+                    if not has_other:
+                        matching_lines.append(line)
+        if matching_lines:
+            fee = sum(l.price_unit for l in matching_lines)
+        elif cnt and cnt.x_studio_lease_plan:
             inv_date = inv.invoice_date or datetime.date.today()
             if rec.x_studio_date and rec.x_studio_date < inv_date:
-                plan = rec.x_studio_contract_id.x_studio_lease_plan
+                plan = cnt.x_studio_lease_plan
                 fee_type = plan.x_studio_late_fee_type
                 if fee_type == 'Fixed Amount':
                     fee = plan.x_studio_late_fee or 0.0
@@ -1037,6 +1049,63 @@
     insts = rec.x_studio_installment_ids
     rec['x_studio_all_installments_invoiced'] = bool(insts) and not any(i.x_studio_status == 'Draft' for i in insts)]]></field>
   </record>
+  <record id="field_lease_contract_pending_termination" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Pending Termination</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_pending_termination</field>
+  </record>
+  <record id="field_lease_contract_total_contract_amount" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Total Contract Value</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_total_contract_amount</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    inst_sum = sum(i.x_studio_amount or 0.0 for i in rec.x_studio_installment_ids)
+    dep = rec.x_studio_lease_plan.x_studio_security_deposit if rec.x_studio_lease_plan else 0.0
+    rec['x_studio_total_contract_amount'] = inst_sum + dep]]></field>
+  </record>
+  <record id="field_lease_contract_total_paid_amount" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Total Amount Paid</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_total_paid_amount</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    paid_inst_sum = 0.0
+    for i in rec.x_studio_installment_ids:
+        if i.x_studio_status == 'Paid' or (i.x_studio_invoice_id and i.x_studio_invoice_id.payment_state in ('paid', 'in_payment')):
+            paid_inst_sum += (i.x_studio_amount or 0.0)
+    dep = rec.x_studio_lease_plan.x_studio_security_deposit if rec.x_studio_lease_plan else 0.0
+    paid_dep = dep if rec.x_studio_deposit_paid else 0.0
+    rec['x_studio_total_paid_amount'] = paid_inst_sum + paid_dep]]></field>
+  </record>
+  <record id="field_lease_contract_total_due_amount" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="False"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Outstanding Due Balance</field>
+    <field name="model">x_lease_contract</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="name">x_studio_total_due_amount</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[for rec in self:
+    tot = rec.x_studio_total_contract_amount or 0.0
+    paid = rec.x_studio_total_paid_amount or 0.0
+    rec['x_studio_total_due_amount'] = max(0.0, tot - paid)]]></field>
+  </record>
   <record id="field_bike_issue_name" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="copied" eval="True"/>
@@ -1127,5 +1196,67 @@
     <field name="store" eval="False"/>
     <field name="compute"><![CDATA[for rec in self:
     rec['x_studio_maintenance_count'] = self.env['fleet.vehicle.log.services'].search_count([('vehicle_id', '=', rec.id)])]]></field>
+  </record>
+
+  <!-- res.company persistent fields for Bike Lease Settings -->
+  <record id="field_company_default_bike_state" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Default Bike Vehicle Stage</field>
+    <field name="model">res.company</field>
+    <field name="model_id" ref="base.model_res_company"/>
+    <field name="name">x_studio_default_bike_state_id</field>
+    <field name="relation">fleet.vehicle.state</field>
+  </record>
+
+  <record id="field_company_bike_state_ids" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Allowed Bike Vehicle Stages</field>
+    <field name="model">res.company</field>
+    <field name="model_id" ref="base.model_res_company"/>
+    <field name="name">x_studio_bike_state_ids</field>
+    <field name="relation">fleet.vehicle.state</field>
+    <field name="relation_table">x_res_company_fleet_vehicle_state_rel</field>
+    <field name="column1">company_id</field>
+    <field name="column2">state_id</field>
+  </record>
+
+  <!-- res.config.settings related fields pointing to company_id -->
+  <record id="field_config_default_bike_state" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Default Bike Vehicle Stage</field>
+    <field name="model">res.config.settings</field>
+    <field name="model_id" ref="base.model_res_config_settings"/>
+    <field name="name">x_studio_default_bike_state_id</field>
+    <field name="relation">fleet.vehicle.state</field>
+    <field name="related">company_id.x_studio_default_bike_state_id</field>
+    <field name="readonly" eval="False"/>
+  </record>
+
+  <record id="field_config_bike_state_ids" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Allowed Bike Vehicle Stages</field>
+    <field name="model">res.config.settings</field>
+    <field name="model_id" ref="base.model_res_config_settings"/>
+    <field name="name">x_studio_bike_state_ids</field>
+    <field name="relation">fleet.vehicle.state</field>
+    <field name="related">company_id.x_studio_bike_state_ids</field>
+    <field name="readonly" eval="False"/>
+  </record>
+
+  <!-- fleet.vehicle company-related allowed bike states field -->
+  <record id="field_fleet_vehicle_company_bike_state_ids" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2many</field>
+    <field name="copied" eval="False"/>
+    <field name="field_description">Company Allowed Bike States</field>
+    <field name="model">fleet.vehicle</field>
+    <field name="model_id" ref="fleet.model_fleet_vehicle"/>
+    <field name="name">x_studio_company_bike_state_ids</field>
+    <field name="relation">fleet.vehicle.state</field>
+    <field name="related">company_id.x_studio_bike_state_ids</field>
+    <field name="readonly" eval="True"/>
   </record>
 </odoo>

@@ -6,19 +6,19 @@
     <field name="web_icon">fa fa-motorcycle,#262c34,#FFFFFF</field>
   </record>
 
-  <!-- 0. Dashboard -->
+  <!-- 1. Dashboard -->
   <record id="menu_bike_lease_dashboard" model="ir.ui.menu" context="{'studio': True}">
     <field name="action" ref="action_bike_lease_dashboard_client"/>
     <field name="name">Dashboard</field>
     <field name="parent_id" ref="bike_lease_managemen_ed788dd6-dc94-40bd-b333-d343b6124e0e"/>
-    <field name="sequence">0</field>
+    <field name="sequence">1</field>
   </record>
 
-  <!-- 1. Fleet Management (Native Odoo Fleet Integration) -->
+  <!-- 3. Fleet Management (Native Odoo Fleet Integration) -->
   <record id="bike_lease_managemen_f9c77707-0668-4336-ba2c-de1be168ff0f" model="ir.ui.menu" context="{'studio': True}">
     <field name="name">Fleet Management</field>
     <field name="parent_id" ref="bike_lease_managemen_ed788dd6-dc94-40bd-b333-d343b6124e0e"/>
-    <field name="sequence">1</field>
+    <field name="sequence">3</field>
   </record>
 
   <record id="bike_lease_managemen_75cfab6e-46f3-4ad6-a915-3ba03f268b9a" model="ir.ui.menu" context="{'studio': True}">
@@ -77,11 +77,18 @@
     <field name="sequence">3</field>
   </record>
 
-  <!-- 3. Configuration -->
+  <!-- 4. Configuration -->
   <record id="bike_lease_managemen_cbaef4c9-805f-44bb-a849-432287446272" model="ir.ui.menu" context="{'studio': True}">
     <field name="name">Configuration</field>
     <field name="parent_id" ref="bike_lease_managemen_ed788dd6-dc94-40bd-b333-d343b6124e0e"/>
-    <field name="sequence">3</field>
+    <field name="sequence">4</field>
+  </record>
+
+  <record id="menu_bike_lease_settings" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="action_bike_lease_config_settings"/>
+    <field name="name">Settings</field>
+    <field name="parent_id" ref="bike_lease_managemen_cbaef4c9-805f-44bb-a849-432287446272"/>
+    <field name="sequence">0</field>
   </record>
 
   <record id="menu_rejection_reasons" model="ir.ui.menu" context="{'studio': True}">
@@ -89,6 +96,13 @@
     <field name="name">Rejection Reasons</field>
     <field name="parent_id" ref="bike_lease_managemen_cbaef4c9-805f-44bb-a849-432287446272"/>
     <field name="sequence">1</field>
+  </record>
+
+  <record id="menu_bike_issues" model="ir.ui.menu" context="{'studio': True}">
+    <field name="action" ref="action_bike_issues"/>
+    <field name="name">Bike Inspection Issues</field>
+    <field name="parent_id" ref="bike_lease_managemen_cbaef4c9-805f-44bb-a849-432287446272"/>
+    <field name="sequence">2</field>
   </record>
 
 </odoo>

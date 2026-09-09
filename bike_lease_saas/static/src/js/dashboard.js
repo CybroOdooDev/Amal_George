@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component, proxy, onWillStart, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, proxy, onWillStart, onMounted, onWillUnmount, onPatched } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 
@@ -65,6 +65,12 @@ export class BikeLeaseDashboard extends Component {
             }
         });
 
+        onPatched(() => {
+            if (!this.state.isLoading) {
+                this.renderCharts();
+            }
+        });
+
         onWillUnmount(() => {
             this.destroyCharts();
         });
@@ -98,7 +104,6 @@ export class BikeLeaseDashboard extends Component {
             console.error("Error loading dashboard data:", e);
         } finally {
             this.state.isLoading = false;
-            setTimeout(() => this.renderCharts(), 50);
         }
     }
 
@@ -111,24 +116,50 @@ export class BikeLeaseDashboard extends Component {
                 if (!isNaN(mId)) {
                     bikeDomain.push(["model_id", "=", mId]);
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
-        const bikes = await this.orm.searchRead("fleet.vehicle", bikeDomain, ["display_name", "license_plate", "vin_sn", "x_studio_status", "model_id", "car_value"]).catch(() => []);
+        const bikes = await this.orm.searchRead("fleet.vehicle", bikeDomain, ["display_name", "license_plate", "vin_sn", "state_id", "model_id", "car_value"]).catch(() => []);
         const models = await this.orm.searchRead("fleet.vehicle.model", [["vehicle_type", "=", "bike"]], ["name", "x_name", "display_name", "brand_id"]).catch(() => []);
         const bikeIds = bikes.map(b => b.id);
-        const contractDomain = bikeIds.length > 0 ? [["x_studio_bike", "in", bikeIds]] : [["id", "=", 0]];
+
+        let contractDomain = bikeIds.length > 0 ? [["x_studio_bike", "in", bikeIds]] : [["id", "=", 0]];
+        if (this.state.statusFilter && this.state.statusFilter !== 'all') {
+            if (this.state.statusFilter === 'active') {
+                contractDomain.push(["x_studio_selection_1", "=", "Active"]);
+            } else if (this.state.statusFilter === 'draft') {
+                contractDomain.push(["x_studio_selection_1", "=", "Draft"]);
+            }
+        }
         const contracts = await this.orm.searchRead("x_lease_contract", contractDomain, ["x_name", "x_studio_partner_id", "x_studio_bike", "x_studio_lease_plan", "x_studio_selection_1", "x_studio_end_date", "x_studio_date", "x_studio_deposit_invoice_id", "x_studio_return_invoice_id"]).catch(() => []);
-        const installments = await this.orm.searchRead("x_lease_installment", [], ["x_studio_amount", "x_studio_total_amount", "x_studio_status", "x_studio_payment_state", "x_studio_is_overdue", "x_studio_contract_id", "x_studio_date", "x_studio_late_fee_amount", "x_studio_invoice_id"]).catch(() => []);
-        const wizards = await this.orm.searchRead("x_bike_return_wizard", [], ["x_studio_contract_id", "x_studio_bike_returned", "x_studio_service_needed", "x_studio_repair_charge"]).catch(() => []);
+        const contractIdSet = new Set(contracts.map(c => c.id));
+
+        const allInstallments = await this.orm.searchRead("x_lease_installment", [], ["x_studio_amount", "x_studio_total_amount", "x_studio_status", "x_studio_payment_state", "x_studio_is_overdue", "x_studio_contract_id", "x_studio_date", "x_studio_late_fee_amount", "x_studio_invoice_id"]).catch(() => []);
+        
+        // Filter installments strictly to match filtered contracts if filtering is applied
+        const installments = allInstallments.filter(inst => {
+            if (!inst.x_studio_contract_id || !inst.x_studio_contract_id[0]) {
+                return this.state.modelFilter === 'all' && this.state.statusFilter === 'all';
+            }
+            return contractIdSet.has(inst.x_studio_contract_id[0]);
+        });
+
+        const allWizards = await this.orm.searchRead("x_bike_return_wizard", [], ["x_studio_contract_id", "x_studio_bike_returned", "x_studio_service_needed", "x_studio_repair_charge"]).catch(() => []);
+        const wizards = allWizards.filter(wiz => {
+            if (!wiz.x_studio_contract_id || !wiz.x_studio_contract_id[0]) {
+                return this.state.modelFilter === 'all' && this.state.statusFilter === 'all';
+            }
+            return contractIdSet.has(wiz.x_studio_contract_id[0]);
+        });
         const applications = await this.orm.searchRead("x_lease_application", [], ["x_name", "x_studio_selection_1"]).catch(() => []);
-        const leasePlans = await this.orm.searchRead("x_lease_plans", [], ["x_name"]).catch(() => []);
+        const leasePlans = await this.orm.searchRead("x_lease_plans", [], ["x_name", "x_studio_security_deposit"]).catch(() => []);
 
         const totalBikes = bikes.length;
-        const availCount = bikes.filter(b => b.x_studio_status === "Available" || !b.x_studio_status).length;
-        const leasedCount = bikes.filter(b => b.x_studio_status === "Leased").length;
-        const reservedCount = bikes.filter(b => b.x_studio_status === "Reserved").length;
-        const maintCount = bikes.filter(b => b.x_studio_status === "Maintenance").length;
-        const retiredCount = bikes.filter(b => b.x_studio_status === "Retired").length;
+        const getBikeState = (b) => (b.state_id ? b.state_id[1] : "");
+        const availCount = bikes.filter(b => !getBikeState(b) || getBikeState(b) === "Available").length;
+        const leasedCount = bikes.filter(b => getBikeState(b) === "Leased").length;
+        const reservedCount = bikes.filter(b => getBikeState(b) === "Reserved").length;
+        const maintCount = bikes.filter(b => getBikeState(b) === "Maintenance").length;
+        const retiredCount = bikes.filter(b => getBikeState(b) === "Retired").length;
         const activeFleet = totalBikes - retiredCount;
         const utilRate = activeFleet > 0 ? ((leasedCount / activeFleet) * 100).toFixed(1) : "0.0";
         const availRate = totalBikes > 0 ? ((availCount / totalBikes) * 100).toFixed(1) : "0.0";
@@ -136,7 +167,7 @@ export class BikeLeaseDashboard extends Component {
         const totalApps = applications.length;
         const pendingApps = applications.filter(a => ["Draft", "Under Review", "Submitted", false].includes(a.x_studio_selection_1)).length;
         const approvedApps = applications.filter(a => ["Approved", "Converted to Contract"].includes(a.x_studio_selection_1)).length;
-        const appApprovalRate = totalApps > 0 ? ((approvedApps / totalApps) * 100).toFixed(1) : "95.2";
+        const appApprovalRate = totalApps > 0 ? ((approvedApps / totalApps) * 100).toFixed(1) : "0.0";
 
         const totalContracts = contracts.length;
         const activeContractsCount = contracts.filter(c => c.x_studio_selection_1 === "Active").length;
@@ -261,24 +292,28 @@ export class BikeLeaseDashboard extends Component {
                 overdueAmt += (inst.x_studio_total_amount || 0);
                 overdueCnt += 1;
                 const cnt = contracts.find(c => c.id === (inst.x_studio_contract_id ? inst.x_studio_contract_id[0] : false));
+                const dueDt = inst.x_studio_date ? new Date(inst.x_studio_date) : null;
+                const daysOverdue = dueDt && now > dueDt ? Math.floor((now - dueDt) / (1000 * 60 * 60 * 24)) : 0;
                 overdueRows.push({
                     id: inst.id,
                     customer: cnt && cnt.x_studio_partner_id ? cnt.x_studio_partner_id[1] : "Customer",
                     contract: cnt ? cnt.x_name : "CNT",
                     contract_id: cnt ? cnt.id : false,
                     bike: cnt && cnt.x_studio_bike ? cnt.x_studio_bike[1] : "Bike",
-                    days_overdue: 14,
+                    days_overdue: daysOverdue,
                     amount: `$${(inst.x_studio_total_amount || 0).toFixed(2)}`,
                 });
             }
         });
 
-        const collEff = totalBilledInPeriod > 0 ? ((collectedCash / totalBilledInPeriod) * 100).toFixed(1) : "100.0";
+        const collEff = totalBilledInPeriod > 0 ? ((collectedCash / totalBilledInPeriod) * 100).toFixed(1) : "0.0";
 
         const returnRows = wizards.map(wiz => {
             const cnt = contracts.find(c => c.id === (wiz.x_studio_contract_id ? wiz.x_studio_contract_id[0] : false));
+            const plan = cnt && cnt.x_studio_lease_plan ? leasePlans.find(p => p.id === cnt.x_studio_lease_plan[0]) : null;
+            const dep = plan ? (plan.x_studio_security_deposit || 0) : 0;
             const rep = wiz.x_studio_repair_charge || 0;
-            const net = 200 - rep;
+            const net = dep - rep;
             return {
                 id: wiz.id,
                 contract: cnt ? cnt.x_name : "CNT",
@@ -305,21 +340,48 @@ export class BikeLeaseDashboard extends Component {
             return mInsts.reduce((acc, i) => acc + (i.x_studio_amount || 0), 0);
         });
 
-        // Chart 4: Reliability Matrix Data
-        const reliabilitySeries = models.map((m) => {
+        // Chart 4: Reliability Matrix Data (5 Operational Metrics for Relevant Active Models)
+        const activeModelsWithVehicles = models.filter((m) => {
+            const mName = m.name || m.x_name || m.display_name;
+            return bikes.some(b => {
+                const modelRef = b.model_id;
+                return modelRef && (modelRef[0] === m.id || modelRef[1] === mName);
+            });
+        });
+
+        const reliabilitySeries = activeModelsWithVehicles.map((m) => {
             const mName = m.name || m.x_name || m.display_name;
             const mBikes = bikes.filter(b => {
                 const modelRef = b.model_id;
                 return modelRef && (modelRef[0] === m.id || modelRef[1] === mName);
             });
             const totalMBikes = mBikes.length;
-            const leasedMBikes = mBikes.filter(b => b.x_studio_status === 'Leased').length;
-            const maintMBikes = mBikes.filter(b => b.x_studio_status === 'Maintenance').length;
+            const getBikeState = (b) => (b.state_id ? b.state_id[1] : "");
+            const leasedMBikes = mBikes.filter(b => getBikeState(b) === 'Leased').length;
+            const maintMBikes = mBikes.filter(b => getBikeState(b) === 'Maintenance').length;
+            
             const utilP = totalMBikes > 0 ? Math.round((leasedMBikes / totalMBikes) * 100) : 0;
             const maintFreeP = totalMBikes > 0 ? Math.round(((totalMBikes - maintMBikes) / totalMBikes) * 100) : 100;
+            
+            const mBikeIds = mBikes.map(b => b.id);
+            const mContracts = contracts.filter(c => c.x_studio_bike && mBikeIds.includes(c.x_studio_bike[0]));
+            const mContractIds = mContracts.map(c => c.id);
+            const mInsts = installments.filter(i => i.x_studio_contract_id && mContractIds.includes(i.x_studio_contract_id[0]));
+            
+            const totalMInstAmt = mInsts.reduce((sum, i) => sum + (i.x_studio_amount || 0), 0);
+            const paidMInstAmt = mInsts.filter(i => ["paid", "in_payment"].includes(i.x_studio_payment_state)).reduce((sum, i) => sum + (i.x_studio_amount || 0), 0);
+            const revYieldP = totalMInstAmt > 0 ? Math.round((paidMInstAmt / totalMInstAmt) * 100) : (mContracts.length > 0 ? 100 : 0);
+
+            const mWizards = wizards.filter(w => w.x_studio_contract_id && mContractIds.includes(w.x_studio_contract_id[0]));
+            const totalMRepairCost = mWizards.reduce((sum, w) => sum + (w.x_studio_repair_charge || 0), 0);
+            const costEffP = totalMInstAmt > 0 ? Math.max(0, Math.round((1 - (totalMRepairCost / (totalMInstAmt + 1))) * 100)) : 100;
+
+            const successfulCnts = mContracts.filter(c => ["Active", "Completed"].includes(c.x_studio_selection_1)).length;
+            const renewalP = mContracts.length > 0 ? Math.round((successfulCnts / mContracts.length) * 100) : 100;
+
             return {
                 name: mName,
-                data: [utilP, 0, maintFreeP, 0, 0]
+                data: [utilP, revYieldP, maintFreeP, costEffP, renewalP]
             };
         });
 
@@ -346,14 +408,14 @@ export class BikeLeaseDashboard extends Component {
                 pending_apps_count: pendingApps,
                 app_approval_rate: appApprovalRate,
                 total_apps: totalApps,
-                total_revenue: `$${totalRev.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-                collected_cash: `$${collectedCash.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                total_revenue: `$${totalRev.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                collected_cash: `$${collectedCash.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                 collection_efficiency: collEff,
                 paid_invoices_count: paidInvoicesCount,
-                overdue_amount: `$${overdueAmt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                overdue_amount: `$${overdueAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                 overdue_count: overdueCnt,
                 active_repair_count: maintCount,
-                repair_cost: "$0.00",
+                repair_cost: `$${wizards.reduce((sum, w) => sum + (w.x_studio_repair_charge || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             },
             charts: {
                 fleet_status: [availCount, leasedCount, reservedCount, maintCount, retiredCount],
@@ -454,8 +516,8 @@ export class BikeLeaseDashboard extends Component {
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
-                                    return ` Revenue: $${context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                                label: function (context) {
+                                    return ` Revenue: $${context.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                                 }
                             }
                         }
@@ -535,7 +597,7 @@ export class BikeLeaseDashboard extends Component {
                         legend: { position: "top", labels: { color: "#0f172a", font: { weight: "600" } } },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     return ` ${context.dataset.label}: ${context.parsed.y}%`;
                                 }
                             }
@@ -559,7 +621,7 @@ export class BikeLeaseDashboard extends Component {
                     labels: planDist.labels || ['Daily Plan', 'Weekly Plan', 'Monthly Plan', 'Quarterly Plan', 'Yearly Plan'],
                     datasets: [{
                         label: "Active Contracts",
-                        data: planDist.data || [3, 8, 15, 6, 2],
+                        data: planDist.data || [],
                         backgroundColor: "#9333ea",
                         borderRadius: 6,
                     }]
@@ -594,9 +656,15 @@ export class BikeLeaseDashboard extends Component {
         this.loadDashboardData();
     }
 
-    onModelFilterChange(ev) {}
+    onModelFilterChange(ev) {
+        this.state.modelFilter = ev.target.value;
+        this.loadDashboardData();
+    }
 
-    onStatusFilterChange(ev) {}
+    onStatusFilterChange(ev) {
+        this.state.statusFilter = ev.target.value;
+        this.loadDashboardData();
+    }
 
     refreshDashboard() {
         this.loadDashboardData();

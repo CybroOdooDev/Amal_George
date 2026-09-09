@@ -25,6 +25,8 @@
   <record id="lease_application_036d2453-d3be-4130-a107-33eec67d96b0" model="ir.model" context="{'studio': True}">
     <field name="model">x_lease_application</field>
     <field name="name">Lease Application</field>
+    <field name="is_mail_thread" eval="True"/>
+    <field name="is_mail_activity" eval="True"/>
   </record>
   <record id="lease_application_x_name_unique" model="ir.model.constraint">
     <field name="name">x_lease_application_x_name_unique</field>
@@ -37,6 +39,8 @@
   <record id="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83" model="ir.model" context="{'studio': True}">
     <field name="model">x_lease_contract</field>
     <field name="name">Lease Contract</field>
+    <field name="is_mail_thread" eval="True"/>
+    <field name="is_mail_activity" eval="True"/>
   </record>
   <record id="lease_contract_x_name_unique" model="ir.model.constraint">
     <field name="name">x_lease_contract_x_name_unique</field>

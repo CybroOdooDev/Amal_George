@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="0">
+<odoo>
     <!-- Manufacturers (Brands) -->
     <record id="manufacturer_honda" model="fleet.vehicle.model.brand" context="{'studio': True}">
         <field name="name">Honda</field>
@@ -177,22 +177,22 @@
     <record id="vehicle_activa_1" model="fleet.vehicle" context="{'studio': True}">
         <field name="model_id" ref="model_activa_6g"/>
         <field name="license_plate">KL-46-A-1001</field>
-        <field name="x_studio_status">Available</field>
+        <field name="state_id" ref="vehicle_state_available"/>
     </record>
     <record id="vehicle_yamaha_1" model="fleet.vehicle" context="{'studio': True}">
         <field name="model_id" ref="model_yamaha_r15"/>
         <field name="license_plate">KL-46-B-2002</field>
-        <field name="x_studio_status">Available</field>
+        <field name="state_id" ref="vehicle_state_available"/>
     </record>
     <record id="vehicle_vespa_1" model="fleet.vehicle" context="{'studio': True}">
         <field name="model_id" ref="model_vespa_urban"/>
         <field name="license_plate">KL-46-C-3003</field>
-        <field name="x_studio_status">Available</field>
+        <field name="state_id" ref="vehicle_state_available"/>
     </record>
     <record id="vehicle_bmw_1" model="fleet.vehicle" context="{'studio': True}">
         <field name="model_id" ref="model_bmw_ce04"/>
         <field name="license_plate">KL-46-E-4004</field>
-        <field name="x_studio_status">Available</field>
+        <field name="state_id" ref="vehicle_state_available"/>
     </record>
 </odoo>
 

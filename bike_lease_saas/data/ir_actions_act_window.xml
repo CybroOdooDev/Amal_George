@@ -1,24 +1,25 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <!-- Custom Bike Vehicle Kanban View (Grid view, not pipeline grouped by state) -->
+  <!-- Custom Bike Vehicle Pipeline Kanban View (Grouped by state_id) -->
   <record id="view_fleet_vehicle_bike_kanban" model="ir.ui.view">
     <field name="name">fleet.vehicle.bike.kanban</field>
     <field name="model">fleet.vehicle</field>
     <field name="priority">20</field>
     <field name="arch" type="xml">
-      <kanban class="o_kanban_mobile" sample="1">
+      <kanban default_group_by="state_id" class="o_kanban_small_column" sample="1">
         <field name="id"/>
         <field name="name"/>
         <field name="model_id"/>
         <field name="license_plate"/>
-        <field name="x_studio_status"/>
+        <field name="x_studio_company_bike_state_ids"/>
+        <field name="state_id" domain="[('id', 'in', x_studio_company_bike_state_ids)]"/>
         <field name="x_studio_additional_daily_charge"/>
         <field name="x_studio_has_additional_charge"/>
         <templates>
           <t t-name="card" class="oe_kanban_global_click p-3 border shadow-sm rounded-3 bg-white mb-2">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <strong class="text-primary fs-6"><field name="name"/></strong>
-              <field name="x_studio_status" widget="badge" readonly="1" decoration-success="x_studio_status == 'Available'" decoration-info="x_studio_status == 'Leased'" decoration-warning="x_studio_status in ('Reserved', 'Maintenance')" decoration-danger="x_studio_status == 'Retired'"/>
+              <field name="state_id" widget="badge" readonly="1" decoration-success="state_id.name == 'Available'" decoration-info="state_id.name == 'Leased'" decoration-warning="state_id.name in ('Reserved', 'Maintenance')" decoration-danger="state_id.name == 'Retired'"/>
             </div>
             <div class="text-dark fw-bold mb-1"><field name="model_id"/></div>
             <div class="text-muted small mb-2">License Plate: <field name="license_plate"/></div>
@@ -77,9 +78,9 @@
             ]]></field>
     <field name="name">Bike Models</field>
     <field name="res_model">fleet.vehicle.model</field>
-    <field name="view_mode">kanban,list,form,pivot,graph</field>
+    <field name="view_mode">list,form</field>
     <field name="domain">[('vehicle_type', '=', 'bike')]</field>
-    <field name="context">{'default_vehicle_type': 'bike', 'bike_lease_readonly': True, 'studio': True}</field>
+    <field name="context">{'default_vehicle_type': 'bike', 'bike_lease_readonly': True, 'studio': True, 'search_default_groupby_brand': 1}</field>
   </record>
   <record id="manufacturers_d44baa60-2720-4f2a-8c71-53a544f7890b" model="ir.actions.act_window" context="{'studio': True}">
     <field name="help"><![CDATA[<p class="o_view_nocontent_smiling_face">
@@ -196,8 +197,8 @@
     <field name="name">Bikes</field>
     <field name="res_model">fleet.vehicle</field>
     <field name="view_mode">kanban,list,form,pivot,graph</field>
-    <field name="domain">[('model_id', '=', active_id)]</field>
-    <field name="context">{'default_model_id': active_id}</field>
+    <field name="domain">[('vehicle_type', '=', 'bike'), ('model_id', '=', active_id)]</field>
+    <field name="context">{'default_model_id': active_id, 'default_vehicle_type': 'bike', 'studio': True}</field>
   </record>
 
   <record id="action_bike_model_bikes_kanban_view" model="ir.actions.act_window.view">
@@ -210,9 +211,14 @@
   <record id="action_manufacturer_bike_models" model="ir.actions.act_window" context="{'studio': True}">
     <field name="name">Bike Models</field>
     <field name="res_model">fleet.vehicle.model</field>
-    <field name="view_mode">kanban,list,form,pivot,graph</field>
+    <field name="view_mode">list,form</field>
     <field name="domain">[('vehicle_type', '=', 'bike'), '|', ('brand_id', '=', active_id), ('x_studio_manufacturer', '=', active_id)]</field>
-    <field name="context">{'default_brand_id': active_id, 'default_x_studio_manufacturer': active_id, 'default_vehicle_type': 'bike', 'bike_lease_readonly': True}</field>
+    <field name="context">{'default_brand_id': active_id, 'default_x_studio_manufacturer': active_id, 'default_vehicle_type': 'bike', 'bike_lease_readonly': True, 'search_default_groupby_brand': 1}</field>
+  </record>
+  <!-- Override native Fleet Vehicle Model action to default to List view with Manufacturer group by -->
+  <record id="fleet.fleet_vehicle_model_action" model="ir.actions.act_window">
+    <field name="view_mode">list,form</field>
+    <field name="context">{'search_default_groupby_brand': True}</field>
   </record>
   <!-- Override native Fleet Services action to default to Kanban (Pipeline) view -->
   <record id="fleet.fleet_vehicle_log_services_action" model="ir.actions.act_window">
@@ -233,5 +239,19 @@
     <field name="view_mode">kanban,list,form</field>
     <field name="domain">[('vehicle_id.vehicle_type', '=', 'bike')]</field>
     <field name="context">{'default_group_by': 'state', 'studio': True}</field>
+  </record>
+
+  <record id="action_bike_lease_config_settings" model="ir.actions.act_window">
+    <field name="name">Settings</field>
+    <field name="res_model">res.config.settings</field>
+    <field name="view_mode">form</field>
+    <field name="target">current</field>
+    <field name="context">{'module': 'bike_lease_saas', 'bin_size': False}</field>
+  </record>
+
+  <record id="action_bike_issues" model="ir.actions.act_window" context="{'studio': True}">
+    <field name="name">Bike Inspection Issues</field>
+    <field name="res_model">x_bike_issue</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>

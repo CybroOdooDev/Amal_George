@@ -4,10 +4,7 @@
     <field name="field_id" ref="currency_bikes_23a9ad05-c7e5-4e7a-8eea-833b5bd1e476"/>
     <field name="json_value">1</field>
   </record>
-  <record id="active_bike_models_bdd4c9ab-7f9b-4176-a7a2-b6ed25243eed" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="active_bike_models_6c9167d1-c6d4-403e-8c4c-82ca59daa2d6"/>
-    <field name="json_value">true</field>
-  </record>
+
   <record id="currency_bike_models_54376965-b5fb-4f57-88e0-c2a98b63f574" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="currency_bike_models_862f87c0-92c1-44a1-b1c8-d195cf9c4540"/>
     <field name="json_value">1</field>
@@ -20,14 +17,7 @@
     <field name="field_id" ref="sequence_bike_models_30930649-2bdc-4c73-9766-027ce4abec75"/>
     <field name="json_value">10</field>
   </record>
-  <record id="active_manufacturers_661d699b-47cc-475d-8986-25bd270c92be" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="active_manufacturers_9f8d6d9b-b126-4966-b95b-bd0ca927b121"/>
-    <field name="json_value">true</field>
-  </record>
-  <record id="sequence_manufacture_64c1744e-8499-44ce-b7e4-7561c793d431" model="ir.default" context="{'studio': True}">
-    <field name="field_id" ref="sequence_manufacture_0dc00898-4c61-49ed-9578-38e4148d20f9"/>
-    <field name="json_value">10</field>
-  </record>
+
   <record id="new_integer_bike_mod_c6ca9a8d-ee2d-45e7-8913-97ae0c789e46" model="ir.default" context="{'studio': True}">
     <field name="field_id" ref="new_integer_bike_mod_63315aca-4fee-4528-b16c-1a3fed5d1198"/>
     <field name="json_value">"0"</field>

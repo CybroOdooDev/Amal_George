@@ -100,8 +100,8 @@
             </group>
             <group string="Surcharges &amp; Availability">
               <field name="state_id" widget="badge" readonly="1" decoration-success="state_id.name == 'Available'" decoration-info="state_id.name == 'Leased'" decoration-warning="state_id.name in ('Reserved', 'Maintenance')" decoration-danger="state_id.name == 'Retired'"/>
-              <field name="x_studio_has_additional_charge" widget="boolean_toggle"/>
-              <field name="x_studio_additional_daily_charge" invisible="not x_studio_has_additional_charge"/>
+              <field name="x_studio_has_additional_charge" widget="boolean_toggle" readonly="state_id.name == 'Leased'"/>
+              <field name="x_studio_additional_daily_charge" invisible="not x_studio_has_additional_charge" readonly="state_id.name == 'Leased'"/>
             </group>
           </group>
         </page>
@@ -164,7 +164,6 @@
               <field name="x_studio_currency_id" invisible="1"/>
               <field name="x_studio_value" required="1"/>
               <field name="x_studio_security_deposit" required="1"/>
-              <field name="x_studio_initial_payment"/>
             </group>
           </group>
           <group string="Late Fee Configuration">
@@ -426,8 +425,8 @@
             <group string="Lease Dates &amp; Bike">
               <field name="x_studio_date" required="1" readonly="x_studio_selection_1 != 'Draft'"/>
               <field name="x_studio_end_date" required="1"/>
-              <field name="x_studio_bike_model" readonly="1" domain="[('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
-              <field name="x_studio_bike" required="1" options="{'no_create': True}" readonly="x_studio_selection_1 != 'Draft'" domain="[('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
+              <field name="x_studio_bike_model" readonly="x_studio_selection_1 != 'Draft'" domain="[('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
+              <field name="x_studio_bike" required="1" options="{'no_create': True}" readonly="x_studio_selection_1 != 'Draft'" domain="[('vehicle_type', '=', 'bike'), ('model_id', '=', x_studio_bike_model)] if x_studio_bike_model else [('vehicle_type', '=', 'bike')]" context="{'default_vehicle_type': 'bike', 'bike_lease_readonly': True}"/>
               <field name="x_studio_lease_plan" required="1" readonly="x_studio_selection_1 != 'Draft'"/>
             </group>
           </group>
@@ -438,6 +437,7 @@
                   <field name="x_name"/>
                   <field name="x_studio_date"/>
                   <field name="x_studio_amount" sum="Total Base Amount"/>
+                  <field name="x_studio_additional_daily_charge" sum="Total Daily Surcharges"/>
                   <field name="x_studio_late_fee_amount" sum="Total Late Fees"/>
                   <field name="x_studio_total_amount" sum="Grand Total"/>
                   <field name="x_studio_invoice_id" readonly="1"/>

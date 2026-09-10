@@ -3,6 +3,7 @@
 import { Component, proxy, onWillStart, onMounted, onWillUnmount, onPatched } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { loadBundle } from "@web/core/assets";
 
 export class BikeLeaseDashboard extends Component {
     static template = "bike_lease_saas.BikeLeaseDashboard";
@@ -80,16 +81,7 @@ export class BikeLeaseDashboard extends Component {
         if (window.Chart) {
             return;
         }
-        return new Promise((resolve, reject) => {
-            const script = document.createElement("script");
-            script.src = "https://cdn.jsdelivr.net/npm/chart.js";
-            script.onload = () => resolve();
-            script.onerror = () => {
-                console.warn("Chart.js failed to load from CDN. Using fallback chart engine.");
-                resolve();
-            };
-            document.head.appendChild(script);
-        });
+        await loadBundle("web.chartjs_lib");
     }
 
     async loadDashboardData() {
@@ -119,7 +111,7 @@ export class BikeLeaseDashboard extends Component {
             } catch (e) { }
         }
         const bikes = await this.orm.searchRead("fleet.vehicle", bikeDomain, ["display_name", "license_plate", "vin_sn", "state_id", "model_id", "car_value"]).catch(() => []);
-        const models = await this.orm.searchRead("fleet.vehicle.model", [["vehicle_type", "=", "bike"]], ["name", "x_name", "display_name", "brand_id"]).catch(() => []);
+        const models = await this.orm.searchRead("fleet.vehicle.model", [["vehicle_type", "=", "bike"]], ["name", "display_name", "brand_id"]).catch(() => []);
         const bikeIds = bikes.map(b => b.id);
 
         let contractDomain = bikeIds.length > 0 ? [["x_studio_bike", "in", bikeIds]] : [["id", "=", 0]];
@@ -134,7 +126,7 @@ export class BikeLeaseDashboard extends Component {
         const contractIdSet = new Set(contracts.map(c => c.id));
 
         const allInstallments = await this.orm.searchRead("x_lease_installment", [], ["x_studio_amount", "x_studio_total_amount", "x_studio_status", "x_studio_payment_state", "x_studio_is_overdue", "x_studio_contract_id", "x_studio_date", "x_studio_late_fee_amount", "x_studio_invoice_id"]).catch(() => []);
-        
+
         // Filter installments strictly to match filtered contracts if filtering is applied
         const installments = allInstallments.filter(inst => {
             if (!inst.x_studio_contract_id || !inst.x_studio_contract_id[0]) {
@@ -219,10 +211,34 @@ export class BikeLeaseDashboard extends Component {
         let paidInvoicesCount = 0;
         const overdueRows = [];
 
-        const monthsLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const invoicedMonthly = new Array(12).fill(0);
-        const collectedMonthly = new Array(12).fill(0);
-        const penaltiesMonthly = new Array(12).fill(0);
+        const allRecordYears = [curYear];
+        if (invoices.length > 0) {
+            invoices.forEach(inv => {
+                const dtStr = inv.invoice_date || inv.date;
+                if (dtStr) {
+                    const d = new Date(dtStr);
+                    if (!isNaN(d.getTime())) allRecordYears.push(d.getFullYear());
+                }
+            });
+        }
+        installments.forEach(inst => {
+            if (inst.x_studio_date) {
+                const d = new Date(inst.x_studio_date);
+                if (!isNaN(d.getTime())) allRecordYears.push(d.getFullYear());
+            }
+        });
+
+        const startYear = Math.min(curYear - 5, ...allRecordYears);
+        const endYear = Math.max(curYear + 3, ...allRecordYears);
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthsLabels = [];
+        for (let y = startYear; y <= endYear; y++) {
+            monthNames.forEach(m => monthsLabels.push(`${m} ${y}`));
+        }
+        const totalTrendMonths = monthsLabels.length;
+        const invoicedMonthly = new Array(totalTrendMonths).fill(0);
+        const collectedMonthly = new Array(totalTrendMonths).fill(0);
+        const penaltiesMonthly = new Array(totalTrendMonths).fill(0);
 
         const processedInvoiceIds = new Set();
         if (invoices.length > 0) {
@@ -240,9 +256,9 @@ export class BikeLeaseDashboard extends Component {
                 }
                 if (dtStr) {
                     const d = new Date(dtStr);
-                    if (!isNaN(d.getTime()) && d.getFullYear() === curYear) {
-                        const mIdx = d.getMonth();
-                        if (mIdx >= 0 && mIdx < 12) {
+                    if (!isNaN(d.getTime()) && d.getFullYear() >= startYear && d.getFullYear() <= endYear) {
+                        const mIdx = (d.getFullYear() - startYear) * 12 + d.getMonth();
+                        if (mIdx >= 0 && mIdx < totalTrendMonths) {
                             invoicedMonthly[mIdx] += (inv.amount_total || 0);
                             if (isPaid) {
                                 collectedMonthly[mIdx] += (inv.amount_total || 0);
@@ -268,9 +284,9 @@ export class BikeLeaseDashboard extends Component {
                 }
                 if (inst.x_studio_date) {
                     const d = new Date(inst.x_studio_date);
-                    if (!isNaN(d.getTime()) && d.getFullYear() === curYear) {
-                        const mIdx = d.getMonth();
-                        if (mIdx >= 0 && mIdx < 12) {
+                    if (!isNaN(d.getTime()) && d.getFullYear() >= startYear && d.getFullYear() <= endYear) {
+                        const mIdx = (d.getFullYear() - startYear) * 12 + d.getMonth();
+                        if (mIdx >= 0 && mIdx < totalTrendMonths) {
                             invoicedMonthly[mIdx] += (inst.x_studio_amount || 0);
                             if (isPaid) {
                                 collectedMonthly[mIdx] += (inst.x_studio_amount || 0);
@@ -281,9 +297,9 @@ export class BikeLeaseDashboard extends Component {
             }
             if (inst.x_studio_date) {
                 const d = new Date(inst.x_studio_date);
-                if (!isNaN(d.getTime()) && d.getFullYear() === curYear) {
-                    const mIdx = d.getMonth();
-                    if (mIdx >= 0 && mIdx < 12 && inst.x_studio_late_fee_amount) {
+                if (!isNaN(d.getTime()) && d.getFullYear() >= startYear && d.getFullYear() <= endYear) {
+                    const mIdx = (d.getFullYear() - startYear) * 12 + d.getMonth();
+                    if (mIdx >= 0 && mIdx < totalTrendMonths && inst.x_studio_late_fee_amount) {
                         penaltiesMonthly[mIdx] += (inst.x_studio_late_fee_amount || 0);
                     }
                 }
@@ -327,9 +343,9 @@ export class BikeLeaseDashboard extends Component {
         });
 
         // Chart 3: Model Yield Data
-        const modelLabels = models.map(m => m.name || m.x_name || m.display_name);
+        const modelLabels = models.map(m => m.name || m.display_name);
         const modelYieldData = models.map((m) => {
-            const mName = m.name || m.x_name || m.display_name;
+            const mName = m.name || m.display_name;
             const mBikes = bikes.filter(b => {
                 const modelRef = b.model_id;
                 return modelRef && (modelRef[0] === m.id || modelRef[1] === mName);
@@ -342,7 +358,7 @@ export class BikeLeaseDashboard extends Component {
 
         // Chart 4: Reliability Matrix Data (5 Operational Metrics for Relevant Active Models)
         const activeModelsWithVehicles = models.filter((m) => {
-            const mName = m.name || m.x_name || m.display_name;
+            const mName = m.name || m.display_name;
             return bikes.some(b => {
                 const modelRef = b.model_id;
                 return modelRef && (modelRef[0] === m.id || modelRef[1] === mName);
@@ -350,7 +366,7 @@ export class BikeLeaseDashboard extends Component {
         });
 
         const reliabilitySeries = activeModelsWithVehicles.map((m) => {
-            const mName = m.name || m.x_name || m.display_name;
+            const mName = m.name || m.display_name;
             const mBikes = bikes.filter(b => {
                 const modelRef = b.model_id;
                 return modelRef && (modelRef[0] === m.id || modelRef[1] === mName);
@@ -359,15 +375,15 @@ export class BikeLeaseDashboard extends Component {
             const getBikeState = (b) => (b.state_id ? b.state_id[1] : "");
             const leasedMBikes = mBikes.filter(b => getBikeState(b) === 'Leased').length;
             const maintMBikes = mBikes.filter(b => getBikeState(b) === 'Maintenance').length;
-            
+
             const utilP = totalMBikes > 0 ? Math.round((leasedMBikes / totalMBikes) * 100) : 0;
             const maintFreeP = totalMBikes > 0 ? Math.round(((totalMBikes - maintMBikes) / totalMBikes) * 100) : 100;
-            
+
             const mBikeIds = mBikes.map(b => b.id);
             const mContracts = contracts.filter(c => c.x_studio_bike && mBikeIds.includes(c.x_studio_bike[0]));
             const mContractIds = mContracts.map(c => c.id);
             const mInsts = installments.filter(i => i.x_studio_contract_id && mContractIds.includes(i.x_studio_contract_id[0]));
-            
+
             const totalMInstAmt = mInsts.reduce((sum, i) => sum + (i.x_studio_amount || 0), 0);
             const paidMInstAmt = mInsts.filter(i => ["paid", "in_payment"].includes(i.x_studio_payment_state)).reduce((sum, i) => sum + (i.x_studio_amount || 0), 0);
             const revYieldP = totalMInstAmt > 0 ? Math.round((paidMInstAmt / totalMInstAmt) * 100) : (mContracts.length > 0 ? 100 : 0);
@@ -424,6 +440,7 @@ export class BikeLeaseDashboard extends Component {
                     invoiced: invoicedMonthly,
                     collected: collectedMonthly,
                     penalties: penaltiesMonthly,
+                    startYear: startYear,
                 },
                 model_yield: {
                     labels: modelLabels,
@@ -443,7 +460,7 @@ export class BikeLeaseDashboard extends Component {
                 returns: returnRows,
             },
             filters: {
-                models: models.map(m => ({ id: m.id, name: m.name || m.x_name || m.display_name })),
+                models: models.map(m => ({ id: m.id, name: m.name || m.display_name })),
             },
         };
     }
@@ -492,7 +509,7 @@ export class BikeLeaseDashboard extends Component {
             this.charts.revenueTrend = new window.Chart(ctx2, {
                 type: "line",
                 data: {
-                    labels: revTrend.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    labels: revTrend.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(m => `${m} ${new Date().getFullYear()}`),
                     datasets: [
                         {
                             label: "Paid Revenue ($)",
@@ -523,11 +540,37 @@ export class BikeLeaseDashboard extends Component {
                         }
                     },
                     scales: {
-                        x: { grid: { color: "rgba(0, 0, 0, 0.06)" }, ticks: { color: "#475569" } },
+                        x: {
+                            grid: { color: "rgba(0, 0, 0, 0.06)" },
+                            ticks: {
+                                color: "#475569",
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 0,
+                            }
+                        },
                         y: { beginAtZero: true, grid: { color: "rgba(0, 0, 0, 0.06)" }, ticks: { color: "#475569", callback: value => "$" + value.toLocaleString() } }
                     }
                 }
             });
+
+            const totalPoints = (revTrend.labels || []).length || 36;
+            const scrollContainer = document.querySelector(".o_chart_container_scroll");
+            if (scrollContainer) {
+                const dynamicMinWidth = Math.max(1200, totalPoints * 85);
+                scrollContainer.style.minWidth = `${dynamicMinWidth}px`;
+            }
+
+            setTimeout(() => {
+                const scrollWrapper = document.querySelector(".o_chart_scroll_wrapper");
+                if (scrollWrapper && scrollContainer) {
+                    const startYear = revTrend.start_year || revTrend.startYear || (new Date().getFullYear() - 1);
+                    const curYear = new Date().getFullYear();
+                    const curMonthIdx = Math.max(0, (curYear - startYear) * 12 + new Date().getMonth());
+                    const targetScroll = (curMonthIdx / totalPoints) * scrollContainer.scrollWidth - (scrollWrapper.clientWidth / 2);
+                    scrollWrapper.scrollLeft = Math.max(0, targetScroll);
+                }
+            }, 100);
         }
 
         // Chart 3: Vehicle Model Revenue Yield (Polar Area Chart)

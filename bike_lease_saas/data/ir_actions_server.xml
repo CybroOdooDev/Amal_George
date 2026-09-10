@@ -229,6 +229,24 @@ for rec in records:
     <field name="trigger_field_ids" eval="[(4, ref('new_many2one_lease_app_bike_model'))]"/>
     <field name="action_server_ids" eval="[(4, ref('action_reset_bike_on_model_change'))]"/>
   </record>
+  <record id="action_reset_contract_bike_on_model_change" model="ir.actions.server" context="{'studio': True}">
+    <field name="name">Reset Contract Bike on Model Change</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="state">code</field>
+    <field name="code">
+for rec in records:
+    if rec.x_studio_bike and rec.x_studio_bike.model_id != rec.x_studio_bike_model:
+        rec.update({'x_studio_bike': False})
+    </field>
+  </record>
+
+  <record id="rule_reset_contract_bike_on_model_change" model="base.automation" context="{'studio': True}">
+    <field name="name">Reset Contract Bike on Model Change</field>
+    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="trigger_field_ids" eval="[(4, ref('new_many2one_lease_contract_bike_model'))]"/>
+    <field name="action_server_ids" eval="[(4, ref('action_reset_contract_bike_on_model_change'))]"/>
+  </record>
   <!-- Server Actions for Lease Contracts -->
   <record id="action_cnt_activate" model="ir.actions.server" context="{'studio': True}">
     <field name="name">Activate Contract</field>
@@ -310,15 +328,16 @@ for rec in records:
                 next_date = current_date + dateutil.relativedelta.relativedelta(months=1)
             
             period_end = min(next_date, end_date)
-            days_in_period = (period_end - current_date).days
+            days_in_period = max((period_end - current_date).days, 1)
             base_fee = plan.x_studio_value or 0.0
-            total_amount = base_fee + (daily_charge * days_in_period)
+            add_charge = daily_charge * days_in_period
 
             env['x_lease_installment'].create({
                 'x_name': f"Installment #{idx}",
                 'x_studio_contract_id': rec.id,
                 'x_studio_date': current_date,
-                'x_studio_amount': total_amount,
+                'x_studio_amount': base_fee,
+                'x_studio_additional_daily_charge': add_charge,
                 'x_studio_status': 'Draft',
                 'x_studio_currency_id': plan.x_studio_currency_id.id if plan.x_studio_currency_id else False,
             })
@@ -394,6 +413,7 @@ for wiz in records:
         })
         
     vals = {
+        'x_studio_selection_1': 'Completed',
         'x_studio_bike_returned': True,
         'x_studio_service_needed': need_service,
         'x_studio_repair_charge': repair,
@@ -417,8 +437,12 @@ for wiz in records:
             issues = wiz.x_studio_issue_ids
             issue_names = ", ".join(issues.mapped('x_name')) if issues else "Inspection Service Needed"
             req_desc = f"Contract: {rec.x_name}\nCustomer: {rec.x_studio_partner_id.name if rec.x_studio_partner_id else 'N/A'}\nIssues Found: {issue_names}\nEstimated Repair Charge: ${repair:.2f}"
+            st_type = env.ref('bike_lease_saas.service_type_repair_maintenance', raise_if_not_found=False) or env['fleet.service.type'].search([('name', '=', 'Repair / Maintenance')], limit=1) or env['fleet.service.type'].search([('name', 'ilike', 'Repair')], limit=1) or env['fleet.service.type'].search([('category', '=', 'service')], limit=1) or env['fleet.service.type'].search([], limit=1)
+            if not st_type:
+                st_type = env['fleet.service.type'].create({'name': 'Repair / Maintenance', 'category': 'service'})
             env['fleet.vehicle.log.services'].create({
                 'vehicle_id': rec.x_studio_bike.id,
+                'service_type_id': st_type.id,
                 'description': f"Return Maintenance: {issue_names}\n{req_desc}",
                 'amount': repair,
                 'state': 'running',
@@ -535,11 +559,47 @@ for rec in records:
 
         # Add line for each past unpaid installment
         for inst in past_unpaid_installments:
-            invoice_lines.append((0, 0, {
-                'name': f"Lease Installment (Termination Settlement) - {rec.x_name} ({inst.x_name})",
-                'quantity': 1,
-                'price_unit': inst.x_studio_amount,
-            }))
+            bike = rec.x_studio_bike
+            plan = rec.x_studio_lease_plan
+            base_rate = plan.x_studio_value if plan and plan.x_studio_value else 0.0
+            daily_charge = (bike.x_studio_additional_daily_charge or 0.0) if (bike and bike.x_studio_has_additional_charge) else 0.0
+
+            start_dt = inst.x_studio_date or rec.x_studio_date or today
+            freq = plan.x_studio_payment_frequency if plan else 'Monthly'
+            if freq == 'Daily':
+                next_dt = start_dt + datetime.timedelta(days=1)
+            elif freq == 'Weekly':
+                next_dt = start_dt + datetime.timedelta(days=7)
+            elif freq == 'Quarterly':
+                next_dt = start_dt + dateutil.relativedelta.relativedelta(months=3)
+            elif freq == 'Yearly':
+                next_dt = start_dt + dateutil.relativedelta.relativedelta(years=1)
+            else:
+                next_dt = start_dt + dateutil.relativedelta.relativedelta(months=1)
+
+            end_dt = rec.x_studio_end_date or next_dt
+            period_end = min(next_dt, end_dt) if end_dt > start_dt else next_dt
+            period_days = max((period_end - start_dt).days, 1)
+
+            if daily_charge > 0:
+                invoice_lines.append((0, 0, {
+                    'name': f"Lease Installment (Termination Settlement) - {rec.x_name} ({inst.x_name})",
+                    'quantity': 1,
+                    'price_unit': base_rate,
+                }))
+                bike_name = bike.display_name or bike.name if bike else 'Vehicle'
+                invoice_lines.append((0, 0, {
+                    'name': f"Additional Daily Surcharge (${daily_charge:.2f}/day x {period_days} days) - {bike_name}",
+                    'quantity': period_days,
+                    'price_unit': daily_charge,
+                }))
+            else:
+                invoice_lines.append((0, 0, {
+                    'name': f"Lease Installment (Termination Settlement) - {rec.x_name} ({inst.x_name})",
+                    'quantity': 1,
+                    'price_unit': inst.x_studio_amount or base_rate,
+                }))
+
             late_fee = inst.x_studio_late_fee_amount or 0.0
             if late_fee > 0:
                 invoice_lines.append((0, 0, {
@@ -736,15 +796,16 @@ for rec in records:
                         next_date = current_date + dateutil.relativedelta.relativedelta(months=1)
                     
                     period_end = min(next_date, end_date)
-                    days_in_period = (period_end - current_date).days
+                    days_in_period = max((period_end - current_date).days, 1)
                     base_fee = plan.x_studio_value or 0.0
-                    total_amount = base_fee + (daily_charge * days_in_period)
+                    add_charge = daily_charge * days_in_period
 
                     env['x_lease_installment'].create({
                         'x_name': f"Installment #{idx}",
                         'x_studio_contract_id': rec.id,
                         'x_studio_date': current_date,
-                        'x_studio_amount': total_amount,
+                        'x_studio_amount': base_fee,
+                        'x_studio_additional_daily_charge': add_charge,
                         'x_studio_status': 'Draft',
                         'x_studio_currency_id': plan.x_studio_currency_id.id if plan.x_studio_currency_id else False,
                     })
@@ -806,11 +867,47 @@ for rec in records:
             }))
 
     for inst in installments_to_invoice:
-        invoice_lines.append((0, 0, {
-            'name': f"Lease Installment - {rec.x_name} ({inst.x_name})",
-            'quantity': 1,
-            'price_unit': inst.x_studio_amount,
-        }))
+        bike = rec.x_studio_bike
+        plan = rec.x_studio_lease_plan
+        base_rate = plan.x_studio_value if plan and plan.x_studio_value else 0.0
+        daily_charge = (bike.x_studio_additional_daily_charge or 0.0) if (bike and bike.x_studio_has_additional_charge) else 0.0
+
+        start_dt = inst.x_studio_date or rec.x_studio_date or datetime.date.today()
+        freq = plan.x_studio_payment_frequency if plan else 'Monthly'
+        if freq == 'Daily':
+            next_dt = start_dt + datetime.timedelta(days=1)
+        elif freq == 'Weekly':
+            next_dt = start_dt + datetime.timedelta(days=7)
+        elif freq == 'Quarterly':
+            next_dt = start_dt + dateutil.relativedelta.relativedelta(months=3)
+        elif freq == 'Yearly':
+            next_dt = start_dt + dateutil.relativedelta.relativedelta(years=1)
+        else:
+            next_dt = start_dt + dateutil.relativedelta.relativedelta(months=1)
+
+        end_dt = rec.x_studio_end_date or next_dt
+        period_end = min(next_dt, end_dt) if end_dt > start_dt else next_dt
+        period_days = max((period_end - start_dt).days, 1)
+
+        if daily_charge > 0:
+            invoice_lines.append((0, 0, {
+                'name': f"Base Lease Fee - {rec.x_name} ({inst.x_name})",
+                'quantity': 1,
+                'price_unit': base_rate,
+            }))
+            bike_name = bike.display_name or bike.name if bike else 'Vehicle'
+            invoice_lines.append((0, 0, {
+                'name': f"Additional Daily Surcharge (${daily_charge:.2f}/day x {period_days} days) - {bike_name}",
+                'quantity': period_days,
+                'price_unit': daily_charge,
+            }))
+        else:
+            invoice_lines.append((0, 0, {
+                'name': f"Lease Installment - {rec.x_name} ({inst.x_name})",
+                'quantity': 1,
+                'price_unit': inst.x_studio_amount or base_rate,
+            }))
+
         late_fee = inst.x_studio_late_fee_amount or 0.0
         if late_fee > 0:
             invoice_lines.append((0, 0, {
@@ -927,15 +1024,15 @@ for rec in records:
                         next_date = current_date + dateutil.relativedelta.relativedelta(years=1)
                     else:
                         next_date = current_date + dateutil.relativedelta.relativedelta(months=1)
-                    period_days = (next_date - current_date).days
+                    period_days = max((next_date - current_date).days, 1)
                     base_rate = plan.x_studio_value or 0.0
-                    total_amount = base_rate + (daily_charge * period_days)
+                    add_charge = daily_charge * period_days
                     env['x_lease_installment'].create({
                         'x_studio_contract_id': rec.id,
                         'x_name': f"Installment #{idx}",
                         'x_studio_date': current_date,
                         'x_studio_amount': base_rate,
-                        'x_studio_total_amount': total_amount,
+                        'x_studio_additional_daily_charge': add_charge,
                         'x_studio_status': 'Draft',
                     })
                     idx += 1
@@ -1006,15 +1103,15 @@ for move in records:
                         next_date = current_date + dateutil.relativedelta.relativedelta(years=1)
                     else:
                         next_date = current_date + dateutil.relativedelta.relativedelta(months=1)
-                    period_days = (next_date - current_date).days
+                    period_days = max((next_date - current_date).days, 1)
                     base_rate = plan.x_studio_value or 0.0
-                    total_amount = base_rate + (daily_charge * period_days)
+                    add_charge = daily_charge * period_days
                     env['x_lease_installment'].create({
                         'x_studio_contract_id': rec.id,
                         'x_name': f"Installment #{idx}",
                         'x_studio_date': current_date,
                         'x_studio_amount': base_rate,
-                        'x_studio_total_amount': total_amount,
+                        'x_studio_additional_daily_charge': add_charge,
                         'x_studio_status': 'Draft',
                     })
                     idx += 1
@@ -1205,9 +1302,9 @@ if period_posted_invoices:
     paid_invoices_count = len(paid_invoices)
 else:
     invoiced_inst = period_installments.filtered(lambda i: i.x_studio_status in ('Invoiced', 'Paid'))
-    total_billed = sum(invoiced_inst.mapped('x_studio_amount'))
+    total_billed = sum(invoiced_inst.mapped('x_studio_total_amount'))
     paid_inst = period_installments.filtered(lambda i: i.x_studio_payment_state in ('paid', 'in_payment'))
-    collected_cash = sum(paid_inst.mapped('x_studio_amount'))
+    collected_cash = sum(paid_inst.mapped('x_studio_total_amount'))
     total_revenue = collected_cash
     paid_invoices_count = len(paid_inst)
 
@@ -1259,26 +1356,42 @@ for wiz in wizards:
         'status': 'Settled & Refunded' if net >= 0 else 'Pending Collection',
     })
 
-# Monthly Revenue & Cashflow Trend Calculation
-months_labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-invoiced_monthly = [0.0] * 12
-collected_monthly = [0.0] * 12
+# Monthly Revenue & Cashflow Trend Calculation (Multi-Year Range: 5 Years Past to 3 Years Future)
+all_years = [today.year]
+for inv in posted_invoices:
+    inv_dt = inv.invoice_date or inv.date
+    if inv_dt:
+        all_years.append(inv_dt.year)
+for inst in installments:
+    inst_dt = inst.x_studio_date or (inst.x_studio_invoice_id.invoice_date if inst.x_studio_invoice_id else False)
+    if inst_dt:
+        all_years.append(inst_dt.year)
+
+min_year = min(min(all_years), today.year - 5)
+max_year = max(max(all_years), today.year + 3)
+month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+months_labels = [f"{m} {y}" for y in range(min_year, max_year + 1) for m in month_names]
+total_trend_months = len(months_labels)
+invoiced_monthly = [0.0] * total_trend_months
+collected_monthly = [0.0] * total_trend_months
 
 for inv in posted_invoices:
     inv_dt = inv.invoice_date or inv.date
-    if inv_dt and inv_dt.year == today.year and inv.payment_state in ('paid', 'in_payment'):
-        m_idx = inv_dt.month - 1
-        invoiced_monthly[m_idx] += inv.amount_total
-        collected_monthly[m_idx] += inv.amount_total
+    if inv_dt and min_year <= inv_dt.year <= max_year and inv.payment_state in ('paid', 'in_payment'):
+        m_idx = (inv_dt.year - min_year) * 12 + (inv_dt.month - 1)
+        if 0 <= m_idx < total_trend_months:
+            invoiced_monthly[m_idx] += inv.amount_total
+            collected_monthly[m_idx] += inv.amount_total
 
 if not any(collected_monthly):
     for inst in installments:
         if inst.x_studio_payment_state in ('paid', 'in_payment'):
             inst_dt = inst.x_studio_date or (inst.x_studio_invoice_id.invoice_date if inst.x_studio_invoice_id else False)
-            if inst_dt and inst_dt.year == today.year:
-                m_idx = inst_dt.month - 1
-                invoiced_monthly[m_idx] += (inst.x_studio_amount or 0.0)
-                collected_monthly[m_idx] += (inst.x_studio_amount or 0.0)
+            if inst_dt and min_year <= inst_dt.year <= max_year:
+                m_idx = (inst_dt.year - min_year) * 12 + (inst_dt.month - 1)
+                if 0 <= m_idx < total_trend_months:
+                    invoiced_monthly[m_idx] += (inst.x_studio_amount or 0.0)
+                    collected_monthly[m_idx] += (inst.x_studio_amount or 0.0)
 
 # Model Yield Chart
 model_yield_labels = []
@@ -1290,7 +1403,7 @@ for m in all_models:
     m_insts = env['x_lease_installment'].search([('x_studio_contract_id', 'in', m_cnts.ids)])
     m_invoiced_insts = m_insts.filtered(lambda i: i.x_studio_status in ('Invoiced', 'Paid'))
     rev = sum(m_invoiced_insts.mapped('x_studio_amount'))
-    model_yield_labels.append(m.name or m.x_name or 'Model')
+    model_yield_labels.append(m.name or 'Model')
     model_yield_data.append(rev)
 
 # Lease Plan Distribution Chart
@@ -1363,7 +1476,8 @@ action = {
             'labels': months_labels,
             'invoiced': invoiced_monthly,
             'collected': collected_monthly,
-            'penalties': [0] * 12,
+            'penalties': [0] * total_trend_months,
+            'start_year': min_year,
         },
         'model_yield': {
             'labels': model_yield_labels,
@@ -1386,36 +1500,6 @@ action = {
         'models': model_options,
     }
 }
-]]></field>
-  </record>
-
-  <!-- Server Action: Renew Lease Contract -->
-  <record id="action_cnt_renew" model="ir.actions.server" context="{'studio': True}">
-    <field name="name">Renew Contract</field>
-    <field name="model_id" ref="lease_contract_a5608d51-ff1f-40d6-998a-a44c6141fb83"/>
-    <field name="state">code</field>
-    <field name="code"><![CDATA[
-for rec in records:
-    app = env['x_lease_application'].create({
-        'x_studio_partner_id': rec.x_studio_partner_id.id if rec.x_studio_partner_id else False,
-        'x_studio_bike_model': rec.x_studio_bike_model.id if rec.x_studio_bike_model else False,
-        'x_studio_bike': rec.x_studio_bike.id if rec.x_studio_bike else False,
-        'x_studio_lease_plan': rec.x_studio_lease_plan.id if rec.x_studio_lease_plan else False,
-        'x_studio_lease_start_date': datetime.date.today(),
-        'x_studio_selection_1': 'Draft',
-    })
-    try:
-        rec.message_post(body=f"Renewal Application created: {app.x_name or 'New Application'}")
-    except Exception:
-        pass
-    action = {
-        'type': 'ir.actions.act_window',
-        'name': 'Renewal Lease Application',
-        'res_model': 'x_lease_application',
-        'res_id': app.id,
-        'view_mode': 'form',
-        'target': 'current',
-    }
 ]]></field>
   </record>
 

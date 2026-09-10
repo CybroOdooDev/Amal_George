@@ -46,26 +46,7 @@
     <field name="name">x_studio_additional_daily_charge</field>
     <field name="on_delete" eval="False"/>
   </record>
-  <record id="description_bike_mod_6de196d4-435e-4424-9795-42b9244aa111" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="False"/>
-    <field name="field_description">Model Name</field>
-    <field name="model">fleet.vehicle.model</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
-    <field name="name">x_name</field>
-    <field name="on_delete" eval="False"/>
-    <field name="required" eval="True"/>
-    <field name="translate">standard</field>
-  </record>
-  <record id="active_bike_models_6c9167d1-c6d4-403e-8c4c-82ca59daa2d6" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Active</field>
-    <field name="model">fleet.vehicle.model</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
-    <field name="name">x_active</field>
-    <field name="on_delete" eval="False"/>
-  </record>
+
   <record id="notes_bike_models_5073e163-b9ed-4923-8c21-7c8d3c004c0e" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">html</field>
     <field name="copied" eval="True"/>
@@ -132,81 +113,6 @@
     <field name="on_delete" eval="False"/>
     <field name="selection">[('Petrol', 'Petrol'), ('Electric', 'Electric'), ('Hybrid', 'Hybrid'), ('Other', 'Other')]</field>
   </record>
-  <record id="new_multiline_text_b_601e6b82-fc2e-42e9-b78c-9b6c1974851d" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">text</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Description</field>
-    <field name="model">fleet.vehicle.model</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
-    <field name="name">x_studio_text_1</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="description_manufact_2dab6a31-5f47-440e-bd46-002e289e65aa" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">char</field>
-    <field name="copied" eval="False"/>
-    <field name="field_description">Manufacturer Name</field>
-    <field name="model">fleet.vehicle.model.brand</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
-    <field name="name">x_name</field>
-    <field name="on_delete" eval="False"/>
-    <field name="required" eval="True"/>
-    <field name="translate">standard</field>
-  </record>
-  <record id="active_manufacturers_9f8d6d9b-b126-4966-b95b-bd0ca927b121" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Active</field>
-    <field name="model">fleet.vehicle.model.brand</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
-    <field name="name">x_active</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="notes_manufacturers_685a0ac7-1dda-494e-aea6-8a05cc609205" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">html</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Notes</field>
-    <field name="model">fleet.vehicle.model.brand</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
-    <field name="name">x_studio_notes</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="image_manufacturers_03127a0e-5518-44fe-9075-41203840c043" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">binary</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Logo</field>
-    <field name="model">fleet.vehicle.model.brand</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
-    <field name="name">x_studio_image</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="sequence_manufacture_0dc00898-4c61-49ed-9578-38e4148d20f9" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">integer</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Sequence</field>
-    <field name="model">fleet.vehicle.model.brand</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
-    <field name="name">x_studio_sequence</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_multiline_text_m_c38a25a8-8c78-428d-b41d-13dafba764fe" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">text</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Description</field>
-    <field name="model">fleet.vehicle.model.brand</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
-    <field name="name">x_studio_description</field>
-    <field name="on_delete" eval="False"/>
-  </record>
-  <record id="new_many2one_bike_mo_beee80ee-44e2-4f48-968d-15198ff51812" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Manufacturer</field>
-    <field name="model">fleet.vehicle.model</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
-    <field name="name">x_studio_manufacturer</field>
-    <field name="relation">fleet.vehicle.model.brand</field>
-  </record>
-
   <record id="new_integer_bike_mod_63315aca-4fee-4528-b16c-1a3fed5d1198" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">integer</field>
     <field name="copied" eval="True"/>
@@ -216,31 +122,7 @@
     <field name="name">x_studio_engine_capacity_cc_</field>
     <field name="on_delete" eval="False"/>
   </record>
-  <record id="field_bike_models_bike_count" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">integer</field>
-    <field name="copied" eval="False"/>
-    <field name="field_description">Bike Count</field>
-    <field name="model">fleet.vehicle.model</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model"/>
-    <field name="name">x_studio_bike_count</field>
-    <field name="readonly" eval="True"/>
-    <field name="store" eval="False"/>
-    <field name="compute"><![CDATA[for rec in self:
-    rec['x_studio_bike_count'] = self.env['fleet.vehicle'].search_count([('model_id', '=', rec.id)])]]></field>
-  </record>
 
-  <record id="field_manufacturers_model_count" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">integer</field>
-    <field name="copied" eval="False"/>
-    <field name="field_description">Model Count</field>
-    <field name="model">fleet.vehicle.model.brand</field>
-    <field name="model_id" ref="fleet.model_fleet_vehicle_model_brand"/>
-    <field name="name">x_studio_model_count</field>
-    <field name="readonly" eval="True"/>
-    <field name="store" eval="False"/>
-    <field name="compute"><![CDATA[for rec in self:
-    rec['x_studio_model_count'] = self.env['fleet.vehicle.model'].search_count([('x_studio_manufacturer', '=', rec.id)])]]></field>
-  </record>
   <record id="description_lease_pl_ca46e860-7f31-4c21-8ba0-638b0bc5b736" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">char</field>
     <field name="copied" eval="False"/>
@@ -334,16 +216,6 @@
     <field name="model">x_lease_plans</field>
     <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
     <field name="name">x_studio_security_deposit</field>
-    <field name="on_delete" eval="False"/>
-    <field name="currency_field">x_studio_currency_id</field>
-  </record>
-  <record id="new_monetary_lease_p_4fe37bc1-0c6c-4ff0-9023-2f5dcfd49252" model="ir.model.fields" context="{'studio': True}">
-    <field name="ttype">monetary</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Initial Payment</field>
-    <field name="model">x_lease_plans</field>
-    <field name="model_id" ref="lease_plans_428a3ea2-6fcc-4987-a4a0-7fb7708060e6"/>
-    <field name="name">x_studio_initial_payment</field>
     <field name="on_delete" eval="False"/>
     <field name="currency_field">x_studio_currency_id</field>
   </record>
@@ -871,6 +743,16 @@
             fee = (rec.x_studio_amount or 0.0) * ((plan.x_studio_late_fee_percentage or 0.0) / 100.0)
     rec['x_studio_late_fee_amount'] = fee]]></field>
   </record>
+  <record id="field_installment_additional_daily_charge" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">monetary</field>
+    <field name="copied" eval="True"/>
+    <field name="currency_field">x_studio_currency_id</field>
+    <field name="field_description">Additional Daily Charge</field>
+    <field name="model">x_lease_installment</field>
+    <field name="model_id" ref="model_lease_installment"/>
+    <field name="name">x_studio_additional_daily_charge</field>
+    <field name="on_delete" eval="False"/>
+  </record>
   <record id="field_installment_total_amount" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">monetary</field>
     <field name="copied" eval="False"/>
@@ -882,7 +764,7 @@
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
     <field name="compute"><![CDATA[for rec in self:
-    rec['x_studio_total_amount'] = (rec.x_studio_amount or 0.0) + (rec.x_studio_late_fee_amount or 0.0)]]></field>
+    rec['x_studio_total_amount'] = (rec.x_studio_amount or 0.0) + (rec.x_studio_additional_daily_charge or 0.0) + (rec.x_studio_late_fee_amount or 0.0)]]></field>
   </record>
 
   <!-- Deposit Invoice fields and computed fields on x_lease_contract -->
@@ -1247,7 +1129,7 @@
     <field name="readonly" eval="False"/>
   </record>
 
-  <!-- fleet.vehicle company-related allowed bike states field -->
+  <!-- fleet.vehicle company-related allowed bike states computed field with fallback -->
   <record id="field_fleet_vehicle_company_bike_state_ids" model="ir.model.fields" context="{'studio': True}">
     <field name="ttype">many2many</field>
     <field name="copied" eval="False"/>
@@ -1256,7 +1138,11 @@
     <field name="model_id" ref="fleet.model_fleet_vehicle"/>
     <field name="name">x_studio_company_bike_state_ids</field>
     <field name="relation">fleet.vehicle.state</field>
-    <field name="related">company_id.x_studio_bike_state_ids</field>
     <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[all_st = self.env['fleet.vehicle.state'].search([])
+for rec in self:
+    st = rec.company_id.x_studio_bike_state_ids if rec.company_id and rec.company_id.x_studio_bike_state_ids else all_st
+    rec['x_studio_company_bike_state_ids'] = st]]></field>
   </record>
 </odoo>

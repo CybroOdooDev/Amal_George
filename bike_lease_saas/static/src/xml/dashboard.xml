@@ -41,47 +41,18 @@
                 <div class="row g-3 mb-4 align-items-stretch">
                     <!-- Big Action Hero Card (Left Side - Create New Application Action Card) -->
                     <div class="col-12 col-lg-4 col-xl-3">
-                        <div class="o_hero_featured_card o_create_app_card h-100 position-relative p-3 d-flex flex-column justify-content-between" t-on-click="this.onCreateApplication" role="button" title="Click to Create New Lease Application">
-                            <div class="o_hero_top_bar d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <div class="o_hero_badge mb-1">
-                                        <span class="badge rounded-pill bg-primary text-white shadow-sm px-2 py-1 fw-semibold extra-small">
-                                            <i class="fa fa-plus-circle me-1"/> Quick Action
-                                        </span>
-                                    </div>
-                                    <h3 class="o_hero_headline mb-1">Create New<br/>Lease Application <span class="fs-5">🚀</span></h3>
-                                    <p class="text-muted extra-small mb-0">Onboard customer &amp; issue contract</p>
-                                </div>
-
-                                <div class="o_hero_rating_pill bg-white shadow-sm rounded-3 p-1.5 px-2 text-end d-none d-sm-block border border-light ms-1">
-                                    <div class="d-flex align-items-center mb-0.5 extra-small">
-                                        <i class="fa fa-folder-open-o text-purple me-1"/>
-                                        <span class="fw-bold text-dark me-1"><t t-esc="this.state.kpi.pending_apps_count"/></span>
-                                        <span class="text-muted">Pending</span>
-                                    </div>
-                                    <span class="badge bg-purple-light text-purple fw-semibold extra-small"><t t-esc="this.state.kpi.app_approval_rate"/>% Approval</span>
-                                </div>
+                        <div class="o_hero_featured_card o_create_app_card h-100 position-relative p-4 d-flex flex-column justify-content-between" t-on-click="this.onCreateApplication" role="button" title="Click to Create New Lease Application">
+                            <div>
+                                <div class="o_hero_welcome_text mb-1">Welcome back,</div>
+                                <h2 class="o_hero_headline fw-bold mb-3">Bike Lease Administrator</h2>
+                                <p class="o_hero_description mb-0">
+                                    Glad to see you again! All fleet contracts and classes are running smoothly today. Check the status of upcoming expiries below.
+                                </p>
                             </div>
-
-                            <!-- Central Action Display Container -->
-                            <div class="o_hero_img_container position-relative my-2 flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center p-2">
-                                <div class="o_hero_action_icon mb-2">
-                                    <i class="fa fa-file-text-o text-primary fs-2"/>
-                                </div>
-                                <div class="fw-bold extra-small text-dark">+ Start Application</div>
-                                <div class="text-muted extra-small">Click anywhere to open form</div>
-                            </div>
-
-                            <!-- Hero Footer Action Button Bar -->
-                            <div class="o_hero_footer d-flex justify-content-between align-items-center pt-2 border-top border-light">
-                                <div class="pe-1">
-                                    <span class="badge bg-dark text-white extra-small mb-0">Instant Onboarding</span>
-                                </div>
-                                <div class="text-nowrap">
-                                    <button class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm o_btn_create_app" t-on-click.stop="this.onCreateApplication">
-                                        <i class="fa fa-plus-circle me-1"/> Create Now
-                                    </button>
-                                </div>
+                            <div class="mt-4">
+                                <button class="btn btn-sm rounded-pill px-3 py-2 fw-semibold o_btn_create_app d-inline-flex align-items-center" t-on-click.stop="this.onCreateApplication">
+                                    Create New Application <i class="fa fa-arrow-right ms-2"/>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -256,8 +227,10 @@
                                 <h3 class="o_dashboard_card_title"><i class="fa fa-line-chart text-primary me-2"/>Revenue Trend (Paid Invoices)</h3>
                                 <span class="badge bg-light text-dark">Posted &amp; Paid Invoices</span>
                             </div>
-                            <div class="o_chart_container">
-                                <canvas id="chart_revenue_trend"/>
+                            <div class="o_chart_scroll_wrapper">
+                                <div class="o_chart_container o_chart_container_scroll">
+                                    <canvas id="chart_revenue_trend"/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -306,7 +279,7 @@
                 </div>
 
                 <!-- Row 4 Data Tables -->
-                <div class="row g-3">
+                <div class="row g-3 mb-5">
                     <!-- Table 1: Overdue Receivables Watchlist -->
                     <div class="col-12 col-xl-6">
                         <div class="o_dashboard_card h-100 mb-0">

@@ -9,7 +9,7 @@
     min-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 2rem;
+    padding: 2rem 2rem 5rem 2rem !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #1e293b;
     position: relative;
@@ -48,6 +48,7 @@
     letter-spacing: -0.02em;
     margin: 0;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0284c7 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -141,7 +142,7 @@
     border-color: rgba(56, 189, 248, 0.6);
     box-shadow: 0 20px 40px rgba(14, 165, 233, 0.18),
                 0 0 25px rgba(255, 255, 255, 0.9),
-                inset 0 1.5px 1.5px rgba(255, 255, 255, 1);
+                inset 0 1px 1px rgba(255, 255, 255, 1);
 }
 
 .o_kpi_icon_wrapper {
@@ -322,6 +323,36 @@
 
 .o_chart_container_tall {
     height: 350px;
+}
+
+.o_chart_scroll_wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.5rem;
+}
+
+.o_chart_scroll_wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.o_chart_scroll_wrapper::-webkit-scrollbar-track {
+    background: rgba(224, 242, 254, 0.4);
+    border-radius: 3px;
+}
+
+.o_chart_scroll_wrapper::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.5);
+    border-radius: 3px;
+}
+
+.o_chart_scroll_wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(2, 132, 199, 0.7);
+}
+
+.o_chart_container_scroll {
+    min-width: 2200px;
+    height: 310px;
 }
 
 /* Data Tables - Scrollable Container & Sticky Header */
@@ -548,40 +579,64 @@
     color: #7e22ce !important;
 }
 
-/* Interactive Create Application Action Card */
+/* Interactive Create Application Action Card (Electric Cyan to Indigo Theme) */
 .o_create_app_card {
     cursor: pointer;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 249, 255, 0.85) 100%);
-    border: 2px solid rgba(56, 189, 248, 0.3);
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 35%, #2563eb 70%, #4f46e5 100%) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 16px 38px rgba(14, 165, 233, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .o_create_app_card:hover {
-    border-color: rgba(37, 99, 235, 0.6);
-    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.12), inset 0 2px 0 rgba(255, 255, 255, 1);
+    transform: translateY(-4px) scale(1.01) !important;
+    box-shadow: 0 24px 52px rgba(14, 165, 233, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
 }
 
-.o_create_app_moped_img {
-    max-height: 135px;
-    object-fit: contain;
-    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.18));
-    transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.45s ease;
+.o_create_app_card .o_hero_welcome_text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    letter-spacing: 0.02em;
 }
 
-.o_create_app_card:hover .o_create_app_moped_img {
-    transform: scale(1.08) rotate(-2deg) translateY(-6px);
-    filter: drop-shadow(0 25px 35px rgba(37, 99, 235, 0.25));
+.o_create_app_card .o_hero_headline {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #ffffff !important;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    text-shadow: 0 2px 10px rgba(2, 132, 199, 0.35) !important;
+}
+
+.o_create_app_card .o_hero_description {
+    font-size: 0.835rem;
+    color: rgba(255, 255, 255, 0.88) !important;
+    line-height: 1.5;
 }
 
 .o_btn_create_app {
-    background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
-    border: none !important;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35) !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    color: #ffffff !important;
+    border-radius: 50px !important;
+    padding: 0.5rem 1.25rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.01em !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
     transition: all 0.3s ease !important;
 }
 
 .o_btn_create_app:hover {
-    background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%) !important;
-    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5) !important;
-    transform: scale(1.05) translateY(-2px) !important;
+    background: #ffffff !important;
+    color: #0284c7 !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+    transform: translateY(-2px) !important;
 }
 

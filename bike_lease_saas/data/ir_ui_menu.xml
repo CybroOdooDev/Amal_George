@@ -2,7 +2,7 @@
 <odoo>
   <!-- Top Level Menu -->
   <record id="bike_lease_managemen_ed788dd6-dc94-40bd-b333-d343b6124e0e" model="ir.ui.menu" context="{'studio': True}">
-    <field name="name">&#160;&#160;Bike Lease Management for Odoo Online</field>
+    <field name="name">&#160;&#160;Bike Lease Management</field>
     <field name="web_icon">fa fa-motorcycle,#262c34,#FFFFFF</field>
   </record>
 

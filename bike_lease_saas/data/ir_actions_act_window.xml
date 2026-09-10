@@ -212,8 +212,8 @@
     <field name="name">Bike Models</field>
     <field name="res_model">fleet.vehicle.model</field>
     <field name="view_mode">list,form</field>
-    <field name="domain">[('vehicle_type', '=', 'bike'), '|', ('brand_id', '=', active_id), ('x_studio_manufacturer', '=', active_id)]</field>
-    <field name="context">{'default_brand_id': active_id, 'default_x_studio_manufacturer': active_id, 'default_vehicle_type': 'bike', 'bike_lease_readonly': True, 'search_default_groupby_brand': 1}</field>
+    <field name="domain">[('vehicle_type', '=', 'bike'), ('brand_id', '=', active_id)]</field>
+    <field name="context">{'default_brand_id': active_id, 'default_vehicle_type': 'bike', 'bike_lease_readonly': True, 'search_default_groupby_brand': 1}</field>
   </record>
   <!-- Override native Fleet Vehicle Model action to default to List view with Manufacturer group by -->
   <record id="fleet.fleet_vehicle_model_action" model="ir.actions.act_window">

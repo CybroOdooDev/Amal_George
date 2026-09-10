@@ -30,6 +30,11 @@
     <field name="fold">False</field>
   </record>
 
+  <record id="service_type_repair_maintenance" model="fleet.service.type">
+    <field name="name">Repair / Maintenance</field>
+    <field name="category">service</field>
+  </record>
+
   <record id="base.main_company" model="res.company">
     <field name="x_studio_default_bike_state_id" ref="vehicle_state_available"/>
     <field name="x_studio_bike_state_ids" eval="[(6, 0, [

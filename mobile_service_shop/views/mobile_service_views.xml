@@ -66,7 +66,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name='action_view_invoice' class="oe_stat_button" type="object" icon="fa-money"
+                        <button name='action_view_invoice' class="oe_stat_button" type="object" icon="edit_square"
                                 invisible="service_state in ('draft')">
                             <field string="Invoice" name="invoice_count" widget="statinfo"/>
                         </button>

@@ -4,7 +4,7 @@
 #    Cybrosys Technologies Pvt. Ltd.
 #
 #    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Anupriya Ashok(odoo@cybrosys.com)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -13,10 +13,6 @@
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
-#
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
-#    GENERAL PUBLIC LICENSE (LGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
 from odoo import fields, models
@@ -121,7 +117,7 @@ class MobileInvoice(models.TransientModel):
             'name': action.name,
             'help': action.help,
             'type': 'ir.actions.act_window',
-            'views': [[list_view_id, 'tree'], [form_view_id, 'form'],
+            'views': [[list_view_id, 'list'], [form_view_id, 'form'],
                       [False, 'graph'], [False, 'kanban'],
                       [False, 'calendar'], [False, 'pivot']],
             'target': action.target,

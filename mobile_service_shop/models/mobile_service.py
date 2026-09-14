@@ -4,7 +4,7 @@
 #    Cybrosys Technologies Pvt. Ltd.
 #
 #    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Anupriya Ashok (odoo@cybrosys.com)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
@@ -13,10 +13,6 @@
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
-#
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
-#    GENERAL PUBLIC LICENSE (LGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
 from odoo import api, fields, models
@@ -214,12 +210,11 @@ class MobileService(models.Model):
             else:
                 value = {
                     'domain': str([('id', 'in', inv_ids)]),
-                    'view_mode': 'tree,form',
+                    'view_mode': 'list,form',
                     'res_model': 'account.move',
                     'view_id': False,
                     'type': 'ir.actions.act_window',
-                    'name': 'Invoice',
-                    'res_id': inv_ids[0]}
+                    'name': 'Invoice'}
             return value
         else:
             raise UserError("No invoice created")

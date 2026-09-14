@@ -25,7 +25,7 @@
                                     <td>
                                         <strong>Customer name:&#160;</strong>
                                     </td>
-                                    <td>&#160;<span t-esc="customer_name"/>
+                                    <td>&#160;<span t-out="customer_name"/>
                                     </td>
                                 </tr>
                             </tbody>
@@ -38,12 +38,12 @@
                                     <td style="margin-right:10%;">
                                         <strong>Requested date:&#160;</strong>
                                     </td>
-                                    <td>&#160;<span t-esc="date_request"/>
+                                    <td>&#160;<span t-out="date_request"/>
                                     </td>
                                     <td style="margin-right:10%;">
                                         <strong>Return date:&#160;</strong>
                                     </td>
-                                    <td>&#160;<span t-esc="date_return"/>
+                                    <td>&#160;<span t-out="date_return"/>
                                     </td>
                                 </tr>
                             </tbody>
@@ -67,19 +67,19 @@
                             <tr>
                                 <td>1</td>
                                 <td>
-                                    <t t-esc="mobile_brand"/>
+                                    <t t-out="mobile_brand"/>
                                 </td>
                                 <td>
-                                    <t t-esc="model_name"/>
+                                    <t t-out="model_name"/>
                                 </td>
                                 <td>
-                                    <t t-esc="imei_no"/>
+                                    <t t-out="imei_no"/>
                                 </td>
                                 <td>
-                                    <t t-esc="complaint_types"/>
+                                    <t t-out="complaint_types"/>
                                 </td>
                                 <td>
-                                    <t t-esc="complaint_description"/>
+                                    <t t-out="complaint_description"/>
                                 </td>
                             </tr>
                         </tbody>
@@ -97,20 +97,20 @@
                     <t t-if="terms">
                         <t t-foreach="terms" t-as="term">
                             <span>
-                                <t t-esc="term.terms_conditions"/>
+                                <t t-out="term.terms_conditions"/>
                                 <br/>
                             </span>
                         </t>
                     </t>
                     <t t-else="">
-                        <span t-esc="'Services provided are subject to a 10  warranty on parts, with no liability for data loss or damages beyond pre-existing conditions, and full payment is required upon completion.'"/>
+                        <span t-out="'Services provided are subject to a 10  warranty on parts, with no liability for data loss or damages beyond pre-existing conditions, and full payment is required upon completion.'"/>
                     </t>
                 </div>
                 <div style="margin-top:200px;">
                     <span>Keep this ticket safely for future reference.</span>
                     <br/>
                     <span>Issue Date :</span>
-                    <t t-esc="date_today"/>
+                    <t t-out="date_today"/>
                 </div>
             </t>
         </t>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    Inherited template view of website Contact us -->
+    <template id="website_contact_template_inherited"
+              inherit_id="website.contactus">
+        <xpath expr="//img[hasclass('img')]"
+               position="replace">
+            <t t-set="company_data" t-value="website.company_id"/>
+            <t t-set="website_data" t-value="website"/>
+            <ul class="list-unstyled mb-0 ps-2">
+                <t t-if="website_data.is_company">
+                    <li>
+                        <t t-out="company_data.name"/>
+                    </li>
+                </t>
+                <t t-if="website_data.is_country_flag">
+                    <li>
+                        <img t-att-src="company_data.country_id.image_url"/>
+                    </li>
+                </t>
+                <li>
+                    <t t-if="not website_data.is_hide_marker_icons and website_data.is_address">
+                        <i class="oi me-2" data-icon="location_on"/>
+                    </t>
+                    <t t-if="not website_data.is_address_in_online and website_data.is_address">
+                        <span class="o_force_ltr">
+                            <t t-out="company_data.street"/>
+                            <t t-out="company_data.street2"/>
+                            <br/>
+                            <div style="margin-left:30px">
+                                <t t-out="company_data.city"/>
+                            </div>
+                            <div style="margin-left:30px">
+                                <t t-out="company_data.state_id.name"/>
+                            </div>
+                            <div style="margin-left:30px">
+                                <t t-out="company_data.zip"/>
+                            </div>
+                            <div style="margin-left:30px">
+                                <t t-out="company_data.country_id.name"/>
+                            </div>
+                        </span>
+                    </t>
+                    <t t-if="website_data.is_address_in_online">
+                        <span class="o_force_ltr">
+                            <t t-out="company_data.street"/>
+                            <t t-out="company_data.street2"/>,
+                            <t t-out="company_data.city"/>,
+                            <t t-out="company_data.state_id.name"/>,
+                            <t t-out="company_data.zip"/>,
+                            <t t-out="company_data.country_id.name"/>
+                        </span>
+                    </t>
+                </li>
+                <li>
+                    <t t-if="not website_data.is_hide_marker_icons and website_data.is_phone">
+                        <t t-if="website_data.is_show_phone_icon">
+                            <i class="oi me-2" data-icon="phone" />
+                        </t>
+                    </t>
+                    <t t-if="website_data.is_phone">
+                        <a class="o_force_ltr"
+                           t-attf-href="tel:{{ company_data.phone }}">
+                            <t t-out="company_data.phone"/>
+                        </a>
+                    </t>
+                </li>
+                <li>
+                    <t t-if="not website_data.is_hide_marker_icons and website_data.is_email">
+                        <i class="oi me-2" data-icon="mail"/>
+                    </t>
+                    <t t-if="website_data.is_email">
+                        <a class="o_force_ltr"
+                           t-attf-href="mailto:{{ company_data.email }}">
+                            <t t-out="company_data.email"/>
+                        </a>
+                    </t>
+                </li>
+                <li>
+                    <t t-if="not website_data.is_hide_marker_icons and website_data.is_website">
+                        <i class="oi me-2" data-icon="public"/>
+                    </t>
+                    <t t-if="website_data.is_website">
+                        <a class="o_force_ltr"
+                           t-attf-href="{{company_data.website}}">
+                            <t t-out="company_data.website"/>
+                        </a>
+                    </t>
+                </li>
+                <li>
+                    <t t-if="website_data.is_vat">
+                        <span class="o_force_ltr">
+                            <t t-out="company_data.vat"/>
+                        </span>
+                    </t>
+                </li>
+                <div style="margin-top:15px;">
+                    <li>
+                        <t t-if="website_data.is_facebook">
+                            <i class="oi me-2" data-icon="oi_facebook"/>
+                            <a class="o_force_ltr"
+                               href="/website/social/facebook"
+                               target="_blank">
+                                <t t-out="website_data.social_facebook"/>
+                            </a>
+                        </t>
+                    </li>
+                    <li>
+                        <t t-if="website_data.is_twitter">
+                            <i class="oi me-2" data-icon="oi_twitter"/>
+                            <a class="o_force_ltr"
+                               href="/website/social/twitter"
+                               target="_blank">
+                                <t t-out="website_data.social_twitter"/>
+                            </a>
+                        </t>
+                    </li>
+                    <li>
+                        <t t-if="website_data.is_linked_in">
+                            <i class="oi me-2" data-icon="oi_linkedin"/>
+                            <a class="o_force_ltr"
+                               href="/website/social/linkedin"
+                               target="_blank">
+                                <t t-out="website_data.social_linked_in"/>
+                            </a>
+                        </t>
+                    </li>
+                    <li>
+                        <t t-if="website_data.is_instagram">
+                            <i class="oi me-2" data-icon="oi_instagram"/>
+                            <a class="o_force_ltr"
+                               href="/website/social/instagram"
+                               target="_blank">
+                                <t t-out="website_data.social_instagram"/>
+                            </a>
+                        </t>
+                    </li>
+                    <li>
+                        <t t-if="website_data.is_git_hub">
+                            <i class="oi me-2" data-icon="oi_github"/>
+                            <a class="o_force_ltr"
+                               href="/website/social/github"
+                               target="_blank">
+                                <t t-out="website_data.social_git_hub"/>
+                            </a>
+                        </t>
+                    </li>
+                </div>
+            </ul>
+        </xpath>
+    </template>
+</odoo>

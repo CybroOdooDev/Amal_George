@@ -34,7 +34,7 @@
         'views/website_contact_us_templates.xml',
     ],
     'images': ['static/description/banner.jpg'],
-    'license': 'AGPL-3',
+    'license': 'LGPL-3',
     'installable': True,
     'application': False,
     'auto_install': False,

@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': "Odoo Selection Field Configurator",
-    'version': "19.5.1.0.1",
+    'version': "20.0.1.0.0",
     'category': "Extra Tools",
     'summary': """Add new options to selection fields dynamically""",
     'description': """This module allows users to dynamically add and manage options

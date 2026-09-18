@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': 'Point of Sale Stock Transfer',
-    'version': '19.5.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Point of Sale',
     'summary': "Allows to Directly Transfer the Stock From the Current POS"
                " Session",

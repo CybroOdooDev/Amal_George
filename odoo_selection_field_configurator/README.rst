@@ -23,7 +23,13 @@ This module allows the user to add new options to the selection fields in Odoo.
 Key Features
 ------------
 
-
+* **Add Dynamic Selection Options:** Add new options to selection fields directly from the user interface without writing Python code or restarting the Odoo service.
+* **Support for Core and Base Fields:** Overcomes standard Odoo restrictions, allowing users to add custom selection values to both core/predefined fields and custom fields.
+* **Centralized Management Interface:** Dedicated "Selection Field Configurator" menu to view, search, and manage all selection fields across different models from a single place.
+* **Custom Sequence & Ordering:** Reorder selection options using drag-and-drop sequence handles to customize how choices appear in dropdown menus.
+* **Edit and Delete Custom Options:** Modify option display names or delete custom selection values safely according to business needs.
+* **Real-Time Dropdown Synchronization:** Newly added options are immediately available in form views and dropdowns with full cache and data validation support.
+* **No-Code Configuration:** Empowers administrators and business users to extend selection fields easily without developer assistance.
 
 Installation
 ------------

@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': "Ecommerce Sequential Variant Selector",
-    'version': '1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Website',
     'summary': """Sequential attribute selection in odoo eCommerce""",
     'description': "This module enables customers to select product attribute "

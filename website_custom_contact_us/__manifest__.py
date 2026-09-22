@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': "Website Custom Contact Us",
-    'version': '19.5.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Website',
     'summary': """Manage the visibility of company details on the Website Contact Us page""",
     'description': """Control which company details appear on your website's Contact Us page.

@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': 'Mobile Service Management',
-    'version': '19.5.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Industries',
     'summary': 'Module for managing mobile service shop daily activities.',
     'description':'This module provides an all-in-one solution for mobile'

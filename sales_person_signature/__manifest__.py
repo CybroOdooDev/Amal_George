@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': "Sales Person Signature",
-    'version': '19.5.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Sales',
     'summary': """Require salesperson signature before confirming quotations/sale orders.""",
     'description': """This module allows the salespersons to add their

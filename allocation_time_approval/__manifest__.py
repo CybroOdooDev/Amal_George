@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': 'Allocation Time Approval',
-    'version': '19.5.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Project',
     'summary': """Approve allocated time for project tasks and timesheets.""",
     'description': """This module enables managers to review and approve 

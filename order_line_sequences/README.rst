@@ -1,15 +1,47 @@
-.. image:: https://img.shields.io/badge/license-AGPL--3-blue.svg
-   :target: https://www.gnu.org/licenses/agpl-3.0-standalone.html
-   :alt: License: AGPL-3
+.. |license| image:: https://img.shields.io/badge/license-LGPL--3-blue.svg
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
+
+.. |odoo| image:: https://img.shields.io/badge/Odoo-20.0-875A7B.svg
+    :target: https://www.odoo.com
+    :alt: Odoo 20.0
+
+.. |edition| image:: https://img.shields.io/badge/Edition-Community-1ABC9C.svg
+    :alt: Community Edition
+
+.. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
+    :target: https://cybrosys.com
+    :alt: Maintainer: Cybrosys Techno Solutions
+
+|license| |odoo| |edition| |maintainer|
 
 Order Line Sequences/Line Numbers
-=================================
+================
+
 This module will help you to add sequence for order lines in sales, purchase and delivery.
 It will also add line numbers in report lines.
 
+Key Features
+------------
+
+* **Automatic Line Numbering**: Automatically generates and displays sequential line numbers (``#``) for order lines across Sales, Purchase, and Inventory Deliveries/Pickings.
+* **Form & List View Integration**: Displays the line sequence number column (``#``) directly in the order line list view of Sales Orders, Purchase Orders, and Stock Picking operations.
+* **PDF Report Integration**: Prints line sequence numbers in standard document reports:
+  - Quotations & Sales Orders
+  - Requests for Quotation (RFQ)
+  - Purchase Orders
+  - Picking Operations
+* **Automatic Company-Wide Setup**: Automatically activates and locks the Sales Order Line Numbers setting for all existing companies upon module installation.
+* **Multi-Company Compatible**: Seamlessly supports multi-company environments.
+* **Zero Configuration**: Ready to use immediately upon installation without requiring additional configuration.
+
+Installation
+------------
+No external dependencies.
+
 Configuration
-=============
-* No additional configurations needed
+-------------
+No additional configuration is required.
 
 Company
 -------
@@ -17,16 +49,8 @@ Company
 
 License
 -------
-Affero General Public License v3.0 (AGPL v3)
-(https://www.gnu.org/licenses/agpl-3.0-standalone.html)
-
-Credits
--------
-Developer: (V16) Amaya Aravind,
-            (V17) Jumana Haseen,
-            (V18) Busthana Shirin,
-            (V19) Vaishnav M V
-Contact : odoo@cybrosys.com
+Lesser General Public License, Version 3 (LGPL v3).
+(http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 
 Contacts
 --------
@@ -49,4 +73,3 @@ For support and more information, please visit `Our Website <https://cybrosys.co
 Further information
 ===================
 HTML Description: `<static/description/index.html>`__
-

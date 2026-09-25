@@ -35,8 +35,7 @@ No external dependencies.
 
 Configuration
 -------------
-
-* No additional configuration is needed.
+No additional configuration is required.
 
 Company
 -------

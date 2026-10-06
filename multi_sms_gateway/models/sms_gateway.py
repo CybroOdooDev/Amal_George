@@ -23,10 +23,14 @@ from odoo import fields, models
 
 class SmsGateway(models.Model):
     """
-    Class to add the gateway providers.
+    Model representing supported SMS Gateway service providers.
+    Stores provider definitions such as Vonage, Twilio, and TeleSign.
     """
     _name = 'sms.gateway'
-    _description = 'SMS Gateway'
+    _description = 'SMS Gateway Provider'
 
-    name = fields.Char(string='Provider Name',
-                       help='Provide the name of the provider.')
+    name = fields.Char(
+        string='Provider Name',
+        required=True,
+        help='Unique identifier name of the SMS gateway provider (e.g., vonage, twilio, telesign).'
+    )

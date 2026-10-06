@@ -23,21 +23,42 @@ from odoo import fields, models
 
 class SmsHistory(models.Model):
     """
-    This model stores the details of all the SMS messages that have been
-    sent, including the gateway name, date of sending, mobile phone number,
-    and SMS text.
+    Model to record the delivery log and audit trail of dispatched SMS messages.
+    Stores gateway provider, dispatch date, recipient phone numbers, message content,
+    and company details.
     """
     _name = 'sms.history'
-    _description = 'SMS History'
+    _description = 'SMS Delivery History'
     _rec_name = 'sms_mobile'
+    _order = 'sms_date desc, id desc'
 
-    sms_gateway_id = fields.Many2one('sms.gateway', string='Gateway',
-                                     help='The SMS Gateway.')
-    sms_date = fields.Datetime(string='Date', default=fields.Datetime.now,
-                               help='Date of sending message.')
+    sms_gateway_id = fields.Many2one(
+        'sms.gateway',
+        string='Gateway',
+        readonly=True,
+        help='The SMS gateway provider used to send the message.'
+    )
+    sms_date = fields.Datetime(
+        string='Date',
+        default=fields.Datetime.now,
+        readonly=True,
+        help='Date and timestamp when the SMS was dispatched.'
+    )
     sms_mobile = fields.Char(
-        string='Mobile Number', help='Phone Number to send SMS.')
-    sms_text = fields.Text(string='SMS Text', help='The message to be sent.')
+        string='Mobile Number',
+        readonly=True,
+        help='Destination phone number(s) to which the SMS was sent.'
+    )
+    sms_text = fields.Text(
+        string='SMS Text',
+        readonly=True,
+        help='Content of the SMS message sent to the recipient(s).'
+    )
     company_id = fields.Many2one(
-        'res.company', string='Company', required=True,
-        default=lambda self: self.env.company, help='Active company.')
+        'res.company',
+        string='Company',
+        required=True,
+        readonly=True,
+        default=lambda self: self.env.company,
+        help='Company from which the SMS was dispatched.'
+    )

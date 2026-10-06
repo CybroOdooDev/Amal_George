@@ -16,30 +16,30 @@
                             <group>
                                 <!-- Credentials for Vonage -->
                                 <group string="Vonage Credentials"
-                                        invisible="gateway_name != 'vonage'">
-                                    <field name="vonage_key" password="True"
-                                            invisible="gateway_name != 'vonage'"/>
+                                       invisible="gateway_name not in ('vonage', 'Vonage')">
+                                    <field name="vonage_key"
+                                           invisible="gateway_name not in ('vonage', 'Vonage')"/>
                                     <field name="vonage_secret" password="True"
                                            string="Secret Key"
-                                            invisible="gateway_name != 'vonage'"/>
+                                           invisible="gateway_name not in ('vonage', 'Vonage')"/>
                                 </group>
                                 <!-- Credentials for Twilio -->
                                 <group string="Twilio Credentials"
-                                        invisible="gateway_name != 'twilio'">
-                                    <field name="twilio_account_sid" password="True"
-                                           invisible="gateway_name != 'twilio'"/>
+                                       invisible="gateway_name not in ('twilio', 'Twilio')">
+                                    <field name="twilio_account_sid"
+                                           invisible="gateway_name not in ('twilio', 'Twilio')"/>
                                     <field name="twilio_auth_token" password="True"
-                                           invisible="gateway_name != 'twilio'"/>
-                                    <field name="twilio_phone_number" password="True"
-                                           invisible="gateway_name != 'twilio'"/>
+                                           invisible="gateway_name not in ('twilio', 'Twilio')"/>
+                                    <field name="twilio_phone_number"
+                                           invisible="gateway_name not in ('twilio', 'Twilio')"/>
                                 </group>
                                 <!-- Credentials for Telesign -->
                                 <group string="Telesign Credentials"
-                                       invisible="gateway_name != 'telesign'">
-                                    <field name="telesign_customer" password="True"
-                                           invisible="gateway_name != 'telesign'"/>
+                                       invisible="gateway_name not in ('telesign', 'Telesign', 'TeleSign')">
+                                    <field name="telesign_customer"
+                                           invisible="gateway_name not in ('telesign', 'Telesign', 'TeleSign')"/>
                                     <field name="telesign_api_key" password="True"
-                                           invisible="gateway_name != 'telesign'"/>
+                                           invisible="gateway_name not in ('telesign', 'Telesign', 'TeleSign')"/>
                                 </group>
                             </group>
                         </page>

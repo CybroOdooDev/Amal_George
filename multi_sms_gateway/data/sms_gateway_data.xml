@@ -2,12 +2,12 @@
 <odoo>
     <!-- Records for SMS Gateway -->
     <record id="sms_gateway_twilio" model="sms.gateway">
-        <field name="name">twilio</field>
+        <field name="name">Twilio</field>
     </record>
-      <record id="sms_gateway_vonage" model="sms.gateway">
-        <field name="name">vonage</field>
+    <record id="sms_gateway_vonage" model="sms.gateway">
+        <field name="name">Vonage</field>
     </record>
-     <record id="sms_gateway_telesign" model="sms.gateway">
-        <field name="name">telesign</field>
+    <record id="sms_gateway_telesign" model="sms.gateway">
+        <field name="name">Telesign</field>
     </record>
 </odoo>

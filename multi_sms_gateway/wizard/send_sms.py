@@ -3,19 +3,16 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>).
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
-#    You can modify it under the terms of the GNU AFFERO
-#    GENERAL PUBLIC LICENSE (AGPL v3), Version 3.
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU AFFERO GENERAL PUBLIC LICENSE (AGPL v3) for more details.
-#
-#    You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
-#    (AGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
 import re
@@ -354,6 +351,9 @@ class SendSms(models.TransientModel):
 
             if status_code == 10033 or 'not been verified' in status_description.lower():
                 raise UserError(_("TeleSign error for %s: Recipient number is not verified in your TeleSign trial account.") % phone_number)
+
+            if status_code == 10008 or 'invalid signature' in status_description.lower():
+                raise UserError(_("TeleSign error for %s: Invalid Signature. Please check your Customer ID and API Key in SMS Gateway Configuration.") % phone_number)
 
             error_message = status_description or f"HTTP {response.status_code}"
             raise UserError(_("TeleSign error for %s: %s (Status: %s)") % (phone_number, error_message, status_code or response.status_code))

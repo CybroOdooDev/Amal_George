@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Server action in 'res.partner' to open the wizard to send the SMS. -->
-    <!-- Available in Form and Tree Views -->
+    <!-- Server action in 'res.partner' to open the wizard to send SMS via Gateway -->
+    <!-- Available in Form and List Views -->
     <record id="action_send_sms" model="ir.actions.server">
-        <field name="name">Send SMS</field>
+        <field name="name">Send SMS via Gateway</field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="binding_model_id" ref="base.model_res_partner"/>
         <field name="binding_view_types">form,list</field>

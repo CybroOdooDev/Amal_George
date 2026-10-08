@@ -1,0 +1,964 @@
+/* ==========================================================================
+   Liquid Glass Theme — Website & Configurator Styling
+   Provides dark glassmorphism styling and high-contrast readable typography
+   for the Website Configurator, Theme Previews, and Website Backend components.
+   ========================================================================== */
+
+// --- 1. Root Configurator Container & Screen Shell ---
+.o_configurator_container {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: $text-white !important;
+
+    .o_configurator_screen {
+        background: transparent !important;
+        background-color: transparent !important;
+        color: $text-white !important;
+
+        .o_configurator_screen_content {
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+
+        // Crisp white Odoo logo with soft shadow on dark wallpaper
+        .o_configurator_odoo_logo {
+            filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
+            opacity: 0.95;
+            transition: $transition-base;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    // --- Skip Button (Global across all configurator screens) ---
+    .btn.btn-link,
+    button.btn.btn-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        background: transparent !important;
+        border: none !important;
+        transition: $transition-base !important;
+        cursor: pointer !important;
+
+        &:hover,
+        &:focus {
+            color: #ffffff !important;
+            text-decoration: underline !important;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.6) !important;
+        }
+    }
+}
+
+// --- 2. Welcome Screen (Ready to build the perfect website?) ---
+.o_configurator_container .o_welcome_screen {
+    .display-2 {
+        color: #ffffff !important;
+        font-weight: 300 !important;
+        text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45) !important;
+        letter-spacing: -0.5px;
+
+        b {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6) !important;
+        }
+    }
+
+    .h1,
+    .h1.text-600 {
+        color: rgba(255, 255, 255, 0.85) !important;
+        font-weight: 300 !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+
+        b {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+    }
+
+    // "Let's do it" button
+    button.btn-primary,
+    .btn.btn-primary {
+        background: $primary-gradient !important;
+        backdrop-filter: blur($blur-light) saturate(180%) !important;
+        -webkit-backdrop-filter: blur($blur-light) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-radius: $radius-sm !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        box-shadow: 0 6px 25px rgba(6, 190, 160, 0.4) !important;
+        transition: $transition-base !important;
+
+        &:hover,
+        &:focus {
+            background: $primary-color !important;
+            box-shadow: 0 8px 30px rgba(6, 190, 160, 0.6) !important;
+            transform: translateY(-2px);
+        }
+    }
+}
+
+// --- 3. Description Screen (I want ... for my ... business) ---
+.o_configurator_container .o_description_screen {
+    .o_configurator_typing_text {
+        color: #ffffff !important;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
+
+        span {
+            color: #ffffff !important;
+        }
+    }
+
+    // Dropdowns for website type and purpose
+    .o_configurator_type_dd,
+    .o_configurator_purpose_dd {
+        box-shadow: inset 0 -3px 0 $primary-color !important;
+
+        a {
+            color: $primary-color !important;
+            text-decoration: none !important;
+            font-weight: 600 !important;
+
+            i.text-primary {
+                color: $primary-color !important;
+            }
+
+            .fa-angle-down {
+                color: rgba(255, 255, 255, 0.85) !important;
+            }
+        }
+
+        .dropdown-menu {
+            background: rgba(30, 38, 48, 0.88) !important;
+            backdrop-filter: blur(30px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.55) !important;
+            padding: 6px !important;
+
+            .dropdown-item {
+                color: #ffffff !important;
+                border-radius: 10px !important;
+                padding: 8px 16px !important;
+                font-size: 16px !important;
+                transition: $transition-base !important;
+
+                &:hover,
+                &:focus {
+                    background: rgba(255, 255, 255, 0.16) !important;
+                    color: #ffffff !important;
+                }
+            }
+        }
+    }
+
+    // Industry input & autocomplete
+    .o_configurator_industry_wrapper {
+        input {
+            color: $primary-color !important;
+            background-color: transparent !important;
+            border: none !important;
+            border-bottom: 3px solid $primary-color !important;
+            font-weight: 500 !important;
+
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.45) !important;
+                font-style: italic !important;
+            }
+
+            &:focus {
+                color: #ffffff !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+
+    .custom-ui-autocomplete {
+        background: rgba(30, 38, 48, 0.92) !important;
+        backdrop-filter: blur(30px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.55) !important;
+
+        .ui-menu-item a {
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            padding: 8px 14px !important;
+            transition: $transition-base !important;
+
+            &:hover,
+            &.ui-state-active {
+                background: rgba(255, 255, 255, 0.16) !important;
+                color: #ffffff !important;
+            }
+
+            &.o_no_result {
+                color: rgba(255, 255, 255, 0.5) !important;
+            }
+        }
+    }
+}
+
+// --- 4. Palette Selection Screen ---
+.o_configurator_container .o_palette_selection_screen {
+    .o_detect_logo {
+        .h2,
+        b {
+            color: #ffffff !important;
+        }
+
+        .o_configurator_logo_upload {
+            background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            border: 2px dashed rgba(255, 255, 255, 0.25) !important;
+            border-radius: 18px !important;
+            color: #ffffff !important;
+            transition: $transition-base !important;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.15) !important;
+                border-color: $primary-color !important;
+            }
+
+            .o_configurator_logo_button,
+            i.fa {
+                color: #ffffff !important;
+            }
+        }
+    }
+
+    .o_palettes_separator {
+        .border-top,
+        .border-start {
+            border-color: rgba(255, 255, 255, 0.18) !important;
+        }
+
+        .palette_selection_or {
+            background: transparent !important;
+            color: rgba(255, 255, 255, 0.65) !important;
+            font-weight: 600 !important;
+        }
+    }
+
+    .palette_card {
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 999px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+        transition: $transition-base !important;
+
+        &:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        &.selected {
+            border-color: $primary-color !important;
+            box-shadow: 0 0 0 3px $primary-color, 0 8px 25px rgba(6, 190, 160, 0.5) !important;
+        }
+    }
+}
+
+// --- 5. Feature Selection Screen ---
+.o_configurator_container .o_feature_selection_screen {
+    .o_configurator_typing_text {
+        color: #ffffff !important;
+        font-weight: 400 !important;
+
+        b.text-info {
+            color: #38bdf8 !important;
+            text-shadow: 0 0 12px rgba(56, 189, 248, 0.45) !important;
+            font-weight: 600 !important;
+        }
+
+        b.text-warning {
+            color: #fbbf24 !important;
+            text-shadow: 0 0 12px rgba(251, 191, 36, 0.45) !important;
+            font-weight: 600 !important;
+        }
+    }
+
+    h2.text-muted {
+        color: rgba(255, 255, 255, 0.72) !important;
+        font-weight: 300 !important;
+    }
+
+    .o_feature_card_container .card {
+        background: rgba(255, 255, 255, 0.08) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        border-radius: 18px !important;
+        transition: $transition-base !important;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25) !important;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        &.border-success {
+            border: 2px solid $primary-color !important;
+            box-shadow: 0 0 18px rgba(6, 190, 160, 0.4) !important;
+            background: rgba(6, 190, 160, 0.12) !important;
+        }
+
+        &.card_installed {
+            opacity: 0.65 !important;
+            cursor: default !important;
+        }
+
+        .card-body {
+            background: transparent !important;
+        }
+
+        .card-title,
+        h3 {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        .card-text,
+        p {
+            color: rgba(255, 255, 255, 0.75) !important;
+            font-size: 0.85rem !important;
+        }
+
+        .o_configurator_feature_status {
+            &.fa-check-circle {
+                color: $primary-color !important;
+            }
+
+            &.fa-circle-o {
+                color: rgba(255, 255, 255, 0.35) !important;
+            }
+
+            &.fa-info-circle {
+                color: rgba(255, 255, 255, 0.5) !important;
+            }
+        }
+
+        i.text-info {
+            color: #38bdf8 !important;
+        }
+
+        i.text-warning {
+            color: #fbbf24 !important;
+        }
+    }
+}
+
+// --- 6. Theme Selection Screen ---
+.o_configurator_container .o_theme_selection_screen {
+    .o_configurator_typing_text {
+        color: #ffffff !important;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
+
+        b {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+    }
+
+    .theme_preview {
+        background: rgba(255, 255, 255, 0.07) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.3s ease !important;
+
+        &:hover {
+            border-color: $primary-color !important;
+            box-shadow: 0 0 22px rgba(6, 190, 160, 0.5) !important;
+            transform: translateY(-8px) !important;
+        }
+
+        .theme_preview_tip {
+            color: rgba(255, 255, 255, 0.75) !important;
+            font-weight: 500 !important;
+            font-size: 0.85rem !important;
+        }
+    }
+}
+
+// --- 7. Theme Preview Kanban View (After Configurator / Themes Menu) ---
+.o_theme_preview_kanban_view {
+    .o_kanban_renderer {
+        background: transparent !important;
+
+        &.o_kanban_grouped {
+            .o_kanban_group {
+                background-color: rgba(30, 38, 48, 0.65) !important;
+                backdrop-filter: blur(20px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+                border: 1px solid rgba(255, 255, 255, 0.12) !important;
+                border-radius: 18px !important;
+                margin: 0 10px 10px 0 !important;
+
+                &:nth-child(even) {
+                    background-color: rgba(25, 32, 42, 0.7) !important;
+                }
+
+                .o_kanban_header {
+                    .o_column_title {
+                        color: #ffffff !important;
+                        font-weight: 600 !important;
+                    }
+                }
+            }
+        }
+
+        .o_kanban_record {
+            .o_theme_preview_bottom {
+                h5,
+                h6,
+                span,
+                div {
+                    color: #ffffff !important;
+                }
+            }
+
+            .o_theme_preview_top {
+                border-radius: 12px !important;
+                overflow: hidden !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            }
+        }
+    }
+}
+
+// --- 8. Website Dashboard & Metrics ---
+.o_website_dashboard {
+    background: transparent !important;
+
+    .o_dashboard_common {
+        .o_box {
+            background: transparent !important;
+
+            .o_inner_box {
+                background: rgba(255, 255, 255, 0.08) !important;
+                backdrop-filter: blur(20px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                border-radius: 16px !important;
+                margin: 6px !important;
+                padding: 16px !important;
+
+                .o_highlight,
+                .o_value,
+                h2,
+                h3 {
+                    color: $primary-color !important;
+                    font-weight: 700 !important;
+                }
+
+                span,
+                p,
+                .text-muted {
+                    color: rgba(255, 255, 255, 0.75) !important;
+                }
+            }
+        }
+    }
+}
+
+// --- 9. Website Menu Dropdown & Submenu Styling ---
+// Ensures dropdown menus and submenus across the Website app have dark glassmorphism
+// styling with clear contrast, distinct category headers, and high-visibility hover/active states.
+.o_website_preview,
+.o_main_navbar {
+    .dropdown-menu,
+    .o-dropdown--menu {
+        background: rgba(26, 34, 46, 0.94) !important;
+        background-color: rgba(26, 34, 46, 0.94) !important;
+        backdrop-filter: blur(35px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(35px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55) !important;
+        padding: 8px !important;
+
+        // Submenu category headers (e.g. "Content", "This page")
+        .dropdown-menu_group,
+        .dropdown-header {
+            color: rgba(255, 255, 255, 0.55) !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.8px !important;
+            padding: 8px 14px 4px 14px !important;
+            margin-top: 4px !important;
+            background: transparent !important;
+            border: none !important;
+        }
+
+        // Dropdown items and links
+        .dropdown-item,
+        a.dropdown-item,
+        button.dropdown-item {
+            color: rgba(255, 255, 255, 0.9) !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            border-radius: 10px !important;
+            padding: 7px 14px !important;
+            font-size: 13.5px !important;
+            font-weight: 400 !important;
+            transition: all 0.2s ease !important;
+            border: none !important;
+            text-decoration: none !important;
+            display: flex !important;
+            align-items: center !important;
+
+            &:hover,
+            &:focus {
+                background: rgba(255, 255, 255, 0.16) !important;
+                background-color: rgba(255, 255, 255, 0.16) !important;
+                color: #ffffff !important;
+                transform: translateX(3px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            &.active,
+            &:active,
+            &.o_active {
+                background: $primary-gradient !important;
+                background-color: $primary-color !important;
+                color: #ffffff !important;
+                font-weight: 600 !important;
+                box-shadow: 0 2px 10px rgba(6, 190, 160, 0.35) !important;
+            }
+
+            // Submenu entries with indentation
+            &.o_dropdown_menu_group_entry {
+                padding-left: 24px !important;
+                font-size: 13px !important;
+                color: rgba(255, 255, 255, 0.82) !important;
+
+                &:hover {
+                    color: #ffffff !important;
+                }
+            }
+        }
+    }
+
+    // High contrast rules if a submenu explicitly has a white or light background
+    .dropdown-menu.bg-white,
+    .dropdown-menu[data-bs-theme="light"],
+    .bg-white > .dropdown-menu,
+    .bg-white .dropdown-menu {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        border: 1px solid rgba(0, 0, 0, 0.12) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+
+        .dropdown-menu_group,
+        .dropdown-header {
+            color: #6c757d !important;
+        }
+
+        .dropdown-item,
+        a,
+        button {
+            color: #212529 !important;
+            background: transparent !important;
+
+            &:hover,
+            &:focus {
+                background-color: rgba(6, 190, 160, 0.12) !important;
+                color: $primary-color !important;
+                transform: translateX(3px);
+            }
+
+            &.active,
+            &:active {
+                background-color: $primary-color !important;
+                color: #ffffff !important;
+            }
+        }
+    }
+}
+
+// --- 10. Website Editor Notification / Toast Overlay ---
+// Ensures notifications like "Content saved!" in Website Editor have dark glassmorphism
+// styling and sharp contrast over any website page background.
+.o_notification_manager {
+    .o_notification {
+        background: rgba(20, 26, 36, 0.95) !important;
+        background-color: rgba(20, 26, 36, 0.95) !important;
+        backdrop-filter: blur(30px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55), 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+
+        .o_notification_title {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            padding: 12px 42px 4px 16px !important;
+        }
+
+        .o_notification_body {
+            padding: 2px 42px 14px 16px !important;
+
+            .o_notification_content {
+                color: rgba(255, 255, 255, 0.92) !important;
+
+                *, div, span, p {
+                    color: rgba(255, 255, 255, 0.92) !important;
+                }
+            }
+        }
+
+        .o_notification_close {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            width: 26px !important;
+            height: 26px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 50% !important;
+            background: transparent !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.16) !important;
+                color: #ffffff !important;
+            }
+        }
+
+        &.border-success,
+        &[class*="success"] {
+            border-left: 4px solid #10b981 !important;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(20, 26, 36, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-success {
+                color: #34d399 !important;
+                text-shadow: 0 0 10px rgba(52, 211, 153, 0.4) !important;
+            }
+        }
+
+        &.border-danger,
+        &[class*="danger"] {
+            border-left: 4px solid #ef4444 !important;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.16) 0%, rgba(20, 26, 36, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-danger {
+                color: #f87171 !important;
+                text-shadow: 0 0 10px rgba(248, 113, 113, 0.4) !important;
+            }
+        }
+
+        &.border-warning,
+        &[class*="warning"] {
+            border-left: 4px solid #f59e0b !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(20, 26, 36, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-warning {
+                color: #fbbf24 !important;
+                text-shadow: 0 0 10px rgba(251, 191, 36, 0.4) !important;
+            }
+        }
+
+        &.border-info,
+        &[class*="info"] {
+            border-left: 4px solid #0ea5e9 !important;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.16) 0%, rgba(20, 26, 36, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-info {
+                color: #38bdf8 !important;
+                text-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
+            }
+        }
+    }
+}
+
+// --- 11. Website "+ New" Creation Menu (NewContentModal) ---
+// Keeps Odoo's original layout, positioning, spacing, and 3-column item arrangement (Screenshot 1),
+// while applying the Liquid Glass visual skin (translucent backdrop, blur, cyan/teal glows, white typography).
+
+@keyframes liquidGlassModalFadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+#o_new_content_menu_choices,
+.o_menu_systray #o_new_content_menu_choices {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 1055 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(10, 16, 26, 0.78) !important;
+    background-color: rgba(10, 16, 26, 0.78) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    border: none !important;
+    box-shadow: none !important;
+    animation: liquidGlassModalFadeIn 0.25s ease forwards !important;
+
+    &::before {
+        display: none !important;
+    }
+
+    // Original container layout & size — transparent (no solid card/box enclosure)
+    .container {
+        max-width: 720px !important;
+        margin: auto !important;
+        padding-top: 32px !important;
+        padding-bottom: 32px !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        transform: none !important;
+    }
+
+    // Original row layout (standard 3-column placement)
+    .row {
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    // Original item elements (Page, Blog Post, Event, Forum, Job Position, Product, Course, Livechat Widget)
+    .o_new_content_element {
+        text-align: center !important;
+        margin-bottom: 12px !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+
+        // Clean link (no outer tile box)
+        a {
+            display: block !important;
+            text-align: center !important;
+            text-decoration: none !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            outline: none !important;
+            cursor: pointer !important;
+
+            // Liquid Glass Circular Icon (110px × 110px)
+            i {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 110px !important;
+                height: 110px !important;
+                line-height: normal !important;
+                border-radius: 50% !important;
+                font-size: 34px !important;
+                color: #ffffff !important;
+                background-color: rgba(32, 42, 60, 0.78) !important;
+                backdrop-filter: blur(20px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+                border: 2.5px solid rgba(255, 255, 255, 0.22) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.28) !important;
+                transition: all 0.32s cubic-bezier(0.19, 1, 0.22, 1) !important;
+                margin: 0 auto !important;
+
+                // Course module thumbnail SVG image
+                &.module_icon {
+                    background-size: 44px 44px !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center center !important;
+                }
+            }
+
+            // High-Contrast Clean Typography
+            p {
+                margin-top: 14px !important;
+                margin-bottom: 22px !important;
+                font-size: 16px !important;
+                font-weight: 500 !important;
+                letter-spacing: 0.2px !important;
+                color: rgba(255, 255, 255, 0.95) !important;
+                text-shadow: 0 2px 6px rgba(0, 0, 0, 0.65) !important;
+                transition: all 0.25s ease !important;
+                text-align: center !important;
+            }
+
+            // Hover & Focus: Cyan/Teal Liquid Glass Highlight
+            &:hover,
+            &:focus {
+                background: transparent !important;
+                background-color: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                text-decoration: none !important;
+                outline: none !important;
+
+                i {
+                    border-color: rgba(6, 190, 160, 1) !important;
+                    background-color: rgba(6, 190, 160, 0.85) !important;
+                    box-shadow: 0 14px 35px rgba(6, 190, 160, 0.5), 0 0 25px rgba(6, 190, 160, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+                    transform: translateY(-4px) scale(1.05) !important;
+                    color: #ffffff !important;
+                }
+
+                p {
+                    color: #ffffff !important;
+                    text-shadow: 0 0 12px rgba(6, 190, 160, 0.75), 0 2px 6px rgba(0, 0, 0, 0.65) !important;
+                }
+            }
+
+            // Active / Pressed Feedback
+            &:active {
+                i {
+                    transform: translateY(-1px) scale(1.01) !important;
+                    box-shadow: 0 6px 18px rgba(6, 190, 160, 0.4) !important;
+                }
+            }
+
+            // Uninstalled modules
+            &.o_uninstalled_module {
+                opacity: 0.85 !important;
+
+                i {
+                    border-style: dashed !important;
+                    border-color: rgba(255, 255, 255, 0.3) !important;
+                }
+
+                &:hover,
+                &:focus {
+                    opacity: 1 !important;
+
+                    i {
+                        border-style: solid !important;
+                        border-color: rgba(6, 190, 160, 1) !important;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- 12. Website Switcher Dropdown ("My Website") ---
+// Styles the Website Switcher systray dropdown with dark frosted glassmorphism,
+// backdrop blur, subtle borders, high-contrast labels, warning indicators, and teal active highlights.
+.o_website_switcher_container {
+    // Toggler button in navbar
+    .dropdown-toggle {
+        color: #ffffff !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border-radius: $radius-sm !important;
+        padding: 5px 10px !important;
+        transition: $transition-base;
+        border: none !important;
+
+        &:hover,
+        &:focus {
+            background: $hover-bg !important;
+            background-color: $hover-bg !important;
+        }
+    }
+
+    // Dropdown menu container
+    .dropdown-menu,
+    .o-dropdown--menu {
+        background: rgba(24, 32, 46, 0.94) !important;
+        background-color: rgba(24, 32, 46, 0.94) !important;
+        backdrop-filter: blur(35px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(35px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55) !important;
+        padding: 8px !important;
+        min-width: 14rem !important;
+        margin-top: 6px !important;
+
+        // Dropdown entry items
+        .dropdown-item,
+        span.dropdown-item,
+        a.dropdown-item {
+            color: rgba(255, 255, 255, 0.9) !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            border-radius: 10px !important;
+            padding: 8px 14px !important;
+            font-size: 13.5px !important;
+            font-weight: 400 !important;
+            display: flex !important;
+            align-items: center !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+            border: none !important;
+
+            // Warning icon for websites without domain configured
+            .fa-warning,
+            .text-warning {
+                color: #fbbf24 !important;
+                font-size: 13px !important;
+            }
+
+            // Hover state
+            &:hover,
+            &:focus {
+                background: rgba(255, 255, 255, 0.14) !important;
+                background-color: rgba(255, 255, 255, 0.14) !important;
+                color: #ffffff !important;
+                transform: translateX(3px);
+            }
+
+            // Active website entry
+            &.active,
+            &:active,
+            &.o_active {
+                background: $primary-gradient !important;
+                background-color: $primary-color !important;
+                color: #ffffff !important;
+                font-weight: 600 !important;
+                box-shadow: 0 2px 10px rgba(6, 190, 160, 0.35) !important;
+
+                .fa-warning,
+                .text-warning {
+                    color: #ffffff !important;
+                }
+            }
+        }
+    }
+}
+
+

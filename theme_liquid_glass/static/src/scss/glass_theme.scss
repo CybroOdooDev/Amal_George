@@ -1,0 +1,1170 @@
+.o_web_client {
+    background: url("/theme_liquid_glass/static/src/img/bg-img.svg") no-repeat center center fixed;
+    background-size: cover;
+    color: $text-white;
+}
+
+.o_action_manager,
+.o_content,
+.o_configurator_container {
+    @include transparent-bg;
+}
+
+body,
+.o_web_client,
+label,
+.o_form_label,
+.o_field_widget,
+.text-muted,
+.o_animated_number,
+h1, h2, h3, h4, h5,
+span, div, p {
+    @include text-white-color;
+}
+
+a {
+    color: $text-white;
+    &:hover {
+        color: rgba(255, 255, 255, 0.8);
+    }
+}
+
+table {
+    @include transparent-bg;
+    thead, tbody, tfoot, tr, th, td {
+        @include transparent-bg;
+    }
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.o_searchview,
+.o_searchview_dropdown_toggler {
+    background: $glass-bg-light !important;
+    @include glass-border;
+    border-radius: $radius-md;
+
+    .o_searchview_input_container {
+        .o_searchview_facet {
+            @include glass-effect($hover-bg, $blur-light);
+            @include text-white-color;
+
+            &:hover {
+                @include transparent-bg;
+            }
+        }
+
+        .o_searchview_input {
+            @include transparent-bg;
+            @include text-white-color;
+        }
+    }
+}
+
+.o_control_panel {
+    border: none !important;
+    background: $glass-bg-darker !important;
+
+    .o_breadcrumb,
+    .breadcrumb {
+        @include transparent-bg;
+
+        .breadcrumb-item,
+        .breadcrumb_item.background,
+        li {
+            @include text-white-color;
+            font-size: 15px;
+
+            a {
+                color: $text-muted !important;
+
+                &:hover {
+                    @include text-white-color;
+                }
+            }
+        }
+    }
+
+    .o_cp_switch_buttons {
+        .btn,
+        button {
+            @include transparent-bg;
+
+            &:hover {
+                background: $hover-bg !important;
+            }
+
+            &.active {
+                @include glass-effect($glass-bg-light, $blur-light);
+                @include glass-border;
+                color: $text-white;
+            }
+        }
+    }
+}
+
+.o_pager {
+    button {
+        @include transparent-bg;
+        border: none !important;
+
+        &:hover:not(:disabled) {
+            @include glass-effect($hover-bg, $blur-light);
+        }
+    }
+}
+
+.btn-group {
+    .o_graph_button {
+        @include transparent-bg;
+        color: $text-white;
+
+        &:hover,
+        &.active {
+            @include glass-effect($glass-bg-light, $blur-light);
+        }
+    }
+}
+
+.o_action_manager {
+    margin-top: 0;
+}
+
+.o_search_panel_section {
+    @include glass-effect($glass-bg-light, $blur-medium);
+    border: 1px solid $glass-border !important;
+    margin-bottom: 5px;
+    border-radius: $radius-md;
+    padding: 18px;
+
+    .o_search_panel_category_value {
+        @include transparent-bg;
+        @include text-white-color;
+    }
+}
+
+.o_search_panel,
+.border-end {
+    border-right: transparent !important;
+}
+
+.dropdown-menu,
+.o-dropdown--menu,
+.o_popover,
+.o-tooltip {
+    background: rgba(26, 34, 46, 0.94) !important;
+    background-color: rgba(26, 34, 46, 0.94) !important;
+    backdrop-filter: blur(35px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(35px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    z-index: 1055 !important;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55) !important;
+    padding: 8px !important;
+
+    .dropdown-item,
+    a,
+    button.dropdown-item,
+    span.dropdown-item {
+        color: rgba(255, 255, 255, 0.9) !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border-radius: 10px !important;
+        padding: 7px 14px !important;
+        transition: $transition-base;
+
+        &:hover,
+        &:focus,
+        &.focus {
+            background: rgba(255, 255, 255, 0.16) !important;
+            background-color: rgba(255, 255, 255, 0.16) !important;
+            color: #ffffff !important;
+        }
+
+        &.active,
+        &:active,
+        &.o_active {
+            background: $primary-gradient !important;
+            background-color: $primary-color !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+    }
+
+    .dropdown-header,
+    .dropdown-menu_group {
+        color: rgba(255, 255, 255, 0.55) !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.8px !important;
+        padding: 8px 14px 4px 14px !important;
+    }
+}
+
+.dropdown-menu button,
+.o-dropdown--menu button {
+    @include text-white-color;
+    @include transparent-bg;
+}
+
+// High contrast fallback if a dropdown menu explicitly has a white or light background
+.dropdown-menu.bg-white,
+.dropdown-menu[data-bs-theme="light"],
+.bg-white > .dropdown-menu,
+.bg-white .dropdown-menu {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+
+    .dropdown-menu_group,
+    .dropdown-header {
+        color: #6c757d !important;
+    }
+
+    .dropdown-item,
+    a,
+    button {
+        color: #212529 !important;
+        background: transparent !important;
+
+        &:hover,
+        &:focus {
+            background-color: rgba(6, 190, 160, 0.12) !important;
+            color: $primary-color !important;
+            transform: translateX(3px);
+        }
+
+        &.active,
+        &:active {
+            background-color: $primary-color !important;
+            color: #ffffff !important;
+        }
+    }
+}
+
+.bs-popover-bottom > .popover-arrow::after {
+    border-bottom-color: $glass-bg-medium !important;
+}
+
+.ui-autocomplete {
+    backdrop-filter: blur($blur-light) saturate(180%) !important;
+}
+
+.settings_tab {
+    @include glass-card($glass-bg-light, $blur-medium);
+    margin-right: 5px;
+    border-right: transparent !important;
+
+    .tab {
+        @include glass-effect($glass-bg-dark, $blur-light);
+        box-shadow: $shadow-medium;
+    }
+}
+
+.settings {
+    @include glass-card($glass-bg-light, $blur-medium);
+
+    h2 {
+        @include glass-effect($glass-bg-darker, $blur-light);
+    }
+}
+
+.o_base_settings_view .o_form_renderer .o_setting_container .settings .settingSearchHeader {
+    @include glass-effect($glass-bg-darker, $blur-light);
+}
+
+.form-check {
+    &:hover {
+        border-color: $primary-color !important;
+
+        .form-check-input:not(:disabled) {
+            border-color: $primary-color !important;
+        }
+    }
+}
+
+.form-check-input:checked,
+input[type="radio"]:checked {
+    background-color: $primary-color;
+    border-color: $primary-color;
+}
+
+.o_required_modifier,
+.o_field_widget:focus-within {
+    --o-input-border-color: #{$text-muted};
+    --o-caret-color: #{$text-muted};
+}
+
+.o-mail-Chatter {
+    @include glass-card($glass-bg-light, $blur-medium);
+    border: 2px solid $glass-border !important;
+    margin: 10px;
+
+    .o-mail-Chatter-top {
+        margin: 10px;
+        @include transparent-bg;
+    }
+
+    .o-mail-Message {
+        padding: 20px;
+        margin: 10px;
+        @include glass-effect($glass-bg-medium, $blur-light);
+        @include glass-border;
+        border-radius: $radius-xl !important;
+
+        &:hover {
+            @include glass-effect($glass-bg-light, $blur-medium);
+        }
+    }
+}
+
+.o-mail-Message-bubble.o-blue.o-blue,
+.o-mail-Message-bubble.o-green.o-green {
+    @include glass-effect($glass-bg-darker, $blur-heavy);
+    border-color: $glass-border !important;
+}
+
+.o-mail-Message-bubble.o-blue.o-muted.o-muted {
+    @include glass-effect($glass-bg-light, $blur-medium);
+    @include glass-border;
+}
+
+.o_odoobot_command,
+.o-discuss-ChannelInvitation-selectable.o-selected {
+    @include transparent-bg;
+}
+
+.o-mail-Composer-bg {
+    @include transparent-bg;
+
+    &:has(textarea:focus) {
+        border-color: $primary-color !important;
+    }
+}
+
+.o-mail-MessagingMenu,
+.o-mail-MessagingMenu-list {
+    background-color: transparent !important;
+}
+
+.o-mail-NotificationItem.o-important.o-important     {
+    @include transparent-bg;
+    @include glass-border;
+
+    &:hover {
+        @include glass-card($glass-bg-light, $blur-medium);
+    }
+}
+
+.o-mail-NotificationItem:hover:hover {
+    @include glass-card($glass-bg-light, $blur-medium);
+    background-color: transparent !important;
+}
+
+.o-mail-DiscussSidebar {
+    @include glass-card($glass-bg-light, $blur-medium);
+    margin-right: 5px;
+
+    .o-mail-DiscussSidebar-top,
+    .o-mail-DiscussSidebar-item {
+        @include transparent-bg;
+    }
+}
+
+.o-mail-Discuss-header {
+    @include transparent-bg;
+
+    .o-mail-Discuss-headerActionsGroup {
+        @include transparent-bg;
+    }
+}
+
+.o-mail-Discuss-content, .o-mail-Discuss-headerActionsGroup {
+    @include glass-card($glass-bg-light, $blur-medium);
+    border: 2px solid $glass-border;
+}
+
+.o-mail-AutoresizeInput {
+    color:  $text-white !important;
+}
+
+.o-mail-Discuss-core,
+.o-mail-ActionPanel {
+    @include transparent-bg;
+}
+
+.o_calendar_renderer {
+    background: $glass-bg-light !important;
+    @include glass-border;
+    --o-cw-border-color: #{$glass-border};
+    margin: 3px;
+    border-radius: $radius-xl;
+    padding: 10px;
+}
+
+/* Main Calendar Week Number Column Fix */
+.fc-week-number,
+.fc-axis,
+td.fc-week-number,
+th.fc-week-number,
+a.fc-week-number,
+.fc-widget-header.fc-week-number {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    box-shadow: none !important;
+}
+
+/* Calendar Sidebar Dark Glass Styling */
+.o_calendar_sidebar_container {
+    background: rgba(30, 38, 48, 0.75) !important;
+    background-color: rgba(30, 38, 48, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 18px !important;
+    padding: 12px !important;
+    margin-left: 10px !important;
+    color: #ffffff !important;
+    --o-view-background-color: transparent !important;
+    --DateTimePicker-color: #ffffff !important;
+    --DateTimePicker-month-color: #ffffff !important;
+
+    * {
+        background-color: transparent !important;
+    }
+
+    .o_calendar_sidebar {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        color: #ffffff !important;
+
+        .o_datetime_picker,
+        .o_calendar_mini {
+            color: #ffffff !important;
+
+            .o_datetime_picker_header,
+            .o_picker_title,
+            .o_month_cell,
+            .o_year_cell,
+            .o_day_of_week_cell,
+            button,
+            th,
+            td,
+            div,
+            span {
+                color: #ffffff !important;
+            }
+
+            .o_day_of_week_cell {
+                color: rgba(255, 255, 255, 0.6) !important;
+            }
+
+            .o_date_item {
+                color: #ffffff !important;
+
+                &.o_selected,
+                &.o_today,
+                &.o_highlight,
+                &.active {
+                    background: #875a7b !important;
+                    background-color: #875a7b !important;
+                    color: #ffffff !important;
+                    border-radius: 50% !important;
+                    font-weight: 700 !important;
+
+                    button, span, div, a {
+                        color: #ffffff !important;
+                    }
+                }
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.2) !important;
+                    border-radius: 50% !important;
+                }
+            }
+        }
+
+        .o_calendar_filter {
+            color: #ffffff !important;
+
+            .o_cw_filter_collapse_title,
+            .o_cw_filter_title,
+            h5, h6, label, span, div, strong {
+                color: #ffffff !important;
+            }
+
+            .o_calendar_filter_item {
+                color: #ffffff !important;
+                background: transparent !important;
+
+                .o_cw_filter_title {
+                    color: #ffffff !important;
+                }
+
+                span, label {
+                    color: #ffffff !important;
+                }
+            }
+        }
+    }
+}
+
+.o_content {
+    .o_activity_view_table, .o_pivot table {
+        background: $glass-bg-light !important;
+        @include glass-border;
+        margin: 3px;
+        padding: 10px;
+     }
+}
+
+.o_calendar_header,
+.o_sidebar_toggler {
+    border-bottom: transparent !important;
+    background: transparent !important;
+}
+
+.fc-scroller-harness,
+.o-scrollbar,
+.o-scrollbar.corner,
+.o_spreadsheet_dashboard_action {
+    @include transparent-bg;
+}
+
+/* Graph View Dark Glassmorphic Card & Tooltip Styling */
+.o_graph_renderer,
+.o_graph_canvas_container,
+.o_graph_view {
+    background: rgba(30, 38, 48, 0.75) !important;
+    background-color: rgba(30, 38, 48, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 18px !important;
+    padding: 16px !important;
+    color: #ffffff !important;
+
+    canvas {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+}
+
+.o_graph_custom_tooltip,
+.chartjs-tooltip,
+.o_tooltip_legend {
+    background: rgba(20, 26, 35, 0.95) !important;
+    background-color: rgba(20, 26, 35, 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    padding: 8px 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+
+    * {
+        color: #ffffff !important;
+    }
+}
+
+.bg-100,
+.text-bg-100,
+.bg-200 {
+    background-color: $glass-bg-light !important;
+    backdrop-filter: blur($blur-heavy) !important;
+}
+
+.bg-view,
+.o_switch_company_menu_items .o_switch_company_item.focus > *,
+.bg-primary-subtle,
+.text-700,
+.bg-secondary,
+.oe_subtotal_footer {
+    @include transparent-bg;
+    background-color: transparent !important;
+    @include text-white-color;
+}
+
+.text-primary {
+    outline: $primary-color !important;
+    @include text-white-color;
+}
+
+a.text-primary:hover,
+.o_loading_indicator,
+.bg-primary {
+    background: $primary-gradient !important;
+    @include text-white-color;
+}
+
+.border-primary {
+    border-color: $primary-color !important;
+}
+
+.o_tag.o_tag_color_0,
+.text-bg-action {
+    background-color: $primary-color !important;
+}
+
+.text-action, .btn-link.text-action:hover {
+    color: $primary-color !important;
+
+}
+
+// ============================================================================
+// Notification / Toast Component — Liquid Glass Theme
+// ============================================================================
+.o_notification_manager,
+body {
+    .o_notification {
+        background: rgba(22, 28, 38, 0.94) !important;
+        background-color: rgba(22, 28, 38, 0.94) !important;
+        backdrop-filter: blur(30px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55), 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        color: #ffffff !important;
+        overflow: hidden !important;
+        transition: $transition-base !important;
+        margin-bottom: 12px !important;
+        min-width: 300px !important;
+
+        // --- Notification Title ---
+        .o_notification_title {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.2px !important;
+            padding: 12px 42px 4px 16px !important;
+            line-height: 1.3 !important;
+            display: block !important;
+        }
+
+        // --- Notification Body & Content ---
+        .o_notification_body {
+            padding: 2px 42px 14px 16px !important;
+            background: transparent !important;
+
+            .o_notification_content {
+                color: rgba(255, 255, 255, 0.92) !important;
+                font-size: 13px !important;
+                line-height: 1.45 !important;
+                font-weight: 400 !important;
+
+                *, div, span, p {
+                    color: rgba(255, 255, 255, 0.92) !important;
+                }
+
+                a, a.alert-link {
+                    color: $primary-color !important;
+                    text-decoration: underline !important;
+                    font-weight: 500 !important;
+
+                    &:hover {
+                        color: #ffffff !important;
+                    }
+                }
+            }
+        }
+
+        // --- Close Button ---
+        .o_notification_close {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            width: 26px !important;
+            height: 26px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 50% !important;
+            background: transparent !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: $transition-base !important;
+            outline: none !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+
+            i, .oi, .oi-close, .fa {
+                font-size: 12px !important;
+                line-height: 1 !important;
+                color: inherit !important;
+            }
+
+            &:hover, &:focus {
+                background: rgba(255, 255, 255, 0.16) !important;
+                color: #ffffff !important;
+                transform: scale(1.1) !important;
+            }
+        }
+
+        // --- Action Buttons in Notification ---
+        .o_notification_buttons {
+            margin-top: 8px !important;
+
+            .btn {
+                padding: 4px 12px !important;
+                font-size: 12px !important;
+                border-radius: $radius-sm !important;
+            }
+
+            .btn-primary {
+                background: $primary-gradient !important;
+                color: #ffffff !important;
+            }
+
+            .btn-secondary {
+                @include glass-effect($glass-bg-light, $blur-light);
+                color: #ffffff !important;
+            }
+        }
+
+        // ====================================================================
+        // TYPE-SPECIFIC ACCENTS & CONTRAST
+        // ====================================================================
+
+        // 1. SUCCESS (e.g., "Content saved.")
+        &.border-success,
+        &[class*="success"] {
+            border-left: 4px solid #10b981 !important;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(22, 28, 38, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-success {
+                color: #34d399 !important;
+                text-shadow: 0 0 10px rgba(52, 211, 153, 0.4) !important;
+            }
+        }
+
+        // 2. DANGER / ERROR
+        &.border-danger,
+        &[class*="danger"] {
+            border-left: 4px solid #ef4444 !important;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.16) 0%, rgba(22, 28, 38, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-danger {
+                color: #f87171 !important;
+                text-shadow: 0 0 10px rgba(248, 113, 113, 0.4) !important;
+            }
+        }
+
+        // 3. WARNING
+        &.border-warning,
+        &[class*="warning"] {
+            border-left: 4px solid #f59e0b !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(22, 28, 38, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-warning {
+                color: #fbbf24 !important;
+                text-shadow: 0 0 10px rgba(251, 191, 36, 0.4) !important;
+            }
+        }
+
+        // 4. INFO
+        &.border-info,
+        &[class*="info"] {
+            border-left: 4px solid #0ea5e9 !important;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.16) 0%, rgba(22, 28, 38, 0.95) 45%) !important;
+
+            .o_notification_title,
+            .text-info {
+                color: #38bdf8 !important;
+                text-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
+            }
+        }
+    }
+}
+
+.alert-info {
+    background: rgba(14, 165, 233, 0.15) !important;
+    border-left: 4px solid #0ea5e9 !important;
+    border-radius: 14px;
+    color: #38bdf8 !important;
+    *, p, span { color: #38bdf8 !important; }
+}
+
+pre {
+    background-color: $glass-bg-light !important;
+    border-radius: $radius-xl;
+    @include text-white-color;
+}
+
+// Native select and options are comprehensively styled in forms.scss
+
+.o-grid {
+    background-color: $glass-bg-light !important;
+    border: 1px solid $glass-bg-light !important;
+    margin: 10px;
+    border-radius: $radius-xl;
+}
+
+.o_tour_pointer {
+    .o_tour_pointer_content {
+        @include glass-effect($glass-bg-medium, $blur-medium);
+        @include glass-border;
+        border-radius: $radius-sm !important;
+    }
+
+    .o_tour_pointer_tip {
+        background-image: $primary-gradient !important;
+    }
+
+    &.o_open {
+        @include glass-effect($glass-bg-medium, $blur-medium);
+        @include glass-border;
+        border-radius: $radius-sm !important;
+    }
+}
+
+.oe_subtotal_footer {
+    border-top: transparent !important;
+}
+
+.o_pivot th,
+.o_pivot td {
+    border: 1px solid $glass-border;
+
+    &:hover {
+        background-color: $hover-bg !important;
+    }
+}
+
+.text-bg-primary {
+    background-color: $primary-color !important;
+}
+
+.alert {
+    color: black !important;
+    p, span {
+        color: black !important;
+    }
+}
+
+.o_sale_optional_products,
+.o_calendar_renderer .fc-event.o_past_event::after {
+    background: $glass-bg-light !important;
+}
+
+.fc-event {
+    padding: 5px !important;
+}
+
+.o_event_title, .card-header {
+    color: black !important;
+    span {
+        color: black !important;
+    }
+}
+
+.badge,
+.o_tag,
+.o_field_badge,
+.rounded-pill,
+.o_tag_badge_text,
+.o-discuss-ChannelInvitation-search.form-control {
+    color: #000000 !important;
+
+    *,
+    span,
+    div,
+    a,
+    label,
+    strong {
+        color: #000000 !important;
+    }
+}
+
+.o_app_menu_sidebar .o_burger_menu_content.o_burger_menu_app, .o_sidebar_topbar, .o-mail-Message.o-card,
+.o_burger_menu .o_burger_menu_content.o_burger_menu_app {
+    @include glass-effect($glass-bg-medium, $blur-medium);
+    @include glass-border;
+    border-radius: $radius-sm !important;
+    gap: 5px;
+    box-shadow: none !important;
+
+    &:hover {
+        background-color: $hover-bg !important;
+    }
+}
+
+.o_burger_menu_content li, .text-900,
+.o_searchview_icon {
+    color: $text-white !important;
+}
+
+.o-mail-MessagingMenu-navbar button.o-active,
+.o-mail-DiscussSidebar-item:hover .o-mail-DiscussSidebarChannel-commands .btn-group .btn:hover,
+.o-mail-DiscussSidebarChannel-container.o-bordered,
+.o-mail-DiscussSidebarChannel-container.o-bordered.o-selfInCall,
+.o-discuss-CallMenu-buttonContent,
+.o_button_more.btn:hover,
+.o-dropdown.btn-outline-secondary.show,
+.o_dashboard_bottom_block,
+.o_form_nosheet,
+.o_we_file_selector_control_panel,
+.o-we-command-img,
+.o-discuss-ChannelInvitation-selectable.o-odd {
+    @include transparent-bg;
+}
+
+.o-discuss-ChannelMember:hover,
+.o-mail-Discuss-headerActions button:hover:has(.fa-video-camera),
+.o-mail-Discuss-headerActions button:hover:has(.fa-phone),
+.o-discuss-NotificationSettings button:hover {
+    background-color: $hover-bg !important;
+}
+
+.o-mail-Composer-actions button {
+    backdrop-filter: none !important;
+    color: $text-white !important;
+}
+
+.bg-white,
+.bg-300,
+.o-mail-MessageCardList .card-body,
+.o-mail-DiscussNotificationSettings button.o-selected {
+    @include glass-effect($glass-bg-medium, $blur-medium);
+}
+
+.o-mail-SearchMessageInput {
+    .o_searchview_input, .btn {
+        @include glass-effect($glass-bg-medium, $blur-medium);
+     }
+}
+
+.card {
+    --card-bg: transparent !important;
+    --bs-card-bg: transparent !important;
+    @include glass-effect($glass-bg-light, $blur-medium);
+    @include glass-border;
+}
+
+.o-mail-NavigableList {
+    background: rgba(80, 86, 91, 0.42) !important;
+    backdrop-filter: blur($blur-medium) saturate(180%) !important;
+    @include glass-border;
+    .o-mail-NavigableList-active, .o-mail-NavigableList-item:hover {
+        @include glass-effect($glass-bg-dark, $blur-medium);
+    }
+}
+
+.border {
+   @include glass-border;
+}
+
+// Form select handled in forms.scss
+
+.o_model_field_selector > .o_model_field_selector_value > .o_model_field_selector_chain_part,
+.o_model_field_selector_popover .o_model_field_selector_popover_body .o_model_field_selector_popover_page > .o_model_field_selector_popover_item {
+    border: none !important;
+    @include transparent-bg;
+
+    &:hover {
+        background: $hover-bg !important;
+    }
+}
+
+.o_datetime_button {
+    color: $text-white !important;
+}
+
+.btn-light {
+    --btn-bg: transparent !important;
+}
+
+tr.bg-light, .list-group-item, .o-mail-DiscussSystray-class:hover {
+    background-color: transparent !important;
+}
+
+.o_pivot.o_pivot table .o_pivot_measure_row:hover,
+.o_pivot.o_pivot table .o_pivot_origin_row:hover,
+.o_pivot.o_pivot table .o_pivot_header_cell_closed:hover,
+.o_pivot.o_pivot table .o_pivot_header_cell_opened:hover {
+    background-color: $hover-bg !important;
+}
+
+.o_cp_action_menus div .o-dropdown,
+.o_facet_remove.btn-link.text-danger,
+.o_optional_columns_dropdown button,
+.power_button,
+.o-mail-Message-actions button{
+    color: $text-white !important;
+}
+
+.o_priority_star.fa-star-o,
+a.o_todo_done_button {
+    color: $text-muted !important;
+}
+
+
+.o-we-command.active, .o-discuss-ChannelInvitation-selectable:hover {
+    background: $hover-bg !important;
+}
+
+.o-mail-Message-core {
+    align-items: center !important;
+    padding-top: 15px !important;
+}
+
+.o_datetime_picker_header button.btn {
+    padding: 2px 6px !important;
+}
+
+/* Onboarding Banner & Component Glass Overrides */
+div.o_onboarding_main,
+div.o_onboarding_container,
+div.o_onboarding,
+div.o_onboarding_wrap,
+div.o_onboarding_step,
+div.o_onboarding_panel,
+div.o_onboarding_banner,
+.o_onboarding_main *,
+.o_onboarding_container * {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    --onboarding-bg: transparent !important;
+    --bs-card-bg: transparent !important;
+}
+
+div.o_onboarding_main,
+div.o_onboarding_container {
+    background: rgba(30, 38, 48, 0.75) !important;
+    background-color: rgba(30, 38, 48, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-bottom: none !important;
+    border-radius: 16px !important;
+    margin-bottom: 0 !important;
+
+    .o_onboarding_step_title,
+    .o_onboarding_title,
+    h1, h2, h3, h4, h5, h6,
+    p, span, label, div, small {
+        color: #ffffff !important;
+    }
+
+    .o_onboarding_step_action,
+    .o_onboarding_step_action__done,
+    .btn,
+    .btn-link,
+    a.o_onboarding_step_action {
+        color: #ffffff !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 12px !important;
+        padding: 5px 14px !important;
+        transition: all 0.25s ease !important;
+        text-decoration: none !important;
+
+        &:hover,
+        &:focus {
+            background: rgba(255, 255, 255, 0.18) !important;
+            background-color: rgba(255, 255, 255, 0.18) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.35) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+    }
+}
+
+/* List Table Record Links & Cell Text Overrides */
+.o_list_renderer,
+.o_list_table {
+    tr.o_data_row td.o_data_cell,
+    tr.o_data_row td.o_data_cell *:not(.badge):not(.rounded-pill):not(.o_tag):not(.o_field_badge):not(.o_tag_badge_text),
+    tr.o_data_row td a,
+    tr.o_data_row td a *:not(.badge):not(.rounded-pill):not(.o_tag),
+    tr.o_data_row td span:not(.badge):not(.rounded-pill):not(.o_tag),
+    tr.o_data_row td span *:not(.badge):not(.rounded-pill):not(.o_tag),
+    td.o_list_many2one,
+    td.o_list_many2one a,
+    td.o_list_many2one span:not(.badge):not(.rounded-pill):not(.o_tag),
+    td.o_data_cell a,
+    td.o_data_cell a *:not(.badge):not(.rounded-pill):not(.o_tag),
+    a.o_form_uri,
+    a.o_form_uri span,
+    .o_form_uri {
+        color: #ffffff !important;
+    }
+
+    tr.o_data_row td a:hover,
+    tr.o_data_row td a:hover *,
+    a.o_form_uri:hover {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    tr.o_data_row td:first-child,
+    tr.o_data_row td:first-child *:not(.badge):not(.rounded-pill):not(.o_tag):not(.o_field_badge) {
+        font-weight: 600 !important;
+        color: #ffffff !important;
+    }
+}
+
+/* ============================================================
+   DEFINITIVE BADGE / STATUS PILL TEXT COLOR — BLACK
+   Highest possible specificity to override all white rules
+   ============================================================ */
+.o_list_renderer .o_list_table tr.o_data_row td .badge,
+.o_list_renderer .o_list_table tr.o_data_row td .badge *,
+.o_list_renderer .o_list_table tr.o_data_row td .rounded-pill,
+.o_list_renderer .o_list_table tr.o_data_row td .rounded-pill *,
+.o_list_renderer .o_list_table tr.o_data_row td .o_tag,
+.o_list_renderer .o_list_table tr.o_data_row td .o_tag *,
+.o_list_renderer .o_list_table tr.o_data_row td .o_field_badge,
+.o_list_renderer .o_list_table tr.o_data_row td .o_field_badge *,
+.o_list_table tr.o_data_row td .badge,
+.o_list_table tr.o_data_row td .badge *,
+.o_list_table tr.o_data_row td .rounded-pill,
+.o_list_table tr.o_data_row td .rounded-pill *,
+.o_list_table tr.o_data_row td .o_tag,
+.o_list_table tr.o_data_row td .o_tag *,
+.o_list_table tr.o_data_row td .o_field_badge,
+.o_list_table tr.o_data_row td .o_field_badge * {
+    color: #000000 !important;
+}
+
+.o_view_nocontent {
+    background-image: none !important;
+    background: transparent !important;
+
+    .o_nocontent_help {
+        /* Keep text readable on dark bg */
+        color: #ffffff !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+
+        p, span, div, strong, h3, h4 {
+            color: #ffffff !important;
+        }
+    }
+}
+
+/* Sample data overlay — ensure no white spotlight or box-shadow */
+.o_view_sample_data .o_nocontent_help {
+    background-color: transparent !important;
+    box-shadow: none !important;
+
+    p, span, div, strong, h3, h4 {
+        color: #ffffff !important;
+    }
+}

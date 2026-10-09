@@ -1,26 +1,20 @@
 /** @odoo-module **/
 
-import { Component, useRef, onMounted, onWillUpdateProps, onWillUnmount, onWillStart } from "@odoo/owl";
+import { Component, signal, onMounted, onPatched, onWillUnmount, onWillStart, useProps } from "@odoo/owl";
 import { loadBundle } from "@web/core/assets";
 
 export class ExpenseBreakdownChart extends Component {
     static template = "accounting_dashboard_pro.ExpenseBreakdownChart";
-    static props = { data: { type: Object, optional: true }, formatCurrency: Function };
+    props = useProps();
+    canvasRef = signal.ref();
 
     setup() {
-        this.canvasRef = useRef("canvas");
         this.chart = null;
         onWillStart(async () => {
             await loadBundle("web.chartjs_lib");
         });
         onMounted(() => this.renderChart());
-        onWillUpdateProps((next) => {
-            if (next.data !== this.props.data) {
-                this.destroyChart();
-                this.props = next;
-                this.renderChart();
-            }
-        });
+        onPatched(() => this.renderChart());
         onWillUnmount(() => this.destroyChart());
     }
 
@@ -32,9 +26,10 @@ export class ExpenseBreakdownChart extends Component {
     }
 
     renderChart() {
+        this.destroyChart();
         const data = this.props.data;
         if (!data || !data.labels || !data.labels.length) return;
-        const el = this.canvasRef.el;
+        const el = this.canvasRef();
         if (!el) return;
         const ctx = el.getContext("2d");
 

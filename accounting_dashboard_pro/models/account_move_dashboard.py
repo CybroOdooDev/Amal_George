@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
-######################################################################################
+###############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>).
-#    Author:  Cybrosys Techno Solutions (odoo@cybrosys.com)
+#    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(odoo@cybrosys.com)
 #
-#    This program is under the terms of the Odoo Proprietary License v1.0 (OPL-1)
-#    It is forbidden to publish, distribute, sublicense, or sell copies of the Software
-#    or modified copies of the Software.
+#    This program is under the terms of the Odoo Proprietary License v1.0(OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
 #
-#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 #    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-#    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-#    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-#    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #    DEALINGS IN THE SOFTWARE.
 #
-########################################################################################
+###############################################################################
 
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -181,6 +181,7 @@ class AccountMoveDashboard(models.Model):
             'change_pct': self._safe_change_pct(abs(in_posted), abs(prev_in)),
         }
         # --- Overdue ---
+        cutoff = min(today, date_to) if date_to else today
         self.env.cr.execute("""
             SELECT move_type,
                    COUNT(*) as cnt,
@@ -188,12 +189,12 @@ class AccountMoveDashboard(models.Model):
             FROM account_move
             WHERE state = 'posted'
               AND payment_state IN ('not_paid', 'partial')
-              AND invoice_date_due < %s
+              AND COALESCE(invoice_date_due, date) < %s
               AND move_type IN ('out_invoice', 'in_invoice')
               AND company_id = ANY(%s)
-              AND date BETWEEN %s AND %s
+              AND date <= %s
             GROUP BY move_type
-        """, (today, company_ids, date_from, date_to))
+        """, (cutoff, company_ids, date_to))
         overdue_data = self.env.cr.dictfetchall()
 
         result['overdue_receivable'] = {
@@ -261,12 +262,12 @@ class AccountMoveDashboard(models.Model):
 
         # --- Cash Balance (basic+ users or readonly users) ---
         if result['user_groups']['is_basic'] or result['user_groups']['is_readonly']:
-            # Current cash balance
+            # Current cash balance (as of period end date)
             self.env.cr.execute("""
                 SELECT COALESCE(SUM(aml.balance), 0)
                 FROM account_move_line aml
                 WHERE aml.parent_state = 'posted'
-                  AND aml.date BETWEEN %s AND %s
+                  AND aml.date <= %s
                   AND aml.company_id = ANY(%s)
                   AND EXISTS (
                       SELECT 1
@@ -274,16 +275,15 @@ class AccountMoveDashboard(models.Model):
                       WHERE aj.default_account_id = aml.account_id
                         AND aj.type IN ('bank', 'cash')
                   )
-            """, (date_from, date_to, company_ids))
+            """, (date_to, company_ids))
 
             cash_balance = self.env.cr.fetchone()[0]
 
             self.env.cr.execute("""
                 SELECT COALESCE(SUM(aml.balance), 0)
                 FROM account_move_line aml
-                JOIN account_move am ON am.id = aml.move_id
                 WHERE aml.parent_state = 'posted'
-                  AND am.date <= %s
+                  AND aml.date <= %s
                   AND aml.company_id = ANY(%s)
                   AND EXISTS (
                       SELECT 1
@@ -298,18 +298,19 @@ class AccountMoveDashboard(models.Model):
                 'prev_amount': prev_cash_balance,
                 'change_pct': self._safe_change_pct(cash_balance, prev_cash_balance),
             }
+
             # --- CASH FLOW KPIs ---
 
-            # Total Receivable (all open customer invoices)
+            # Total Receivable (all open customer invoices as of date_to)
             self.env.cr.execute("""
                 SELECT COALESCE(SUM(amount_residual_signed), 0)
                 FROM account_move
                 WHERE state = 'posted'
                   AND move_type = 'out_invoice'
-                  AND date BETWEEN %s AND %s
+                  AND date <= %s
                   AND payment_state IN ('not_paid', 'partial')
                   AND company_id = ANY(%s)
-            """, (date_from, date_to,company_ids,))
+            """, (date_to, company_ids))
             total_receivable = self.env.cr.fetchone()[0]
 
             # Previous receivable (open invoices as of prev_to)
@@ -324,16 +325,16 @@ class AccountMoveDashboard(models.Model):
             """, (prev_to, company_ids))
             prev_receivable = self.env.cr.fetchone()[0]
 
-            # Total Payable (all open vendor bills)
+            # Total Payable (all open vendor bills as of date_to)
             self.env.cr.execute("""
                 SELECT COALESCE(SUM(ABS(amount_residual_signed)), 0)
                 FROM account_move
                 WHERE state = 'posted'
                   AND move_type = 'in_invoice'
-                  AND date BETWEEN %s AND %s
+                  AND date <= %s
                   AND payment_state IN ('not_paid', 'partial')
                   AND company_id = ANY(%s)
-            """, (date_from, date_to, company_ids,))
+            """, (date_to, company_ids))
             total_payable = self.env.cr.fetchone()[0]
 
             # Previous payable
@@ -643,7 +644,7 @@ class AccountMoveDashboard(models.Model):
             FROM account_move_line aml
             JOIN account_account aa ON aa.id = aml.account_id
             JOIN account_move am ON am.id = aml.move_id
-            WHERE aa.account_type = 'expense'
+            WHERE aa.account_type LIKE 'expense%%'
               AND am.state = 'posted'
               AND am.date BETWEEN %(date_from)s AND %(date_to)s
               AND aml.company_id = ANY(%(company_ids)s)
@@ -729,33 +730,53 @@ class AccountMoveDashboard(models.Model):
             SELECT am.id, am.name,
                    rp.name AS partner_name,
                    ABS(am.amount_residual_signed) AS amount,
-                   am.invoice_date_due,
-                   (am.invoice_date_due - %s) AS days_until_due
+                   COALESCE(am.invoice_date_due, am.date) AS invoice_date_due,
+                   (COALESCE(am.invoice_date_due, am.date) - %s) AS days_until_due
             FROM account_move am
             LEFT JOIN res_partner rp ON rp.id = am.partner_id
             WHERE am.state = 'posted'
               AND am.move_type = 'in_invoice'
               AND am.payment_state IN ('not_paid', 'partial')
-              AND am.invoice_date_due BETWEEN %s AND %s
+              AND COALESCE(am.invoice_date_due, am.date) >= %s
               AND am.company_id = ANY(%s)
-            ORDER BY am.invoice_date_due ASC LIMIT %s
-        """, (today, today, today + timedelta(days=7), company_ids, limit))
+            ORDER BY COALESCE(am.invoice_date_due, am.date) ASC, am.id ASC LIMIT %s
+        """, (today, today, company_ids, limit))
         result['upcoming_bills'] = self.env.cr.dictfetchall()
 
         lang = self.env.lang or 'en_US'
         self.env.cr.execute("""
-            SELECT ap.id, am.name,
-                   rp.name AS partner_name,
-                   ap.amount AS amount,
-                   ap.date, ap.payment_type,
-                   COALESCE(aj.name->>%(lang)s, aj.name->>'en_US', aj.name::text) AS journal_name
-            FROM account_payment ap
-            JOIN account_move am ON am.id = ap.move_id
-            LEFT JOIN res_partner rp ON rp.id = ap.partner_id
-            LEFT JOIN account_journal aj ON aj.id = ap.journal_id
-            WHERE am.state = 'posted'
-              AND ap.company_id = ANY(%(company_ids)s)
-            ORDER BY ap.date DESC, ap.id DESC LIMIT %(limit)s
+            SELECT * FROM (
+                SELECT ap.id,
+                       COALESCE(ap.name, am.name, 'Payment') AS name,
+                       rp.name AS partner_name,
+                       ap.amount AS amount,
+                       ap.date,
+                       ap.payment_type,
+                       COALESCE(aj.name->>%(lang)s, aj.name->>'en_US', aj.name::text) AS journal_name,
+                       'account.payment' AS res_model
+                FROM account_payment ap
+                LEFT JOIN account_move am ON am.id = ap.move_id
+                LEFT JOIN res_partner rp ON rp.id = ap.partner_id
+                LEFT JOIN account_journal aj ON aj.id = ap.journal_id
+                WHERE ap.state IN ('paid', 'reconciled', 'draft')
+                  AND ap.company_id = ANY(%(company_ids)s)
+                UNION ALL
+                SELECT absl.id,
+                       COALESCE(absl.payment_ref, am.name, 'Bank Payment') AS name,
+                       rp.name AS partner_name,
+                       ABS(absl.amount) AS amount,
+                       am.date,
+                       CASE WHEN absl.amount >= 0 THEN 'inbound' ELSE 'outbound' END AS payment_type,
+                       COALESCE(aj.name->>%(lang)s, aj.name->>'en_US', aj.name::text) AS journal_name,
+                       'account.bank.statement.line' AS res_model
+                FROM account_bank_statement_line absl
+                JOIN account_move am ON am.id = absl.move_id
+                LEFT JOIN res_partner rp ON rp.id = absl.partner_id
+                LEFT JOIN account_journal aj ON aj.id = am.journal_id
+                WHERE absl.is_reconciled = true
+                  AND absl.company_id = ANY(%(company_ids)s)
+            ) combined_payments
+            ORDER BY date DESC, id DESC LIMIT %(limit)s
         """, {'lang': lang, 'company_ids': company_ids, 'limit': limit})
         result['recent_payments'] = self.env.cr.dictfetchall()
 
@@ -813,9 +834,9 @@ class AccountMoveDashboard(models.Model):
         if cnt:
             alerts.append({
                 'type': 'danger',
-                'icon': 'fa-exclamation-triangle',
+                'icon': 'warning',
                 'title': _('%d invoices overdue by 30+ days') % cnt,
-                'subtitle': _('Total: %s') % self.env.company.currency_id.symbol + f' {amt:,.2f}',
+                'subtitle': _('Total: %s %s') % (self.env.company.currency_id.symbol, f'{amt:,.2f}'),
                 'action': 'overdue_invoices',
             })
 
@@ -829,7 +850,7 @@ class AccountMoveDashboard(models.Model):
             if unrec:
                 alerts.append({
                     'type': 'warning',
-                    'icon': 'fa-university',
+                    'icon': 'account_balance',
                     'title': _('%d unreconciled bank statement lines') % unrec,
                     'subtitle': _('Pending reconciliation'),
                     'action': 'reconcile',
@@ -848,7 +869,7 @@ class AccountMoveDashboard(models.Model):
         if due_today:
             alerts.append({
                 'type': 'info',
-                'icon': 'fa-calendar',
+                'icon': 'calendar_today',
                 'title': _('%d bills due today') % due_today,
                 'subtitle': _('Review and schedule payments'),
                 'action': 'bills_due_today',
@@ -865,7 +886,7 @@ class AccountMoveDashboard(models.Model):
         if drafts:
             alerts.append({
                 'type': 'info',
-                'icon': 'fa-file-text-o',
+                'icon': 'description',
                 'title': _('%d draft invoices/bills') % drafts,
                 'subtitle': _('Awaiting confirmation'),
                 'action': 'draft_moves',
@@ -1011,11 +1032,11 @@ class AccountMoveDashboard(models.Model):
             JOIN account_move am ON am.id = aml.move_id
             JOIN account_account aa ON aa.id = aml.account_id
             WHERE am.state = 'posted'
-              AND am.move_type IN ('in_invoice', 'in_refund')
+              AND aa.account_type LIKE 'expense%%'
               AND am.date BETWEEN %(date_from)s AND %(date_to)s
-              AND am.company_id = ANY(%(company_ids)s)
-              AND aml.display_type = 'product'
+              AND aml.company_id = ANY(%(company_ids)s)
             GROUP BY aa.name
+            HAVING SUM(ABS(aml.balance)) > 0
             ORDER BY total DESC
             LIMIT 10
         """, {'lang': lang, 'date_from': date_from, 'date_to': date_to,
@@ -1052,13 +1073,18 @@ class AccountMoveDashboard(models.Model):
         if not lines:
             return {'available': True, 'labels': [], 'budgeted': [], 'actual': []}
 
+        distinct_budgets = len(lines.mapped('budget_analytic_id'))
         labels = []
         budgeted = []
         actual = []
         for line in lines:
-            label = line.budget_analytic_id.name
-            if len(label) > 25:
-                label = label[:22] + '...'
+            acc_name = line.account_id.name or line.name or line.budget_analytic_id.name
+            if distinct_budgets > 1:
+                label = f"{acc_name} ({line.budget_analytic_id.name})"
+            else:
+                label = acc_name
+            if len(label) > 28:
+                label = label[:25] + '...'
             labels.append(label)
             budgeted.append(line.budget_amount)
             actual.append(line.achieved_amount)
@@ -1083,17 +1109,30 @@ class AccountMoveDashboard(models.Model):
 
         self.env.cr.execute("""
             SELECT
-                to_char(ap.date, 'YYYY-MM') AS month,
-                ap.payment_type,
-                COALESCE(SUM(ap.amount), 0) AS total
-            FROM account_payment ap
-            JOIN account_move am ON am.id = ap.move_id
-            WHERE am.state = 'posted'
-              AND ap.date >= %s
-              AND ap.company_id = ANY(%s)
-            GROUP BY to_char(ap.date, 'YYYY-MM'), ap.payment_type
+                to_char(payment_date, 'YYYY-MM') AS month,
+                payment_type,
+                COALESCE(SUM(amount), 0) AS total
+            FROM (
+                SELECT ap.date AS payment_date,
+                       ap.payment_type,
+                       ap.amount
+                FROM account_payment ap
+                WHERE ap.state IN ('paid', 'reconciled')
+                  AND ap.date >= %s
+                  AND ap.company_id = ANY(%s)
+                UNION ALL
+                SELECT am.date AS payment_date,
+                       CASE WHEN absl.amount >= 0 THEN 'inbound' ELSE 'outbound' END AS payment_type,
+                       ABS(absl.amount) AS amount
+                FROM account_bank_statement_line absl
+                JOIN account_move am ON am.id = absl.move_id
+                WHERE absl.is_reconciled = true
+                  AND am.date >= %s
+                  AND absl.company_id = ANY(%s)
+            ) flow
+            GROUP BY to_char(payment_date, 'YYYY-MM'), payment_type
             ORDER BY month
-        """, (date_from, company_ids))
+        """, (date_from, company_ids, date_from, company_ids))
         rows = self.env.cr.dictfetchall()
 
         months = []
@@ -1137,28 +1176,48 @@ class AccountMoveDashboard(models.Model):
         """, (opening_date, company_ids))
         opening = self.env.cr.fetchone()[0]
 
-        # Inflows in period (inbound payments)
+        # Inflows in period (inbound payments + reconciled bank receipts)
         self.env.cr.execute("""
-            SELECT COALESCE(SUM(ap.amount), 0)
-            FROM account_payment ap
-            JOIN account_move am ON am.id = ap.move_id
-            WHERE am.state = 'posted'
-              AND ap.payment_type = 'inbound'
-              AND ap.date BETWEEN %s AND %s
-              AND ap.company_id = ANY(%s)
-        """, (date_from, date_to, company_ids))
+            SELECT COALESCE(SUM(amount), 0)
+            FROM (
+                SELECT ap.amount
+                FROM account_payment ap
+                WHERE ap.state IN ('paid', 'reconciled')
+                  AND ap.payment_type = 'inbound'
+                  AND ap.date BETWEEN %s AND %s
+                  AND ap.company_id = ANY(%s)
+                UNION ALL
+                SELECT absl.amount
+                FROM account_bank_statement_line absl
+                JOIN account_move am ON am.id = absl.move_id
+                WHERE absl.is_reconciled = true
+                  AND absl.amount > 0
+                  AND am.date BETWEEN %s AND %s
+                  AND absl.company_id = ANY(%s)
+            ) inc
+        """, (date_from, date_to, company_ids, date_from, date_to, company_ids))
         inflows = self.env.cr.fetchone()[0]
 
-        # Outflows in period (outbound payments)
+        # Outflows in period (outbound payments + reconciled bank disbursements)
         self.env.cr.execute("""
-            SELECT COALESCE(SUM(ap.amount), 0)
-            FROM account_payment ap
-            JOIN account_move am ON am.id = ap.move_id
-            WHERE am.state = 'posted'
-              AND ap.payment_type = 'outbound'
-              AND ap.date BETWEEN %s AND %s
-              AND ap.company_id = ANY(%s)
-        """, (date_from, date_to, company_ids))
+            SELECT COALESCE(SUM(amount), 0)
+            FROM (
+                SELECT ap.amount
+                FROM account_payment ap
+                WHERE ap.state IN ('paid', 'reconciled')
+                  AND ap.payment_type = 'outbound'
+                  AND ap.date BETWEEN %s AND %s
+                  AND ap.company_id = ANY(%s)
+                UNION ALL
+                SELECT ABS(absl.amount) AS amount
+                FROM account_bank_statement_line absl
+                JOIN account_move am ON am.id = absl.move_id
+                WHERE absl.is_reconciled = true
+                  AND absl.amount < 0
+                  AND am.date BETWEEN %s AND %s
+                  AND absl.company_id = ANY(%s)
+            ) outc
+        """, (date_from, date_to, company_ids, date_from, date_to, company_ids))
         outflows = self.env.cr.fetchone()[0]
 
         closing = opening + inflows - outflows

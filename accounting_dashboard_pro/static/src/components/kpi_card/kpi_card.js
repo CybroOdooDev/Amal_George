@@ -1,28 +1,16 @@
 /** @odoo-module **/
 
-import { Component, onMounted, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onPatched, signal, proxy, useProps } from "@odoo/owl";
 
 export class KpiCard extends Component {
     static template = "accounting_dashboard_pro.KpiCard";
-    static props = {
-        title: { type: String },
-        icon: { type: String },
-        amount: { type: Number },
-        subtitle: { type: String, optional: true },
-        changePct: { type: Number, optional: true },
-        prevAmount: { type: Number, optional: true },
-        color: { type: String, optional: true },
-        formatCurrency: { type: Function },
-        onClick: { type: Function, optional: true },
-        useRaw: { type: Boolean, optional: true },
-        rawSuffix: { type: String, optional: true },
-        info: { type: String, optional: true },
-    };
+    props = useProps();
+    amountRef = signal.ref();
 
     setup() {
-        this.amountRef = useRef("amount");
-        this.infoState = useState({ show: false });
+        this.infoState = proxy({ show: false });
         onMounted(() => this.animateCount());
+        onPatched(() => this.animateCount());
     }
 
     onInfoEnter(ev) {
@@ -35,7 +23,7 @@ export class KpiCard extends Component {
     }
 
     animateCount() {
-        const el = this.amountRef.el;
+        const el = this.amountRef();
         if (!el) return;
         const target = this.props.amount || 0;
         const duration = 700;
@@ -69,7 +57,7 @@ export class KpiCard extends Component {
 
     get changeIcon() {
         const pct = this.props.changePct || 0;
-        return pct > 0 ? "fa-arrow-up" : pct < 0 ? "fa-arrow-down" : "fa-minus";
+        return pct > 0 ? "arrow_upward" : pct < 0 ? "arrow_downward" : "remove";
     }
 
     get hasPrev() {

@@ -1440,7 +1440,8 @@
     border-bottom: 1px solid var(--adp-border);
     padding-bottom: 8px;
 
-    .fa-info-circle {
+    .fa-info-circle,
+    .oi {
         font-size: 14px;
     }
 }
@@ -1500,7 +1501,8 @@
     align-items: center;
     gap: 8px;
 
-    .fa {
+    .fa,
+    .oi {
         color: #0ea5e9;
         font-size: 18px;
     }
@@ -1604,7 +1606,8 @@
     white-space: nowrap;
     transition: all .2s;
 
-    .fa {
+    .fa,
+    .oi {
         font-size: 11px;
     }
 

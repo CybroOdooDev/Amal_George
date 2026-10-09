@@ -1,20 +1,21 @@
 /** @odoo-module **/
 
-import { Component, useRef, onMounted, onWillUnmount, onWillStart, useState } from "@odoo/owl";
+import { Component, signal, proxy, onMounted, onPatched, onWillUnmount, onWillStart, useProps } from "@odoo/owl";
 import { loadBundle } from "@web/core/assets";
 
 export class JournalBalanceChart extends Component {
     static template = "accounting_dashboard_pro.JournalBalanceChart";
-    static props = { journals: { type: Array }, formatCurrency: Function };
+    props = useProps();
+    canvasRef = signal.ref();
 
     setup() {
-        this.canvasRef = useRef("canvas");
         this.chart = null;
-        this.state = useState({ selectedIndex: 0 });
+        this.state = proxy({ selectedIndex: 0 });
         onWillStart(async () => {
             await loadBundle("web.chartjs_lib");
         });
         onMounted(() => this.renderChart());
+        onPatched(() => this.renderChart());
         onWillUnmount(() => this.destroyChart());
     }
 
@@ -36,9 +37,10 @@ export class JournalBalanceChart extends Component {
     }
 
     renderChart() {
+        this.destroyChart();
         const data = this.selectedJournal;
         if (!data || !data.labels || !data.labels.length) return;
-        const el = this.canvasRef.el;
+        const el = this.canvasRef();
         if (!el) return;
         const ctx = el.getContext("2d");
 

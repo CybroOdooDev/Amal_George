@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add AI Address Extraction Button to Partner Form View -->
+    <record id="view_partner_form_inherit_ai_address" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.ai.address</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_open_address_extractor"
+                            type="object"
+                            class="btn btn-outline-primary">
+                        <i class="oi me-1" data-icon="wand_stars" aria-hidden="true"/>
+                        <span>AI Extract Address</span>
+                    </button>
+                </header>
+            </xpath>
+        </field>
+    </record>
+</odoo>

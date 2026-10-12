@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Address Extraction Menu Item under Contacts Application -->
+    <menuitem id="menu_address_ai_extractor"
+              name="AI Address Extractor"
+              action="action_address_extraction_wizard"
+              parent="contacts.menu_contacts"
+              sequence="25"/>
+
+    <!-- AI Address Extractor Settings Menu Item under Contacts -> Configuration -->
+    <menuitem id="menu_address_ai_extractor_config_settings"
+              name="AI Address Extractor Settings"
+              action="action_address_ai_extractor_config_settings"
+              parent="contacts.res_partner_menu_config"
+              sequence="100"/>
+</odoo>

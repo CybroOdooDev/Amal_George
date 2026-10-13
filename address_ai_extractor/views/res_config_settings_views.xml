@@ -11,7 +11,7 @@
                      string="AI Address Extractor"
                      name="address_ai_extractor"
                      logo="/address_ai_extractor/static/description/icon.png">
-                    <block title="Google Gemini AI Integration" name="gemini_ai_settings_container">
+                    <block title="Google Gemini AI" name="gemini_ai_settings_container">
                         <setting id="gemini_api_key_setting" string="Gemini API Key" help="Configure Google Gemini API key to enable AI-powered address extraction. Stored securely on the server.">
                             <div class="content-group">
                                 <div class="mt16 row">
@@ -33,6 +33,11 @@
                                     </a>
                                 </div>
                             </div>
+                        </setting>
+                    </block>
+                    <block title="Address Autofill" name="address_autofill_container">
+                        <setting id="address_autofill_setting" string="Address Autofill" help="Enable AI-powered address autofill in Contact form and list views.">
+                            <field name="address_autofill"/>
                         </setting>
                     </block>
                 </app>

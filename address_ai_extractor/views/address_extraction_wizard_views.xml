@@ -6,19 +6,24 @@
         <field name="arch" type="xml">
             <form string="AI Address Extractor">
                 <field name="state" invisible="1"/>
+                <field name="is_partner_readonly" invisible="1"/>
 
                 <!-- STEP 1: Address Input (Draft) -->
                 <div invisible="state != 'draft'">
                     <group>
-                        <field name="partner_id" options="{'no_create': True}" placeholder="Optional: Select contact to update, or leave empty to create a new one"/>
+                        <field name="partner_id"
+                               readonly="is_partner_readonly"
+                               options="{'no_create': True}"
+                               placeholder="Select contact to update..."/>
                     </group>
                     <group string="Address Input">
                         <field name="raw_address"
                                nolabel="1"
-                               widget="text"
+                               colspan="2"
+                               rows="6"
                                placeholder="Enter or paste address text here..."
                                class="w-100"
-                               style="min-height: 120px; font-size: 14px;"/>
+                               style="width: 100% !important; min-height: 140px; font-size: 14px;"/>
                     </group>
                 </div>
 
@@ -26,7 +31,6 @@
                 <div invisible="state != 'extracted'">
                     <group string="Extracted Address Components">
                         <group>
-                            <field name="extracted_name" placeholder="Contact or company name"/>
                             <field name="extracted_street" placeholder="Street line 1"/>
                             <field name="extracted_street2" placeholder="Street line 2"/>
                             <field name="extracted_city" placeholder="City / Town"/>
@@ -35,7 +39,9 @@
                             <field name="extracted_country_id" options="{'no_open': True, 'no_create': True}"/>
                             <field name="extracted_state_id" options="{'no_open': True, 'no_create': True}"/>
                             <field name="extracted_zip" placeholder="ZIP / Postal Code"/>
-                            <field name="partner_id" options="{'no_create': True}"/>
+                            <field name="partner_id"
+                                   readonly="is_partner_readonly"
+                                   options="{'no_create': True}"/>
                         </group>
                     </group>
 
@@ -51,8 +57,8 @@
                             type="object"
                             class="btn-primary"
                             invisible="state != 'draft'">
-                        <i class="oi me-1" data-icon="wand_stars" aria-hidden="true"/>
-                        <span>Extract Address</span>
+                        <i class="oi me-1" data-icon="location_on" aria-hidden="true"/>
+                        <span>Address Autofill</span>
                     </button>
                     <button string="Cancel"
                             class="btn-secondary"
@@ -90,5 +96,7 @@
         <field name="view_mode">form</field>
         <field name="target">new</field>
         <field name="view_id" ref="view_address_extraction_wizard_form"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list,form</field>
     </record>
 </odoo>

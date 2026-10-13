@@ -33,10 +33,6 @@ class ResConfigSettings(models.TransientModel):
             ('gemini-3.8-flash', 'Gemini 3.8 Flash (Latest & Most Powerful)'),
             ('gemini-3.5-flash-lite', 'Gemini 3.5 Flash Lite (Cost-Effective)'),
             ('gemini-flash-latest', 'Gemini Flash Latest (Auto-Updated)'),
-            ('gemini-2.5-flash', 'Gemini 2.5 Flash (Deprecated)'),
-            ('gemini-2.5-pro', 'Gemini 2.5 Pro (Deprecated)'),
-            ('gemini-1.5-flash', 'Gemini 1.5 Flash (Deprecated)'),
-            ('gemini-1.5-pro', 'Gemini 1.5 Pro (Deprecated)'),
         ],
         string="Gemini Model",
         config_parameter="address_ai_extractor.gemini_model",
@@ -44,6 +40,12 @@ class ResConfigSettings(models.TransientModel):
         groups="base.group_system",
         required=True,
         help="The Google Gemini model used for address parsing.",
+    )
+    address_autofill = fields.Boolean(
+        string="Address Autofill",
+        config_parameter="address_ai_extractor.address_autofill",
+        default=True,
+        help="Enable AI-powered address autofill in Contact form and list views.",
     )
 
     def action_test_gemini_connection(self):

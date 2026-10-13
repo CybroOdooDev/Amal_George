@@ -15,7 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 COUNTRY_ALIASES = {
@@ -40,7 +40,8 @@ class AddressExtractionWizard(models.TransientModel):
     partner_id = fields.Many2one(
         comodel_name='res.partner',
         string="Target Contact",
-        help="Select an existing contact to update, or leave blank to create a new contact.",
+        required=True,
+        help="Select the contact to update.",
     )
     raw_address = fields.Text(
         string="Full Address Text",
@@ -57,10 +58,37 @@ class AddressExtractionWizard(models.TransientModel):
         required=True,
     )
 
-    # Extracted address fields
-    extracted_name = fields.Char(
-        string="Name / Recipient",
+    is_partner_readonly = fields.Boolean(
+        string="Is Partner Readonly",
+        default=False,
+        help="Technical flag indicating if the target contact should be readonly.",
     )
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        if self.env.context.get('partner_readonly') or self.env.context.get('default_is_partner_readonly'):
+            res['is_partner_readonly'] = True
+        partner_id = res.get('partner_id') or self.env.context.get('default_partner_id')
+        if not partner_id and self.env.context.get('active_model') == 'res.partner' and self.env.context.get('active_id'):
+            partner_id = self.env.context.get('active_id')
+            res['partner_id'] = partner_id
+        if partner_id and not res.get('raw_address'):
+            partner = self.env['res.partner'].browse(partner_id)
+            address_parts = [
+                partner.street,
+                partner.street2,
+                partner.city,
+                partner.state_id.name if partner.state_id else False,
+                partner.zip,
+                partner.country_id.name if partner.country_id else False,
+            ]
+            non_empty_parts = [p.strip() for p in address_parts if p and p.strip()]
+            if non_empty_parts:
+                res['raw_address'] = ", ".join(non_empty_parts)
+        return res
+
+
     extracted_street = fields.Char(
         string="Street Address",
     )
@@ -107,7 +135,6 @@ class AddressExtractionWizard(models.TransientModel):
 
         self.write({
             'state': 'extracted',
-            'extracted_name': extracted.get('name') or False,
             'extracted_street': extracted.get('street') or False,
             'extracted_street2': extracted.get('street2') or False,
             'extracted_city': extracted.get('city') or False,
@@ -206,8 +233,6 @@ class AddressExtractionWizard(models.TransientModel):
                 update_vals['zip'] = self.extracted_zip
             if self.extracted_country_id:
                 update_vals['country_id'] = self.extracted_country_id.id
-            if self.extracted_name and not partner.name:
-                update_vals['name'] = self.extracted_name
         else:
             if self.extracted_street and not partner.street:
                 update_vals['street'] = self.extracted_street
@@ -221,8 +246,6 @@ class AddressExtractionWizard(models.TransientModel):
                 update_vals['zip'] = self.extracted_zip
             if self.extracted_country_id and not partner.country_id:
                 update_vals['country_id'] = self.extracted_country_id.id
-            if self.extracted_name and not partner.name:
-                update_vals['name'] = self.extracted_name
 
         if update_vals:
             partner.write(update_vals)
@@ -242,7 +265,7 @@ class AddressExtractionWizard(models.TransientModel):
     def action_create_contact(self):
         """Create a new contact using the confirmed address components."""
         self.ensure_one()
-        name = self.extracted_name or (self.raw_address.splitlines()[0][:50] if self.raw_address else False) or _("New Contact")
+        name = (self.raw_address.splitlines()[0][:50] if self.raw_address else False) or _("New Contact")
 
         partner_vals = {
             'name': name,

@@ -18,7 +18,7 @@
 {
     'name': 'Google GenAI Address Extraction',
     'version': '20.0.1.0.0',
-    'category': 'Extra Tools',
+    'category': 'Contact',
     'summary': 'Extract and parse full addresses into structured contact fields using Google Gemini AI',
     'description': """
 Google GenAI Address Extraction for Odoo 20
@@ -26,16 +26,6 @@ Google GenAI Address Extraction for Odoo 20
 Seamlessly extract unstructured, single-string addresses into individual
 Odoo address fields (Street, Street 2, City, State, ZIP, Country) using
 Google Gemini AI and the official google-genai Python SDK.
-
-Key Features:
--------------
-* Official Google GenAI Python SDK (`google-genai`) integration.
-* Secure Gemini API key configuration with real-time connection test.
-* Single-field address input with intelligent component parsing.
-* Accurate resolution of State and Country against existing Odoo records without creating duplicates.
-* Dual workflow: apply extracted address to an existing contact or create a new contact.
-* Safeguard protection: prevents accidental overwrite of existing contact details without user consent.
-* Handles international and multi-line address formats gracefully.
     """,
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
@@ -51,6 +41,14 @@ Key Features:
         'views/res_partner_views.xml',
         'views/address_menus.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'address_ai_extractor/static/src/**/*',
+        ],
+    },
+    'external_dependencies': {
+        'python': ['google-genai']
+    },
     'images': ['static/description/banner.png'],
     'installable': True,
     'application': True,

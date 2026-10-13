@@ -39,10 +39,6 @@ except ImportError:
 
 if HAS_GENAI:
     class AddressExtractionSchema(BaseModel):
-        name: Optional[str] = Field(
-            default=None,
-            description="Recipient person or organization/company name, if present in the address text",
-        )
         street: Optional[str] = Field(
             default=None,
             description="Primary street address line, building name, flat/house number, and road",
@@ -125,11 +121,13 @@ class GeminiService(models.AbstractModel):
                 max_output_tokens=5,
                 temperature=0.0,
             )
+            print("Request:", "Ping")
             response = client.models.generate_content(
                 model=model,
                 contents="Ping",
                 config=config,
             )
+            print("Response:", getattr(response, 'text', None) or response)
             if response and (response.text or response.candidates):
                 return True, _("Connection successful! Connected to Google Gemini model '%s'.") % model
             return True, _("Connection successful! Google Gemini responded.")
@@ -151,15 +149,28 @@ class GeminiService(models.AbstractModel):
         model = self._get_model_name()
 
         system_instruction = (
-            "You are an expert address parser. Extract structured address components "
-            "from the provided address string.\n\n"
-            "CRITICAL INSTRUCTIONS:\n"
-            "1. Do NOT hallucinate, guess, or invent any missing information.\n"
-            "2. If any field (name, street, street2, city, state, zip, country) is not "
-            "explicitly stated or directly evident in the address, return it as null.\n"
-            "3. Separate street into 'street' (primary number, building, road) and "
-            "'street2' (flat/suite, floor, landmark, locality/sub-locality) when possible.\n"
-            "4. Return only the structured schema."
+            "You are an expert international address parser for an ERP system (Odoo).\n"
+            "Analyze the unstructured, free-form, or multi-line address text and extract "
+            "standardized address components into the specified schema.\n\n"
+            "FIELD EXTRACTION GUIDELINES:\n"
+            "- street: Primary street address line, including building/house number, building/premise name, and street/road/avenue.\n"
+            "- street2: Secondary address line, such as apartment, suite, unit, floor, room number, sub-locality, "
+            "neighborhood, or landmark (e.g., 'Suite 400', 'Opposite Central Park', 'Floor 3').\n"
+            "- city: City, municipality, township, or village name. Exclude postal codes, state, or country.\n"
+            "- state: State, province, region, canton, or territory (e.g., 'California' or 'CA', 'Ontario', 'Kerala'). "
+            "Use the standard name or official code.\n"
+            "- zip: Postal code, ZIP code, or PIN code (e.g., '94103', 'SW1A 1AA', '673001'). "
+            "Exclude label prefixes like 'PIN:', 'ZIP:', 'Postal Code:'.\n"
+            "- country: Country name or ISO country code (e.g., 'United States', 'US', 'Germany', 'India').\n\n"
+            "PARSING & CLEANING RULES:\n"
+            "1. Clean Values: Strip extraneous prefixes or labels (such as 'Address:', 'Deliver to:', 'City:', 'State:'), "
+            "and remove leading/trailing punctuation (commas, periods, semicolons, hyphens).\n"
+            "2. Filter Out Noise: Discard any person or recipient names, company names (such as 'Attn:', 'To:', 'Contact:'), "
+            "phone numbers, fax, email addresses, website URLs, tax IDs, tracking numbers, "
+            "and delivery instructions (e.g., 'Leave at front door') unless they serve as a physical landmark.\n"
+            "3. No Hallucinations: Do NOT invent, assume, or fabricate any missing details. "
+            "If any component is not present or clearly identifiable in the input text, set its value to null.\n"
+            "4. Return only the structured schema output."
         )
 
         config = types.GenerateContentConfig(
@@ -170,11 +181,13 @@ class GeminiService(models.AbstractModel):
         )
 
         try:
+            print("Request:", cleaned_input)
             response = client.models.generate_content(
                 model=model,
                 contents=cleaned_input,
                 config=config,
             )
+            print("Response:", getattr(response, 'text', None) or response)
             return self._parse_extraction_response(response)
         except UserError:
             raise
@@ -199,7 +212,7 @@ class GeminiService(models.AbstractModel):
             except Exception:
                 data = {}
 
-        fields = ['name', 'street', 'street2', 'city', 'state', 'zip', 'country']
+        fields = ['street', 'street2', 'city', 'state', 'zip', 'country']
         result = {}
         for field in fields:
             val = data.get(field)

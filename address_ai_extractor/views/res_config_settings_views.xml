@@ -7,8 +7,8 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="AI Address Extractor"
-                     string="AI Address Extractor"
+                <app data-string="AI Address Autofill"
+                     string="AI Address Autofill"
                      name="address_ai_extractor"
                      logo="/address_ai_extractor/static/description/icon.png">
                     <block title="Google Gemini AI" name="gemini_ai_settings_container">
@@ -45,7 +45,7 @@
         </field>
     </record>
 
-    <!-- Action to open settings directly to the AI Address Extractor app tab -->
+    <!-- Action to open settings directly to the AI Address Autofill app tab -->
     <record id="action_address_ai_extractor_config_settings" model="ir.actions.act_window">
         <field name="name">Settings</field>
         <field name="res_model">res.config.settings</field>

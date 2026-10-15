@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- AI Address Extractor Settings Menu Item under Contacts -> Configuration -->
+    <!-- AI Address Autofill Settings Menu Item under Contacts -> Configuration -->
     <menuitem id="menu_address_ai_extractor_config_settings"
               name="Settings"
               action="action_address_ai_extractor_config_settings"

@@ -16,12 +16,12 @@
 #
 #############################################################################
 {
-    'name': 'Google GenAI Address Extraction',
+    'name': 'AI Address Autofill',
     'version': '20.0.1.0.0',
     'category': 'Contact',
     'summary': 'Extract and parse full addresses into structured contact fields using Google Gemini AI',
     'description': """
-Google GenAI Address Extraction for Odoo 20
+AI Address Autofill for Odoo 20
 ============================================
 Seamlessly extract unstructured, single-string addresses into individual
 Odoo address fields (Street, Street 2, City, State, ZIP, Country) using

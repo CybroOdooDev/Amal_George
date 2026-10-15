@@ -89,7 +89,7 @@ class GeminiService(models.AbstractModel):
         if not api_key or not api_key.strip():
             raise UserError(
                 _("Google Gemini API Key is not configured.\n\n"
-                  "Please navigate to Settings > AI Address Extractor "
+                  "Please navigate to Settings > AI Address Autofill "
                   "and enter your Gemini API key.")
             )
         return api_key.strip()

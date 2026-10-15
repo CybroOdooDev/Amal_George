@@ -4,7 +4,7 @@
         <field name="name">address.extraction.wizard.form</field>
         <field name="model">address.extraction.wizard</field>
         <field name="arch" type="xml">
-            <form string="AI Address Extractor">
+            <form string="AI Address Autofill">
                 <field name="state" invisible="1"/>
                 <field name="is_partner_readonly" invisible="1"/>
 
@@ -91,7 +91,7 @@
 
     <!-- Action to launch wizard directly -->
     <record id="action_address_extraction_wizard" model="ir.actions.act_window">
-        <field name="name">AI Address Extractor</field>
+        <field name="name">AI Address Autofill</field>
         <field name="res_model">address.extraction.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>

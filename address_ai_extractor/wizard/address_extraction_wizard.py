@@ -144,7 +144,7 @@ class AddressExtractionWizard(models.TransientModel):
         })
 
         return {
-            'name': _('AI Address Extractor'),
+            'name': _('AI Address Autofill'),
             'type': 'ir.actions.act_window',
             'res_model': 'address.extraction.wizard',
             'res_id': self.id,

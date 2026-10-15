@@ -12,8 +12,8 @@
 
 |license| |odoo| |maintainer|
 
-Google GenAI Address Extraction
-===============================
+AI Address Autofill
+==================
 Extract and parse full addresses into structured contact fields (Street, Street 2, City, State, ZIP, and Country) using Google Gemini AI and the official Google GenAI Python SDK.
 
 Key Features
@@ -21,11 +21,9 @@ Key Features
 * **Intelligent AI Address Parsing**: Automatically parses unstructured, multi-line, or messy single-string addresses into discrete Odoo contact fields (Street, Street 2, City, State, ZIP Code, and Country) using Google Gemini AI.
 * **Dual Access Points**: Conveniently trigger Address Autofill directly from the **Contact Form View** header button or from the **Contacts List View** Actions (Cog) menu.
 * **Interactive 2-Step Review Wizard**: Paste raw text in the draft state, review and adjust parsed address fields in the extracted state, and confirm before applying.
-* **Smart Geographical Matching**: Intelligently resolves country aliases (e.g., USA, UK, UAE) and automatically matches states and countries with native Odoo database records (``res.country`` and ``res.country.state``).
-* **Overwrite Protection Control**: Choose whether to overwrite existing contact address fields or only populate missing information.
+* **Selective Overwrite Protection**: Choose whether to overwrite existing contact address fields or preserve existing data and only populate missing information.
 * **New Contact Creation**: Easily generate a brand-new contact directly from raw address text or apply the extracted fields to an existing contact.
 * **Built-in Connection Testing**: Validate Gemini API credentials and model accessibility in real-time with a dedicated "Test Connection" button.
-* **Complete Chatter Audit Trail**: Automatically logs parsed address changes to the contact chatter for full transparency and audit history.
 
 Installation
 ------------
@@ -35,15 +33,11 @@ Installation
 
     pip install google-genai
 
-2. Place the ``address_ai_extractor`` module folder into your custom addons directory.
-3. Restart your Odoo server.
-4. Update the Apps List in developer mode (**Apps > Update Apps List**).
-5. Search for **Google GenAI Address Extraction** (``address_ai_extractor``) and click **Activate**.
 
 Configuration
 -------------
 1. Log into Odoo as an Administrator.
-2. Navigate to **Contacts > Configuration > Settings** (or **Settings > General Settings > AI Address Extractor**).
+2. Navigate to **Contacts > Configuration > Settings** (or **Settings > General Settings > AI Address Autofill**).
 3. In the **Google Gemini AI** section:
    - **Gemini API Key**: Enter your API key obtained from `Google AI Studio <https://aistudio.google.com/app/apikey>`_.
    - **Gemini Model**: Select your preferred model (e.g., *Gemini 3.5 Flash*, *Gemini 3.8 Flash*, or *Gemini 3.5 Flash Lite*).
@@ -75,3 +69,7 @@ Maintainer
 This module is maintained by Cybrosys Technologies.
 
 For support and more information, please visit `Our Website <https://cybrosys.com/>`__
+
+Further information
+===================
+HTML Description: `<static/description/index.html>`__

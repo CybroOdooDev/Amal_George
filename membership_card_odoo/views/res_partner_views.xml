@@ -25,7 +25,7 @@
                     </group>
                     <field name="member_lines" invisible="free_member">
                         <list editable="bottom">
-                            <field name="membership_id"/>
+                            <field name="membership_id" domain="[('type', '=', 'service')]"/>
                             <field name="date_from"/>
                             <field name="date_to"/>
                         </list>

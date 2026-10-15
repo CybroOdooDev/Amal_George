@@ -27,105 +27,135 @@
     <!-- To print Pdf. -->
     <template id="print_member_ship_card">
         <t t-call="web.html_container">
-            <div style="border: 2px solid black; padding: 15px; margin-bottom: 40px; height: 90%;">
-                <tr t-if="free_member==True">
-                    <div style="border-bottom: 2px solid black;   margin-bottom: 15px;">
-                        <h2 style=" text-align: center;">Free Member</h2>
+            <div style="box-sizing: border-box; border: 2px solid black; padding: 12px 16px; height: 100%; page-break-after: always; page-break-inside: avoid;">
+                <t t-if="free_member">
+                    <div style="border-bottom: 2px solid black; margin-bottom: 0px; padding-bottom: 3px;">
+                        <h2 style="text-align: center; font-size: 22px; font-weight: bold; margin: 0;">Free Member</h2>
                     </div>
-                </tr>
-                <tr t-else="free_member==False">
-                    <tr>
-                        <div style="border-bottom: 2px solid black;   margin-bottom: 15px;">
-                            <h2 style="text-align:center;">
-                                <t t-esc="membership_product[0]"/>
-                            </h2>
-                        </div>
-                    </tr>
-                </tr>
-                <div style="display: -webkit-box;  display: flex; -webkit-box-pack: space-between;   justify-content: space-between; -webkit-align-self: center align-self: center; align-items: center;  ">
-                    <div>
-                        <img style="width: 120px;  border-radius: 5px;"
-                             t-attf-src="data:image/*;base64,{{image}}"/>
+                </t>
+                <t t-else="">
+                    <div style="border-bottom: 2px solid black; margin-bottom: 0px; padding-bottom: 3px;">
+                        <h2 style="text-align: center; font-size: 22px; font-weight: bold; margin: 0;">
+                            <t t-esc="membership_product[0] if membership_product else ''"/>
+                        </h2>
                     </div>
-                    <div class="session_1" style="margin-left: 15px; margin-top: 0px; padding-top: 0px;">
-                        <tr t-if="free_member==True">
-                            <tr>
-                                <h2 style="text-align:center;line-height: .1;">
-                                </h2>
-                            </tr>
-                            <tr>
-                                <h2 t-if="name" style="text-align:left; margin-top: 0px; ">Name:
-                                    <span t-esc="name"/>
-                                </h2>
-                            </tr>
-                            <tr>
-                                <h2 t-if="phone" style="text-align:left;">Phone No:
-                                    <span t-esc="phone"/>
-                                </h2>
-                            </tr>
-                             <tr>
-                                <h2 t-if="function" style="text-align:left;">Job:
-                                    <span t-esc="function"/>
-                                </h2>
-                            </tr>
-                            <br/>
-                            <br/>
+                </t>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 110px; vertical-align: top; padding-right: 14px;">
+                                <img style="width: 110px; height: 120px; object-fit: cover; border-radius: 6px; display: block;"
+                                     t-attf-src="data:image/*;base64,{{image}}"/>
+                            </td>
+                            <td style="vertical-align: top;">
+                                <table class="session_1" style="width: 100%; border-collapse: collapse;">
+                                    <tbody>
+                                        <t t-if="free_member">
+                                            <tr t-if="name">
+                                                <td style="padding: 3px 0;">
+                                                    <h2 style="text-align: left; margin: 0; font-size: 16px; font-weight: bold; line-height: 1.2;">Name:
+                                                        <span t-esc="name"/>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="phone">
+                                                <td style="padding: 3px 0;">
+                                                    <h2 style="text-align: left; margin: 0; font-size: 16px; font-weight: bold; line-height: 1.2; word-break: break-word;">Phone No:
+                                                        <span t-esc="phone"/>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="function">
+                                                <td style="padding: 3px 0;">
+                                                    <h2 style="text-align: left; margin: 0; font-size: 16px; font-weight: bold; line-height: 1.2;">Job:
+                                                        <span t-esc="function"/>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-else="">
+                                            <tr t-if="name">
+                                                <td style="padding: 3px 0;">
+                                                    <h2 style="text-align: left; margin: 0; font-size: 16px; font-weight: bold; line-height: 1.2;">Name:
+                                                        <span t-esc="name"/>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="phone">
+                                                <td style="padding: 3px 0;">
+                                                    <h2 style="text-align: left; margin: 0; font-size: 16px; font-weight: bold; line-height: 1.2; word-break: break-word;">Phone No:
+                                                        <span t-esc="phone"/>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="start_date">
+                                                <td style="padding: 3px 0;">
+                                                    <h2 style="text-align: left; margin: 0; font-size: 16px; font-weight: bold; line-height: 1.2;">Start Date:
+                                                        <span t-esc="start_date"/>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="end_date">
+                                                <td style="padding: 3px 0;">
+                                                    <h2 style="text-align: left; margin: 0; font-size: 16px; font-weight: bold; line-height: 1.2;">End Date:
+                                                        <span t-esc="end_date"/>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </td>
                         </tr>
-                        <tr t-else="free_member==False">
-                            <tr>
-                                <h2 style="text-align:center;line-height: .1;">
-                                </h2>
-                            </tr>
-                            <tr>
-                                <h2 t-if="name" style="text-align:left; margin-top: 0px; ">Name:
-                                    <span t-esc="name"/>
-                                </h2>
-                            </tr>
-                            <tr>
-                                <h2 t-if="phone" style="text-align:left;">Phone No:
-                                    <span t-esc="phone"/>
-                                </h2>
-                            </tr>
-                            <tr>
-                                <h2 style="text-align:left;">Start Date:
-                                    <span t-esc="start_date"/>
-                                </h2>
-                            </tr>
-                            <tr>
-                                <h2 style="text-align:left;">End Date:
-                                    <span t-esc="end_date"/>
-                                </h2>
-                            </tr>
-                        </tr>
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
-            <div style="border: 2px solid black; padding: 15px;  height: 90%;">
-                <div class="session_2" style="width: 500px; ">
-                    <tr>
-                        <h2 style="text-align:left;">
-                            <span t-esc="company_name"/>
-                        </h2>
-                        <h2 style="text-align:left;">
-                            <span t-esc="company_address"/>,
-                            <br/>
-                            <span t-esc="city"/>,
-                            <span t-esc="state"/>,
-                            <span t-esc="country"/>
-                        </h2>
-                        <h2 style="text-align:left;">
-                            Email:
-                            <span t-esc="company_email"/>
-                        </h2>
-                        <h2 style="text-align:left;">
-                            Contact:
-                            <span t-esc="company_phone"/>
-                        </h2>
-                        <h2 style="text-align:left;">
-                            <span t-esc="website"/>
-                        </h2>
-                    </tr>
-                </div>
+            <div style="box-sizing: border-box; border: 2px solid black; padding: 12px 18px; height: 100%; page-break-inside: avoid;">
+                <table class="session_2" style="width: 100%; border-collapse: collapse;">
+                    <tbody>
+                        <tr>
+                            <td style="padding: 2px 0 6px 0;">
+                                <h2 style="text-align: left; margin: 0; font-size: 20px; font-weight: bold;">
+                                    <span t-esc="company_name"/>
+                                </h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;">
+                                <h2 style="text-align: left; margin: 0; font-size: 14.5px; font-weight: 500; line-height: 1.3;">
+                                    <span t-esc="company_address"/>,
+                                    <br/>
+                                    <span t-esc="city"/>,
+                                    <span t-esc="state"/>,
+                                    <span t-esc="country"/>
+                                </h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;">
+                                <h2 style="text-align: left; margin: 0; font-size: 14.5px; font-weight: normal;">
+                                    Email:
+                                    <span t-esc="company_email"/>
+                                </h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;">
+                                <h2 style="text-align: left; margin: 0; font-size: 14.5px; font-weight: normal;">
+                                    Contact:
+                                    <span t-esc="company_phone"/>
+                                </h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;">
+                                <h2 style="text-align: left; margin: 0; font-size: 14.5px; font-weight: normal;">
+                                    <span t-esc="website"/>
+                                </h2>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </t>
     </template>

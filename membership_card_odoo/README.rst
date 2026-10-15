@@ -1,14 +1,29 @@
-.. image:: https://img.shields.io/badge/license-AGPL--3-blue.svg
-    :target: https://www.gnu.org/licenses/AGPL-3.0-standalone.html
-    :alt: License: AGPL-3
+.. |license| image:: https://img.shields.io/badge/license-LGPL--3-blue.svg
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
+
+.. |odoo| image:: https://img.shields.io/badge/Odoo-19.0-875A7B.svg
+    :target: https://www.odoo.com
+    :alt: Odoo 19.0
+
+.. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
+    :target: https://cybrosys.com
+    :alt: Maintainer: Cybrosys Techno Solutions
+
+|license| |odoo| |maintainer|
 
 Membership Card
-===============
+=========================
 This module helps you to print membership card.
 
+Installation
+------------
+No external dependencies.
+
 Configuration
-=============
-* No additional configurations needed
+-------------
+No additional configuration is required.
+
 
 Company
 -------
@@ -16,16 +31,8 @@ Company
 
 License
 -------
-General Public License, Version 3 (AGPL v3).
-(https://www.gnu.org/licenses/AGPL-3.0-standalone.html)
-
-Credits
--------
-* Developers: 	(V16) Rahna Rasheed
-                (V17) Gayathri V
-                (V18) Safa KB,
-                (V19) Cybrosys Technologies,
-Contact : odoo@cybrosys.com
+Lesser General Public License, Version 3 (LGPL v3).
+(http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 
 Contacts
 --------
@@ -40,6 +47,7 @@ Maintainer
 ==========
 .. image:: https://cybrosys.com/images/logo.png
    :target: https://cybrosys.com
+
 
 This module is maintained by Cybrosys Technologies.
 

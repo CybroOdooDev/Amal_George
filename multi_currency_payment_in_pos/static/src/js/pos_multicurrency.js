@@ -45,19 +45,27 @@ patch(PaymentScreen.prototype, {
         });
     },
 
-    // Showing currencies in settings
+    /**
+     * Toggle the visibility of the multi-currency container.
+     *
+     * @param {Event} event - Input change event from checkbox.
+     */
     async show_options(event) {
-        let isChecked = event.target.checked;
-        let multiCurrencyContainer = document.getElementById("multicurrency_container");
+        const isChecked = event.target.checked;
+        const multiCurrencyContainer = document.getElementById("multicurrency_container");
 
         if (multiCurrencyContainer) {
             multiCurrencyContainer.style.display = isChecked ? "block" : "none";
         }
     },
 
-    // Converting the currencies.
+    /**
+     * Compute exchange conversion for the selected currency.
+     *
+     * @param {Event} event - Dropdown selection change event.
+     */
     async compute_currency(event) {
-        let ConvContainer = document.getElementById("conversion_container");
+        const ConvContainer = document.getElementById("conversion_container");
         const selectedCurrency = event.target.value;
         if (selectedCurrency === 'selected disabled') {
             if (ConvContainer) {
@@ -73,19 +81,19 @@ patch(PaymentScreen.prototype, {
             return;
         }
 
-        let multi_cur_input = document.getElementsByClassName("multicurrency_input")[0];
+        const multiCurInput = document.getElementsByClassName("multicurrency_input")[0];
 
         if (ConvContainer) {
             ConvContainer.style.display = "block";
         }
-        if (multi_cur_input) {
-            multi_cur_input.style.border = "1px solid black";
+        if (multiCurInput) {
+            multiCurInput.style.border = "1px solid black";
         }
 
-        let totalDiv = document.getElementsByClassName("total")[0];
+        const totalDiv = document.getElementsByClassName("total")[0];
         let totalValue = 0;
         if (totalDiv) {
-            let totalText = totalDiv.textContent.trim();
+            const totalText = totalDiv.textContent.trim();
             totalValue = parseFloat(totalText.replace(/[^0-9.-]+/g, '')) || 0;
         }
 
@@ -105,41 +113,46 @@ patch(PaymentScreen.prototype, {
         }
     },
 
+    /**
+     * Add a payment line using the selected foreign currency and amount.
+     *
+     * @param {Object} ev - Payment method configuration object.
+     */
     async multi_currency_payment_line(ev) {
         if (this.pos.config.enable_multicurrency) {
-            let amount_val = document.getElementsByClassName("multicurrency_input")[0]?.value;
-            if (!amount_val) {
+            let amountVal = document.getElementsByClassName("multicurrency_input")[0]?.value;
+            if (!amountVal) {
                 return;
             }
-            amount_val = parseFloat(amount_val);
-            let total_val = 0;
-            let remaining_val = 0;
-            let total = document.getElementsByClassName("total");
+            amountVal = parseFloat(amountVal);
+            let totalVal = 0;
+            let remainingVal = 0;
+            const total = document.getElementsByClassName("total");
             if (total.length) {
-                total_val = parseFloat(total[0].innerText.replace(/[^\d.]/g, '')) || 0;
+                totalVal = parseFloat(total[0].innerText.replace(/[^\d.]/g, '')) || 0;
             }
-            let remaining = document.getElementsByClassName("payment-status-remaining");
+            const remaining = document.getElementsByClassName("payment-status-remaining");
             if (remaining.length && remaining[0].children[1]) {
-                let parts = remaining[0].children[1].innerText.split(" ");
-                remaining_val = parseFloat(parts[1]) || 0;
+                const parts = remaining[0].children[1].innerText.split(" ");
+                remainingVal = parseFloat(parts[1]) || 0;
             }
-            if (total_val > 0 || remaining_val > 0) {
-                if (amount_val && this.multi_currency.rate) {
+            if (totalVal > 0 || remainingVal > 0) {
+                if (amountVal && this.multi_currency.rate) {
                     await this.addNewPaymentLine(ev);
-                    var update_amount = amount_val / this.multi_currency.rate;
+                    const updateAmount = amountVal / this.multi_currency.rate;
                     const selectedLine = this.selectedPaymentLine;
                     if (selectedLine) {
-                        selectedLine.setAmount(update_amount);
+                        selectedLine.setAmount(updateAmount);
                         selectedLine.converted_currency = {
                             name: this.multi_currency.name,
                             symbol: this.multi_currency.symbol,
-                            amount: amount_val,
+                            amount: amountVal,
                         };
                         selectedLine.payment_currency = this.multi_currency.name;
-                        selectedLine.currency_amount = amount_val;
+                        selectedLine.currency_amount = amountVal;
                         selectedLine.update?.({
                             payment_currency: this.multi_currency.name,
-                            currency_amount: amount_val,
+                            currency_amount: amountVal,
                         });
                     }
                     const order = this.currentOrder || this.pos.getOrder();
@@ -148,7 +161,7 @@ patch(PaymentScreen.prototype, {
                             name: this.multi_currency.name,
                             symbol: this.multi_currency.symbol,
                             rate: this.multi_currency.rate,
-                            amount: amount_val,
+                            amount: amountVal,
                             converted_total: this.multi_currency.total,
                         };
                     }
@@ -167,30 +180,42 @@ patch(PaymentScreen.prototype, {
         }
     },
 
+    /**
+     * Recalculate converted currency values when selected payment line is updated.
+     *
+     * @override
+     */
     _updateSelectedPaymentline() {
         super._updateSelectedPaymentline(...arguments);
         if (this.pos.config.enable_multicurrency) {
             if (this.selectedPaymentLine && this.multi_currency.rate && this.selectedPaymentLine.converted_currency) {
-                const change_amount = this.selectedPaymentLine.amount * this.multi_currency.rate;
+                const changeAmount = this.selectedPaymentLine.amount * this.multi_currency.rate;
                 this.selectedPaymentLine.converted_currency = {
                     name: this.multi_currency.name,
                     symbol: this.multi_currency.symbol,
-                    amount: change_amount,
+                    amount: changeAmount,
                 };
                 this.selectedPaymentLine.payment_currency = this.multi_currency.name;
-                this.selectedPaymentLine.currency_amount = change_amount;
+                this.selectedPaymentLine.currency_amount = changeAmount;
                 this.selectedPaymentLine.update?.({
                     payment_currency: this.multi_currency.name,
-                    currency_amount: change_amount,
+                    currency_amount: changeAmount,
                 });
             }
         }
     },
 
+    /**
+     * Sync payment line multi-currency data when validate button is clicked.
+     *
+     * @override
+     * @param {Object} [args={}] - Validation arguments.
+     * @returns {Promise<any>}
+     */
     async onClickValidate(args = {}) {
         const order = this.currentOrder || this.pos.getOrder();
         if (order && order.payment_ids) {
-            order.payment_ids.forEach(line => {
+            order.payment_ids.forEach((line) => {
                 if (line.converted_currency) {
                     const cName = line.converted_currency.name;
                     const cAmount = line.converted_currency.amount;
@@ -206,10 +231,16 @@ patch(PaymentScreen.prototype, {
         return await super.onClickValidate(...arguments);
     },
 
+    /**
+     * Sync payment line multi-currency data before order validation is finalized.
+     *
+     * @override
+     * @param {boolean} isForceValidate - Flag indicating forced validation.
+     */
     async validateOrder(isForceValidate) {
         const order = this.currentOrder || this.pos.getOrder();
         if (order && order.payment_ids) {
-            order.payment_ids.forEach(line => {
+            order.payment_ids.forEach((line) => {
                 if (line.converted_currency) {
                     const cName = line.converted_currency.name;
                     const cAmount = line.converted_currency.amount;

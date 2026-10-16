@@ -1,46 +1,47 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+#############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
 #    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Yadhu Shankar E (odoo@cybrosys.com)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
-#    You can modify it under the terms of the GNU AFFERO
-#    GENERAL PUBLIC LICENSE (AGPL v3), Version 3.
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU AFFERO GENERAL PUBLIC LICENSE (AGPL v3) for more details.
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
-#    (AGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
-from odoo import fields, models, api
+#############################################################################
+from odoo import api, fields, models
 
 
 class PosConfig(models.Model):
+    """Inherit pos.config to configure multi-currency support in POS."""
     _inherit = 'pos.config'
+    _description = 'Point of Sale Configuration'
 
     currency_ids = fields.Many2many(
         'res.currency',
-        string='Currency',
-        help='Currencies supported in POS.'
+        string='Currencies',
+        help='Currencies supported for multi-currency payments in POS.',
     )
-
     enable_multicurrency = fields.Boolean(
-        string='Enable Multi Currency',
-        help='Enable multi currency in POS.'
+        string='Enable Multi-Currency',
+        default=False,
+        help='Enable multi-currency payment support in POS.',
     )
 
-    # ---------------------------------------------------------
-    # Returns full multicurrency configuration for POS
-    # ---------------------------------------------------------
     @api.model
     def get_config_settings(self, config_id):
+        """Retrieve multi-currency configuration settings for the specified POS config.
+
+        :param int or str config_id: ID of the pos.config record.
+        :return: List of dictionaries containing currency details (id, name, symbol, rate).
+        :rtype: list[dict]
+        """
         if not config_id:
             return []
         try:
@@ -59,11 +60,14 @@ class PosConfig(models.Model):
             })
         return result
 
-    # ---------------------------------------------------------
-    # Return details of one selected currency
-    # ---------------------------------------------------------
     @api.model
     def get_selected_currency(self, selected_id):
+        """Retrieve details and exchange rate for the selected foreign currency.
+
+        :param int or str selected_id: ID of the res.currency record.
+        :return: List containing dictionary with currency details (id, name, symbol, rate, usd_val).
+        :rtype: list[dict]
+        """
         if not selected_id:
             return []
         try:

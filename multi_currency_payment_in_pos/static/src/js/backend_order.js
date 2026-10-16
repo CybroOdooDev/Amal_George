@@ -1,13 +1,20 @@
 /** @odoo-module **/
 import { patch } from "@web/core/utils/patch";
 import { PosPayment } from "@point_of_sale/app/models/pos_payment";
+import { GeneratePrinterData } from "@point_of_sale/app/utils/printer/generate_printer_data";
 
 /**
- * Patch for PosPayment to include converted currency information
- * when exporting payment data for receipt printing and serialization.
+ * Patch for PosPayment and GeneratePrinterData to include converted currency
+ * information when exporting payment data for receipt printing and serialization.
  */
 
 patch(PosPayment.prototype, {
+    /**
+     * Initialize PosPayment with foreign currency values if available.
+     *
+     * @override
+     * @param {Object} vals - Raw payment data values.
+     */
     setup(vals) {
         super.setup(...arguments);
         if (vals) {
@@ -20,6 +27,14 @@ patch(PosPayment.prototype, {
         }
     },
 
+    /**
+     * Include converted foreign currency details in printed receipt data.
+     *
+     * @override
+     * @param {string} baseUrl - Base URL.
+     * @param {Object} headerData - Header data.
+     * @returns {Object}
+     */
     export_for_printing(baseUrl, headerData) {
         const result = super.export_for_printing ? super.export_for_printing(...arguments) : {};
         if (this.converted_currency) {
@@ -30,5 +45,47 @@ patch(PosPayment.prototype, {
             this.payment_currency = this.converted_currency.name;
         }
         return result;
+    },
+});
+
+patch(GeneratePrinterData.prototype, {
+    /**
+     * Enrich printer payment data with foreign currency name and amount.
+     *
+     * @override
+     * @returns {Array<Object>}
+     */
+    generatePaymentData() {
+        const payments = super.generatePaymentData(...arguments);
+        return this.order.payment_ids.map((line, index) => {
+            const data = payments[index] || {};
+            const paymentCurrency =
+                line.payment_currency ||
+                line.raw?.payment_currency ||
+                line.converted_currency?.name ||
+                false;
+            let currencyAmount =
+                line.currency_amount ??
+                line.raw?.currency_amount ??
+                line.converted_currency?.amount;
+            if (
+                currencyAmount !== undefined &&
+                currencyAmount !== false &&
+                currencyAmount !== null &&
+                !isNaN(currencyAmount)
+            ) {
+                currencyAmount =
+                    typeof currencyAmount === "number"
+                        ? currencyAmount.toFixed(2)
+                        : currencyAmount;
+            } else {
+                currencyAmount = false;
+            }
+            return {
+                ...data,
+                payment_currency: paymentCurrency,
+                currency_amount: currencyAmount,
+            };
+        });
     },
 });

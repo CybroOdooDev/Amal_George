@@ -1,44 +1,39 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+#############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
 #    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Yadhu Shankar E (odoo@cybrosys.com)
+#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
-#    You can modify it under the terms of the GNU AFFERO
-#    GENERAL PUBLIC LICENSE (AGPL v3), Version 3.
+#    You can modify it under the terms of the GNU LESSER
+#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU AFFERO GENERAL PUBLIC LICENSE (AGPL v3) for more details.
+#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
-#    You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
-#    (AGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
+#############################################################################
 {
     'name': "POS Multi Currency Payment",
     'version': '20.0.1.0.0',
     'category': 'Point of Sale',
-    'summary': "This module allows us to make payment in multiple "
-                   "currencies in Odoo 19 POS module.",
-    'description': "This module in Odoo 19 offers the "
-                   "option to expand its capabilities, enabling companies "
-                   "to take payments in different currencies. A variety of "
-                   "adjustments and setups are required for the POS module "
-                   "to be extended to support several currencies, enabling "
-                   "businesses to perform transactions in various monetary "
-                   "units without any issues.",
+    'summary': "Multi-currency payment support for Point of Sale in Odoo 20.",
+    'description': """POS Multi Currency Payment
+==============================
+This module enables accepting payments in multiple foreign currencies in Point of Sale.
+It allows cashiers to select a currency, view conversion rates, and record payments
+in the chosen currency while updating the order totals accurately.
+""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
     'depends': ['point_of_sale', 'account'],
     'data': [
-        'views/res_config_settings_views.xml'
+        'views/res_config_settings_views.xml',
+        'views/pos_order_receipt.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [
@@ -46,11 +41,11 @@
             'multi_currency_payment_in_pos/static/src/js/pos_models.js',
             'multi_currency_payment_in_pos/static/src/js/pos_multicurrency.js',
             'multi_currency_payment_in_pos/static/src/js/backend_order.js',
-            'multi_currency_payment_in_pos/static/src/scss/multicurrency.scss'
+            'multi_currency_payment_in_pos/static/src/scss/multicurrency.scss',
         ],
     },
     'images': ['static/description/banner.jpg'],
-    'license': 'AGPL-3',
+    'license': 'LGPL-3',
     'installable': True,
     'auto_install': False,
     'application': False,

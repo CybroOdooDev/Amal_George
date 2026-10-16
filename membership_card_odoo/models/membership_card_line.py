@@ -15,7 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -30,34 +30,53 @@ class MembershipCardLine(models.Model):
 
     partner_id = fields.Many2one(
         'res.partner',
-        string='Partner',
         ondelete='cascade',
         required=True,
-        help="The partner who holds this membership line."
+        help="The partner who holds this membership line.",
     )
     membership_id = fields.Many2one(
         'product.template',
-        required=True,
         string='Membership Product',
+        required=True,
         domain=[('type', '=', 'service')],
-        help="The product/service representing the membership."
+        help="The product/service representing the membership.",
     )
     date_from = fields.Date(
         string='Start Date',
         required=True,
-        help="Date from which the membership is valid."
+        help="Date from which the membership is valid.",
     )
     date_to = fields.Date(
         string='End Date',
         required=True,
-        help="Date until which the membership is valid."
+        help="Date until which the membership is valid.",
     )
+
+    @api.constrains('membership_id')
+    def _check_membership_id(self):
+        for line in self:
+            if line.membership_id and line.membership_id.type != 'service':
+                raise ValidationError(
+                    line.env._(
+                        "The membership product '%(product)s' must be a "
+                        "service product.",
+                        product=line.membership_id.display_name,
+                    ),
+                )
 
     @api.constrains('date_from', 'date_to')
     def _check_dates(self):
         for line in self:
-            if line.date_from and line.date_to and line.date_to < line.date_from:
+            if (
+                line.date_from
+                and line.date_to
+                and line.date_to < line.date_from
+            ):
                 raise ValidationError(
-                    _("End Date (%s) cannot be earlier than Start Date (%s).",
-                      line.date_to, line.date_from)
+                    line.env._(
+                        "End Date (%(end_date)s) cannot be earlier than "
+                        "Start Date (%(start_date)s).",
+                        end_date=line.date_to,
+                        start_date=line.date_from,
+                    ),
                 )

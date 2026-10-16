@@ -17,18 +17,18 @@
 #############################################################################
 {
     'name': 'Membership Card',
-    'version': "19.0.1.0.0",
+    'version': '19.0.1.0.0',
     'category': 'Extra Tools',
     'summary': """Print Membership Card either with membership
-     product or free member""",
-    'description': """This module helps to Print Membership Card wisely if 
-     customer is having membership product it will print card according to 
-     membership product if not it will print card as free member.""",
+        product or free member""",
+    'description': """This module helps to Print Membership Card wisely if
+        customer is having membership product it will print card according to
+        membership product if not it will print card as free member.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['contacts','product'],
+    'depends': ['contacts', 'product'],
     'data': [
         'security/ir.model.access.csv',
         'views/res_partner_views.xml',

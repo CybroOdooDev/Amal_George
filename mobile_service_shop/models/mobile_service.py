@@ -59,17 +59,17 @@ class MobileService(models.Model):
     imei_no = fields.Char(string="IMEI Number",
                           help="IMEI Number of the device.")
     model_name = fields.Many2one('brand.model', string="Model",
-                                 domain="[('mobile_brand_name','=',brand_name)]"
-                                 , help="Model name of the device.")
+                                 domain="[('mobile_brand_name','=',brand_name)]",
+                                 help="Model name of the device.")
     image_medium = fields.Binary(related='model_name.image_medium', store=True,
                                  attachment=True, help="Image of the device.")
     date_request = fields.Date(string="Requested Date",
                                default=fields.Date.context_today,
                                help="Device submitted date.")
-    return_date = fields.Date(string="Return Date", required=True,
+    return_date = fields.Date(string="Expected Return Date", required=True,
                               help="Device returned date.")
     technician_name = fields.Many2one('res.users',
-                                      string="Technician Name",
+                                      string="Technician",
                                       default=lambda self: self.env.user,
                                       help="Work assigned technician name.",
                                       required=True)
@@ -81,56 +81,77 @@ class MobileService(models.Model):
         help='Service status of the work.')
     complaints_tree = fields.One2many('mobile.complaint.tree',
                                       'complaint_id',
-                                      string='Complaints Tree',
+                                      string='Complaints',
                                       help='Mobile complaint details.')
     product_order_line = fields.One2many('product.order.line',
                                          'product_order_id',
                                          string='Parts Order Lines',
                                          help='Product parts order details.')
-    internal_notes = fields.Text(string="Internal Notes")
+    internal_notes = fields.Text(string="Notes")
     invoice_count = fields.Integer(compute='_compute_invoice_count',
                                    string='# Invoice', copy=False,
+                                   compute_sudo=True,
                                    help="Count of invoice.")
     invoice_ids = fields.Many2many("account.move", string='Invoices',
-                                   compute="_get_invoiced",
+                                   compute="_compute_invoice_ids",
+                                   compute_sudo=True,
                                    copy=False, help="Invoices line")
     first_payment_inv = fields.Many2one('account.move', copy=False,
                                         help="First payment of the invoice.")
-    first_invoice_created = fields.Boolean(string="First Invoice Created",copy=False,
-                                           help="Date of the first invoice.")
-    journal_type = fields.Many2one('account.journal',
-                                   'Journal',
-                                   default=lambda self: self.env[
-                                       'account.journal'].search(
-                                       [('code', '=', 'SERV')]),
-                                   help='Type of the journal.')
-    company_id = fields.Many2one('res.company', 'Company',
-                                 default=lambda self: self.env.company,
-                                 help='Default company id.')
+    first_invoice_created = fields.Boolean(
+        string="First Invoice Generated", copy=False,
+        help="Indicates whether the first invoice has been created."
+    )
+
+    @api.model
+    def _default_journal_type(self):
+        """Get the default sales journal for mobile services."""
+        company_id = self.env.context.get('company_id') or self.env.company.id
+        journal = self.env['account.journal'].sudo().search([
+            ('code', '=', 'SERV'),
+            ('company_id', '=', company_id),
+        ], limit=1)
+        if not journal:
+            journal = self.env['account.journal'].sudo().search([
+                ('type', '=', 'sale'),
+                ('company_id', '=', company_id),
+            ], limit=1)
+        return journal
 
     @api.model
     def _default_picking_transfer(self):
         """To get the default picking transfers."""
-        type_obj = self.env['stock.picking.type']
-        company_id = self.env.context.get(
-            'company_id') or self.env.user.company_id.id
-        types = type_obj.search([('code', '=', 'outgoing'),
-                                 ('warehouse_id.company_id', '=', company_id)],
-                                limit=1)
-        if not types:
-            types = type_obj.search([('code', '=', 'outgoing'),
-                                     ('warehouse_id', '=', False)])
-        return types[:4]
+        company_id = self.env.context.get('company_id') or self.env.company.id
+        picking_type = self.env['stock.picking.type'].sudo().search([
+            ('code', '=', 'outgoing'),
+            ('warehouse_id.company_id', '=', company_id),
+        ], limit=1)
+        if not picking_type:
+            picking_type = self.env['stock.picking.type'].sudo().search([
+                ('code', '=', 'outgoing'),
+                '|',
+                ('company_id', '=', company_id),
+                ('company_id', '=', False),
+            ], limit=1)
+        return picking_type
+
+    journal_type = fields.Many2one('account.journal',
+                                   string='Journal',
+                                   default=lambda self: self._default_journal_type(),
+                                   help='Type of the journal.')
+    company_id = fields.Many2one('res.company',
+                                 default=lambda self: self.env.company,
+                                 help='Default company id.')
     stock_picking_id = fields.Many2one('stock.picking',
                                        string="Picking Id",
                                        help='Stock picking ID information.')
     picking_transfer_id = fields.Many2one('stock.picking.type',
                                           string='Deliver To',
                                           required=True,
-                                          default=_default_picking_transfer,
+                                          default=lambda self: self._default_picking_transfer(),
                                           help="This will determine picking "
                                                "type of outgoing shipment.")
-    picking_count = fields.Integer(string="Picking Count",
+    picking_count = fields.Integer(string="Pickings",
                                    help='Number of outgoing shipment')
 
     @api.onchange('return_date')
@@ -138,7 +159,7 @@ class MobileService(models.Model):
         """Check the return date and request date"""
         if self.return_date:
             if self.return_date < self.date_request:
-                raise UserError("Return date should be greater than requested date")
+                raise UserError(self.env._("Return date should be greater than requested date"))
 
     def action_approve(self):
         """Assigning the Service Request to the corresponding user"""
@@ -161,68 +182,70 @@ class MobileService(models.Model):
         self.service_state = 'not_solved'
 
     def action_send_mail(self):
-        """This function opens a window to compose an email, with the edi sale
-        template message loaded by default"""
+        """Open a window to compose an email with the service status template."""
         self.ensure_one()
-        try:
-            template_id = self.env.ref(
-                'mobile_service_shop.email_template_mobile_service')
-        except ValueError:
-            template_id = False
-        try:
-            compose_form_id = self.env.ref(
-                'mail.email_compose_message_wizard_form')
-        except ValueError:
-            compose_form_id = False
+        template = self.env.ref(
+            'mobile_service_shop.email_template_mobile_service',
+            raise_if_not_found=False,
+        )
+        if not template:
+            raise UserError(
+                self.env._(
+                    "Email template 'Service Status Email' is missing or could not be found."
+                )
+            )
+
+        compose_form = self.env.ref(
+            'mail.email_compose_message_wizard_form',
+            raise_if_not_found=False,
+        )
         ctx = {
             'default_model': 'mobile.service',
             'default_res_ids': self.ids,
-            'default_use_template': bool(template_id),
-            'default_template_id': template_id.id,
+            'default_template_id': template.id,
             'default_composition_mode': 'comment',
-            'default_partner_ids': [(4, self.person_name.id)] if self.person_name else [],
+            'default_partner_ids': [self.person_name.id] if self.person_name else [],
         }
-        return {
-            'name': ('Compose Email'),
+        res = {
+            'name': self.env._('Compose Email'),
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
             'res_model': 'mail.compose.message',
-            'views': [(compose_form_id.id, 'form')],
-            'view_id': compose_form_id.id,
             'target': 'new',
-            'context': ctx}
+            'context': ctx,
+        }
+        if compose_form:
+            res['views'] = [(compose_form.id, 'form')]
+            res['view_id'] = compose_form.id
+        return res
 
     def action_return_advance(self):
         """This method returns the current invoice related to the work"""
-        inv_obj = self.env['account.move'].search(
-            [('invoice_origin', '=', self.name)])
-        inv_ids = inv_obj.ids
-        view_id = self.env.ref('account.view_move_form').id
-        if inv_ids:
-            if len(inv_ids) <= 1:
-                value = {
-                    'view_mode': 'form',
-                    'res_model': 'account.move',
-                    'view_id': view_id,
-                    'type': 'ir.actions.act_window',
-                    'name': 'Invoice',
-                    'res_id': inv_ids[0]}
-            else:
-                value = {
-                    'domain': str([('id', 'in', inv_ids)]),
-                    'view_mode': 'list,form',
-                    'res_model': 'account.move',
-                    'view_id': False,
-                    'type': 'ir.actions.act_window',
-                    'name': 'Invoice'}
-            return value
-        else:
-            raise UserError("No invoice created")
+        inv_ids = self.env['account.move'].sudo().search([
+            ('invoice_origin', '=', self.name)
+        ]).ids
+        if not inv_ids:
+            raise UserError(self.env._("No invoice created."))
+        if len(inv_ids) == 1:
+            return {
+                'name': self.env._('Invoice'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'account.move',
+                'view_mode': 'form',
+                'res_id': inv_ids[0],
+            }
+        return {
+            'name': self.env._('Invoices'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', inv_ids)],
+        }
 
     def _compute_invoice_count(self):
         """Calculating the number of invoices"""
-        for record in self:
-            record.invoice_count = self.env['account.move'].search_count(
+        for record in self.sudo():
+            record.invoice_count = self.env['account.move'].sudo().search_count(
                 [('invoice_origin', '=', record.name)])
 
     @api.model_create_multi
@@ -230,43 +253,47 @@ class MobileService(models.Model):
         """Creating sequence"""
         for vals in vals_list:
             if 'company_id' in vals:
-                vals['name'] = self.env['ir.sequence'].with_context(
-                    with_company=vals['company_id']
-                    ).next_by_code('mobile.service') or ('New')
+                vals['name'] = self.env['ir.sequence'].with_company(
+                    vals['company_id']
+                ).next_by_code('mobile.service') or self.env._('New')
             else:
                 vals['name'] = self.env['ir.sequence'].next_by_code(
-                    'mobile.service') or ('New')
+                    'mobile.service'
+                ) or self.env._('New')
             vals['service_state'] = 'draft'
-        return super(MobileService, self).create(vals_list)
+        return super().create(vals_list)
 
-    def unlink(self):
-        """Supering the unlink function"""
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_draft_or_cancel(self):
+        """Prevent deleting records that have already been assigned or processed."""
         for service in self:
             if service.service_state != 'draft':
-                raise UserError('You cannot delete an assigned service request')
-        return super(MobileService, self).unlink()
+                raise UserError(
+                    self.env._('You cannot delete an assigned service request')
+                )
 
     def action_invoice_create_wizard(self):
         """Opening a wizard to create invoice"""
         return {
-            'name': ('Create Invoice'),
+            'name': self.env._('Create Invoice'),
             'view_mode': 'form',
             'res_model': 'mobile.invoice.wizard',
             'type': 'ir.actions.act_window',
-            'target': 'new'
+            'target': 'new',
         }
 
     def action_post_stock(self):
         """It will post a stock picking with products in parts usage"""
         if not self.product_order_line:
-            raise UserError('No products are mentioned for this service.')
-        
+            raise UserError(self.env._('No products are mentioned for this service.'))
+
         move_lines = []
         lines_to_update = []
         for order in self.product_order_line:
             if not order.stock_number and order.product_uom_qty > order.qty_stock_move:
                 qty_to_move = order.product_uom_qty - order.qty_stock_move
                 move_lines.append((0, 0, {
+                    'description_picking': order.product_id.display_name or self.name,
                     'product_id': order.product_id.id,
                     'product_uom_qty': qty_to_move,
                     'uom_id': order.product_id.uom_id.id if order.product_id.uom_id else False,
@@ -276,7 +303,9 @@ class MobileService(models.Model):
                 lines_to_update.append((order, qty_to_move))
 
         if not move_lines:
-            raise UserError('Nothing to post stock move or all products already have stock moves.')
+            raise UserError(
+                self.env._('Nothing to post stock move or all products already have stock moves.')
+            )
 
         pick = {
             'picking_type_id': self.picking_transfer_id.id,
@@ -284,42 +313,46 @@ class MobileService(models.Model):
             'origin': self.name,
             'location_dest_id': self.person_name.property_stock_customer.id,
             'location_id': self.picking_transfer_id.default_location_src_id.id,
-            'move_ids': move_lines
+            'move_ids': move_lines,
         }
         picking = self.env['stock.picking'].create(pick)
         self.stock_picking_id = picking.id
         self.picking_count = len(picking)
         picking.action_confirm()
         picking.action_assign()
-        
-        # Force "Done" quantities and "Picked" status for Odoo 19 automation
+
         for move in picking.move_ids:
             move.write({
                 'quantity': move.product_uom_qty,
-                'picked': True
+                'picked': True,
             })
-            
-        # Validate skipping backorder/immediate wizards
-        picking.with_context(cancel_backorder=True)._action_done()
-        
+
+        picking.button_validate()
+
         for order, qty in lines_to_update:
             order.write({
                 'stock_number': picking.name,
-                'qty_stock_move': order.qty_stock_move + qty
+                'qty_stock_move': order.qty_stock_move + qty,
             })
-            
+
+        # pylint: disable=no-member
         self.message_post(
-            body='Stock moves have been successfully posted for picking %s.'
-                 % picking.name,)
+            body=self.env._(
+                'Stock moves have been successfully posted for picking %s.', picking.name
+            ),
+        )
 
     def action_view_invoice(self):
         """It will show the invoice for the customer"""
         self.ensure_one()
-        invoice_ids = self.env['account.move'].search(
-            ['|',('invoice_origin', '=', self.name),('reversed_entry_id.invoice_origin', '=', self.name)])
+        invoice_ids = self.env['account.move'].sudo().search([
+            '|',
+            ('invoice_origin', '=', self.name),
+            ('reversed_entry_id.invoice_origin', '=', self.name),
+        ])
         inv_ids = invoice_ids.ids
         action = {
-            'name': ("Invoices"),
+            'name': self.env._("Invoices"),
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
             'target': 'current',
@@ -328,13 +361,8 @@ class MobileService(models.Model):
         }
         if len(inv_ids) > 1:
             action['view_mode'] = 'list,form'
-            action['views'] = [
-                (self.env.ref('account.view_move_tree').id, 'list'),
-                (self.env.ref('account.view_move_form').id, 'form')
-            ]
         elif len(inv_ids) == 1:
             action['view_mode'] = 'form'
-            action['views'] = [(self.env.ref('account.view_move_form').id, 'form')]
             action['res_id'] = inv_ids[0]
         else:
             return {'type': 'ir.actions.act_window_close'}
@@ -346,21 +374,13 @@ class MobileService(models.Model):
         now_utc = fields.Datetime.now()
         now_local = fields.Datetime.context_timestamp(self, now_utc)
         date_today = now_local.strftime("%Y-%m-%d %H:%M %p")
-        complaint_text = ""
-        description_text = ""
-        complaint_id = self.env['mobile.complaint.tree'].search(
-            [('complaint_id', '=', self.id)])
-        if complaint_id:
-            for obj in complaint_id:
-                complaint = obj.complaint_type_tree
-                description = obj.description_tree
-                complaint_text = complaint.complaint_type + ", " + complaint_text
-                if description.description:
-                    description_text = description.description + ", " + description_text
-        else:
-            for obj in complaint_id:
-                complaint = obj.complaint_type_tree
-                complaint_text = complaint.complaint_type + ", " + complaint_text
+        complaint_types = []
+        descriptions = []
+        for obj in self.complaints_tree:
+            if obj.complaint_type_tree and obj.complaint_type_tree.complaint_type:
+                complaint_types.append(obj.complaint_type_tree.complaint_type)
+            if obj.description_tree and obj.description_tree.description:
+                descriptions.append(obj.description_tree.description)
         data = {
             'ids': self.ids,
             'model': self._name,
@@ -369,23 +389,25 @@ class MobileService(models.Model):
             'date_return': self.return_date,
             'sev_id': self.name,
             'warranty': self.is_in_warranty,
-            'customer_name': self.person_name.name,
-            'imei_no': self.imei_no,
-            'technician': self.technician_name.name,
-            'complaint_types': complaint_text,
-            'complaint_description': description_text,
+            'customer_name': self.person_name.name if self.person_name else '',
+            'imei_no': self.imei_no or '',
+            'technician': self.technician_name.name if self.technician_name else '',
+            'complaint_types': ", ".join(complaint_types),
+            'complaint_description': ", ".join(descriptions),
             'mobile_brand': self.brand_name.display_name if self.brand_name else '',
             'model_name': self.model_name.display_name if self.model_name else '',
-            }
+        }
         return self.env.ref(
-            'mobile_service_shop.mobile_service_ticket').report_action(self,
-                                                                       data=data)
+            'mobile_service_shop.mobile_service_ticket'
+        ).report_action(self, data=data)
 
-    def _get_invoiced(self):
+    def _compute_invoice_ids(self):
         """Compute the invoices linked to this service record"""
-        for record in self:
-            record.invoice_ids = self.env['account.move'].search(
+        for record in self.sudo():
+            record.invoice_ids = self.env['account.move'].sudo().search(
                 ['|',
                  ('invoice_origin', '=', record.name),
                  ('reversed_entry_id.invoice_origin', '=', record.name)
                  ])
+
+    _get_invoiced = _compute_invoice_ids

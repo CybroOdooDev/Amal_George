@@ -6,19 +6,16 @@
     :target: https://www.odoo.com
     :alt: Odoo 20.0
 
-.. |edition| image:: https://img.shields.io/badge/Edition-Community-1ABC9C.svg
-    :alt: Community Edition
-
 .. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
     :target: https://cybrosys.com
     :alt: Maintainer: Cybrosys Techno Solutions
 
-|license| |odoo| |edition| |maintainer|
+|license| |odoo| |maintainer|
 
 Allocation Time Approval
 ========================
 
-This module enables managers to review and approve allocated time on project tasks and timesheets.
+This module enables managers to review and approve allocated time on project tasks.
 
 Key Features
 ------------
@@ -40,10 +37,10 @@ Assign user access rights under **Settings > Users & Companies > Users** (Access
 
 * **Project**:
   * **User**: Allows users to create tasks and request manager approval for allocated hours.
-  * **Administrator**: Grants project managers full access to review, approve, or cancel allocated time requests and manage task stage transitions.
+  * **Administrator**: Grants project managers full access to review, approve, or cancel allocated time requests, manage task stage transitions, and access the **Allocated Hour Approval** dashboard (**Timesheets > Allocated Hour Approval**).
 
 * **Timesheets**:
-  * **User / Administrator**: Grants access to timesheets and the **Allocated Hour Approval** menu (**Timesheets > Allocated Hour Approval**).
+  * **User**: Allows team members to log timesheets on assigned tasks.
 
 Company
 -------

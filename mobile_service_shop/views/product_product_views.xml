@@ -8,12 +8,10 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']"
                    position="after">
-                <strong>
-                    <span>&amp;nbsp;</span>
+                <div class="d-flex gap-1 fw-bold">
                     <field name="brand_name"/>
-                    <span>&amp;nbsp;</span>
                     <field name="model_name"/>
-                </strong>
+                </div>
             </xpath>
         </field>
     </record>
@@ -25,12 +23,10 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']"
                    position="after">
-                <strong>
-                    <span>&amp;nbsp;</span>
+                <div class="d-flex gap-1 fw-bold">
                     <field name="brand_name"/>
-                    <span>&amp;nbsp;</span>
                     <field name="model_name"/>
-                </strong>
+                </div>
             </xpath>
         </field>
     </record>
@@ -51,5 +47,5 @@
     <!--        Model product.product parts inventory menu-->
     <menuitem action="product_template_action_product" id="product_template_menu_parts"
               parent="mobile_service_shop_menu_root"
-              name="Parts inventory" sequence="2"/>
+              name="Parts Inventory" sequence="2"/>
 </odoo>

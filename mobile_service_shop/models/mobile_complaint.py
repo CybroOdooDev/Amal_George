@@ -24,6 +24,6 @@ class MobileComplaint(models.Model):
     _description = 'Mobile Complaint'
     _rec_name = 'complaint_type'
 
-    complaint_type = fields.Char(string="Complaint Type", required=True,
+    complaint_type = fields.Char(required=True,
                                  help="This field specifies the type of the "
                                       "complaint.")

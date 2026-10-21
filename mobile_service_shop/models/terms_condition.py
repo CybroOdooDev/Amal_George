@@ -25,13 +25,12 @@ class TermsConditions(models.Model):
     _rec_name = 'terms_id'
 
     terms_id = fields.Char(string="Terms and condition",
-                           compute="_compute_terms_id", help="this will be "
-                                                             "the terms id.")
+                           compute="_compute_terms_id",
+                           help="Identifier of the terms and conditions.")
     terms_conditions = fields.Text(string="Terms and Conditions",
-                                   help="this will be the terms and "
-                                        "conditions space.")
+                                   help="Details of terms and conditions.")
 
     def _compute_terms_id(self):
         """Return the terms ID"""
         for record in self:
-            record.terms_id = str(self.id) or ''
+            record.terms_id = str(record.id) if record.id else ''

@@ -27,7 +27,7 @@ class ProductOrderLine(models.Model):
                                        help="Reference to the related mobile "
                                             "service order to which this product"
                                             " order line belongs.")
-    product_id = fields.Many2one('product.product', string='Product',
+    product_id = fields.Many2one('product.product',
                                  domain="[('is_a_parts','=', True)]",
                                  help="Product ID of the product.",
                                  required=True)
@@ -41,8 +41,7 @@ class ProductOrderLine(models.Model):
     qty_stock_move = fields.Float(string='Stock Move Posted Qty', readonly=True,
                                   help="Count of stock move.")
     part_price = fields.Float(compute='_compute_part_price', string='Price',
-                             store=True, help="Price for the "
-                                                             "part.")
+                              store=True, help="Price for the part.")
     product_uom = fields.Char(string='Unit of Measure', required=True,
                               help="Unit of measure of the product.")
     stock_number = fields.Char(string="Picking", help="Stock move picking name",
@@ -57,9 +56,8 @@ class ProductOrderLine(models.Model):
             self.price_unit = product_template_obj.list_price
             self.product_uom = product_template_obj.uom_id.name
 
-    @api.depends('product_uom_qty', 'product_id')
+    @api.depends('product_uom_qty', 'product_id', 'price_unit')
     def _compute_part_price(self):
         """Compute the amount of part price"""
         for line in self:
-            price = line.price_unit * line.product_uom_qty
-            line.update({'part_price': price})
+            line.part_price = line.price_unit * line.product_uom_qty

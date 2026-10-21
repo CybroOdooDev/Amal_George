@@ -6,17 +6,15 @@
     :target: https://www.odoo.com
     :alt: Odoo 20.0
 
-.. |edition| image:: https://img.shields.io/badge/Edition-Community-1ABC9C.svg
-    :alt: Community Edition
 
 .. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
     :target: https://cybrosys.com
     :alt: Maintainer: Cybrosys Techno Solutions
 
-|license| |odoo| |edition| |maintainer|
+|license| |odoo| |maintainer|
 
 Mobile Service Management
-================
+=========================
 
 Module for mobile service shop daily activities
 
@@ -28,7 +26,7 @@ Key Features
 * Technician assignment and stage workflow management (*Draft*, *Assigned*, *Completed*, *Returned*, *Not Solved*).
 * Multi-complaint tracking with configurable complaint types and detailed diagnostic descriptions.
 * Parts usage management with automatic stock picking generation and inventory validation.
-* Invoicing wizard supporting advance payments (fixed amount or percentage), technician fees, and parts usage.
+* Invoicing wizard supporting advance payment amounts and full settlement invoicing with parts usage.
 * Automated customer email notifications for service status updates.
 * Professional PDF printing for Mobile Service Tickets and customer receipts.
 * Master data management for Mobile Brands, Models (with image support), Complaints, and Terms & Conditions.

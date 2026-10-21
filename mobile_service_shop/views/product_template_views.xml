@@ -11,11 +11,13 @@
                 <label for="is_a_parts"/>
             </xpath>
             <xpath expr="//page[@name='general_information']" position="after">
-                <page string="Parts details" invisible="is_a_parts == False">
+                <page string="Parts Details" invisible="is_a_parts == False">
                     <group>
                         <group>
                             <field name="brand_name" required="is_a_parts == True"/>
-                            <field name="model_name" domain="[('id', 'in', allowed_model_ids)]" required="is_a_parts == True"/>
+                            <field name="model_name"
+                                   domain="[('id', 'in', allowed_model_ids)]"
+                                   required="is_a_parts == True"/>
                             <field name="allowed_model_ids" invisible="1"/>
                         </group>
                         <group>

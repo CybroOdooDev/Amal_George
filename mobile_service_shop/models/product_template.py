@@ -28,7 +28,7 @@ class ProductTemplate(models.Model):
     brand_name = fields.Many2one('mobile.brand', string="Brand",
                                  help="Select a mobile brand for the part.")
     allowed_model_ids = fields.Many2many('brand.model', compute='_compute_allowed_model_ids')
-    model_name = fields.Many2one('brand.model', string="Model Name",
+    model_name = fields.Many2one('brand.model', string="Model",
                                  help="Select a model for the part.")
     model_colour = fields.Char(string="Colour", help="Colour for the part.")
     extra_descriptions = fields.Text(string="Note", help="Extra description "
@@ -43,4 +43,6 @@ class ProductTemplate(models.Model):
                     ('mobile_brand_name', '=', rec.brand_name.id)
                 ]).ids
             else:
-                rec.allowed_model_ids = self.env['brand.model'].search([]).ids
+                rec.allowed_model_ids = self.env['brand.model'].search([
+                    ('id', '!=', False)
+                ]).ids

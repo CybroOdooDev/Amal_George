@@ -27,18 +27,18 @@
                 <field name="mobile_brand_name"/>
                 <templates>
                     <t t-name="card">
-                        <div class="oe_kanban_global_click">
-                            <div class="o_kanban_image">
+                        <div class="d-flex gap-2">
+                            <aside class="o_kanban_image">
                                 <field name="image_medium" widget="image" class="o_image_64_contain o_kanban_avatar"/>
-                            </div>
-                            <div class="oe_kanban_details">
+                            </aside>
+                            <main class="oe_kanban_details">
                                 <strong class="o_kanban_record_title">
                                     <field name="mobile_brand_name"/>
                                 </strong>
-                            </div>
-                            <p>
-                                <field name="mobile_brand_models"/>
-                            </p>
+                                <p class="mb-0 text-muted">
+                                    <field name="mobile_brand_models"/>
+                                </p>
+                            </main>
                         </div>
                     </t>
                 </templates>

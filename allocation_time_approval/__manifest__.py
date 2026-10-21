@@ -19,9 +19,9 @@
     'name': 'Allocation Time Approval',
     'version': '20.0.1.0.0',
     'category': 'Project',
-    'summary': """Approve allocated time for project tasks and timesheets.""",
-    'description': """This module enables managers to review and approve 
-    allocated hours on project tasks and timesheets.""",
+    'summary': """Approve allocated time for project tasks.""",
+    'description': """This module enables managers to review and approve
+    allocated hours on project tasks.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
@@ -29,6 +29,7 @@
     'depends': ['hr_timesheet', 'project'],
     'data': [
         'security/ir.access.csv',
+        'data/project_task_type_data.xml',
         'views/project_task_views.xml',
         'views/manager_approval_views.xml',
     ],
@@ -38,7 +39,3 @@
     'auto_install': False,
     'application': False,
 }
-
-
-
-

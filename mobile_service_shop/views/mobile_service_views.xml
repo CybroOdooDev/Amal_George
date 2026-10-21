@@ -33,14 +33,14 @@
         <field name="arch" type="xml">
             <form string="Mobile Shop">
                 <header>
-                    <button string="Assign to technician" type="object" name="action_approve"
+                    <button string="Assign to Technician" type="object" name="action_approve"
                             class="oe_highlight"
                             invisible="service_state != 'draft'"
                             groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                     <button string="Completed" type="object" name="action_complete"
                             class="oe_highlight"
                             invisible="service_state != 'assigned'"/>
-                    <button string="Return advance" type="object" name="action_return_advance"
+                    <button string="Return Advance" type="object" name="action_return_advance"
                             class="oe_highlight"
                             invisible="service_state != 'not_solved'"
                             groups="mobile_service_shop.mobile_service_shop_group_manager"/>
@@ -48,26 +48,26 @@
                             invisible="service_state not in ('completed', 'assigned')"
                             type="object" class="oe_highlight"
                             groups="mobile_service_shop.mobile_service_shop_group_manager"/>
-                    <button name="action_post_stock" string="Post Stock moves"
+                    <button name="action_post_stock" string="Post Stock Moves"
                             invisible="service_state not in ('completed', 'assigned')"
                             type="object" class="oe_highlight"
                             groups="mobile_service_shop.mobile_service_shop_group_manager"/>
-                    <button string="Return to customer" type="object" name="action_return_to"
-                            invisible="service_state not in ('completed')"
+                    <button string="Return to Customer" type="object" name="action_return_to"
+                            invisible="service_state != 'completed'"
                             groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                     <button string="Not Solved" type="object" name="action_not_solved"
-                            invisible="service_state not in ('assigned')"/>
+                            invisible="service_state != 'assigned'"/>
                     <button name="action_get_ticket" string="Print Ticket" type="object" class="oe_highlight"
                             groups="mobile_service_shop.mobile_service_shop_group_manager"/>
-                    <button name="action_send_mail" string="Send email" type="object"
-                            invisible="service_state in ('draft')"
+                    <button name="action_send_mail" string="Send Email" type="object"
+                            invisible="service_state == 'draft'"
                             groups="mobile_service_shop.mobile_service_shop_group_manager"/>
                     <field name="service_state" widget="statusbar" statusbar_visible="draft,returned,not_solved"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name='action_view_invoice' class="oe_stat_button" type="object" icon="edit_square"
-                                invisible="service_state in ('draft')">
+                        <button name='action_view_invoice' class="oe_stat_button" type="object" icon="description"
+                                invisible="service_state == 'draft'">
                             <field string="Invoice" name="invoice_count" widget="statinfo"/>
                         </button>
                     </div>
@@ -88,7 +88,7 @@
                         <group>
                             <field name="person_name" widget="res_partner_many2one"
                                    context="{'res_partner_search_mode': 'customer'}" style="width:50%;"
-                                   readonly="service_state not in 'draft'"/>
+                                   readonly="service_state != 'draft'"/>
                             <field name="contact_no" style="width:50%;"
                                    readonly="service_state in ('returned','not_solved')"/>
                             <field name="email_id" style="width:50%;"
@@ -109,16 +109,16 @@
                             <label for="brand_name"/>
                             <div class="o_row">
                                 <field name="brand_name" placeholder="Brand name"
-                                       readonly="service_state not in 'draft'"/>
+                                       readonly="service_state != 'draft'"/>
                                 <field name="model_name" placeholder="Model name"
-                                       readonly="service_state not in 'draft'"/>
+                                       readonly="service_state != 'draft'"/>
                             </div>
                             <field name="date_request" style="width:50%;"
-                                   readonly="service_state not in 'draft'"/>
+                                   readonly="service_state != 'draft'"/>
                             <field name="return_date" style="width:50%;"
                                    readonly="service_state in ('returned','not_solved')"/>
                             <field name="technician_name" style="width:50%;"
-                                   readonly="service_state not in 'draft'"/>
+                                   readonly="service_state != 'draft'"/>
                             <field name="picking_count" invisible="1"/>
                         </group>
                     </group>
@@ -127,9 +127,9 @@
                             <group>
                                 <group>
                                     <field name="imei_no" style="width:50%;" colspan="1"
-                                           readonly="service_state not in 'draft'"/>
+                                           readonly="service_state != 'draft'"/>
                                     <field name="warranty_number" style="width:50%;"
-                                           readonly="service_state not in 'draft'"
+                                           readonly="service_state != 'draft'"
                                            required="is_in_warranty == True" invisible="is_in_warranty != True"/>
                                 </group>
                                 <group>
@@ -155,7 +155,7 @@
                         <page string="Parts Usage">
                             <field name="product_order_line" mode="list"
                                    readonly="service_state in ('returned','not_solved')">
-                                <list string="Complaints" editable="bottom">
+                                <list string="Parts" editable="bottom">
                                     <field name="product_id" context="{'default_is_a_parts': True}" options="{'no_quick_create': True}"/>
                                     <field name="product_uom_qty"/>
                                     <field name="product_uom"/>
@@ -186,12 +186,12 @@
                 <field name="image_medium"/>
                 <field name="id"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-                            <div class="o_kanban_image">
+                    <t t-name="card">
+                        <div class="d-flex gap-2">
+                            <aside class="o_kanban_image">
                                 <img t-att-src="kanban_image('mobile.service', 'image_medium', record.id.raw_value)" alt="Mobile Service"/>
-                            </div>
-                            <div class="oe_kanban_content">
+                            </aside>
+                            <main class="oe_kanban_content">
                                 <div>
                                     <strong class="o_kanban_record_title">
                                         <field name="name"/>
@@ -203,8 +203,7 @@
                                     <br/>
                                     <field name="service_state"/>
                                 </div>
-                            </div>
-                            <div class="oe_clear"/>
+                            </main>
                         </div>
                     </t>
                 </templates>
@@ -255,10 +254,9 @@
         </field>
     </record>
     <!--Mobile service model menus-->
-    <menuitem id="mobile_service_shop_menu_root" web_icon="mobile_service_shop/static/description/icon.png"
+    <menuitem id="mobile_service_shop_menu_root" web_icon="mobile_service_shop,static/description/icon.png"
               name="Mobile Service" sequence="20"
               groups="mobile_service_shop.mobile_service_shop_group_user,mobile_service_shop.mobile_service_shop_group_manager"/>
-    <menuitem id="mobile_service_shop_menu" parent="mobile_service_shop_menu_root" sequence="20"/>
     <menuitem action="mobile_service_action_request" id="mobile_service_menu_request"
               parent="mobile_service_shop_menu_root"
               name="Service Request" sequence="1"/>

@@ -20,14 +20,14 @@
     'version': '20.0.1.0.0',
     'category': 'Industries',
     'summary': 'Module for managing mobile service shop daily activities.',
-    'description':'This module provides an all-in-one solution for mobile'
+    'description': 'This module provides an all-in-one solution for mobile'
                   ' service centers, helping them efficiently manage operations'
                   ' while maintaining high levels of customer satisfaction.',
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['stock_account', 'account' ,'sale','product','mail'],
+    'depends': ['stock', 'account', 'mail'],
     'data': ['security/mobile_service_shop_security.xml',
              'security/ir.access.csv',
              'data/mobile_service_data.xml',
@@ -51,7 +51,5 @@
     },
     'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',
-    'installable': True,
-    'auto_install': False,
     'application': True,
 }

@@ -26,8 +26,9 @@ class MobileServiceTicket(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data):
         """Returns the data file for the report"""
-        terms = self.env['terms.conditions'].search([])
+        terms = self.env['terms.conditions'].search([('id', '!=', False)])
         return {
+            'doc_ids': docids,
             'date_today': data['date_today'],
             'date_request': data['date_request'],
             'date_return': data['date_return'],

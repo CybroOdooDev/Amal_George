@@ -29,5 +29,4 @@ class MobileComplaintDescription(models.Model):
                                               string="Complaint Type",
                                               required=True, copy=False,
                                               help="Complaint type template.")
-    description = fields.Text(string="Description",
-                              help="Complaint description.")
+    description = fields.Text(help="Complaint description.")

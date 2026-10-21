@@ -87,7 +87,7 @@
                 </div>
                 <div style="margin-top:10px;">
                     <t t-if="warranty">
-                        <span>The device is in warranty range !!</span>
+                        <span>The device is covered under warranty.</span>
                     </t>
                 </div>
                 <div style="margin-top:30px;">
@@ -103,7 +103,7 @@
                         </t>
                     </t>
                     <t t-else="">
-                        <span t-out="'Services provided are subject to a 10  warranty on parts, with no liability for data loss or damages beyond pre-existing conditions, and full payment is required upon completion.'"/>
+                        <span t-out="'Services provided are subject to a 10-day warranty on parts, with no liability for data loss or damages beyond pre-existing conditions, and full payment is required upon completion.'"/>
                     </t>
                 </div>
                 <div style="margin-top:200px;">

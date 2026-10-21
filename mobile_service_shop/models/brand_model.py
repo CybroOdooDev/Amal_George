@@ -30,5 +30,5 @@ class BrandModel(models.Model):
                                         help="Brand name of the mobile")
     mobile_brand_models = fields.Char(string="Model Name", required=True,
                                       help="Model name of the mobile")
-    image_medium = fields.Binary(string='image', store=True, attachment=True,
+    image_medium = fields.Binary(string='Image', store=True, attachment=True,
                                  help="Mobile image space")

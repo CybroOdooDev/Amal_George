@@ -19,9 +19,9 @@
                     </div>
                 </group>
                 <footer>
-                    <button name="action_invoice_create" string="Create Invoices" type="object"
+                    <button name="action_invoice_create" string="Create Invoice" type="object"
                             class="btn-primary"/>
-                    <button string="Cancel" class="btn-default" special="cancel"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>

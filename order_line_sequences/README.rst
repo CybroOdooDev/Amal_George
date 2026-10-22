@@ -16,7 +16,7 @@
 |license| |odoo| |edition| |maintainer|
 
 Order Line Sequences/Line Numbers
-================
+=================================
 
 This module will help you to add sequence for order lines in sales, purchase and delivery.
 It will also add line numbers in report lines.

@@ -1,4 +1,3 @@
-/** @odoo-module **/
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { Component, useProps, t } from "@odoo/owl";
@@ -15,15 +14,18 @@ export class TransferRefPopup extends Component {
     });
 
     setup() {
-    this.dialog = useService("dialog");
+        this.dialog = useService("dialog");
     }
 
-    // Function for redirect to the backend transfer  view
-    stock_view() {
-    var ref_id = this.props.data.id
-     location.href = '/web#id='+ ref_id +'&&model=stock.picking&view_type=form'
+    // Function to open the backend transfer view in a new tab without disrupting POS
+    openStockTransfer() {
+        const refId = this.props.data?.id;
+        if (refId) {
+            window.open(`/odoo/action-stock.action_picking_tree_all/${refId}`, "_blank");
+        }
     }
-    confirm(){
-    this.props.close();
+
+    confirm() {
+        this.props.close();
     }
 }

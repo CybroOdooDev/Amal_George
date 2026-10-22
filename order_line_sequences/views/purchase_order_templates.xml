@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--        Inherited purchase report purchase order document-->
-    <template id="purchase_order_report"
-              inherit_id="purchase.report_purchaseorder_document">
+    <!-- Inherited purchase report purchase order document -->
+    <template id="purchase_order_report" inherit_id="purchase.report_purchaseorder_document">
         <xpath expr="//table[hasclass('table')]//tr//th[@name='th_description']"
                position="before">
             <th name="th_sequence" class="text-start">#</th>
@@ -15,8 +14,8 @@
         </xpath>
     </template>
 
-    <template id="purchase_quotation_report"
-              inherit_id="purchase.report_purchasequotation_document">
+    <!-- Inherited purchase report purchase quotation document -->
+    <template id="purchase_quotation_report" inherit_id="purchase.report_purchasequotation_document">
         <xpath expr="//table[hasclass('table')]//tr//th[@name='th_description']"
                position="before">
             <th name="th_sequence" class="text-start">#</th>
@@ -29,4 +28,3 @@
         </xpath>
     </template>
 </odoo>
-

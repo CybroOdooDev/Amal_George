@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--        Inherited stock report picking-->
+    <!-- Inherited stock report picking -->
     <template id="stock_picking_report" inherit_id="stock.report_picking">
         <xpath expr="//table[hasclass('table')]//tr//th[@name='th_product']"
                position="before">
@@ -14,4 +14,3 @@
         </xpath>
     </template>
 </odoo>
-

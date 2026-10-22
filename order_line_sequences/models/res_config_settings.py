@@ -20,6 +20,7 @@ from odoo import fields, models
 
 class ResConfigSettings(models.TransientModel):
     """Inherit res.config.settings to make show_sol_numbers readonly."""
+
     _inherit = 'res.config.settings'
 
     show_sol_numbers = fields.Boolean(

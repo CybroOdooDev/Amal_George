@@ -19,14 +19,17 @@
     'name': 'Order Line Sequences/Line Numbers',
     'version': '20.0.1.0.0',
     'category': 'Extra Tools',
-    'summary': 'Sequence numbers in order lines of sales,purchase and delivery.',
-    'description': """This module will help you to add sequence for order lines
-    in sales, purchase and delivery. It will also add line numbers in report lines.""",
+    'summary': (
+        'Sequence numbers in order lines of sales, purchase and delivery.'
+    ),
+    'description': """This module will help you to add sequence for order
+    lines in sales, purchase and delivery. It will also add line numbers in
+    report lines.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
-    'website': "https://www.cybrosys.com",
-    'depends': ['base', 'sale_management', 'purchase', 'stock'],
+    'website': 'https://www.cybrosys.com',
+    'depends': ['sale_management', 'purchase', 'stock'],
     'data': [
         'views/res_config_settings_views.xml',
         'views/purchase_order_views.xml',

@@ -16,7 +16,7 @@
 |license| |odoo| |edition| |maintainer|
 
 Point of Sale Stock Transfer
-================
+============================
 
 This module helps to transfer stock from POS session.
 

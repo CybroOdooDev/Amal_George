@@ -20,11 +20,14 @@ from odoo import fields, models
 
 class ResCompany(models.Model):
     """Inherit res.company to default show_sol_numbers to True."""
+
     _inherit = 'res.company'
 
     show_sol_numbers = fields.Boolean(default=True)
 
     def _auto_init(self):
         res = super()._auto_init()
-        self.env['res.company'].search([('show_sol_numbers', '=', False)]).write({'show_sol_numbers': True})
+        self.env['res.company'].search(
+            [('show_sol_numbers', '=', False)],
+        ).write({'show_sol_numbers': True})
         return res

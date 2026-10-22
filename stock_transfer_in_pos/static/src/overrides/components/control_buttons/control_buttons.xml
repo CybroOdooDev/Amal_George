@@ -6,8 +6,8 @@
             <t t-if="this.pos.config.stock_transfer" t-call="point_of_sale.controlButton"
                 icon="'swap_horiz'"
                 btnText.translate="Stock Transfer"
-                btnClasses="'btn-secondary '"
-                onClick="() => this.clickDiscount1()">
+                btnClasses="'btn-secondary'"
+                onClick="() => this.clickStockTransfer()">
             </t>
         </xpath>
     </t>

@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--    Inherited form view of purchase order -->
+    <!-- Inherited form view of purchase order -->
     <record id="purchase_order_form" model="ir.ui.view">
-        <field name="name">
-            purchase.order.view.form.inherit.order.line.sequences
-        </field>
+        <field name="name">purchase.order.view.form.inherit.order.line.sequences</field>
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
@@ -15,4 +13,3 @@
         </field>
     </record>
 </odoo>
-

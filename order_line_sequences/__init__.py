@@ -19,5 +19,10 @@ from . import models
 
 
 def post_init_hook(env):
-    """Enable line numbers on Sales Orders for all existing companies upon module installation."""
-    env['res.company'].search([('show_sol_numbers', '=', False)]).write({'show_sol_numbers': True})
+    """Enable line numbers on Sales Orders for existing companies.
+
+    Triggered upon module installation.
+    """
+    env['res.company'].search(
+        [('show_sol_numbers', '=', False)],
+    ).write({'show_sol_numbers': True})

@@ -19,7 +19,7 @@
     'name': "Website Custom Contact Us",
     'version': '20.0.1.0.0',
     'category': 'Website',
-    'summary': """Manage the visibility of company details on the Website Contact Us page""",
+    'summary': "Manage the visibility of company details on the Website Contact Us page",
     'description': """Control which company details appear on your website's Contact Us page.
     Easily show or hide information such as company name, address, phone,
     email, website, working hours, social media links, and map location

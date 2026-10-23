@@ -50,5 +50,6 @@
     <menuitem id="ir_model_fields_menu_root"
               name="Selection Field Configurator"
               web_icon="odoo_selection_field_configurator,static/description/icon.png"
+              groups="base.group_system"
               action="ir_model_fields_action"/>
 </odoo>

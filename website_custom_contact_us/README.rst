@@ -6,9 +6,6 @@
     :target: https://www.odoo.com
     :alt: Odoo 20.0
 
-.. |edition| image:: https://img.shields.io/badge/Edition-Community-1ABC9C.svg
-    :alt: Community Edition
-
 .. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
     :target: https://cybrosys.com
     :alt: Maintainer: Cybrosys Techno Solutions
@@ -16,8 +13,8 @@
 |license| |odoo| |edition| |maintainer|
 
 Website Custom Contact Us
-================
-This module allow to set the visibility for company details in the website
+=========================
+This module allows you to configure the visibility of company details on the website
 contact us page.
 
 Key Features
@@ -34,7 +31,9 @@ No external dependencies.
 
 Configuration
 -------------
-No additional configuration is required.
+1. Navigate to Website -> Configuration -> Settings or open the Website record in Website -> Configuration -> Websites.
+2. Open the Contact Us tab on the Website form.
+3. Configure Company Data Visibility, Address/Phone Options, and Social Links as desired.
 
 Company
 -------

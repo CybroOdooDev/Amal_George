@@ -16,9 +16,9 @@
 |license| |odoo| |edition| |maintainer|
 
 Multiple Warehouses in Sale Order Lines
-================
+=======================================
 
-This module will help you to set warehouses per sale order lines and the picking will be created for the selected warehouses separately.
+This module will help you to set warehouses per sale order line and the pickings will be created for the selected warehouses separately.
 
 
 Key Features

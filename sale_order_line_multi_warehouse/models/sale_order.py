@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
@@ -15,73 +14,39 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import fields, models
-from odoo.tools import float_compare
+from odoo import api, fields, models
 
 
 class SaleOrderLine(models.Model):
+    """Extension of 'sale.order.line' to allow setting a specific warehouse
+    per order line, generating separate stock pickings per warehouse.
     """
-        Extension of 'sale.order.line' with an additional
-        field 'product_warehouse_id'.
-        """
+
     _inherit = 'sale.order.line'
 
     product_warehouse_id = fields.Many2one(
         'stock.warehouse',
-        string='Warehouse', help='Warehouse where product taken from')
+        string='Line Warehouse',
+        help='Warehouse where product is taken from',
+        check_company=True,
+    )
 
-    def _action_launch_stock_rule(self, previous_product_uom_qty=False):
+    @api.depends('product_warehouse_id')
+    def _compute_warehouse_id(self):
+        """Override to update line warehouse when a specific warehouse
+        is configured on the sale order line.
         """
-             Overwriting the function for adding functionalities of multiple
-             warehouses in the sale order line.
-             param previous_product_uom_qty(str): Uom quantity of previous
-             product
-             boolean: Returns True, if the picking created.
-            """
-        if self._context.get("skip_procurement"):
-            return True
-        precision = self.env['decimal.precision'].precision_get(
-            'Product Unit of Measure')
-        procurements = []
+        res = super()._compute_warehouse_id()
         for line in self:
-            line = line.with_company(line.company_id)
-            if line.state != 'sale' or not line.product_id.type in (
-                    'consu', 'product'):
-                continue
-            qty = line._get_qty_procurement(previous_product_uom_qty)
-            if float_compare(qty, line.product_uom_qty,
-                             precision_digits=precision) == 0:
-                continue
-            group_id = line.order_id.stock_reference_ids
-            if not group_id:
-                group_id = self.env['stock.reference'].create(
-                    line._prepare_reference_vals())
-                line.order_id.stock_reference_ids = group_id
-            else:
-                updated_vals = {}
-                if updated_vals:
-                    group_id.write(updated_vals)
-            values = line._prepare_procurement_values()
             if line.product_warehouse_id:
-                values['warehouse_id'] = line.product_warehouse_id
-            product_qty = line.product_uom_qty - qty
-            line_uom = line.product_uom_id
-            quant_uom = line.product_id.uom_id
-            product_qty, procurement_uom = line_uom._adjust_uom_quantities(
-                product_qty, quant_uom)
-            procurements.append(self.env['stock.rule'].Procurement(
-                line.product_id, product_qty, procurement_uom,
-                line.order_id.partner_shipping_id.property_stock_customer,
-                line.product_id.display_name, line.order_id.name,
-                line.order_id.company_id, values))
+                line.warehouse_id = line.product_warehouse_id
+        return res
 
-        # procurements.append(procurements)
-        if procurements:
-            self.env['stock.rule'].run(procurements)
-        orders = self.mapped('order_id')
-        for order in orders:
-            pickings_to_confirm = order.picking_ids.filtered(
-                lambda p: p.state not in ['cancel', 'done'])
-            if pickings_to_confirm:
-                pickings_to_confirm.action_confirm()
-        return True
+    def _prepare_procurement_values(self):
+        """Prepare procurement values setting warehouse_id from the line
+        when a custom line warehouse is specified.
+        """
+        values = super()._prepare_procurement_values()
+        if self.product_warehouse_id:
+            values['warehouse_id'] = self.product_warehouse_id
+        return values

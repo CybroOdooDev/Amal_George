@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
@@ -30,11 +29,9 @@
     'depends': ['sale_management'],
     'data': [
         'views/sale_order_views.xml',
-        'views/res_config_settings_views.xml'
+        'views/res_config_settings_views.xml',
     ],
     'images': ['static/description/banner.jpg'],
     'license': "LGPL-3",
-    'installable': True,
-    'auto_install': False,
-    'application': False,
 }
+

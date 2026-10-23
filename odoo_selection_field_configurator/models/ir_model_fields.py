@@ -15,200 +15,171 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from psycopg2 import sql
+from collections import defaultdict
 
 from odoo import api, models
+from odoo.addons.base.models.ir_model import IrModelFieldsSelection as BaseIrModelFieldsSelection
 from odoo.exceptions import UserError
 from odoo.fields import Selection
-from odoo.tools.translate import _
-from odoo.addons.base.models.ir_model import IrModelFields
-from odoo.addons.base.models.ir_model import IrModelFieldsSelection
+from odoo.tools.misc import OrderedSet
 
 
-def convert_to_cache(self, value, record, validate=True):
-    """ Monkey patched the function convert_to_cache and added condition to check
-    value in by search get all selections of that field. """
-    if not validate:
-        return value or None
-    if value and self.column_type[0] == 'int4':
-        value = int(value)
-    if value in self.get_values(record.env):
-        return value
-    elif not value:
-        return None
-    if self.type == 'selection':
-        field_id = record.env['ir.model.fields'].search(
-            [('model', '=', str(self).rsplit(".", 1)[0]),
-             ('name', '=', str(self).rsplit(".", 1)[1])]).id
-        value_list = [i.value for i in
-                      record.env['ir.model.fields.selection'].search(
-                          [('field_id', '=', field_id)])]
-        if value in value_list:
-            return value
-    raise UserError(
-        _("User Error: Custom selection requires Python code implementation, "
-          "preferably through a custom addon to provide the desired "
-          "functionalities."))
+class IrModelFields(models.Model):
+    """ Inherited ir.model.fields to allow updating selection_ids on base fields
+    while strictly preserving core protection against modifying base field schema. """
+    _inherit = 'ir.model.fields'
+
+    def _get_writable_properties(self):
+        """ Include selection_ids in writable properties so that adding, editing,
+        or reordering selection options on base fields does not trigger core
+        schema alteration restrictions, while keeping all structural checks active. """
+        properties = super()._get_writable_properties()
+        return properties + ['selection_ids']
 
 
-Selection.convert_to_cache = convert_to_cache
+class IrModelFieldsSelection(models.Model):
+    """ Inherited ir.model.fields.selection to dynamically manage selection
+    options on base and custom fields, ensuring core option protection and
+    seamless registry synchronization without import-time monkey-patching. """
+    _inherit = 'ir.model.fields.selection'
 
-original_description_selection = Selection._description_selection
-
-
-def _description_selection(self, env):
-    """ Monkey patched to include custom selections from ir.model.fields.selection """
-    res = original_description_selection(self, env)
-    if self.type == 'selection':
-        # We use sudo() to avoid access rights issues when fetching selections
-        # _get_ids is a cached method on ir.model.fields
-        field_id = env['ir.model.fields'].sudo()._get_ids(self.model_name).get(
-            self.name)
-        if field_id:
-            custom_selections = env['ir.model.fields.selection'].sudo().search(
-                [('field_id', '=', field_id)])
-            if custom_selections:
-                # Convert to list if it's not already (it might be a tuple from original)
-                res = list(res)
-                existing_values = {str(key) for key, label in res}
-                for sel in custom_selections:
-                    if str(sel.value) not in existing_values:
-                        res.append((sel.value, sel.name))
-    return res
-
-
-Selection._description_selection = _description_selection
-
-
-def write(self, vals):
-    """ Monkey Patching the write function to remove raise error for editing in
-    base fields. """
-    # If set, *one* column can be renamed here
-    column_rename = None
-    patched_models = set()
-    if vals and self:
-        for item in self:
-            if vals.get('model_id', item.model_id.id) != item.model_id.id:
-                raise UserError(
-                    _("Changing the model of a field is forbidden!"))
-            if vals.get('ttype', item.ttype) != item.ttype:
-                raise UserError(
-                    _("Changing the type of a field is not yet supported. "
-                      "Please drop it and create it again!"))
-            obj = self.pool.get(item.model)
-            field = getattr(obj, '_fields', {}).get(item.name)
-            if vals.get('name', item.name) != item.name:
-                # We need to rename the field
-                item._prepare_update()
-                if item.ttype in ('one2many', 'many2many', 'binary'):
-                    # Those field names are not explicit in the database!
+    def _is_core_selection(self):
+        """ Check whether a selection record was defined by Python code/modules.
+        Returns True for core/module options and False for user-configured options. """
+        self.ensure_one()
+        if self.field_id.state == 'manual':
+            return False
+        # Module-defined selection records have entries in ir.model.data
+        if self.env['ir.model.data'].sudo().search_count([
+            ('model', '=', 'ir.model.fields.selection'),
+            ('res_id', '=', self.id),
+        ]):
+            return True
+        # Verify against Python class field definition
+        model_obj = self.env.get(self.field_id.model)
+        if model_obj is not None:
+            field = model_obj._fields.get(self.field_id.name)
+            if field and hasattr(field, '_selection_modules'):
+                modules = field._selection_modules(model_obj)
+                if self.value in modules:
                     return True
-                else:
-                    if column_rename:
-                        raise UserError(
-                            _('Can only rename one field at a time!'))
-                    column_rename = (
-                        obj._table, item.name, vals['name'], item.index,
-                        item.store)
-            # We don't check the 'state', because it might come from the context
-            # (thus be set for multiple fields) and will be ignored anyway.
-            if obj is not None and field is not None:
-                patched_models.add(obj._name)
-    # These shall never be written (modified)
-    for column_name in ('model_id', 'model', 'state'):
-        if column_name in vals:
-            del vals[column_name]
-    res = super(IrModelFields, self).write(vals)
-    self.env.flush_all()
-    if column_rename:
-        # Rename column in database, and its corresponding index if present
-        table, oldname, newname, index, stored = column_rename
-        if stored:
-            self._cr.execute(
-                sql.SQL('ALTER TABLE {} RENAME COLUMN {} TO {}').format(
-                    sql.Identifier(table),
-                    sql.Identifier(oldname),
-                    sql.Identifier(newname)))
-            if index:
-                self._cr.execute(
-                    sql.SQL('ALTER INDEX {} RENAME TO {}').format(
-                        sql.Identifier(f'{table}_{oldname}_index'),
-                        sql.Identifier(f'{table}_{newname}_index'), ))
-    if column_rename or patched_models:
-        # Setup models, this will reload all manual fields in registry
-        self.env.flush_all()
-        self.pool._setup_models__(self._cr)
+        return False
 
-    if patched_models:
-        # Update the database schema of the models to patch
-        models = self.pool.descendants(patched_models, '_inherits')
-        self.pool.init_models(self.env.cr, models, dict(
-            self._context, update_custom_fields=True))
-    return res
+    @api.model_create_multi
+    def create(self, vals_list):
+        """ Allow creating selection options for base fields by bypassing
+        the state != 'manual' check through standard model creation, and
+        synchronizing the registry. """
+        field_ids = {vals['field_id'] for vals in vals_list if 'field_id' in vals}
+        fields = self.env['ir.model.fields'].browse(field_ids)
+        field_names = {(field.model, field.name) for field in fields}
 
+        recs = super(BaseIrModelFieldsSelection, self).create(vals_list)
 
-IrModelFields.write = write
+        target_models = OrderedSet(
+            model
+            for model, name in field_names
+            if model in self.pool and name in self.pool[model]._fields
+        )
+        if target_models:
+            self.env.flush_all()
+            self.pool._setup_models__(self.env.cr, target_models)
+            self._sync_selection_fields(target_models)
 
+        return recs
 
-@api.model_create_multi
-def create(self, vals_list):
-    """ Monkey Patching the create function to remove raise error for editing in
-    base fields. """
-    # We bypass IrModelFieldsSelection.create by calling models.Model.create directly.
-    # This skips the check: if field.state != 'manual': raise UserError(...)
+    def write(self, vals):
+        """ Update selection options, preventing alteration of core technical values
+        and ensuring database columns and registry are properly updated. """
+        if 'field_id' in vals:
+            raise UserError(self.env._('Changing the field of a selection is forbidden!'))
 
-    field_ids = {vals['field_id'] for vals in vals_list}
-    fields = self.env['ir.model.fields'].browse(field_ids)
-    field_names = set()
-    for field in fields:
-        field_names.add((field.model, field.name))
+        if 'value' in vals:
+            for selection in self:
+                if vals['value'] != selection.value and selection._is_core_selection():
+                    raise UserError(self.env._(
+                        "The technical value of core/system selection options cannot be modified!"
+                    ))
 
-    recs = models.Model.create(self, vals_list)
+        res = super().write(vals)
 
-    model_names = {
-        model
-        for model, name in field_names
-        if model in self.pool and name in self.pool[model]._fields
-    }
-    if model_names:
-        # setup models; this re-initializes model in registry
-        self.env.flush_all()
-        self.pool._setup_models__(self._cr, model_names)
+        target_models = OrderedSet(self.mapped('field_id.model'))
+        self._sync_selection_fields(target_models)
+        return res
 
-    return recs
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_manual(self):
+        """ Prevent deletion of core/system selection options, while allowing
+        custom-added options to be safely deleted. """
+        if self.env.context.get('force_delete'):
+            return
+        if self.pool.ready:
+            core_selections = self.filtered(lambda sel: sel._is_core_selection())
+            if core_selections:
+                raise UserError(self.env._(
+                    "Core/default selection options cannot be deleted! "
+                    "Only custom options added dynamically can be deleted."
+                ))
 
+    def unlink(self):
+        """ Unlink custom selection options and refresh model registry. """
+        target_models = OrderedSet(self.mapped('field_id.model'))
+        res = super().unlink()
+        self._sync_selection_fields(target_models)
+        return res
 
-IrModelFieldsSelection.create = create
+    def _register_hook(self):
+        """ Re-synchronize custom selection options whenever the registry is built. """
+        super()._register_hook()
+        self._sync_selection_fields()
 
+    @api.model
+    def _sync_selection_fields(self, target_models=None):
+        """ Synchronize selection fields in registry with ir.model.fields.selection,
+        ensuring all options are present in field.selection and field._selection
+        without requiring database queries during value conversions. """
+        query = """
+            SELECT f.model, f.name, s.value, COALESCE(s.name->>'en_US', s.value) AS label
+            FROM ir_model_fields_selection s
+            JOIN ir_model_fields f ON s.field_id = f.id
+            WHERE f.ttype IN ('selection', 'reference')
+        """
+        params = []
+        if target_models:
+            query += " AND f.model IN %s"
+            params.append(tuple(target_models))
+        query += " ORDER BY s.sequence, s.id"
 
-def write(self, vals):
-    """ Monkey Patching the write function to remove raise error for editing in
-    base fields. """
-    # We bypass IrModelFieldsSelection.write by calling models.Model.write directly.
-    # This skips the check: if any(selection.field_id.state != 'manual' for selection in self): raise UserError(...)
+        self.env.cr.execute(query, params)
+        rows = self.env.cr.fetchall()
 
-    if 'field_id' in vals:
-        raise UserError(_('Changing the field of a selection is forbidden!'))
+        grouped = defaultdict(list)
+        for model_name, field_name, value, label in rows:
+            grouped[(model_name, field_name)].append((value, label))
 
-    res = models.Model.write(self, vals)
+        models_to_check = set(target_models) if target_models else {m for m, _ in grouped}
 
-    self.env.flush_all()
-    model_names = self.field_id.model_id.mapped('model')
-    if model_names:
-        self.pool._setup_models__(self._cr, model_names)
+        for model_name in models_to_check:
+            if model_name not in self.pool:
+                continue
+            for field_name, field in self.pool[model_name]._fields.items():
+                if isinstance(field, Selection):
+                    args = getattr(field, '_args__', None) or {}
+                    base_selection = args.get('selection')
+                    if base_selection is None and isinstance(getattr(field, 'selection', None), (list, tuple)):
+                        base_selection = field.selection
 
-    return res
-
-
-IrModelFieldsSelection.write = write
-
-
-@api.ondelete(at_uninstall=False)
-def _unlink_if_manual(self):
-    """ Monkey Patching the _unlink_if_manual function to remove raise error for
-    editing in base fields. """
-    return True
-
-
-IrModelFieldsSelection._unlink_if_manual = _unlink_if_manual
-
+                    if isinstance(base_selection, (list, tuple)):
+                        db_selections = grouped.get((model_name, field_name))
+                        if db_selections is not None:
+                            existing_keys = {item[0] for item in db_selections}
+                            merged_selections = list(db_selections)
+                            for key, val in base_selection:
+                                if key not in existing_keys:
+                                    merged_selections.append((key, val))
+                                    existing_keys.add(key)
+                            field.selection = tuple(merged_selections)
+                            field._selection = dict(merged_selections)
+                        else:
+                            field.selection = tuple(base_selection)
+                            field._selection = dict(base_selection)

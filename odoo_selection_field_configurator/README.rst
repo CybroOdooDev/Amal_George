@@ -16,7 +16,7 @@
 |license| |odoo| |edition| |maintainer|
 
 Odoo Selection Field Configurator
-================
+=================================
 
 This module allows the user to add new options to the selection fields in Odoo.
 

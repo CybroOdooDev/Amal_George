@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
@@ -19,14 +18,14 @@
     'name': 'Multiple Warehouses in Sale Order Lines',
     'version': '20.0.1.0.0',
     'category': 'Sales',
-    'summary': 'Set warehouses per sale order lines.',
-    'description': """This module will help to set warehouses per sale order 
-     lines and the picking will be created for the selected warehouses separately.""",
+    'summary': 'Set warehouses per sale order line.',
+    'description': """This module helps to set warehouses per sale order line
+     and creates separate pickings for the selected warehouses.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
-    'website': "https://www.cybrosys.com",
-    'depends': ['base', 'sale_management', 'account', 'stock'],
+    'website': 'https://www.cybrosys.com',
+    'depends': ['sale_management', 'sale_stock'],
     'data': [
         'views/sale_order_views.xml',
     ],

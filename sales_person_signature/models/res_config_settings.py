@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
@@ -24,5 +23,6 @@ class ResConfigSettings(models.TransientModel):
 
     is_sale_document_approve = fields.Boolean(
         string="Sale Document Approve",
-        config_parameter='sale.sale_document_approve',
-        help="Enable to bring approval in sale orders")
+        config_parameter='sales_person_signature.sale_document_approve',
+        help="Enable to bring approval in sale orders",
+    )

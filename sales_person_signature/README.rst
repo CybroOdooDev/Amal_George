@@ -6,9 +6,6 @@
     :target: https://www.odoo.com
     :alt: Odoo 20.0
 
-.. |edition| image:: https://img.shields.io/badge/Edition-Community-1ABC9C.svg
-    :alt: Community Edition
-
 .. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
     :target: https://cybrosys.com
     :alt: Maintainer: Cybrosys Techno Solutions
@@ -16,7 +13,7 @@
 |license| |odoo| |edition| |maintainer|
 
 Sales Person Signature
-================
+======================
 
 This module allows salespersons to add their signatures to sale documents. Only after signing can the user confirm the quotation.
 
@@ -36,7 +33,7 @@ Configuration
 -------------
 
 1. Go to **Sales -> Configuration -> Settings**.
-2. Under **Quotations & Orders**, locate the **Sale Approval** section.
+2. Locate the **Sale Approval** section.
 3. Enable **Sale Document Approve** to enforce salesperson signatures before order confirmation.
 
 Company

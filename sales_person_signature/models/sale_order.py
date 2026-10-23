@@ -16,6 +16,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class SaleOrder(models.Model):
@@ -23,10 +24,10 @@ class SaleOrder(models.Model):
     field for signature. """
     _inherit = 'sale.order'
 
-    sale_person_signature = fields.Binary(string='Signature',
-                                          help="Field for adding the "
-                                               "signature of the sales"
-                                               "person")
+    sale_person_signature = fields.Binary(
+        string='Signature',
+        help="Field for adding the signature of the salesperson",
+    )
     is_check_signature = fields.Boolean(
         compute='_compute_signature_flags',
         help="Check if user is salesperson and settings field "
@@ -44,14 +45,28 @@ class SaleOrder(models.Model):
         help="Check if sale approval enabled",
     )
 
-    @api.depends('user_id', 'sale_person_signature')
+    @api.depends('user_id', 'sale_person_signature', 'sale_order_template_id')
+    @api.depends_context('uid')
     def _compute_signature_flags(self):
         """Compute UI helper booleans used by the form view."""
         approve_enabled = self.env['ir.config_parameter'].sudo().get_bool(
-            'sale.sale_document_approve'
+            'sales_person_signature.sale_document_approve',
         )
         current_user = self.env.user
         for rec in self:
             rec.is_settings_approval = approve_enabled
             rec.is_user_salesperson = approve_enabled and rec.user_id == current_user
             rec.is_check_signature = approve_enabled and bool(rec.sale_person_signature)
+
+    def action_confirm(self):
+        """Override action_confirm to enforce salesperson signature validation."""
+        approve_enabled = self.env['ir.config_parameter'].sudo().get_bool(
+            'sales_person_signature.sale_document_approve',
+        )
+        if approve_enabled:
+            for order in self:
+                if not order.sale_person_signature:
+                    raise ValidationError(
+                        self.env._("Salesperson signature is required before confirming the quotation."),
+                    )
+        return super().action_confirm()

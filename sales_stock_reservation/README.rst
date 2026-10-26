@@ -14,7 +14,7 @@
 
 Product Stock Reservation
 =========================
-Allow sales users to create a product stock reservation directly from the sales quotation form.
+Allows sales users to create a product stock reservation directly from the sales quotation form.
 
 Key Features
 ------------
@@ -30,7 +30,10 @@ No external dependencies.
 
 Configuration
 -------------
-No additional configuration is required.
+* Navigate to **Inventory > Configuration > Settings**.
+* Under the **Stock Reservation Location** section, you can optionally configure:
+  * **Source Location**: The location from which stock is reserved (defaults to the warehouse stock location).
+  * **Destination Location**: The location where reserved stock is held (defaults to customer location).
 
 
 Company
@@ -46,7 +49,7 @@ Credits
 -------
 * Developer: (V16) Shikhil Raj,
              (V18) Prayag K,
-             (v19) Surya Gayathry TA
+             (V19) Surya Gayathry TA
 
 * Contact : odoo@cybrosys.com
 

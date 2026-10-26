@@ -28,13 +28,9 @@ class ResConfigSettings(models.TransientModel):
 
     source_location_id = fields.Many2one(
         "stock.location",
-        string="Source Location",
         config_parameter='sales_stock_reservation.source_location_id',
-        help='This is a Many2one field that refers to the location from '
-             'which the products will be sourced.')
+        help='Location from which products will be reserved.')
     destination_location_id = fields.Many2one(
         "stock.location",
-        string="Destination Location",
         config_parameter='sales_stock_reservation.destination_location_id',
-        help='This is a Many2one field that refers to the location to which '
-             'the products will be delivered.')
+        help='Location to which products will be reserved.')

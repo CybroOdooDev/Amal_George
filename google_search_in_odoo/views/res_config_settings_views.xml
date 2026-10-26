@@ -2,47 +2,31 @@
 <odoo>
     <!--    Inherit res config settings view-->
     <record id="res_config_settings_view_form" model="ir.ui.view">
-        <field name="name">
-            res.config.settings.view.form.inherit.google.search.in.odoo
-        </field>
+        <field name="name">res.config.settings.view.form.inherit.google.search.in.odoo</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id"
-               ref="base_setup.res_config_settings_view_form"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <setting id="recaptcha" position="after">
-                <div class="col-12 col-lg-6 o_setting_box"
-                     id="sync_google_search_setting">
-                    <div class="o_setting_left_pane">
-                        <field name="google_search"/>
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label string="Google Search"
-                               for="google_search"/>
-                        <div class="text-muted">
-                            Synchronize your search with Google Search
+                <setting id="google_search_setting"
+                         string="Google Search"
+                         help="Enable Google web search in the systray">
+                    <field name="google_search"/>
+                    <div class="content-group" invisible="not google_search">
+                        <div class="mt16 row">
+                            <label for="ser_client_api" string="API Key" class="col-3 col-lg-3 o_light_label"/>
+                            <field name="ser_client_api" password="True"/>
                         </div>
-                        <div class="content-group"
-                             invisible="google_search == False">
-                            <div class="mt16 row">
-                                <label for="ser_client_api" string="API Key"
-                                       class="col-3 col-lg-3 o_light_label"/>
-                                <field name="ser_client_api" nolabel="1"/>
-                            </div>
-                            <div class="content-group mt16">
-                                <div role="alert"
-                                     class="alert alert-warning">
-                                    Create a Custom Search Exa Api
-                                    <a role="button"
-                                       href="https://exa.ai/"
-                                       class="btn btn-link btn-success o_activity_link mr8">
-                                        <i class="fa fa-arrow-right"/>
-                                        Click Here
-                                    </a>
-                                </div>
-                            </div>
+                        <div class="mt16">
+                            <a role="button"
+                               href="https://exa.ai/"
+                               target="_blank"
+                               class="btn btn-link btn-success o_activity_link">
+                                <i class="fa fa-arrow-right me-1"/>
+                                Get API Key from Exa
+                            </a>
                         </div>
                     </div>
-                </div>
+                </setting>
             </setting>
         </field>
     </record>

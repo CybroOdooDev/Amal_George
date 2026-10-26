@@ -27,16 +27,15 @@ class StockReservation(models.TransientModel):
         "sale.stock.reservation", string="Wizard",
         help="Sale stock reservation wizard")
     order_line_name = fields.Char(
-     string="Order Line",
-     help="Name of order line")
+        string="Order Line",
+        help="Name of order line")
     product_id = fields.Many2one(
         "product.product",
-        string="Product",
         help="Product to be reserved")
-    quantity = fields.Float(string="Quantity", help="Product quantity")
+    quantity = fields.Float(help="Product quantity")
     unit_of_measure_id = fields.Many2one(
         "uom.uom", string="UOM", help="Unit of measure")
-    reserve_quantity = fields.Char(string="Reserve Quantity",
-                                   help="Quantity to be reserved")
+    reserve_quantity = fields.Float(
+        help="Quantity to be reserved")
     move_id = fields.Many2one(
-        "stock.move", string="Move Id", help="Stock move")
+        "stock.move", string="Stock Move", help="Stock move")

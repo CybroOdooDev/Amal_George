@@ -20,8 +20,6 @@
 #
 ###############################################################################
 from odoo import api, fields, models
-from exa_py import Exa
-
 
 
 class ResConfigSettings(models.TransientModel):
@@ -29,58 +27,15 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     google_search = fields.Boolean(
-        string='Allow the users to synchronize the google search',
+        string='Enable Google Search',
         config_parameter='google_search_in_odoo.google_search',
-        help="For synchronizing the google search")
+        help="Enable Google search in the systray")
     ser_client_api = fields.Char(
-        "API Key",
+        string="API Key",
         config_parameter='google_search_in_odoo.ser_client_api',
-        help="Google search api key")
+        help="API key for Exa web search")
 
     @api.model
     def google_search_config(self, input_data):
-        """Get search results from Exa API using the query input."""
-        google_search = self.env['ir.config_parameter'].sudo().get_param(
-            'google_search_in_odoo.google_search')
-        if not google_search:
-            return {
-                'error': 'Please enable Google Search.'
-            }
-        else:
-            api_key = self.env['ir.config_parameter'].sudo().get_param(
-                'google_search_in_odoo.ser_client_api')
-            if not api_key:
-                return {
-                    'error': 'Please provide API key.'
-                }
-
-        try:
-            exa = Exa(api_key)
-            response = exa.search(
-                input_data,
-                num_results=10,
-                type="auto",
-                contents={"highlights": True}
-            )
-
-            items = []
-            if response and response.results:
-                for result in response.results:
-                    snippet = ""
-                    if result.highlights:
-                        snippet = " ... ".join(result.highlights)
-                    elif result.summary:
-                        snippet = result.summary
-                    elif result.text:
-                        snippet = result.text[:300] + "..." if len(result.text) > 300 else result.text
-
-                    items.append({
-                        'title': result.title or '',
-                        'link': result.url or '',
-                        'snippet': snippet
-                    })
-            return items
-        except Exception as e:
-            return {
-                'error': f"Exa Search Error: {str(e)}"
-            }
+        """Proxy to res.users.google_search_config."""
+        return self.env['res.users'].google_search_config(input_data)

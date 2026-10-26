@@ -23,14 +23,13 @@
     'name': "Google Search Systray",
     'version': '19.0.1.0.0',
     'category': "Extra Tools",
-    'summary': """Manage to browse anything in Odoo itself""",
-    'description': """This module will helps to browse anything in 
-     Odoo itself""",
+    'summary': "Search the web directly from the Odoo systray",
+    'description': """This module helps users search the web directly from the Odoo systray.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': "https://www.cybrosys.com",
-    'depends': ['base', 'base_setup'],
+    'depends': ['base', 'base_setup', 'web'],
     'external_dependencies': {
         'python': ['exa_py'],
     },
@@ -42,6 +41,10 @@
             'google_search_in_odoo/static/src/xml/google_search.xml',
             'google_search_in_odoo/static/src/js/google_search.js',
             'google_search_in_odoo/static/src/css/google_search.css'
+        ],
+        'web.assets_unit_tests': [
+            'google_search_in_odoo/static/src/js/google_search.js',
+            'google_search_in_odoo/static/tests/unit/google_search.test.js',
         ],
     },
     'license': 'LGPL-3',

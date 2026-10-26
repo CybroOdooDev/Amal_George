@@ -3,7 +3,7 @@
     <data noupdate="1">
         <!-- Define the sequence for stock reservations -->
         <record id="seq_stock_reserved" model="ir.sequence">
-            <field name="name">Sock Reserved Sequence</field>
+            <field name="name">Stock Reserved Sequence</field>
             <field name="code">stock.reserved</field>
             <field name="prefix">STOCK/RES/</field>
             <field name="padding">3</field>

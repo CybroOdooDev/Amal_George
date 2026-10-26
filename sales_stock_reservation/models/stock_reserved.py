@@ -15,7 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import api, fields, models,_
+from odoo import api, fields, models
 
 
 class StockReserved(models.Model):
@@ -25,22 +25,21 @@ class StockReserved(models.Model):
     _name = "stock.reserved"
     _description = "Reserved stock details"
 
-    name = fields.Char(string="Name", readonly=True, help="Name")
-    order_line_name = fields.Char(string="Order Line", readonly=True,
-                                  help="Name of order line")
-    product_id = fields.Many2one("product.product", string="Product",
-                                 readonly=True, help="Product reserved")
+    name = fields.Char(readonly=True, help="Name")
+    order_line_name = fields.Char(
+        string="Order Line", readonly=True, help="Name of order line")
+    product_id = fields.Many2one(
+        "product.product", readonly=True, help="Product reserved")
     status = fields.Selection(
         [('reserved', 'Reserved'), ('cancelled', 'Cancelled')],
-        string="Status", readonly=True, help="Status of reservation")
-    reserved_quantity = fields.Float(string="Reserved Quantity",
-                                     readonly=True,
-                                     help="Quantity Reserved")
-    sale_order_id = fields.Many2one("sale.order", string="Sale Order",
-                                    readonly=True,
-                                    help="Sale order")
-    move_id = fields.Many2one("stock.move", string="Move Id", readonly=True,
-                              help="Stock move details")
+        readonly=True, help="Status of reservation")
+    reserved_quantity = fields.Float(
+        readonly=True, help="Quantity Reserved")
+    sale_order_id = fields.Many2one(
+        "sale.order", readonly=True, help="Sale order")
+    move_id = fields.Many2one(
+        "stock.move", string="Stock Move", readonly=True,
+        help="Stock move details")
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -50,9 +49,8 @@ class StockReserved(models.Model):
         :return: the result of the parent `create()` method call
         """
         for vals in vals_list:
-            if vals.get('name', _('New')) == _('New'):
+            if vals.get('name', self.env._('New')) == self.env._('New'):
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'stock.reserved'
-                ) or _('New')
-        res = super().create(vals_list)
-        return res
+                ) or self.env._('New')
+        return super().create(vals_list)

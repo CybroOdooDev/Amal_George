@@ -1,116 +1,106 @@
-/** @odoo-module **/
+import { Component, useState, onWillStart, useRef } from "@odoo/owl";
 import { WarningDialog } from "@web/core/errors/error_dialogs";
 import { useService } from "@web/core/utils/hooks";
-import { Component, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
+
 export class GoogleSearchWidget extends Component {
-    async setup() {
-        super.setup(...arguments);
-        this.orm = useService('orm');
+    static template = "google_search_in_odoo.SearchSystray";
+
+    setup() {
+        this.orm = useService("orm");
         this.dialog = useService("dialog");
+        this.searchInputRef = useRef("searchInput");
         this.state = useState({
-            isGoogleSearchEnabled: '',
+            isGoogleSearchEnabled: false,
+            showResults: false,
+            query: "",
+            results: [],
+            expandedIndices: {},
         });
-        this.orm.call("ir.config_parameter", "get_param", ["google_search_in_odoo.google_search"]).then((result) => {
-            this.state.isGoogleSearchEnabled = result;
+
+        onWillStart(async () => {
+            await this._checkSearchStatus();
         });
     }
-     onKeyPress(ev) {
+
+    async _checkSearchStatus() {
+        try {
+            const isEnabled = await this.orm.call(
+                "res.users",
+                "get_google_search_status",
+                []
+            );
+            this.state.isGoogleSearchEnabled = Boolean(isEnabled);
+        } catch {
+            this.state.isGoogleSearchEnabled = false;
+        }
+    }
+
+    onKeyPress(ev) {
         if (ev.key === "Enter") {
             ev.preventDefault();
-            this._onClick(ev);
+            this._onSearch();
         }
     }
+
     _onCloseResults(ev) {
-        ev.stopPropagation();
-        const resultsDiv = document.getElementById('google_result');
-        if (resultsDiv) {
-            resultsDiv.classList.add('hidden');
+        if (ev) {
+            ev.stopPropagation();
         }
+        this.state.showResults = false;
     }
-    async _onClick(ev) {
-        var self = this;
-        // Get response from google based on the search value and display result on the template
-        var input = document.getElementById("search_text");
-        const resultsDiv = document.getElementById('google_result');
-        const contentDiv = document.getElementById('google_result_content');
-        if (ev.key === "Enter" && input.value.trim() !== '') {
-            this.orm.call('res.config.settings', 'google_search_config', [input.value]).then(function (result) {
-                if (result.error) {
-                    var title = _t("Alert");
-                    var message = _t(result.error);
-                    self.dialog.add(WarningDialog, { title, message });
-                } else if (result === null) {
-                    var warning = _t('Limit exceeded for Queries and Queries per day');
-                    self.dialog.add(WarningDialog, { title, warning });
-                } else {
-                    if (contentDiv) {
-                        contentDiv.innerHTML = '';
-                        contentDiv.scrollTop = 0;
-                        for (let i = 0; i < result.length; i++) {
-                            const resultItem = document.createElement("div");
-                            const titleText = document.createTextNode(result[i].title);
-                            const titleElement = document.createElement("h2");
-                            titleElement.classList.add("header");
-                            titleElement.appendChild(titleText);
-                            const linkElement = document.createElement("a");
-                            linkElement.classList.add("link");
-                            linkElement.href = result[i].link;
-                            linkElement.textContent = result[i].link;
-                            
-                            const snippetElement = document.createElement("p");
-                            snippetElement.classList.add("content");
-                            const fullSnippet = result[i].snippet || '';
-                            const maxLen = 150;
-                            if (fullSnippet.length > maxLen) {
-                                const shortSnippet = fullSnippet.substring(0, maxLen) + '...';
-                                snippetElement.textContent = shortSnippet;
-                                snippetElement.classList.add("collapsible");
-                                snippetElement.title = "Click to expand";
-                                
-                                let expanded = false;
-                                snippetElement.addEventListener('click', (e) => {
-                                    e.stopPropagation();
-                                    if (expanded) {
-                                        snippetElement.textContent = shortSnippet;
-                                        snippetElement.classList.remove("expanded");
-                                        snippetElement.title = "Click to expand";
-                                        expanded = false;
-                                    } else {
-                                        snippetElement.textContent = fullSnippet;
-                                        snippetElement.classList.add("expanded");
-                                        snippetElement.title = "Click to collapse";
-                                        expanded = true;
-                                    }
-                                });
-                            } else {
-                                snippetElement.textContent = fullSnippet;
-                            }
-                            
-                            resultItem.appendChild(titleElement);
-                            resultItem.appendChild(linkElement);
-                            resultItem.appendChild(snippetElement);
-                            contentDiv.appendChild(resultItem);
-                        }
-                    }
-                    if (resultsDiv) {
-                        resultsDiv.classList.remove('hidden');
-                    }
-                    if (contentDiv) {
-                        contentDiv.scrollTop = 0;
-                    }
-                }
-            });
-        } else {
-            if (resultsDiv) {
-                resultsDiv.classList.add('hidden');
+
+    toggleExpand(index) {
+        this.state.expandedIndices[index] = !this.state.expandedIndices[index];
+    }
+
+    async _onSearch() {
+        const query = (this.state.query || "").trim();
+        if (!query) {
+            this.state.showResults = false;
+            return;
+        }
+
+        try {
+            const result = await this.orm.call(
+                "res.users",
+                "google_search_config",
+                [query]
+            );
+
+            if (!result) {
+                this.dialog.add(WarningDialog, {
+                    title: _t("Warning"),
+                    message: _t("Limit exceeded for Queries and Queries per day"),
+                });
+                return;
             }
+
+            if (result.error) {
+                this.dialog.add(WarningDialog, {
+                    title: _t("Alert"),
+                    message: result.error,
+                });
+                return;
+            }
+
+            if (Array.isArray(result)) {
+                this.state.results = result;
+                this.state.expandedIndices = {};
+                this.state.showResults = true;
+            }
+        } catch {
+            this.dialog.add(WarningDialog, {
+                title: _t("Alert"),
+                message: _t("Unable to perform search. Please try again later."),
+            });
         }
     }
 }
+
 export const searchItem = {
     Component: GoogleSearchWidget,
 };
-GoogleSearchWidget.template = "google_search_in_odoo.SearchSystray";
+
 registry.category("systray").add("GoogleSearch", searchItem, { sequence: 0 });

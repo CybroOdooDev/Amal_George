@@ -4,7 +4,7 @@
 
 Google Search Systray
 =====================
-This module will helps to browse anything in Odoo itself
+This module helps to browse anything in Odoo itself
 
 License
 -------

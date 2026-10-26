@@ -28,15 +28,14 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     apply_stock_reservation = fields.Boolean(
-        string="Apply stock reservation",copy=False,
+        string="Apply stock reservation", copy=False,
         help="Apply stock reservation in draft")
     state_reservation = fields.Selection([
-        ('reserved', 'Reserved'), ('cancel', 'Cancelled')],copy=False,
+        ('reserved', 'Reserved'), ('cancel', 'Cancelled')], copy=False,
         help="Condition for visibility of buttons")
     reserved_stock_ids = fields.One2many(
         "stock.reserved",
-        "sale_order_id",copy=False,
-        string="Reserved Stock",
+        "sale_order_id", copy=False,
         help="Stock reserved details")
 
     def action_create_stock_reservation(self):
@@ -88,25 +87,24 @@ class SaleOrder(models.Model):
           :return: a dictionary representing the action to create a new stock
            reservation
           """
+        storable_lines = self.order_line.filtered(
+            lambda line: line.product_id and line.product_id.type != 'service'
+        )
         line_vals = [(0, 0, {
             'order_line_name': f"{self.name}-{line.name}",
             'product_id': line.product_id.id,
             'quantity': line.product_uom_qty,
             'unit_of_measure_id': line.product_uom_id.id,
-            'reserve_quantity': line.product_uom_qty
-        }) for line in self.order_line] if self.order_line else []
-        return {
-            'name': "Stock Reservation",
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'sale.stock.reservation',
-            'context': {'default_sale_order_id': self.id,
-                        'default_stock_reservation_ids': line_vals},
-            'view_id': self.env.ref(
-                'sales_stock_reservation.sale_stock_reservation_view_form').id,
-            'target': 'new',
+            'reserve_quantity': line.product_uom_qty,
+        }) for line in storable_lines] if storable_lines else []
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'sales_stock_reservation.sale_stock_reservation_wizard_action'
+        )
+        action['context'] = {
+            'default_sale_order_id': self.id,
+            'default_stock_reservation_ids': line_vals,
         }
+        return action
 
     def action_cancel_reservation(self):
         """
@@ -134,7 +132,7 @@ class SaleOrder(models.Model):
         """
         self.state_reservation = 'cancel'
         self.reserved_stock_ids.mapped('move_id')._action_cancel()
-        self.mapped("reserved_stock_ids").status = 'cancelled'
+        self.reserved_stock_ids.write({'status': 'cancelled'})
         return True
 
     def action_confirm(self):
@@ -152,5 +150,7 @@ class SaleOrder(models.Model):
         :return: the result of the parent `action_confirm()` method call
         """
         res = super().action_confirm()
-        self.action_cancel_reservation()
+        for order in self:
+            if order.state_reservation == 'reserved':
+                order.action_cancel_reservation()
         return res

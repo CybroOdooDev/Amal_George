@@ -15,28 +15,26 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
 class SaleOrder(models.Model):
-    """Inherit the 'sale_order' model to confirm Sale Orders, Create Invoices,
-    Validate Invoices, and Print Bills when 'Confirm Quotation',
+    """Inherit the 'sale.order' model to confirm Sale Orders, Create Invoices,
+    Validate Invoices, and Print Invoices when 'Confirm Quotation',
     'Create Invoice', 'Validate Invoice', and 'Print Invoices'
     are enabled in Configuration Settings."""
     _inherit = 'sale.order'
 
     automate_print_invoices = fields.Boolean(
         string='Print Invoices',
-        help="Print invoices for corresponding purchase orders")
+        help="Print invoices for corresponding sales orders")
 
     @api.model_create_multi
     def create(self, vals_list):
-        """
-            Super the method create to confirm quotation, create and validate
-            invoice
-        """
-        res = super(SaleOrder, self).create(vals_list)
+        """Super the method create to confirm quotation, create and validate
+        invoice."""
+        res = super().create(vals_list)
         automate_sale = self.env['ir.config_parameter'].sudo().get_bool(
             'automate_sale')
         automate_invoice = self.env['ir.config_parameter'].sudo().get_bool(
@@ -59,7 +57,8 @@ class SaleOrder(models.Model):
                         for line in order.order_line:
                             if line.product_id.invoice_policy == 'delivery':
                                 raise ValidationError(
-                                    _("Please choose only ordered invoicing policy"))
+                                    self.env._(
+                                        "Please choose only ordered invoicing policy"))
                     order.action_confirm()
                     if automate_invoice:
                         order._create_invoices()

@@ -19,16 +19,16 @@
     'name': 'POS Order Management',
     'version': '20.0.1.0.0',
     'category': 'Point of Sale',
-    'summary': "POS All Order's Management",
+    'summary': 'POS All Orders Management',
     'description': """Module allows you to display all the old orders in Point of Sale.
-     You will get the detailed view of Order Reference, Receipt Reference, Customer and Order Date.""",
+    You will get the detailed view of Order Reference, Receipt Reference, Customer and Order Date.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
     'depends': ['base', 'point_of_sale'],
     'data': [
-        'views/res_config_settings_views.xml'
+        'views/res_config_settings_views.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [

@@ -19,7 +19,7 @@ from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):
-    """Inherit the 'res_config_settings' model to add fields
+    """Inherit the 'res.config.settings' model to add fields
     in the settings of the Sale and Purchase modules."""
     _inherit = 'res.config.settings'
 

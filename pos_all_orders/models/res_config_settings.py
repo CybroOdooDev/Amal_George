@@ -19,28 +19,30 @@ from odoo import api, fields, models
 
 
 class ResConfigSettings(models.TransientModel):
-    """ Inherit the base settings to add field."""
+    """Inherit the base settings to add POS all orders configuration."""
     _inherit = 'res.config.settings'
 
     pos_all_order = fields.Selection(
-        [('current_session', 'Load Orders from the current session'),
-         ('past_order', 'Load All past Orders'),
-         ('last_n', 'Load all orders of last n days')],
-        string='Pos All Orders',
-        help='Select Order types',
+        [
+            ('current_session', 'Load Orders from the current session'),
+            ('past_order', 'Load All past Orders'),
+            ('last_n', 'Load all orders of last n days'),
+        ],
+        string='POS All Orders',
+        help='Select order types to load in POS',
         config_parameter='pos_all_orders.pos_all_order',
     )
 
     n_days = fields.Integer(
-        string="No.of Day's",
-        help='Add number of days',
+        string='Number of Days',
+        help='Specify the number of past days to load orders for',
         config_parameter='pos_all_orders.n_days',
     )
 
     @api.model
     def get_values(self):
-        """get values from the fields"""
-        res = super(ResConfigSettings, self).get_values()
+        """Get values from the fields."""
+        res = super().get_values()
         icp = self.env['ir.config_parameter'].sudo()
         pos_all_order = icp.get_str('pos_all_orders.pos_all_order') or False
         n_days = icp.get_int('pos_all_orders.n_days') or 0
@@ -51,8 +53,9 @@ class ResConfigSettings(models.TransientModel):
         return res
 
     def set_values(self):
-        """Set values in the fields"""
-        super(ResConfigSettings, self).set_values()
+        """Set values in the fields."""
+        res = super().set_values()
         icp = self.env['ir.config_parameter'].sudo()
-        icp.set_str('pos_all_orders.pos_all_order', self.pos_all_order or None)
+        icp.set_str('pos_all_orders.pos_all_order', self.pos_all_order or False)
         icp.set_int('pos_all_orders.n_days', self.n_days or 0)
+        return res

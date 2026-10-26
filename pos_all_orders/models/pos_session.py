@@ -16,11 +16,12 @@
 #
 #############################################################################
 from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models
 
 
 class PosSession(models.Model):
-    """inherit pos.session to load data in session."""
+    """Inherit pos.session to load POS order data in session."""
     _inherit = 'pos.session'
 
     @api.model
@@ -72,6 +73,7 @@ class PosSession(models.Model):
     @api.model
     def get_all_past_orders(self, session_id=None):
         """Get all past orders up to the current date."""
+        del session_id
         current_date = fields.Datetime.now()
         domain = [
             ('date_order', '<=', current_date),
@@ -92,6 +94,7 @@ class PosSession(models.Model):
     @api.model
     def get_default_all_orders(self, session_id=None):
         """Retrieves all POS orders."""
+        del session_id
         domain = [('state', '!=', 'cancel')]
         orders = self.env['pos.order'].search(domain, order='date_order desc, id desc')
         return [{
@@ -125,9 +128,8 @@ class PosSession(models.Model):
 
         if config_type == 'current_session':
             return self.get_all_order({'session': session_val})
-        elif config_type == 'past_order':
+        if config_type == 'past_order':
             return self.get_all_past_orders({'session': session_val})
-        elif config_type == 'last_n':
+        if config_type == 'last_n':
             return self.get_all_order({'session': session_val, 'n_days': n_days})
-        else:
-            return self.get_default_all_orders({'session': session_val})
+        return self.get_default_all_orders({'session': session_val})

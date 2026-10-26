@@ -18,10 +18,9 @@
 {
     'name': 'Automate Sale And Purchase Orders',
     'version': '20.0.1.0.0',
-    'category': 'Sales,Purchase',
+    'category': 'Sales',
     'summary': 'Automate the sale and purchase orders flow',
-    'description': 'Automate sale and purchase orders at the' 
-                   'time of creation of sale and purchase order',
+    'description': """Automate sale and purchase orders at the time of creation of sale and purchase order.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
@@ -30,7 +29,7 @@
     'data': [
         'views/purchase_order_views.xml',
         'views/res_config_settings_views.xml',
-        'views/sale_order_views.xml'
+        'views/sale_order_views.xml',
     ],
     'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',

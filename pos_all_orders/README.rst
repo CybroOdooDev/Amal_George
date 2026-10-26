@@ -16,9 +16,9 @@
 |license| |odoo| |edition| |maintainer|
 
 POS Order Management
-================
+====================
 
-POS All Order's Management
+POS All Orders Management
 
 
 Key Features

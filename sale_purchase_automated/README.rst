@@ -16,7 +16,7 @@
 |license| |odoo| |edition| |maintainer|
 
 Automate Sale And Purchase Orders
-================
+=================================
 Automate the sale and purchase orders flow.
 
 Key Features

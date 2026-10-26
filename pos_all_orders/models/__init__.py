@@ -15,5 +15,4 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from . import pos_session
-from . import res_config_settings
+from . import pos_session, res_config_settings

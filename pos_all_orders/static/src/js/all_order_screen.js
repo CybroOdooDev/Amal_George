@@ -41,8 +41,7 @@ export class CustomALLOrdrScreen extends Component {
                 {}
             );
             this.state.orders = orders || [];
-        } catch (error) {
-            console.error("Failed to load POS all orders:", error);
+        } catch (_error) {
             this.state.orders = [];
         } finally {
             this.state.loading = false;
@@ -119,8 +118,7 @@ export class CustomALLOrdrScreen extends Component {
             } else {
                 this.pos.navigate("ProductScreen");
             }
-        } catch (error) {
-            console.error("Error navigating back from CustomALLOrdrScreen:", error);
+        } catch (_error) {
             if (this.pos.router?.back) {
                 this.pos.router.back();
             } else {

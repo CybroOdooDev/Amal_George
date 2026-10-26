@@ -15,24 +15,25 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
 class PurchaseOrder(models.Model):
-    """Inherit the 'purchase_order' model to confirm Purchase Orders
+    """Inherit the 'purchase.order' model to confirm Purchase Orders
     and Print Bills when 'Confirm RFQ' and 'Print Bill' are enabled
     in Configuration Settings."""
     _inherit = 'purchase.order'
 
     automate_print_bills = fields.Boolean(
-        string='Create Bills', help="Create bills with purchase orders")
+        string='Print Bills',
+        help="Print bills for corresponding purchase orders")
 
     @api.model_create_multi
     def create(self, vals_list):
         """Super the method create to confirm RFQ"""
         # Call super to create records
-        res = super(PurchaseOrder, self).create(vals_list)
+        res = super().create(vals_list)
 
         # Get configuration parameters
         automate_purchase = self.env['ir.config_parameter'].sudo().get_bool(
@@ -59,7 +60,8 @@ class PurchaseOrder(models.Model):
                     for line in record.order_line:
                         if line.product_id.invoice_policy == 'delivery':
                             raise ValidationError(
-                                _("Please choose only ordered invoicing policy"))
+                                self.env._(
+                                    "Please choose only ordered invoicing policy"))
 
                 # Confirm the purchase order
                 record.button_confirm()

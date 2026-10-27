@@ -6,18 +6,15 @@
     :target: https://www.odoo.com
     :alt: Odoo 20.0
 
-.. |edition| image:: https://img.shields.io/badge/Edition-Community-1ABC9C.svg
-    :alt: Community Edition
-
 .. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
     :target: https://cybrosys.com
     :alt: Maintainer: Cybrosys Techno Solutions
 
-|license| |odoo| |edition| |maintainer|
+|license| |odoo| |maintainer|
 
 Project Dashboard
 ================
-In this dashboard you can get Detailed Dashboard View for Project
+In this dashboard, users can get a comprehensive, real-time performance view of projects, tasks, timesheets, margins, and sales.
 
 Key Features
 ------------

@@ -17,12 +17,26 @@
 #############################################################################
 import re
 
-from telesign.messaging import MessagingClient
-from twilio.rest import Client
-from vonage import Auth, Vonage
-from vonage_messages import Sms
+try:
+    from telesign.messaging import MessagingClient
+except ImportError:
+    MessagingClient = None
 
-from odoo import _, api, fields, models
+try:
+    from twilio.rest import Client
+except ImportError:
+    Client = None
+
+try:
+    from vonage import Auth, Vonage
+    from vonage_messages import Sms
+except ImportError:
+    Auth = None
+    Vonage = None
+    Sms = None
+
+from odoo import fields, models
+from odoo.addons.phone_validation.tools import phone_validation
 from odoo.exceptions import UserError
 
 
@@ -51,55 +65,6 @@ class SendSms(models.TransientModel):
         help='Message text content to be delivered to recipients.'
     )
 
-    @property
-    def sms_id(self):
-        """Legacy property alias for gateway_config_id."""
-        return self.gateway_config_id
-
-    @property
-    def sms_to(self):
-        """Legacy property alias for recipient_numbers."""
-        return self.recipient_numbers
-
-    @property
-    def text(self):
-        """Legacy property alias for message_text."""
-        return self.message_text
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        """
-        Remap legacy field names to current field names if passed in creation values.
-        """
-        for vals in vals_list:
-            if 'sms_id' in vals and 'gateway_config_id' not in vals:
-                vals['gateway_config_id'] = vals.pop('sms_id')
-            if 'sms_to' in vals and 'recipient_numbers' not in vals:
-                vals['recipient_numbers'] = vals.pop('sms_to')
-            if 'text' in vals and 'message_text' not in vals:
-                vals['message_text'] = vals.pop('text')
-        return super().create(vals_list)
-
-    @api.model
-    def default_get(self, fields_list):
-        """
-        Load default field values and ensure compatibility with legacy context keys.
-
-        Args:
-            fields_list (list[str]): List of fields to compute defaults for.
-
-        Returns:
-            dict: Dictionary of default field values.
-        """
-        defaults = super().default_get(fields_list)
-        if not defaults.get('gateway_config_id') and self.env.context.get('default_sms_id'):
-            defaults['gateway_config_id'] = self.env.context.get('default_sms_id')
-        if not defaults.get('recipient_numbers') and self.env.context.get('default_sms_to'):
-            defaults['recipient_numbers'] = self.env.context.get('default_sms_to')
-        if not defaults.get('message_text') and self.env.context.get('default_text'):
-            defaults['message_text'] = self.env.context.get('default_text')
-        return defaults
-
     def action_send_sms(self):
         """
         Execute SMS sending flow across the configured SMS gateway and record delivery logs.
@@ -113,13 +78,13 @@ class SendSms(models.TransientModel):
         """
         self.ensure_one()
         if not self.gateway_config_id:
-            raise UserError(_('Please select an SMS Gateway configuration.'))
+            raise UserError(self.env._('Please select an SMS Gateway configuration.'))
         if not self.recipient_numbers:
-            raise UserError(_('Please provide a recipient phone number.'))
+            raise UserError(self.env._('Please provide a recipient phone number.'))
 
         normalized_phone_numbers = self._get_recipient_phone_numbers()
         if not normalized_phone_numbers:
-            raise UserError(_('No valid phone numbers found to send SMS.'))
+            raise UserError(self.env._('No valid phone numbers found to send SMS.'))
 
         gateway_name = (self.gateway_config_id.gateway_name or '').lower()
 
@@ -130,7 +95,12 @@ class SendSms(models.TransientModel):
         elif gateway_name == 'telesign':
             self._send_via_telesign(normalized_phone_numbers)
         else:
-            raise UserError(_("Unsupported SMS Gateway: %s") % (self.gateway_config_id.gateway_name or 'None'))
+            raise UserError(
+                self.env._(
+                    "Unsupported SMS Gateway: %(gateway)s",
+                    gateway=self.gateway_config_id.gateway_name or 'None',
+                )
+            )
 
         self._create_sms_history_records(normalized_phone_numbers)
         self._post_chatter_notification()
@@ -138,8 +108,8 @@ class SendSms(models.TransientModel):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('SMS Sent'),
-                'message': _('SMS has been sent successfully.'),
+                'title': self.env._('SMS Sent'),
+                'message': self.env._('SMS has been sent successfully.'),
                 'type': 'success',
                 'sticky': False,
                 'next': {'type': 'ir.actions.act_window_close'},
@@ -163,12 +133,17 @@ class SendSms(models.TransientModel):
         if not phone_number:
             return False
 
-        country_code = country.code if country and hasattr(country, 'code') and country.code else None
-        country_phone_code = country.phone_code if country and hasattr(country, 'phone_code') and country.phone_code else None
+        country_code = (
+            country.code if country and hasattr(country, 'code') and country.code else None
+        )
+        country_phone_code = (
+            country.phone_code
+            if country and hasattr(country, 'phone_code') and country.phone_code
+            else None
+        )
 
         formatted_number = None
         try:
-            from odoo.addons.phone_validation.tools import phone_validation
             region = None if phone_number.startswith('+') else country_code
             formatted_number = phone_validation.phone_format(
                 phone_number,
@@ -177,15 +152,21 @@ class SendSms(models.TransientModel):
                 force_format='E164',
                 raise_exception=False,
             )
-        except Exception:
+        except UserError:
             formatted_number = None
 
-        if formatted_number and formatted_number.startswith('+') and formatted_number != phone_number:
+        has_valid_e164 = (
+            formatted_number
+            and formatted_number.startswith('+')
+            and formatted_number != phone_number
+        )
+        if has_valid_e164:
             clean_e164 = '+' + re.sub(r'\D', '', formatted_number[1:])
             if len(clean_e164) > 1:
                 return clean_e164
-        elif formatted_number and formatted_number.startswith('+') and re.match(r'^\+\d{7,15}$', formatted_number):
-            return formatted_number
+        elif formatted_number and formatted_number.startswith('+'):
+            if re.match(r'^\+\d{7,15}$', formatted_number):
+                return formatted_number
 
         # Fallback normalization when phone_validation tool cannot parse
         clean_digits = re.sub(r'\D', '', phone_number)
@@ -202,7 +183,11 @@ class SendSms(models.TransientModel):
                 if trunk_stripped:
                     clean_digits = trunk_stripped
 
-            if clean_digits.startswith(country_code_str) and len(clean_digits) > len(country_code_str) + 6:
+            has_country_digits = (
+                clean_digits.startswith(country_code_str)
+                and len(clean_digits) > len(country_code_str) + 6
+            )
+            if has_country_digits:
                 return f"+{clean_digits}"
             return f"+{country_code_str}{clean_digits}"
 
@@ -215,7 +200,9 @@ class SendSms(models.TransientModel):
         Returns:
             list[str]: List of valid E.164 normalized recipient phone numbers.
         """
-        raw_number_list = [num.strip() for num in self.recipient_numbers.split(',') if num.strip()]
+        raw_number_list = [
+            num.strip() for num in self.recipient_numbers.split(',') if num.strip()
+        ]
         if not raw_number_list:
             return []
 
@@ -250,6 +237,9 @@ class SendSms(models.TransientModel):
         Raises:
             UserError: If client initialization or message sending fails.
         """
+        if Vonage is None or Auth is None or Sms is None:
+            raise UserError(self.env._("The 'vonage' Python library is not installed."))
+
         api_key = (self.gateway_config_id.vonage_key or '').strip()
         api_secret = (self.gateway_config_id.vonage_secret or '').strip()
         try:
@@ -258,22 +248,32 @@ class SendSms(models.TransientModel):
                 api_secret=api_secret,
             ))
         except Exception as error:
-            raise UserError(_("Vonage configuration error: %s") % error)
+            raise UserError(
+                self.env._("Vonage configuration error: %(error)s", error=error)
+            )
 
+        clean_company = re.sub(r'[^a-zA-Z0-9]', '', self.env.company.name or '')[:11]
+        sender = clean_company or 'Vonage'
         for phone_number in recipient_numbers:
             try:
                 formatted_number = phone_number.lstrip('+')
                 vonage_client.messages.send(
                     Sms(
                         to=formatted_number,
-                        from_='Vonage APIs',
+                        from_=sender,
                         text=self.message_text,
                     )
                 )
             except UserError:
                 raise
             except Exception as error:
-                raise UserError(_("Vonage error for %s: %s") % (phone_number, error))
+                raise UserError(
+                    self.env._(
+                        "Vonage error for %(number)s: %(error)s",
+                        number=phone_number,
+                        error=error,
+                    )
+                )
 
     def _send_via_twilio(self, recipient_numbers):
         """
@@ -285,13 +285,18 @@ class SendSms(models.TransientModel):
         Raises:
             UserError: If client initialization or message transmission encounters an error.
         """
+        if Client is None:
+            raise UserError(self.env._("The 'twilio' Python library is not installed."))
+
         account_sid = (self.gateway_config_id.twilio_account_sid or '').strip()
         auth_token = (self.gateway_config_id.twilio_auth_token or '').strip()
         sender_phone_number = str(self.gateway_config_id.twilio_phone_number or '').strip()
         try:
             twilio_client = Client(account_sid, auth_token)
         except Exception as error:
-            raise UserError(_("Twilio configuration error: %s") % error)
+            raise UserError(
+                self.env._("Twilio configuration error: %(error)s", error=error)
+            )
 
         for phone_number in recipient_numbers:
             try:
@@ -303,16 +308,29 @@ class SendSms(models.TransientModel):
             except UserError:
                 raise
             except Exception as error:
-                raw_error_message = getattr(error, 'msg', None) or str(error)
-                clean_error_message = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]', '', raw_error_message).strip()
-                lower_error_message = clean_error_message.lower()
+                raw_error = getattr(error, 'msg', None) or str(error)
+                clean_error = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]', '', raw_error).strip()
+                lower_error = clean_error.lower()
 
-                if getattr(error, 'code', None) == 572006 or 'predefined sms templates' in lower_error_message:
-                    clean_error_message = _("Trial accounts can only use predefined template keywords (e.g. 'sms_delivery_updates').")
-                elif getattr(error, 'code', None) == 21608 or 'verified recipient' in lower_error_message or 'unverified' in lower_error_message:
-                    clean_error_message = _("Recipient number is not verified in your Twilio trial account.")
+                code = getattr(error, 'code', None)
+                if code == 572006 or 'predefined sms templates' in lower_error:
+                    clean_error = self.env._(
+                        "Trial accounts can only use predefined template keywords "
+                        "(e.g. 'sms_delivery_updates')."
+                    )
+                elif (code == 21608 or 'verified recipient' in lower_error
+                      or 'unverified' in lower_error):
+                    clean_error = self.env._(
+                        "Recipient number is not verified in your Twilio trial account."
+                    )
 
-                raise UserError(_("Twilio error for %s: %s") % (phone_number, clean_error_message))
+                raise UserError(
+                    self.env._(
+                        "Twilio error for %(number)s: %(error)s",
+                        number=phone_number,
+                        error=clean_error,
+                    )
+                )
 
     def _send_via_telesign(self, recipient_numbers):
         """
@@ -324,39 +342,71 @@ class SendSms(models.TransientModel):
         Raises:
             UserError: If client initialization fails or TeleSign returns an error status.
         """
+        if MessagingClient is None:
+            raise UserError(self.env._("The 'telesign' Python library is not installed."))
+
         customer_id = (self.gateway_config_id.telesign_customer or '').strip()
         api_key = (self.gateway_config_id.telesign_api_key or '').strip()
         try:
             telesign_client = MessagingClient(customer_id, api_key)
         except Exception as error:
-            raise UserError(_("TeleSign configuration error: %s") % error)
+            raise UserError(
+                self.env._("TeleSign configuration error: %(error)s", error=error)
+            )
 
         for phone_number in recipient_numbers:
             try:
                 response = telesign_client.message(phone_number, self.message_text, 'ARN')
             except Exception as error:
-                raise UserError(_("TeleSign connection error: %s") % error)
+                raise UserError(
+                    self.env._("TeleSign connection error: %(error)s", error=error)
+                )
 
-            status_info = response.json.get('status', {}) if isinstance(getattr(response, 'json', None), dict) else {}
+            json_data = getattr(response, 'json', None)
+            status_info = json_data.get('status', {}) if isinstance(json_data, dict) else {}
             status_code = status_info.get('code')
-            status_description = status_info.get('description', '')
+            status_desc = status_info.get('description', '')
 
             # Status codes 200 (Delivered/Final OK) and 290 (Message in progress) are successful
             if status_code in (200, 290) or (response.ok and not status_code):
                 continue
 
             # Handle TeleSign error responses
-            if status_code == 11000 or 'phone_number' in status_description.lower():
-                raise UserError(_("TeleSign error for %s: Invalid phone number format.") % phone_number)
+            if status_code == 11000 or 'phone_number' in status_desc.lower():
+                raise UserError(
+                    self.env._(
+                        "TeleSign error for %(number)s: Invalid phone number format.",
+                        number=phone_number,
+                    )
+                )
 
-            if status_code == 10033 or 'not been verified' in status_description.lower():
-                raise UserError(_("TeleSign error for %s: Recipient number is not verified in your TeleSign trial account.") % phone_number)
+            if status_code == 10033 or 'not been verified' in status_desc.lower():
+                raise UserError(
+                    self.env._(
+                        "TeleSign error for %(number)s: Recipient number is not verified "
+                        "in your TeleSign trial account.",
+                        number=phone_number,
+                    )
+                )
 
-            if status_code == 10008 or 'invalid signature' in status_description.lower():
-                raise UserError(_("TeleSign error for %s: Invalid Signature. Please check your Customer ID and API Key in SMS Gateway Configuration.") % phone_number)
+            if status_code == 10008 or 'invalid signature' in status_desc.lower():
+                raise UserError(
+                    self.env._(
+                        "TeleSign error for %(number)s: Invalid Signature. Please check "
+                        "your Customer ID and API Key in SMS Gateway Configuration.",
+                        number=phone_number,
+                    )
+                )
 
-            error_message = status_description or f"HTTP {response.status_code}"
-            raise UserError(_("TeleSign error for %s: %s (Status: %s)") % (phone_number, error_message, status_code or response.status_code))
+            err_msg = status_desc or f"HTTP {response.status_code}"
+            raise UserError(
+                self.env._(
+                    "TeleSign error for %(number)s: %(error)s (Status: %(status)s)",
+                    number=phone_number,
+                    error=err_msg,
+                    status=status_code or response.status_code,
+                )
+            )
 
     def _create_sms_history_records(self, recipient_numbers):
         """
@@ -374,15 +424,17 @@ class SendSms(models.TransientModel):
 
     def _post_chatter_notification(self):
         """
-        Post notification in the active record chatter if the wizard was launched from a document.
+        Post notification in active record chatter if wizard was launched from a document.
         """
         active_model = self.env.context.get('active_model')
         active_id = self.env.context.get('active_id')
-        if active_model and active_id and active_model in self.env:
-            record = self.env[active_model].browse(active_id)
-            if hasattr(record, 'message_post'):
-                record.message_post(
-                    body=_("SMS Sent: %s") % self.message_text,
-                    message_type="comment",
-                    subtype_xmlid="mail.mt_comment",
-                )
+        active_ids = self.env.context.get('active_ids') or ([active_id] if active_id else [])
+        if active_model and active_ids and active_model in self.env:
+            records = self.env[active_model].browse(active_ids)
+            for record in records:
+                if hasattr(record, 'message_post'):
+                    record.message_post(
+                        body=self.env._("SMS Sent: %(text)s", text=self.message_text),
+                        message_type="comment",
+                        subtype_xmlid="mail.mt_comment",
+                    )

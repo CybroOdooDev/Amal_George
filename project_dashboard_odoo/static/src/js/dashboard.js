@@ -4,6 +4,7 @@ import { useService } from "@web/core/utils/hooks";
 import { user } from "@web/core/user";
 import { rpc } from "@web/core/network/rpc";
 import { _t } from "@web/core/l10n/translation";
+import { loadBundle } from "@web/core/assets";
 import { Component, onMounted, onWillStart, proxy, signal } from "@odoo/owl";
 
 /**
@@ -107,6 +108,7 @@ export class ProjectDashboard extends Component {
      * Event handler for the 'onWillStart' event.
      */
     async willStart() {
+        await loadBundle("web.chartjs_lib");
         await this.fetch_data();
     }
 
@@ -155,15 +157,19 @@ export class ProjectDashboard extends Component {
                 }]
             },
             options: {
-                legend: {
-                    position: 'left',
-                    labels: {
-                        boxWidth: 12,
-                        fontSize: 11,
-                        fontColor: '#64748b'
+                plugins: {
+                    legend: {
+                        position: 'left',
+                        labels: {
+                            boxWidth: 12,
+                            font: {
+                                size: 11
+                            },
+                            color: '#64748b'
+                        }
                     }
                 },
-                cutoutPercentage: 65,
+                cutout: '65%',
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: {
@@ -210,32 +216,37 @@ export class ProjectDashboard extends Component {
         const options = {
             responsive: true,
             maintainAspectRatio: false,
-            legend: {
-                display: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
             },
             scales: {
-                xAxes: [{
-                    gridLines: {
+                x: {
+                    grid: {
                         display: false,
                         drawBorder: false
                     },
                     ticks: {
-                        fontColor: "#94a3b8",
-                        fontSize: 10
+                        color: "#94a3b8",
+                        font: {
+                            size: 10
+                        }
                     }
-                }],
-                yAxes: [{
-                    gridLines: {
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
                         color: "rgba(226, 232, 240, 0.6)",
-                        zeroLineColor: "rgba(226, 232, 240, 0.8)",
                         drawBorder: false
                     },
                     ticks: {
-                        beginAtZero: true,
-                        fontColor: "#94a3b8",
-                        fontSize: 10
+                        color: "#94a3b8",
+                        font: {
+                            size: 10
+                        }
                     }
-                }]
+                }
             }
         };
 
@@ -570,6 +581,15 @@ export class ProjectDashboard extends Component {
                 { type: "success" }
             );
         }
+    }
+
+    /**
+     * Refresh the dashboard data and re-render charts.
+     */
+    async refreshDashboard() {
+        await this.fetch_data();
+        await this.render_project_task();
+        await this.render_top_employees_graph();
     }
 }
 ProjectDashboard.template = "ProjectDashboard";

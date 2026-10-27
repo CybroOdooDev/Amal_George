@@ -19,8 +19,8 @@
                 </notebook>
                 <footer>
                     <button string="Send SMS" name="action_send_sms"
-                            type="object" class="oe_highlight"/>
-                    <button string="Cancel" class="oe_link" special="cancel"/>
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>

@@ -15,8 +15,8 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class SmsGatewayConfig(models.Model):
@@ -39,8 +39,13 @@ class SmsGatewayConfig(models.Model):
         string='Gateway Name',
         help='Technical identifier name of the selected SMS gateway provider.'
     )
+    gateway_provider = fields.Char(
+        compute='_compute_gateway_provider',
+        store=True,
+        help='Normalized lowercase identifier for the gateway provider.'
+    )
     vonage_key = fields.Char(
-        string='API Key',
+        string='Vonage API Key',
         help='API Key obtained from the Vonage developer dashboard.'
     )
     vonage_secret = fields.Char(
@@ -56,7 +61,6 @@ class SmsGatewayConfig(models.Model):
         help='Authentication token corresponding to your Twilio Account SID.'
     )
     twilio_phone_number = fields.Char(
-        string='Twilio Phone Number',
         help='Sender phone number registered in Twilio in E.164 format (e.g., +17372508034).'
     )
     telesign_customer = fields.Char(
@@ -64,9 +68,16 @@ class SmsGatewayConfig(models.Model):
         help='Customer ID (UUID) provided by your TeleSign account dashboard.'
     )
     telesign_api_key = fields.Char(
-        string='API Key',
+        string='TeleSign API Key',
         help='REST API Key generated in your TeleSign account.'
     )
+
+    @api.depends('sms_gateway_id.name')
+    def _compute_gateway_provider(self):
+        for record in self:
+            record.gateway_provider = (
+                record.sms_gateway_id.name or ''
+            ).strip().lower()
 
     @api.constrains(
         'sms_gateway_id',
@@ -79,17 +90,23 @@ class SmsGatewayConfig(models.Model):
         Validate that required credential fields are populated for the selected gateway.
 
         Raises:
-            UserError: If any required credential field is empty for the active gateway.
+            ValidationError: If any required credential field is empty for the active gateway.
         """
         for record in self:
-            gateway = (record.sms_gateway_id.name or '').lower()
+            gateway = record.gateway_provider or (record.sms_gateway_id.name or '').strip().lower()
             if gateway == 'telesign':
                 if not record.telesign_customer or not record.telesign_api_key:
-                    raise UserError(_('Please provide valid credentials for TeleSign.'))
+                    raise ValidationError(
+                        self.env._('Please provide valid credentials for TeleSign.')
+                    )
             elif gateway == 'vonage':
                 if not record.vonage_key or not record.vonage_secret:
-                    raise UserError(_('Please provide valid credentials for Vonage.'))
+                    raise ValidationError(
+                        self.env._('Please provide valid credentials for Vonage.')
+                    )
             elif gateway == 'twilio':
                 if (not record.twilio_phone_number or not record.twilio_auth_token
                         or not record.twilio_account_sid):
-                    raise UserError(_('Please provide valid credentials for Twilio.'))
+                    raise ValidationError(
+                        self.env._('Please provide valid credentials for Twilio.')
+                    )

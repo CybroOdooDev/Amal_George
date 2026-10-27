@@ -8,6 +8,6 @@
         <field name="name">Vonage</field>
     </record>
     <record id="sms_gateway_telesign" model="sms.gateway">
-        <field name="name">Telesign</field>
+        <field name="name">TeleSign</field>
     </record>
 </odoo>

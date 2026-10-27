@@ -19,27 +19,31 @@
     'name': 'Multiple SMS Gateway Integration',
     'version': '20.0.1.0.0',
     'category': 'Extra Tools',
-    'summary': 'Module to send SMS through different SMS gateway',
-    'description': """This modules helps to send SMS using different SMS 
-                    gateways including Twilio, Vonage, TeleSign""",
+    'summary': 'Module to send SMS through different SMS gateways',
+    'description': """This module helps to send SMS using different SMS 
+                    gateways including Twilio, Vonage, TeleSign.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['base', 'contacts'],
+    'depends': [
+        'contacts',
+        'mail',
+        'phone_validation',
+    ],
     'data': [
         'security/multi_sms_gateway_groups.xml',
-        'security/sms_history_security.xml',
         'security/ir.access.csv',
+        'security/sms_history_security.xml',
         'data/sms_gateway_data.xml',
         'views/sms_history_views.xml',
         'views/sms_gateway_config_views.xml',
         'views/res_partner_views.xml',
         'wizard/send_sms_views.xml',
-        'views/multi_sms_gateway_menus.xml'
+        'views/multi_sms_gateway_menus.xml',
     ],
     'external_dependencies': {
-        'python': ['telesign', 'twilio', 'vonage']
+        'python': ['telesign', 'twilio', 'vonage'],
     },
     'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',

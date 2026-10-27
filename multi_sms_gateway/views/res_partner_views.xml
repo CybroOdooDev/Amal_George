@@ -8,6 +8,8 @@
         <field name="binding_model_id" ref="base.model_res_partner"/>
         <field name="binding_view_types">form,list</field>
         <field name="state">code</field>
+        <field name="group_ids"
+               eval="[(4, ref('multi_sms_gateway.multi_sms_gateway_group_manager'))]"/>
         <field name="code">action = records.send_sms()</field>
     </record>
 </odoo>

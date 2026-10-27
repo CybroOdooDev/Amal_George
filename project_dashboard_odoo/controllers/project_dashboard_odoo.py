@@ -15,9 +15,14 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-import datetime
+import datetime as dt
+import logging
+
 from odoo import http
+from odoo.exceptions import AccessError, UserError
 from odoo.http import request
+
+_logger = logging.getLogger(__name__)
 
 
 class ProjectFilter(http.Controller):
@@ -42,13 +47,14 @@ class ProjectFilter(http.Controller):
                         allowed_company_ids = [cids]
                     elif isinstance(cids, list):
                         allowed_company_ids = [int(cid) for cid in cids if str(cid).isdigit()]
-            except (RuntimeError, Exception):
+            except (RuntimeError, ValueError, KeyError, TypeError) as err:
+                _logger.debug("Failed to determine allowed_company_ids: %s", err)
                 allowed_company_ids = []
         if allowed_company_ids:
             try:
                 request.update_context(allowed_company_ids=allowed_company_ids)
-            except (RuntimeError, Exception):
-                pass
+            except (RuntimeError, ValueError, TypeError) as err:
+                _logger.debug("Failed to update context with allowed_company_ids: %s", err)
 
     def _get_project_domain(self):
         """Standard project domain matching Odoo's project.open_view_project_all action:
@@ -59,7 +65,7 @@ class ProjectFilter(http.Controller):
         domain = [
             '|',
             ('company_id', '=', False),
-            ('company_id', 'in', request.env.companies.ids)
+            ('company_id', 'in', request.env.companies.ids),
         ]
         Project = request.env['project.project']
         if 'is_internal_project' in Project._fields:
@@ -75,7 +81,7 @@ class ProjectFilter(http.Controller):
         if not projects:
             return request.env['sale.order']
         project_records = request.env['project.project'].browse(
-            projects.ids if hasattr(projects, 'ids') else projects
+            projects.ids if hasattr(projects, 'ids') else projects,
         )
         so_ids = set()
         if 'sale_order_id' in project_records._fields:
@@ -85,7 +91,7 @@ class ProjectFilter(http.Controller):
 
         tasks = request.env['project.task'].sudo().search_read([
             ('project_id', 'in', project_records.ids),
-            '|', ('sale_order_id', '!=', False), ('sale_line_id', '!=', False)
+            '|', ('sale_order_id', '!=', False), ('sale_line_id', '!=', False),
         ], ['sale_order_id', 'sale_line_id'])
         for t in tasks:
             if t.get('sale_order_id'):
@@ -93,11 +99,11 @@ class ProjectFilter(http.Controller):
         task_sale_line_ids = [t['sale_line_id'][0] for t in tasks if t.get('sale_line_id')]
         if task_sale_line_ids:
             lines = request.env['sale.order.line'].sudo().search_read([
-                ('id', 'in', task_sale_line_ids)
+                ('id', 'in', task_sale_line_ids),
             ], ['order_id'])
-            for l in lines:
-                if l.get('order_id'):
-                    so_ids.add(l['order_id'][0])
+            for line in lines:
+                if line.get('order_id'):
+                    so_ids.add(line['order_id'][0])
 
         if analytic_records:
             if hasattr(analytic_records, 'mapped'):
@@ -111,9 +117,10 @@ class ProjectFilter(http.Controller):
         try:
             return request.env['sale.order'].search([
                 ('id', 'in', list(so_ids)),
-                '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids)
+                '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids),
             ])
-        except Exception:
+        except (AccessError, UserError) as err:
+            _logger.debug("Failed to search sale orders: %s", err)
             return request.env['sale.order']
 
     @http.route('/project/task/count', auth='user', type='jsonrpc')
@@ -145,7 +152,7 @@ class ProjectFilter(http.Controller):
         return {
             'project': project_name,
             'task': total_task,
-            'color': colors
+            'color': colors,
         }
 
     @http.route('/employee/timesheet', auth='user', type='jsonrpc')
@@ -169,7 +176,7 @@ class ProjectFilter(http.Controller):
                     inner join hr_employee on hr_employee.id =
                     account_analytic_line.employee_id
                     where account_analytic_line.project_id in %s
-                    group by hr_employee.id, hr_employee.name ORDER 
+                    group by hr_employee.id, hr_employee.name ORDER
                     BY unit DESC Limit 10 '''
         request.env.cr.execute(query, [tuple(allowed_projects.ids)])
         top_product = request.env.cr.dictfetchall()
@@ -194,7 +201,7 @@ class ProjectFilter(http.Controller):
             project_ids = request.env['project.project'].search(
                 base_domain + [('user_id', '=', request.env.uid)])
         employee_ids = request.env['hr.employee'].search([
-            '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids)
+            '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids),
         ])
         # getting partner data
         for employee_id in employee_ids:
@@ -225,7 +232,7 @@ class ProjectFilter(http.Controller):
         # checking the employee selected or not
         if data['employee'] == 'null':
             emp_selected = request.env['hr.employee'].search([
-                '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids)
+                '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids),
             ]).ids
         else:
             emp_selected = [int(data['employee'])]
@@ -234,9 +241,9 @@ class ProjectFilter(http.Controller):
         start_date_val = None
         end_date_val = None
         if start_date and start_date != 'null':
-            start_date_val = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+            start_date_val = dt.datetime.strptime(start_date, "%Y-%m-%d").date()
         if end_date and end_date != 'null':
-            end_date_val = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+            end_date_val = dt.datetime.strptime(end_date, "%Y-%m-%d").date()
 
         if data['project'] == 'null':
             project_domain = list(base_domain)
@@ -250,18 +257,22 @@ class ProjectFilter(http.Controller):
 
         timesheet_domain = [
             ('project_id', 'in', pro_selected),
-            ('employee_id', 'in', emp_selected)
+            ('employee_id', 'in', emp_selected),
         ]
         if start_date_val:
             timesheet_domain.append(('date', '>=', start_date_val))
         if end_date_val:
             timesheet_domain.append(('date', '<=', end_date_val))
 
-        report_project = request.env['timesheets.analysis.report'].search(timesheet_domain)
-        analytic_project = request.env['account.analytic.line'].search(timesheet_domain)
+        report_project = request.env['timesheets.analysis.report']
+        analytic_project = request.env['account.analytic.line']
+        if report_project.has_access('read'):
+            report_project = report_project.search(timesheet_domain)
+        if analytic_project.has_access('read'):
+            analytic_project = analytic_project.search(timesheet_domain)
         margin = round(sum(report_project.mapped('margin')), 2) if report_project else 0
         sale_orders = self._get_sale_orders_for_projects(pro_selected, analytic_records=analytic_project)
-        total_time = sum(analytic_project.mapped('unit_amount'))
+        total_time = sum(analytic_project.mapped('unit_amount')) if analytic_project else 0
         return {
             'total_project': pro_selected,
             'total_emp': emp_selected,
@@ -271,7 +282,7 @@ class ProjectFilter(http.Controller):
             'list_hours_recorded': analytic_project.ids,
             'total_margin': margin,
             'total_margin_ids': report_project.ids,
-            'total_so': sale_orders.ids
+            'total_so': sale_orders.ids,
         }
 
     @http.route('/get/tiles/data', auth='user', type='jsonrpc')
@@ -288,18 +299,18 @@ class ProjectFilter(http.Controller):
         if request.env.user.has_group('project.group_project_manager'):
             all_project = request.env['project.project'].search(base_domain)
             all_task = request.env['project.task'].search([
-                ('project_id', 'in', all_project.ids)
+                ('project_id', 'in', all_project.ids),
             ])
             analytic_project = request.env['account.analytic.line'].search([
-                ('project_id', 'in', all_project.ids)
+                ('project_id', 'in', all_project.ids),
             ])
             report_project = request.env['timesheets.analysis.report'].search([
-                ('project_id', 'in', all_project.ids)
+                ('project_id', 'in', all_project.ids),
             ])
             margin = round(sum(report_project.mapped('margin')), 2) if report_project else 0
             total_time = sum(analytic_project.mapped('unit_amount'))
             employees = request.env['hr.employee'].search([
-                '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids)
+                '|', ('company_id', '=', False), ('company_id', 'in', request.env.companies.ids),
             ])
             sale_orders = self._get_sale_orders_for_projects(all_project, analytic_records=analytic_project)
             project_stage_ids = request.env['project.project.stage'].sudo().search([])
@@ -327,49 +338,53 @@ class ProjectFilter(http.Controller):
                 'project_kanban_view_id': request.env.ref('project.view_project_kanban', raise_if_not_found=False).id if request.env.ref('project.view_project_kanban', raise_if_not_found=False) else False,
                 'currency_symbol': request.env.company.currency_id.symbol or '$',
                 'flag': 1}
-        else:
-            all_project = request.env['project.project'].search(
-                base_domain + [('user_id', '=', request.env.uid)])
-            all_task = request.env['project.task'].search([
+        all_project = request.env['project.project'].search(
+            base_domain + [('user_id', '=', request.env.uid)])
+        all_task = request.env['project.task'].search([
+            ('project_id', 'in', all_project.ids),
+            ('user_ids', 'in', [request.env.uid]),
+        ])
+        analytic_project = request.env['account.analytic.line']
+        report_project = request.env['timesheets.analysis.report']
+        if analytic_project.has_access('read'):
+            analytic_project = analytic_project.search(
+                [('project_id', 'in', all_project.ids)],
+            )
+        total_time = sum(analytic_project.mapped('unit_amount')) if analytic_project else 0
+        if report_project.has_access('read'):
+            report_project = report_project.search([
                 ('project_id', 'in', all_project.ids),
-                ('user_ids', 'in', [request.env.uid])
             ])
-            analytic_project = request.env['account.analytic.line'].search(
-                [('project_id', 'in', all_project.ids)])
-            total_time = sum(analytic_project.mapped('unit_amount'))
-            report_project = request.env['timesheets.analysis.report'].search([
-                ('project_id', 'in', all_project.ids)
-            ])
-            margin = round(sum(report_project.mapped('margin')), 2) if report_project else 0
-            sale_orders = self._get_sale_orders_for_projects(all_project, analytic_records=analytic_project)
-            project_stage_ids = request.env['project.project.stage'].sudo().search([])
-            project_stage_list = []
-            for project_stage_id in project_stage_ids:
-                total_projects = request.env['project.project'].sudo().search_count(
-                    base_domain + [('stage_id', '=', project_stage_id.id),
-                                   ('id', 'in', all_project.ids)])
-                project_stage_list.append({
-                    'id': project_stage_id.id,
-                    'name': project_stage_id.name,
-                    'projects': total_projects
-                })
-            return {
-                'total_projects': len(all_project),
-                'total_projects_ids': all_project.ids,
-                'total_tasks': len(all_task),
-                'total_tasks_ids': all_task.ids,
-                'total_hours': total_time,
-                'total_hours_ids': analytic_project.ids,
-                'total_profitability': margin,
-                'total_margin_ids': report_project.ids,
-                'total_employees': 0,
-                'total_employees_ids': [],
-                'total_sale_orders': len(sale_orders),
-                'sale_orders_ids': sale_orders.ids,
-                'project_stage_list': project_stage_list,
-                'project_kanban_view_id': request.env.ref('project.view_project_kanban', raise_if_not_found=False).id if request.env.ref('project.view_project_kanban', raise_if_not_found=False) else False,
-                'currency_symbol': request.env.company.currency_id.symbol or '$',
-                'flag': 2}
+        margin = round(sum(report_project.mapped('margin')), 2) if report_project else 0
+        sale_orders = self._get_sale_orders_for_projects(all_project, analytic_records=analytic_project)
+        project_stage_ids = request.env['project.project.stage'].sudo().search([])
+        project_stage_list = []
+        for project_stage_id in project_stage_ids:
+            total_projects = request.env['project.project'].sudo().search_count(
+                base_domain + [('stage_id', '=', project_stage_id.id),
+                               ('id', 'in', all_project.ids)])
+            project_stage_list.append({
+                'id': project_stage_id.id,
+                'name': project_stage_id.name,
+                'projects': total_projects,
+            })
+        return {
+            'total_projects': len(all_project),
+            'total_projects_ids': all_project.ids,
+            'total_tasks': len(all_task),
+            'total_tasks_ids': all_task.ids,
+            'total_hours': total_time,
+            'total_hours_ids': analytic_project.ids,
+            'total_profitability': margin,
+            'total_margin_ids': report_project.ids,
+            'total_employees': 0,
+            'total_employees_ids': [],
+            'total_sale_orders': len(sale_orders),
+            'sale_orders_ids': sale_orders.ids,
+            'project_stage_list': project_stage_list,
+            'project_kanban_view_id': request.env.ref('project.view_project_kanban', raise_if_not_found=False).id if request.env.ref('project.view_project_kanban', raise_if_not_found=False) else False,
+            'currency_symbol': request.env.company.currency_id.symbol or '$',
+            'flag': 2}
 
     @http.route('/get/hours', auth='user', type='jsonrpc')
     def get_hours_data(self, **kw):
@@ -385,9 +400,11 @@ class ProjectFilter(http.Controller):
         else:
             all_project = request.env['project.project'].search(
                 base_domain + [('user_id', '=', request.env.uid)]).ids
-        report_records = request.env['timesheets.analysis.report'].search([
-            ('project_id', 'in', all_project)
-        ])
+        report_records = request.env['timesheets.analysis.report']
+        if report_records.has_access('read'):
+            report_records = report_records.search([
+                ('project_id', 'in', all_project),
+            ])
 
         hour_recorded = [sum(report_records.filtered(lambda x: x.billable_type == '09_non_billable').mapped('unit_amount'))]
         hour_recorde = [sum(report_records.filtered(lambda x: x.billable_type == '04_billable_time').mapped('unit_amount'))]
@@ -418,25 +435,24 @@ class ProjectFilter(http.Controller):
         if request.env.user.has_group('project.group_project_manager'):
             all_project = request.env['project.project'].search(base_domain)
             tasks = request.env['project.task'].search([
-                ('project_id', 'in', all_project.ids)
+                ('project_id', 'in', all_project.ids),
             ], order='project_id asc')
             project_name = []
             for task in tasks:
                 stage_name = task.stage_id.name if task.stage_id else ''
                 project_name.append([task.name, task.id, task.project_id.name, stage_name])
             return {
-                'project': project_name
+                'project': project_name,
             }
-        else:
-            all_project = request.env['project.project'].search(
-                base_domain + [('user_id', '=', request.env.uid)]).ids
-            all_tasks = request.env['project.task'].search([
-                ('project_id', 'in', all_project)
-            ])
-            task_project = []
-            for task in all_tasks:
-                stage_name = task.stage_id.name if task.stage_id else ''
-                task_project.append([task.name, task.id, task.project_id.name, stage_name])
-            return {
-                'project': task_project
-            }
+        all_project = request.env['project.project'].search(
+            base_domain + [('user_id', '=', request.env.uid)]).ids
+        all_tasks = request.env['project.task'].search([
+            ('project_id', 'in', all_project),
+        ])
+        task_project = []
+        for task in all_tasks:
+            stage_name = task.stage_id.name if task.stage_id else ''
+            task_project.append([task.name, task.id, task.project_id.name, stage_name])
+        return {
+            'project': task_project,
+        }

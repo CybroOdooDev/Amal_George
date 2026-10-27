@@ -15,7 +15,7 @@
 
                 <!-- Right Action Buttons -->
                 <div class="d-flex align-items-center">
-                    <button class="sf-btn-pill" onclick="location.reload()">
+                    <button class="sf-btn-pill" t-on-click="() => this.refreshDashboard()">
                         <i class="oi me-1" data-icon="refresh"></i> Refresh
                     </button>
                 </div>

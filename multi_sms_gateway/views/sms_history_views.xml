@@ -40,7 +40,10 @@
         <field name="res_model">sms.history</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                SMS history is not created yet! Please send an SMS to create new history.
+                No SMS history recorded yet!
+            </p>
+            <p>
+                Send an SMS to create a new delivery record.
             </p>
         </field>
     </record>

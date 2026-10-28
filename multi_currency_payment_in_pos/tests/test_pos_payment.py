@@ -15,23 +15,28 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
+from unittest.mock import patch
+
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
+@tagged('post_install', 'at_install')
 class TestPosPayment(TransactionCase):
     """Test multi-currency fields and data loading on pos.payment."""
 
     def setUp(self):
         super().setUp()
-        self.payment_method = self.env['pos.payment.method'].search([('type', '=', 'bank')], limit=1)
+        self.payment_method = self.env['pos.payment.method'].search(
+            [('type', '=', 'bank')],
+            limit=1,
+        )
         if not self.payment_method:
             self.payment_method = self.env['pos.payment.method'].create({
                 'name': 'Bank Test Method',
                 'type': 'bank',
                 'receivable_account_id': self.env['account.account'].search(
                     [('account_type', '=', 'asset_receivable')],
-                    limit=1
+                    limit=1,
                 ).id,
             })
         self.pos_config = self.env['pos.config'].create({
@@ -79,3 +84,14 @@ class TestPosPayment(TransactionCase):
         """Test _load_pos_data_fields execution on pos.payment."""
         fields = self.env['pos.payment']._load_pos_data_fields(self.pos_config.id)
         self.assertIsInstance(fields, list)
+        self.assertEqual(fields, [])
+
+        pos_load_mixin = next(
+            cls for cls in type(self.env['pos.payment']).__mro__
+            if cls.__name__ == 'PosLoadMixin'
+        )
+        with patch.object(pos_load_mixin, '_load_pos_data_fields', return_value=['amount']):
+            ext_fields = self.env['pos.payment']._load_pos_data_fields(self.pos_config.id)
+            self.assertIn('amount', ext_fields)
+            self.assertIn('payment_currency', ext_fields)
+            self.assertIn('currency_amount', ext_fields)

@@ -15,30 +15,32 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 
 class SaleOrder(models.Model):
     """
-    Extend the base ResPartner model to include additional features.
+    Extend the SaleOrder model to include customer blacklist warnings.
 
-    This class inherits from the base ResPartner model and adds functionality
-    to mark customers as blacklisted.
+    This class inherits from sale.order and displays a warning notification
+    when a blacklisted customer is selected.
     """
     _inherit = 'sale.order'
 
     partner_blacklist_warning = fields.Text(
-        compute='_compute_partner_blacklist_warning', help="Warning message",
-        string="warning"
+        string="Blacklist Warning",
+        compute='_compute_partner_blacklist_warning',
+        help="Warning message displayed when the customer is blacklisted.",
     )
 
-    @api.depends('partner_id')
+    @api.depends('partner_id.blacklisted_partner')
     def _compute_partner_blacklist_warning(self):
-        """Add warning message on sale order if the customer is blacklisted"""
+        """Add warning message on sale order if the customer is blacklisted."""
         for rec in self:
             if rec.partner_id.blacklisted_partner:
-                rec.partner_blacklist_warning = _(
-                    'The %s is marked as blacklisted' % rec.partner_id.name
+                rec.partner_blacklist_warning = self.env._(
+                    "The customer %s is marked as blacklisted.",
+                    rec.partner_id.name,
                 )
             else:
-                rec.partner_blacklist_warning = ''
+                rec.partner_blacklist_warning = False

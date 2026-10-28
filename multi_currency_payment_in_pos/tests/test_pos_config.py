@@ -18,7 +18,7 @@
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
+@tagged('post_install', 'at_install')
 class TestPosConfig(TransactionCase):
     """Test multi-currency configuration on pos.config."""
 
@@ -54,6 +54,7 @@ class TestPosConfig(TransactionCase):
         self.pos_config = self.pos_config_model.create({
             'name': 'Multi Currency Test POS',
             'enable_multicurrency': True,
+            'payment_method_ids': [(6, 0, [])],
         })
         self.pos_config.currency_ids = [(6, 0, [self.currency_eur.id, self.currency_usd.id])]
 
@@ -68,7 +69,9 @@ class TestPosConfig(TransactionCase):
         self.assertFalse(self.pos_config.enable_multicurrency)
 
     def test_get_config_settings_valid(self):
-        """Test get_config_settings returns correct currency configurations for a valid pos.config."""
+        """Test get_config_settings returns correct currency configurations for
+        a valid pos.config.
+        """
         settings = self.pos_config_model.get_config_settings(self.pos_config.id)
         self.assertIsInstance(settings, list)
         self.assertEqual(len(settings), 2)
@@ -83,7 +86,9 @@ class TestPosConfig(TransactionCase):
         self.assertEqual(eur_entry['rate'], self.currency_eur.rate)
 
     def test_get_config_settings_invalid_id(self):
-        """Test get_config_settings gracefully returns empty list on invalid or missing config IDs."""
+        """Test get_config_settings gracefully returns empty list on invalid or
+        missing config IDs.
+        """
         self.assertEqual(self.pos_config_model.get_config_settings(False), [])
         self.assertEqual(self.pos_config_model.get_config_settings(0), [])
         self.assertEqual(self.pos_config_model.get_config_settings(99999999), [])
@@ -104,7 +109,9 @@ class TestPosConfig(TransactionCase):
         self.assertEqual(info['usd_val'], expected_usd_val)
 
     def test_get_selected_currency_invalid_id(self):
-        """Test get_selected_currency gracefully returns empty list on invalid or missing currency IDs."""
+        """Test get_selected_currency gracefully returns empty list on invalid or
+        missing currency IDs.
+        """
         self.assertEqual(self.pos_config_model.get_selected_currency(False), [])
         self.assertEqual(self.pos_config_model.get_selected_currency(0), [])
         self.assertEqual(self.pos_config_model.get_selected_currency(99999999), [])

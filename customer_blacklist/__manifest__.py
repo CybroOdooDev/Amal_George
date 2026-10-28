@@ -16,19 +16,20 @@
 #
 #############################################################################
 {
-    "name": "Blacklist Customer",
-    "version": '20.0.1.0.0',
-    "category": 'Contact',
-    'summary': """This module help to blacklist customers""",
-    'description': """This module help to blacklist customers. If the customer
-     is blacklisted, a notification will be shown in sale order and invoice. 
-     Also the customer can't buy products from website""",
+    'name': 'Blacklist Customer',
+    'version': '20.0.1.0.0',
+    'category': 'Contacts',
+    'summary': 'Blacklist Customers and Restrict eCommerce Purchases',
+    'description': """This module helps to blacklist customers. If a customer
+     is blacklisted, a warning notification is displayed on quotations, sales orders,
+     and customer invoices. Also, blacklisted customers are blocked from purchasing
+     products through the eCommerce website.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
-    'website': "https://www.cybrosys.com",
-    "depends": ['sale_management','contacts','account','website_sale_stock'],
-    "data": [
+    'website': 'https://www.cybrosys.com',
+    'depends': ['sale_management', 'contacts', 'account', 'website_sale'],
+    'data': [
         'views/res_partner_views.xml',
         'views/sale_order_views.xml',
         'views/account_move_views.xml',

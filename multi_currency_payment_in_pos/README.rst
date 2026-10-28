@@ -14,7 +14,7 @@
 
 POS Multi Currency Payment
 ==================
-This module allows to use multiple currency in Point of Sale module.
+This module allows the use of multiple currencies in the Point of Sale module.
 
 Key Features
 ------------

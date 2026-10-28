@@ -15,8 +15,4 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from . import test_sms_gateway
-from . import test_sms_gateway_config
-from . import test_sms_history
-from . import test_res_partner
-from . import test_send_sms_wizard
+from . import test_customer_blacklist

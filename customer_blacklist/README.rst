@@ -6,18 +6,15 @@
     :target: https://www.odoo.com
     :alt: Odoo 20.0
 
-.. |edition| image:: https://img.shields.io/badge/Edition-Community-1ABC9C.svg
-    :alt: Community Edition
-
 .. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
     :target: https://cybrosys.com
     :alt: Maintainer: Cybrosys Techno Solutions
 
-|license| |odoo| |edition| |maintainer|
+|license| |odoo| |maintainer|
 
 Blacklist Customer
 ==================
-This Odoo app helps to blacklist customers. If the customer is blacklisted, a notification will be shown in sale order and invoice. Also, the customers can't buy products from website.
+This Odoo app helps to blacklist customers. If a customer is blacklisted, a notification is displayed on quotations, sales orders, and customer invoices. In addition, blacklisted customers are prevented from purchasing products from the eCommerce website.
 
 Key Features
 ------------

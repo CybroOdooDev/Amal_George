@@ -138,7 +138,14 @@ patch(PaymentScreen.prototype, {
             }
             if (totalVal > 0 || remainingVal > 0) {
                 if (amountVal && this.multi_currency.rate) {
-                    await this.addNewPaymentLine(ev);
+                    const paymentMethod =
+                        (ev && ev.id ? ev : null) ||
+                        this.payment_methods_from_config?.find((m) => m.type === "cash") ||
+                        this.payment_methods_from_config?.[0];
+                    if (!paymentMethod) {
+                        return;
+                    }
+                    await this.addNewPaymentLine(paymentMethod);
                     const updateAmount = amountVal / this.multi_currency.rate;
                     const selectedLine = this.selectedPaymentLine;
                     if (selectedLine) {
@@ -184,9 +191,10 @@ patch(PaymentScreen.prototype, {
      * Recalculate converted currency values when selected payment line is updated.
      *
      * @override
+     * @param {number|boolean} [amount=false]
      */
-    _updateSelectedPaymentline() {
-        super._updateSelectedPaymentline(...arguments);
+    updateSelectedPaymentline(amount = false) {
+        super.updateSelectedPaymentline(...arguments);
         if (this.pos.config.enable_multicurrency) {
             if (this.selectedPaymentLine && this.multi_currency.rate && this.selectedPaymentLine.converted_currency) {
                 const changeAmount = this.selectedPaymentLine.amount * this.multi_currency.rate;
@@ -203,6 +211,13 @@ patch(PaymentScreen.prototype, {
                 });
             }
         }
+    },
+
+    /**
+     * Compatibility alias for _updateSelectedPaymentline.
+     */
+    _updateSelectedPaymentline() {
+        return this.updateSelectedPaymentline(...arguments);
     },
 
     /**

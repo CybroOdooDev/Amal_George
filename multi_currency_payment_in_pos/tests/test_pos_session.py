@@ -18,7 +18,7 @@
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
+@tagged('post_install', 'at_install')
 class TestPosSession(TransactionCase):
     """Test model loading parameters on pos.session."""
 
@@ -26,6 +26,7 @@ class TestPosSession(TransactionCase):
         super().setUp()
         self.pos_config = self.env['pos.config'].create({
             'name': 'POS Session Test Config',
+            'payment_method_ids': [(6, 0, [])],
         })
         self.pos_session_model = self.env['pos.session']
 

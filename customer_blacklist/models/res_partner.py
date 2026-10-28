@@ -20,13 +20,14 @@ from odoo import fields, models
 
 class ResPartner(models.Model):
     """
-    Extend the base ResPartner model to include additional features.
+    Extend the ResPartner model to include customer blacklist features.
 
-    This class inherits from the base ResPartner model and adds functionality
+    This class inherits from res.partner and adds functionality
     to mark customers as blacklisted.
     """
     _inherit = 'res.partner'
 
-    blacklisted_partner = fields.Boolean(string="Blacklist Partner",
-                                         help="Enable to make the customer as"
-                                              " blacklisted")
+    blacklisted_partner = fields.Boolean(
+        string="Blacklist Partner",
+        help="Enable to mark the customer as blacklisted.",
+    )

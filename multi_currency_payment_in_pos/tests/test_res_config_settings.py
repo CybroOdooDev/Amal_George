@@ -18,7 +18,7 @@
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
+@tagged('post_install', 'at_install')
 class TestResConfigSettings(TransactionCase):
     """Test multi-currency configuration in res.config.settings."""
 
@@ -49,6 +49,7 @@ class TestResConfigSettings(TransactionCase):
         self.pos_config = self.env['pos.config'].create({
             'name': 'Settings Test POS',
             'enable_multicurrency': False,
+            'payment_method_ids': [(6, 0, [])],
         })
         self.pos_config.currency_ids = [(6, 0, [])]
 
@@ -65,7 +66,9 @@ class TestResConfigSettings(TransactionCase):
 
     def test_set_values(self):
         """Test set_values saves multicurrency configuration from settings into pos.config."""
-        settings = self.env['res.config.settings'].with_context(pos_config_id=self.pos_config.id).create({
+        settings = self.env['res.config.settings'].with_context(
+            pos_config_id=self.pos_config.id,
+        ).create({
             'pos_config_id': self.pos_config.id,
             'enable_currency': True,
             'currency_ids': [(6, 0, [self.currency_eur.id, self.currency_usd.id])],
@@ -83,3 +86,33 @@ class TestResConfigSettings(TransactionCase):
         self.assertIsInstance(fields, list)
         self.assertIn('enable_currency', fields)
         self.assertIn('currency_ids', fields)
+
+    def test_get_values_fallback_pos_config(self):
+        """Test get_values falls back to searching pos.config when context is empty."""
+        self.pos_config.enable_multicurrency = True
+        settings = self.env['res.config.settings'].with_context()
+        values = settings.get_values()
+        self.assertIn('enable_currency', values)
+        self.assertIn('currency_ids', values)
+
+    def test_set_values_fallback_pos_config(self):
+        """Test set_values falls back to searching pos.config when context is empty."""
+        settings = self.env['res.config.settings'].with_context().create({
+            'enable_currency': False,
+            'currency_ids': [(6, 0, [])],
+        })
+        settings.set_values()
+        self.assertFalse(self.pos_config.enable_multicurrency)
+
+    def test_set_values_with_context(self):
+        """Test set_values retrieves pos_config from context when pos_config_id is unset."""
+        settings = self.env['res.config.settings'].with_context(
+            pos_config_id=self.pos_config.id,
+        ).create({
+            'enable_currency': True,
+            'currency_ids': [(6, 0, [self.currency_usd.id])],
+        })
+        if hasattr(settings, 'pos_config_id'):
+            settings.pos_config_id = False
+        settings.set_values()
+        self.assertTrue(self.pos_config.enable_multicurrency)

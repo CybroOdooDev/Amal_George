@@ -24,12 +24,10 @@ class PosPayment(models.Model):
     _description = 'Point of Sale Payment'
 
     payment_currency = fields.Char(
-        string='Payment Currency',
         copy=False,
         help='Currency code or symbol used for this payment.',
     )
     currency_amount = fields.Float(
-        string='Currency Amount',
         digits=(16, 2),
         copy=False,
         help='Payment amount in the selected foreign currency.',

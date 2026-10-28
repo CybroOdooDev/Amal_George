@@ -69,7 +69,7 @@
         </xpath>
     </t>
     <!-- Extended PaymentScreenPaymentLines to show converted currency amount and symbol -->
-    <t t-name="POS_multi_currency.PaymentScreenPaymentLines"
+    <t t-name="multi_currency_payment_in_pos.PaymentScreenPaymentLines"
        t-inherit="point_of_sale.PaymentScreenPaymentLines"
        t-inherit-mode="extension">
         <xpath expr="//span[hasclass('payment-name')]" position="after">

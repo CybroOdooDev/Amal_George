@@ -18,20 +18,23 @@
 from odoo.tests.common import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install')
+@tagged('post_install', 'at_install')
 class TestPosOrder(TransactionCase):
     """Test multi-currency receipt data generation on pos.order."""
 
     def setUp(self):
         super().setUp()
-        self.payment_method = self.env['pos.payment.method'].search([('type', '=', 'bank')], limit=1)
+        self.payment_method = self.env['pos.payment.method'].search(
+            [('type', '=', 'bank')],
+            limit=1,
+        )
         if not self.payment_method:
             self.payment_method = self.env['pos.payment.method'].create({
                 'name': 'Bank Test Method',
                 'type': 'bank',
                 'receivable_account_id': self.env['account.account'].search(
                     [('account_type', '=', 'asset_receivable')],
-                    limit=1
+                    limit=1,
                 ).id,
             })
         self.pos_config = self.env['pos.config'].create({

@@ -18,11 +18,9 @@
 from odoo import api, fields, models
 
 
-class ResConfigSettings(models.TransientModel):
+class ResConfigSettings(models.TransientModel):  # pylint: disable=no-wizard-in-models
     """Inherit res.config.settings to provide multi-currency settings for POS."""
-    _name = 'res.config.settings'
     _inherit = ['res.config.settings', 'pos.load.mixin']
-    _description = 'Point of Sale Settings'
 
     currency_ids = fields.Many2many(
         'res.currency',
@@ -60,7 +58,7 @@ class ResConfigSettings(models.TransientModel):
 
     def set_values(self):
         """Save multi-currency configuration values from settings into pos.config."""
-        super().set_values()
+        res = super().set_values()
         pos_config = False
         if hasattr(self, 'pos_config_id') and self.pos_config_id:
             pos_config = self.pos_config_id
@@ -72,6 +70,7 @@ class ResConfigSettings(models.TransientModel):
         if pos_config:
             pos_config.enable_multicurrency = self.enable_currency
             pos_config.currency_ids = [(6, 0, self.currency_ids.ids)]
+        return res
 
     @api.model
     def _load_pos_data_fields(self, config):

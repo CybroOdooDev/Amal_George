@@ -10,11 +10,11 @@
                     <button string="Send For Approval" class="btn-primary"
                             type="object" name="action_send"
                             groups="hr.group_hr_user"
-                            invisible="state not in 'draft'"/>
+                            invisible="state != 'draft'"/>
                     <button string="Approve" class="btn-primary"
                             groups="hr.group_hr_manager" type="object"
                             name="action_approve"
-                            invisible="state not in 'to_approve'"/>
+                            invisible="state != 'to_approve'"/>
                     <button string="Refuse" groups="hr.group_hr_manager"
                             type="object"
                             name="action_reject"
@@ -49,7 +49,7 @@
                         <group>
                             <field name="date_start"/>
                             <field name="announcement_type"
-                                   invisible="is_announcement != False"/>
+                                   invisible="is_announcement"/>
                             <field name="attachment_ids"
                                    widget="many2many_binary"
                                    class="oe_inline"/>
@@ -82,7 +82,7 @@
             </form>
         </field>
     </record>
-    <!--        Creating hr announcement list view-->
+    <!-- Creating hr announcement list view -->
     <record id="hr_announcement_view_tree" model="ir.ui.view">
         <field name="name">hr.announcement.view.tree</field>
         <field name="model">hr.announcement</field>
@@ -94,7 +94,7 @@
             </list>
         </field>
     </record>
-    <!--        Creating hr announcement search view-->
+    <!-- Creating hr announcement search view -->
     <record id="hr_announcement_view_search" model="ir.ui.view">
         <field name="name">hr.announcement.view.search</field>
         <field name="model">hr.announcement</field>
@@ -111,20 +111,20 @@
                         domain="[('state', '=', 'approved')]"/>
                 <filter name="general_announcements"
                         string="General Announcements"
-                        domain="[('is_announcement', '=',True)]"/>
+                        domain="[('is_announcement', '=', True)]"/>
                 <filter string="Status" name="Status" domain="[]"
                         context="{'group_by':'state'}"/>
             </search>
         </field>
     </record>
-    <!--        Creating hr announcement action-->
+    <!-- Creating hr announcement action -->
     <record id="hr_announcement_action" model="ir.actions.act_window">
         <field name="name">Announcements</field>
         <field name="res_model">hr.announcement</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="hr_announcement_view_search"/>
         <field name="help" type="html">
-            <p class="oe_view_nocontent_create">
+            <p class="o_view_nocontent_smiling_face">
                 Click to Create a New Record.
             </p>
         </field>

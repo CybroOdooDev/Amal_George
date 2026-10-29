@@ -19,7 +19,7 @@
 #    DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 
 class HrEmployee(models.Model):
@@ -29,7 +29,8 @@ class HrEmployee(models.Model):
     announcement_count = fields.Integer(
         compute='_compute_announcement_count',
         string='# Announcements',
-        help="Count of Announcements")
+        help="Count of Announcements",
+    )
 
     def _get_announcement_domain(self, now_date):
         """Returns domain to fetch all relevant announcements for the employee."""
@@ -49,16 +50,19 @@ class HrEmployee(models.Model):
         now_date = fields.Date.today()
         for obj in self:
             announcements = self.env['hr.announcement'].sudo().search(
-                obj._get_announcement_domain(now_date))
+                obj._get_announcement_domain(now_date)
+            )
             obj.announcement_count = len(announcements)
 
     def action_announcement_view(self):
         """Announcement view for each employee."""
         now_date = fields.Date.today()
         announcement_ids = self.env['hr.announcement'].sudo().search(
-            self._get_announcement_domain(now_date)).ids
+            self._get_announcement_domain(now_date)
+        ).ids
         view_id = self.env.ref(
-            'ent_hr_reward_warning.hr_announcement_view_form').id
+            'ent_hr_reward_warning.hr_announcement_view_form'
+        ).id
         if announcement_ids:
             if len(announcement_ids) > 1:
                 return {
@@ -67,14 +71,14 @@ class HrEmployee(models.Model):
                     'res_model': 'hr.announcement',
                     'view_id': False,
                     'type': 'ir.actions.act_window',
-                    'name': _('Announcements'),
+                    'name': self.env._('Announcements'),
                 }
-            else:
-                return {
-                    'view_mode': 'form',
-                    'res_model': 'hr.announcement',
-                    'view_id': view_id,
-                    'type': 'ir.actions.act_window',
-                    'name': _('Announcements'),
-                    'res_id': announcement_ids[0],
-                }
+            return {
+                'view_mode': 'form',
+                'res_model': 'hr.announcement',
+                'view_id': view_id,
+                'type': 'ir.actions.act_window',
+                'name': self.env._('Announcements'),
+                'res_id': announcement_ids[0],
+            }
+        return False

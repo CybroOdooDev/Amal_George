@@ -15,7 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):
@@ -34,7 +34,6 @@ class ResConfigSettings(models.TransientModel):
             ('gemini-3.5-flash-lite', 'Gemini 3.5 Flash Lite (Cost-Effective)'),
             ('gemini-flash-latest', 'Gemini Flash Latest (Auto-Updated)'),
         ],
-        string="Gemini Model",
         config_parameter="address_ai_extractor.gemini_model",
         default="gemini-3.5-flash",
         groups="base.group_system",
@@ -42,7 +41,6 @@ class ResConfigSettings(models.TransientModel):
         help="The Google Gemini model used for address parsing.",
     )
     address_autofill = fields.Boolean(
-        string="Address Autofill",
         config_parameter="address_ai_extractor.address_autofill",
         default=True,
         help="Enable AI-powered address autofill in Contact form and list views.",
@@ -61,11 +59,11 @@ class ResConfigSettings(models.TransientModel):
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _('Configuration Missing'),
-                    'message': _('Please enter an API Key before testing the connection.'),
+                    'title': self.env._('Configuration Missing'),
+                    'message': self.env._('Please enter an API Key before testing the connection.'),
                     'type': 'warning',
                     'sticky': False,
-                }
+                },
             }
 
         success, msg = self.env['gemini.service'].test_connection(
@@ -77,9 +75,9 @@ class ResConfigSettings(models.TransientModel):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Connection Successful') if success else _('Connection Failed'),
+                'title': self.env._('Connection Successful') if success else self.env._('Connection Failed'),
                 'message': msg,
                 'type': 'success' if success else 'danger',
                 'sticky': not success,
-            }
+            },
         }

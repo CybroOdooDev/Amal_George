@@ -30,7 +30,6 @@ class AccountDashboardConfig(models.Model):
 
     user_id = fields.Many2one(
         'res.users',
-        string='User',
         required=True,
         default=lambda self: self.env.user,
         ondelete='cascade',
@@ -51,7 +50,6 @@ class AccountDashboardConfig(models.Model):
             ('last_year', 'Last Year'),
             ('custom', 'Custom Range'),
         ],
-        string='Default Period',
         help='Default Period',
         default='this_month',
     )
@@ -62,7 +60,6 @@ class AccountDashboardConfig(models.Model):
             ('M', 'Millions (M)'),
             ('B', 'Billions (B)'),
         ],
-        string='Amount Format',
         help='Amount Format',
         default='full',
     )
@@ -75,7 +72,6 @@ class AccountDashboardConfig(models.Model):
         help='Companies to include in dashboard data',
     )
     collapsed_widgets = fields.Json(
-        string='Collapsed Widgets',
         default=list,
         help='List of widget IDs the user has collapsed',
     )
@@ -90,12 +86,10 @@ class AccountDashboardConfig(models.Model):
         help='Ordered list of KPI keys for display order',
     )
     hidden_charts = fields.Json(
-        string='Hidden Charts',
         default=list,
         help='List of chart keys the user has hidden',
     )
     chart_order = fields.Json(
-        string='Chart Order',
         default=list,
         help='Ordered list of chart keys for display order',
     )
@@ -104,7 +98,6 @@ class AccountDashboardConfig(models.Model):
             ('light', 'Light'),
             ('dark', 'Dark'),
         ],
-        string='Theme',
         help='Theme Mode',
         default='dark',
     )

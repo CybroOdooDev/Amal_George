@@ -16,10 +16,12 @@
 #
 #############################################################################
 import json
-from typing import Optional
+import logging
 
-from odoo import _, models
+from odoo import models
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 try:
     from google import genai
@@ -39,27 +41,27 @@ except ImportError:
 
 if HAS_GENAI:
     class AddressExtractionSchema(BaseModel):
-        street: Optional[str] = Field(
+        street: str | None = Field(
             default=None,
             description="Primary street address line, building name, flat/house number, and road",
         )
-        street2: Optional[str] = Field(
+        street2: str | None = Field(
             default=None,
             description="Secondary address line, suite/apartment number, sub-locality, landmark, or floor",
         )
-        city: Optional[str] = Field(
+        city: str | None = Field(
             default=None,
             description="City, town, municipality, or village name",
         )
-        state: Optional[str] = Field(
+        state: str | None = Field(
             default=None,
             description="State, province, region, or union territory name or code",
         )
-        zip: Optional[str] = Field(
+        zip: str | None = Field(
             default=None,
             description="Postal code, ZIP code, or PIN code",
         )
-        country: Optional[str] = Field(
+        country: str | None = Field(
             default=None,
             description="Country name or ISO country code",
         )
@@ -88,9 +90,11 @@ class GeminiService(models.AbstractModel):
         api_key = self._get_param_value(self.CONFIG_API_KEY)
         if not api_key or not api_key.strip():
             raise UserError(
-                _("Google Gemini API Key is not configured.\n\n"
-                  "Please navigate to Settings > AI Address Autofill "
-                  "and enter your Gemini API key.")
+                self.env._(
+                    "Google Gemini API Key is not configured.\n\n"
+                    "Please navigate to Settings > AI Address Autofill "
+                    "and enter your Gemini API key.",
+                ),
             )
         return api_key.strip()
 
@@ -103,8 +107,10 @@ class GeminiService(models.AbstractModel):
         """Instantiate and return the Google GenAI SDK Client."""
         if not HAS_GENAI:
             raise UserError(
-                _("The official 'google-genai' Python SDK is not installed in this environment.\n"
-                  "Please install it using: pip install google-genai")
+                self.env._(
+                    "The official 'google-genai' Python SDK is not installed in this environment.\n"
+                    "Please install it using: pip install google-genai",
+                ),
             )
         key = api_key.strip() if api_key else self._get_api_key()
         return genai.Client(api_key=key)
@@ -121,16 +127,15 @@ class GeminiService(models.AbstractModel):
                 max_output_tokens=5,
                 temperature=0.0,
             )
-            print("Request:", "Ping")
+            _logger.debug("Testing Gemini API connection for model: %s", model)
             response = client.models.generate_content(
                 model=model,
                 contents="Ping",
                 config=config,
             )
-            print("Response:", getattr(response, 'text', None) or response)
             if response and (response.text or response.candidates):
-                return True, _("Connection successful! Connected to Google Gemini model '%s'.") % model
-            return True, _("Connection successful! Google Gemini responded.")
+                return True, self.env._("Connection successful! Connected to Google Gemini model '%s'.", model)
+            return True, self.env._("Connection successful! Google Gemini responded.")
         except UserError:
             raise
         except Exception as exc:
@@ -142,7 +147,7 @@ class GeminiService(models.AbstractModel):
         Send unstructured address text to Google Gemini and return structured address dict.
         """
         if not address_text or not address_text.strip():
-            raise UserError(_("Please provide an address text to extract."))
+            raise UserError(self.env._("Please provide an address text to extract."))
 
         cleaned_input = address_text.strip()
         client = self._get_client()
@@ -181,13 +186,12 @@ class GeminiService(models.AbstractModel):
         )
 
         try:
-            print("Request:", cleaned_input)
+            _logger.debug("Requesting Gemini address extraction for input length: %s", len(cleaned_input))
             response = client.models.generate_content(
                 model=model,
                 contents=cleaned_input,
                 config=config,
             )
-            print("Response:", getattr(response, 'text', None) or response)
             return self._parse_extraction_response(response)
         except UserError:
             raise
@@ -206,10 +210,10 @@ class GeminiService(models.AbstractModel):
             elif isinstance(response.parsed, dict):
                 data = response.parsed
 
-        if not data and response.text:
+        if not data and getattr(response, 'text', None):
             try:
                 data = json.loads(response.text)
-            except Exception:
+            except (json.JSONDecodeError, TypeError, ValueError):
                 data = {}
 
         fields = ['street', 'street2', 'city', 'state', 'zip', 'country']
@@ -231,27 +235,28 @@ class GeminiService(models.AbstractModel):
             message = getattr(exc, 'message', str(exc))
 
             if code in (400, 403) or 'API_KEY_INVALID' in str(message) or 'PERMISSION_DENIED' in str(message):
-                return _(
+                return self.env._(
                     "Invalid Google Gemini API key or unauthorized request.\n"
-                    "Please verify that your API key is correct and has Gemini API access enabled in Google AI Studio."
+                    "Please verify that your API key is correct and has Gemini API access enabled in Google AI Studio.",
                 )
             if code == 429 or 'RESOURCE_EXHAUSTED' in str(message):
-                return _(
+                return self.env._(
                     "Google Gemini API quota exceeded or rate limit reached.\n"
-                    "Please wait a moment before trying again, or check your Gemini API plan."
+                    "Please wait a moment before trying again, or check your Gemini API plan.",
                 )
             if code and code >= 500:
-                return _(
+                return self.env._(
                     "Google Gemini service is temporarily unavailable (Error %s).\n"
-                    "Please try again in a few minutes."
-                ) % code
+                    "Please try again in a few minutes.",
+                    code,
+                )
 
-            return _("Google Gemini API error: %s") % (message or str(exc))
+            return self.env._("Google Gemini API error: %s", message or str(exc))
 
         exc_str = str(exc).lower()
         if 'timeout' in exc_str:
-            return _("The request to Google Gemini timed out. Please check your internet connectivity and try again.")
+            return self.env._("The request to Google Gemini timed out. Please check your internet connectivity and try again.")
         if 'connection' in exc_str or 'network' in exc_str:
-            return _("Unable to connect to Google Gemini service. Please verify your server's network connection.")
+            return self.env._("Unable to connect to Google Gemini service. Please verify your server's network connection.")
 
-        return _("An unexpected error occurred while communicating with Google Gemini: %s") % str(exc)
+        return self.env._("An unexpected error occurred while communicating with Google Gemini: %s", str(exc))

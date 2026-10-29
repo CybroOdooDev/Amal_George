@@ -21,5 +21,3 @@
 ###############################################################################
 from . import hr_announcement
 from . import hr_employee
-
-

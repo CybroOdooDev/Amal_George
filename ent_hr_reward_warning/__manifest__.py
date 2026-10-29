@@ -23,22 +23,22 @@
     'name': 'Enterprise OpenHRMS Official Announcements',
     'version': '20.0.1.0.0',
     'category': 'Human Resources',
-    'summary': """Managing Official Announcements""",
-    'description': """This module helps you to manage hr official announcements
+    'summary': 'Managing Official Announcements',
+    'description': """This module helps you to manage HR official announcements
      and Add Attachments to the announcement""",
     'live_test_url': 'https://www.youtube.com/watch?v=4gy3Jqn46SQ&feature=youtu.be',
     'author': 'Cybrosys Techno Solutions, Open HRMS',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
-    'website': "https://www.openhrms.com",
+    'website': 'https://www.openhrms.com',
     'depends': ['mail', 'hr'],
     'data': [
         'security/ent_hr_reward_warning_groups.xml',
+        'security/ir.access.csv',
         'data/ir_sequence_data.xml',
         'data/ir_cron_data.xml',
         'views/hr_announcement_views.xml',
         'views/hr_employee_views.xml',
-        'security/ir.access.csv',
     ],
     'demo': ['demo/hr_announcement_demo.xml'],
     'images': ['static/description/banner.jpg'],
@@ -47,4 +47,3 @@
     'auto_install': False,
     'application': True,
 }
-

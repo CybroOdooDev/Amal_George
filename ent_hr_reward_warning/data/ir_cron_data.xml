@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <!-- For getting expiry date-->
+    <data noupdate="1">
+        <!-- For getting expiry date -->
         <record id="hr_announcement_cron" model="ir.cron">
             <field name="name">HR Announcement Expiry Date</field>
             <field name="interval_number">1</field>

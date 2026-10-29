@@ -19,7 +19,6 @@
 #    DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-from datetime import datetime
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -30,65 +29,100 @@ class HrAnnouncement(models.Model):
     _description = 'HR Announcement'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Code No:', default='New', copy=False, readonly=True,
-                       help="Sequence Number of the Announcement")
-    announcement_reason = fields.Text(string='Title',
-                                      required=True,
-                                      help="Announcement Subject")
+    name = fields.Char(
+        string='Code No:',
+        default='New',
+        copy=False,
+        readonly=True,
+        help="Sequence Number of the Announcement",
+    )
+    announcement_reason = fields.Text(
+        string='Title',
+        required=True,
+        help="Announcement Subject",
+    )
     state = fields.Selection(
-        [('draft', 'Draft'), ('to_approve', 'Waiting For Approval'),
-         ('approved', 'Approved'), ('rejected', 'Refused'),
-         ('expired', 'Expired')],
-        string='Status', default='draft',
-        tracking=True, help="State of the Announcement")
-    requested_date = fields.Date(string='Requested Date',
-                                 default=datetime.now().strftime('%Y-%m-%d'),
-                                 help="Create Date of Record")
-    attachment_ids = fields.Many2many(comodel_name='ir.attachment',
-                                      relation='doc_warning_rel',
-                                      column1='doc_id', column2='attach_id4',
-                                      string="Attachment",
-                                      help='You can attach the copy of your '
-                                           'Letter')
-    company_id = fields.Many2one(comodel_name='res.company', string='Company',
-                                 default=lambda self: self.env.user.company_id,
-                                 readonly=True, help="Login user Company")
-    is_announcement = fields.Boolean(string='Is general Announcement?',
-                                     help="To set Announcement as general "
-                                          "announcement")
+        [
+            ('draft', 'Draft'),
+            ('to_approve', 'Waiting For Approval'),
+            ('approved', 'Approved'),
+            ('rejected', 'Refused'),
+            ('expired', 'Expired'),
+        ],
+        string='Status',
+        default='draft',
+        tracking=True,
+        help="State of the Announcement",
+    )
+    requested_date = fields.Date(
+        default=fields.Date.context_today,
+        help="Create Date of Record",
+    )
+    attachment_ids = fields.Many2many(
+        comodel_name='ir.attachment',
+        relation='doc_warning_rel',
+        column1='doc_id',
+        column2='attach_id4',
+        help="You can attach a copy of your letter",
+    )
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        default=lambda self: self.env.company,
+        readonly=True,
+        help="Login user Company",
+    )
+    is_announcement = fields.Boolean(
+        string='Is general Announcement?',
+        help="To set Announcement as general announcement",
+    )
     announcement_type = fields.Selection(
-        [('employee', 'By Employee'), ('department', 'By Department'),
-         ('job_position', 'By Job Position')],
-        help="Select the type of employee")
-    employee_ids = fields.Many2many(comodel_name='hr.employee',
-                                    relation='hr_employee_announcements',
-                                    column1='announcement', column2='employee',
-                                    string='Employees',
-                                    help="Employee's which want to see this "
-                                         "announcement")
-    department_ids = fields.Many2many(comodel_name='hr.department',
-                                      relation='hr_department_announcements',
-                                      column1='announcement',
-                                      column2='department',
-                                      string='Departments',
-                                      help="Department's which want to see "
-                                           "this announcement")
-    position_ids = fields.Many2many(comodel_name='hr.job',
-                                    relation='hr_job_position_announcements',
-                                    column1='announcement',
-                                    column2='job_position',
-                                    string='Job Positions',
-                                    help="Job Position's which want to see "
-                                         "this announcement")
-    announcement = fields.Html(string='Letter', help="Announcement Content")
-    date_start = fields.Date(string='Start Date', default=fields.Date.today(),
-                             required=True, help="Start date of "
-                                                 "announcement want"
-                                                 " to see")
-    date_end = fields.Date(string='End Date', default=fields.Date.today(),
-                           required=True, help="End date of "
-                                               "announcement want too"
-                                               " see")
+        [
+            ('employee', 'By Employee'),
+            ('department', 'By Department'),
+            ('job_position', 'By Job Position'),
+        ],
+        help="Select the type of employee",
+    )
+    employee_ids = fields.Many2many(
+        comodel_name='hr.employee',
+        relation='hr_employee_announcements',
+        column1='announcement',
+        column2='employee',
+        string='Employees',
+        help="Employees who should see this announcement",
+    )
+    department_ids = fields.Many2many(
+        comodel_name='hr.department',
+        relation='hr_department_announcements',
+        column1='announcement',
+        column2='department',
+        string='Departments',
+        help="Departments that should see this announcement",
+    )
+    position_ids = fields.Many2many(
+        comodel_name='hr.job',
+        relation='hr_job_position_announcements',
+        column1='announcement',
+        column2='job_position',
+        string='Job Positions',
+        help="Job positions that should see this announcement",
+    )
+    announcement = fields.Html(
+        string='Letter',
+        help="Announcement Content",
+    )
+    date_start = fields.Date(
+        string='Start Date',
+        default=fields.Date.context_today,
+        required=True,
+        help="Start date of announcement validity",
+    )
+    date_end = fields.Date(
+        string='End Date',
+        default=fields.Date.context_today,
+        required=True,
+        help="End date of announcement validity",
+    )
 
     def action_reject(self):
         """For rejecting the announcement"""
@@ -105,8 +139,11 @@ class HrAnnouncement(models.Model):
     @api.constrains('date_start', 'date_end')
     def _check_dates(self):
         """Check the date condition"""
-        if self.date_start > self.date_end:
-            raise ValidationError("Start date must be less than End Date")
+        for record in self:
+            if record.date_start and record.date_end and record.date_start > record.date_end:
+                raise ValidationError(
+                    self.env._("Start date must be less than End Date")
+                )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -115,21 +152,23 @@ class HrAnnouncement(models.Model):
             if vals.get('name', 'New') == 'New':
                 if vals.get('is_announcement'):
                     vals['name'] = self.env['ir.sequence'].next_by_code(
-                        'hr.announcement.general')
+                        'hr.announcement.general'
+                    ) or 'New'
                 else:
                     vals['name'] = self.env['ir.sequence'].next_by_code(
-                        'hr.announcement')
-        return super(HrAnnouncement, self).create(vals_list)
+                        'hr.announcement'
+                    ) or 'New'
+        return super().create(vals_list)
 
     def get_expiry_state(self):
         """
-        Function is used for Expiring Announcement based on expiry date
-        it activate from the crone job.
+        Function is used for expiring announcement based on expiry date;
+        it is activated from the cron job.
         """
-        announcement = self.search([
+        announcements = self.search([
             ('state', '!=', 'rejected'),
             ('date_end', '<', fields.Date.today()),
         ])
-        announcement.write({
-            'state': 'expired'
+        announcements.write({
+            'state': 'expired',
         })

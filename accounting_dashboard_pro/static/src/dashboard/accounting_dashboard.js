@@ -245,7 +245,7 @@ export class AccountingDashboard extends Component {
                 this.state.period = config.default_period;
             }
         } catch (e) {
-            console.error("Config load error:", e);
+            // Silently fallback to defaults on config load error
         }
     }
 
@@ -257,7 +257,7 @@ export class AccountingDashboard extends Component {
                 [[this.state.configId], vals]
             );
         } catch (e) {
-            console.error("Config save error:", e);
+            // Silently handle save config error
         }
     }
 
@@ -315,7 +315,6 @@ export class AccountingDashboard extends Component {
             // Always load charts — visibleCharts getter handles group filtering
             await this._loadCharts();
         } catch (e) {
-            console.error("Dashboard load error:", e);
             this.state.error = e.message || "Failed to load dashboard data";
         }
         this.state.loading = false;
@@ -327,7 +326,7 @@ export class AccountingDashboard extends Component {
             try {
                 this.state[stateKey] = await this.orm.call("account.move", method, [args]);
             } catch (e) {
-                console.warn(`Chart ${stateKey} load failed:`, e.message || e);
+                // Silently keep default chart data on individual failure
             }
         };
 
@@ -904,7 +903,6 @@ export class AccountingDashboard extends Component {
 
         if (actionName === 'generate_reports') {
             if (!this.state.userGroups.is_user && !this.state.userGroups.is_manager) {
-                console.warn("Unauthorized report access attempt.");
                 return;
             }
             this.onGenerateReportsClick();
@@ -917,7 +915,7 @@ export class AccountingDashboard extends Component {
                 try {
                     resId = await this.orm.call("ir.model.data", "_xmlid_to_res_id", ["account_reports.aged_payable_report"]);
                 } catch (e) {
-                    console.warn("Failed to resolve Aged Payable report via XML ID:", e);
+                    resId = null;
                 }
                 if (resId) {
                     this.action.doAction({
@@ -944,7 +942,7 @@ export class AccountingDashboard extends Component {
                 const reports = await this.orm.searchRead("account.report", [], ["id", "name"]);
                 this.state.availableReports = reports || [];
             } catch (e) {
-                console.error("Failed to load accounting reports:", e);
+                this.state.availableReports = [];
             }
         }
         this.state.showReportModal = true;

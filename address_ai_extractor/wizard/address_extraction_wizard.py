@@ -15,7 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 COUNTRY_ALIASES = {
@@ -40,7 +40,6 @@ class AddressExtractionWizard(models.TransientModel):
     partner_id = fields.Many2one(
         comodel_name='res.partner',
         string="Target Contact",
-        required=True,
         help="Select the contact to update.",
     )
     raw_address = fields.Text(
@@ -59,7 +58,6 @@ class AddressExtractionWizard(models.TransientModel):
     )
 
     is_partner_readonly = fields.Boolean(
-        string="Is Partner Readonly",
         default=False,
         help="Technical flag indicating if the target contact should be readonly.",
     )
@@ -87,7 +85,6 @@ class AddressExtractionWizard(models.TransientModel):
             if non_empty_parts:
                 res['raw_address'] = ", ".join(non_empty_parts)
         return res
-
 
     extracted_street = fields.Char(
         string="Street Address",
@@ -120,7 +117,7 @@ class AddressExtractionWizard(models.TransientModel):
         """Send address text to Gemini service and resolve components into Odoo records."""
         self.ensure_one()
         if not self.raw_address or not self.raw_address.strip():
-            raise UserError(_("Please enter an address in the text area."))
+            raise UserError(self.env._("Please enter an address in the text area."))
 
         extracted = self.env['gemini.service'].extract_address(self.raw_address)
 
@@ -144,7 +141,7 @@ class AddressExtractionWizard(models.TransientModel):
         })
 
         return {
-            'name': _('AI Address Autofill'),
+            'name': self.env._('AI Address Autofill'),
             'type': 'ir.actions.act_window',
             'res_model': 'address.extraction.wizard',
             'res_id': self.id,
@@ -191,20 +188,20 @@ class AddressExtractionWizard(models.TransientModel):
         if country_record:
             state = state_model.search([
                 ('country_id', '=', country_record.id),
-                '|', ('code', '=ilike', query), ('name', '=ilike', query)
+                '|', ('code', '=ilike', query), ('name', '=ilike', query),
             ], limit=1)
             if state:
                 return state
 
             state = state_model.search([
                 ('country_id', '=', country_record.id),
-                ('name', 'ilike', query)
+                ('name', 'ilike', query),
             ], limit=1)
             if state:
                 return state
 
         state = state_model.search([
-            '|', ('code', '=ilike', query), ('name', '=ilike', query)
+            '|', ('code', '=ilike', query), ('name', '=ilike', query),
         ], limit=1)
         if state:
             return state
@@ -215,7 +212,7 @@ class AddressExtractionWizard(models.TransientModel):
         """Apply confirmed address values to the selected partner."""
         self.ensure_one()
         if not self.partner_id:
-            raise UserError(_("Please select a target contact to update, or click 'Create New Contact' instead."))
+            raise UserError(self.env._("Please select a target contact to update, or click 'Create New Contact' instead."))
 
         partner = self.partner_id
         update_vals = {}
@@ -254,18 +251,18 @@ class AddressExtractionWizard(models.TransientModel):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Contact Updated'),
-                'message': _("Address successfully applied to '%s'.") % partner.name,
+                'title': self.env._('Contact Updated'),
+                'message': self.env._("Address successfully applied to '%s'.", partner.name),
                 'type': 'success',
                 'sticky': False,
                 'next': {'type': 'ir.actions.act_window_close'},
-            }
+            },
         }
 
     def action_create_contact(self):
         """Create a new contact using the confirmed address components."""
         self.ensure_one()
-        name = (self.raw_address.splitlines()[0][:50] if self.raw_address else False) or _("New Contact")
+        name = (self.raw_address.splitlines()[0][:50] if self.raw_address else False) or self.env._("New Contact")
 
         partner_vals = {
             'name': name,
@@ -280,7 +277,7 @@ class AddressExtractionWizard(models.TransientModel):
         new_partner = self.env['res.partner'].create(partner_vals)
 
         return {
-            'name': _('New Contact'),
+            'name': self.env._('New Contact'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'res_id': new_partner.id,

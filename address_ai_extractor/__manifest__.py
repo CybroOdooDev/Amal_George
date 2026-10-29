@@ -47,7 +47,7 @@ Google Gemini AI and the official google-genai Python SDK.
         ],
     },
     'external_dependencies': {
-        'python': ['google-genai']
+        'python': ['google-genai'],
     },
     'images': ['static/description/banner.png'],
     'installable': True,

@@ -21,10 +21,10 @@
 ###############################################################################
 
 from datetime import date, timedelta
+
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
-from odoo.tools.translate import _
 from odoo.exceptions import AccessError
 
 
@@ -41,7 +41,7 @@ class AccountMoveDashboard(models.Model):
         if isinstance(group_xmlids, str):
             group_xmlids = [group_xmlids]
         if not any(self.env.user.has_group(g) for g in group_xmlids):
-            raise AccessError(_('You do not have access to this dashboard data.'))
+            raise AccessError(self.env._('You do not have access to this dashboard data.'))
 
     @api.model
     def _dashboard_get_period(self, period, date_from=None, date_to=None):
@@ -113,7 +113,7 @@ class AccountMoveDashboard(models.Model):
 
         period = params.get('period', 'this_month')
         date_from, date_to = self._dashboard_get_period(
-            period, params.get('date_from'), params.get('date_to')
+            period, params.get('date_from'), params.get('date_to'),
         )
         company_ids = self._dashboard_company_ids(params.get('company_ids'))
         prev_from, prev_to = self._dashboard_prev_period(date_from, date_to)
@@ -632,7 +632,7 @@ class AccountMoveDashboard(models.Model):
         company_ids = self._dashboard_company_ids(params.get('company_ids'))
         period = params.get('period', 'this_month')
         date_from, date_to = self._dashboard_get_period(
-            period, params.get('date_from'), params.get('date_to')
+            period, params.get('date_from'), params.get('date_to'),
         )
         limit = params.get('limit', 10)
 
@@ -668,7 +668,7 @@ class AccountMoveDashboard(models.Model):
         company_ids = self._dashboard_company_ids(params.get('company_ids'))
         period = params.get('period', 'this_month')
         date_from, date_to = self._dashboard_get_period(
-            period, params.get('date_from'), params.get('date_to')
+            period, params.get('date_from'), params.get('date_to'),
         )
 
         self.env.cr.execute("""
@@ -810,7 +810,7 @@ class AccountMoveDashboard(models.Model):
     def get_account_journal_ids(self, params):
         """ Get default journal Ids """
         return self.env["account.journal"].search([
-            ("type", "in", ["bank", "cash"])
+            ("type", "in", ["bank", "cash"]),
         ]).mapped("default_account_id").ids
 
     @api.model
@@ -835,8 +835,8 @@ class AccountMoveDashboard(models.Model):
             alerts.append({
                 'type': 'danger',
                 'icon': 'warning',
-                'title': _('%d invoices overdue by 30+ days') % cnt,
-                'subtitle': _('Total: %s %s') % (self.env.company.currency_id.symbol, f'{amt:,.2f}'),
+                'title': self.env._('%(count)d invoices overdue by 30+ days', count=cnt),
+                'subtitle': self.env._('Total: %(symbol)s %(amount)s', symbol=self.env.company.currency_id.symbol, amount=f'{amt:,.2f}'),
                 'action': 'overdue_invoices',
             })
 
@@ -851,8 +851,8 @@ class AccountMoveDashboard(models.Model):
                 alerts.append({
                     'type': 'warning',
                     'icon': 'account_balance',
-                    'title': _('%d unreconciled bank statement lines') % unrec,
-                    'subtitle': _('Pending reconciliation'),
+                    'title': self.env._('%(count)d unreconciled bank statement lines', count=unrec),
+                    'subtitle': self.env._('Pending reconciliation'),
                     'action': 'reconcile',
                 })
 
@@ -870,8 +870,8 @@ class AccountMoveDashboard(models.Model):
             alerts.append({
                 'type': 'info',
                 'icon': 'calendar_today',
-                'title': _('%d bills due today') % due_today,
-                'subtitle': _('Review and schedule payments'),
+                'title': self.env._('%(count)d bills due today', count=due_today),
+                'subtitle': self.env._('Review and schedule payments'),
                 'action': 'bills_due_today',
             })
 
@@ -887,8 +887,8 @@ class AccountMoveDashboard(models.Model):
             alerts.append({
                 'type': 'info',
                 'icon': 'description',
-                'title': _('%d draft invoices/bills') % drafts,
-                'subtitle': _('Awaiting confirmation'),
+                'title': self.env._('%(count)d draft invoices/bills', count=drafts),
+                'subtitle': self.env._('Awaiting confirmation'),
                 'action': 'draft_moves',
             })
 
@@ -958,7 +958,6 @@ class AccountMoveDashboard(models.Model):
             "date_from": date_from.isoformat() if date_from else None,
             "date_to": date_to.isoformat() if date_to else None,
         }
-
 
     # ------------------------------------------------------------------
     # P&L Trend (12 months) — Revenue, Expenses, Net Profit lines

@@ -15,7 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -23,7 +23,6 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     show_address_autofill_button = fields.Boolean(
-        string="Show Address Autofill Button",
         compute='_compute_show_address_autofill_button',
         default=True,
     )
@@ -59,7 +58,7 @@ class ResPartner(models.Model):
     def action_open_address_extractor(self):
         """Open the AI Address Extraction wizard for this contact record."""
         if not self._is_address_extraction_enabled():
-            raise UserError(_("Address extraction is disabled in settings."))
+            raise UserError(self.env._("Address extraction is disabled in settings."))
 
         partner = self[:1]
         context = {
@@ -86,7 +85,7 @@ class ResPartner(models.Model):
                 context['default_raw_address'] = ", ".join(non_empty_parts)
 
         return {
-            'name': _('Address Autofill'),
+            'name': self.env._('Address Autofill'),
             'type': 'ir.actions.act_window',
             'res_model': 'address.extraction.wizard',
             'view_mode': 'form',

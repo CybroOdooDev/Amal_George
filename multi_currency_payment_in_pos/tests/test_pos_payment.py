@@ -80,18 +80,22 @@ class TestPosPayment(TransactionCase):
         self.assertEqual(payment.payment_currency, 'GBP')
         self.assertAlmostEqual(payment.currency_amount, 42.50)
 
-    def test_load_pos_data_fields(self):
-        """Test _load_pos_data_fields execution on pos.payment."""
+    def test_load_pos_data_fields_preserves_empty_super(self):
+        """Test _load_pos_data_fields returns empty list if super() is empty to load all fields."""
         fields = self.env['pos.payment']._load_pos_data_fields(self.pos_config.id)
         self.assertIsInstance(fields, list)
         self.assertEqual(fields, [])
 
-        pos_load_mixin = next(
-            cls for cls in type(self.env['pos.payment']).__mro__
-            if cls.__name__ == 'PosLoadMixin'
-        )
-        with patch.object(pos_load_mixin, '_load_pos_data_fields', return_value=['amount']):
-            ext_fields = self.env['pos.payment']._load_pos_data_fields(self.pos_config.id)
-            self.assertIn('amount', ext_fields)
-            self.assertIn('payment_currency', ext_fields)
-            self.assertIn('currency_amount', ext_fields)
+    def test_load_pos_data_fields_with_super_fields(self):
+        """Test _load_pos_data_fields appends multicurrency fields when super() returns a field list."""
+        with patch(
+            'odoo.addons.point_of_sale.models.pos_load_mixin.PosLoadMixin._load_pos_data_fields',
+            return_value=['id', 'amount'],
+        ):
+            fields = self.env['pos.payment']._load_pos_data_fields(self.pos_config.id)
+            self.assertIsInstance(fields, list)
+            self.assertIn('payment_currency', fields)
+            self.assertIn('currency_amount', fields)
+            self.assertIn('id', fields)
+            self.assertIn('amount', fields)
+

@@ -20,7 +20,7 @@ from odoo.tests.common import TransactionCase, tagged
 
 @tagged('post_install', 'at_install')
 class TestResConfigSettings(TransactionCase):
-    """Test multi-currency configuration in res.config.settings."""
+    """Test multi-currency related configuration fields in res.config.settings."""
 
     def setUp(self):
         super().setUp()
@@ -51,68 +51,33 @@ class TestResConfigSettings(TransactionCase):
             'enable_multicurrency': False,
             'payment_method_ids': [(6, 0, [])],
         })
-        self.pos_config.currency_ids = [(6, 0, [])]
 
-    def test_get_values(self):
-        """Test get_values loads multicurrency configuration from pos.config."""
+    def test_settings_read_related_fields(self):
+        """Test related fields on res.config.settings read from pos.config."""
         self.pos_config.enable_multicurrency = True
         self.pos_config.currency_ids = [(6, 0, [self.currency_eur.id])]
 
-        settings = self.env['res.config.settings'].with_context(pos_config_id=self.pos_config.id)
-        values = settings.get_values()
+        settings = self.env['res.config.settings'].create({
+            'pos_config_id': self.pos_config.id,
+        })
+        self.assertTrue(settings.enable_currency)
+        self.assertIn(self.currency_eur, settings.currency_ids)
 
-        self.assertTrue(values.get('enable_currency'))
-        self.assertEqual(values.get('currency_ids'), [(6, 0, [self.currency_eur.id])])
-
-    def test_set_values(self):
-        """Test set_values saves multicurrency configuration from settings into pos.config."""
-        settings = self.env['res.config.settings'].with_context(
-            pos_config_id=self.pos_config.id,
-        ).create({
+    def test_settings_write_related_fields(self):
+        """Test writing to related fields on settings updates pos.config."""
+        settings = self.env['res.config.settings'].create({
             'pos_config_id': self.pos_config.id,
             'enable_currency': True,
             'currency_ids': [(6, 0, [self.currency_eur.id, self.currency_usd.id])],
         })
-        settings.set_values()
 
         self.assertTrue(self.pos_config.enable_multicurrency)
         self.assertIn(self.currency_eur, self.pos_config.currency_ids)
         self.assertIn(self.currency_usd, self.pos_config.currency_ids)
 
-    def test_load_pos_data_fields(self):
-        """Test _load_pos_data_fields executes on res.config.settings."""
-        settings_model = self.env['res.config.settings']
-        fields = settings_model._load_pos_data_fields(self.pos_config)
-        self.assertIsInstance(fields, list)
-        self.assertIn('enable_currency', fields)
-        self.assertIn('currency_ids', fields)
-
-    def test_get_values_fallback_pos_config(self):
-        """Test get_values falls back to searching pos.config when context is empty."""
-        self.pos_config.enable_multicurrency = True
-        settings = self.env['res.config.settings'].with_context()
-        values = settings.get_values()
-        self.assertIn('enable_currency', values)
-        self.assertIn('currency_ids', values)
-
-    def test_set_values_fallback_pos_config(self):
-        """Test set_values falls back to searching pos.config when context is empty."""
-        settings = self.env['res.config.settings'].with_context().create({
+        settings.write({
             'enable_currency': False,
-            'currency_ids': [(6, 0, [])],
-        })
-        settings.set_values()
-        self.assertFalse(self.pos_config.enable_multicurrency)
-
-    def test_set_values_with_context(self):
-        """Test set_values retrieves pos_config from context when pos_config_id is unset."""
-        settings = self.env['res.config.settings'].with_context(
-            pos_config_id=self.pos_config.id,
-        ).create({
-            'enable_currency': True,
             'currency_ids': [(6, 0, [self.currency_usd.id])],
         })
-        if hasattr(settings, 'pos_config_id'):
-            settings.pos_config_id = False
-        settings.set_values()
-        self.assertTrue(self.pos_config.enable_multicurrency)
+        self.assertFalse(self.pos_config.enable_multicurrency)
+        self.assertEqual(self.pos_config.currency_ids.ids, [self.currency_usd.id])

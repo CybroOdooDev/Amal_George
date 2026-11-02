@@ -21,7 +21,6 @@ from odoo import api, fields, models
 class PosConfig(models.Model):
     """Inherit pos.config to configure multi-currency support in POS."""
     _inherit = 'pos.config'
-    _description = 'Point of Sale Configuration'
 
     currency_ids = fields.Many2many(
         'res.currency',
@@ -76,11 +75,13 @@ class PosConfig(models.Model):
             return []
         if not currency.exists():
             return []
-        usd_val = round(1 / currency.rate, 2) if currency.rate else 0
+        rate_val = round(currency.rate, 4) if currency.rate else 0
         return [{
             'id': currency.id,
             'name': currency.name,
             'symbol': currency.symbol,
             'rate': currency.rate,
-            'usd_val': usd_val,
+            'usd_val': rate_val,
+            'rate_val': rate_val,
         }]
+

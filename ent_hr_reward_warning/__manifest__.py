@@ -33,7 +33,6 @@
     'website': 'https://www.openhrms.com',
     'depends': ['mail', 'hr'],
     'data': [
-        'security/ent_hr_reward_warning_groups.xml',
         'security/ir.access.csv',
         'data/ir_sequence_data.xml',
         'data/ir_cron_data.xml',

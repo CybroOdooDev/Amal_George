@@ -13,7 +13,7 @@
 |license| |odoo| |maintainer|
 
 POS Multi Currency Payment
-==================
+==========================
 This module allows the use of multiple currencies in the Point of Sale module.
 
 Key Features

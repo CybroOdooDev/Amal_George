@@ -111,3 +111,16 @@
     font-size: 18px;
 }
 
+.mc-input.mc-input-error {
+    border: 1.5px solid #dc3545;
+}
+
+.payment-currency {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 0.25rem 0.5rem;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pos-text-secondary, #6c757d);
+}
+

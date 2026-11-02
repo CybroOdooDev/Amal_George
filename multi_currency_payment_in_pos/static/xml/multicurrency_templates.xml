@@ -13,35 +13,39 @@
                     <input type="checkbox" id="multi_currency_check"
                            name="multi_currency_check"
                            class="mc-toggle"
-                           t-on-click="(ev) => this.show_options(ev)"/>
+                           t-att-checked="this.multi_currency.showOptions"
+                           t-on-change="(ev) => this.toggleMultiCurrency(ev)"/>
                 </div>
                 <!-- Main Multicurrency Panel -->
-                <div class="mc-panel" id="multicurrency_container"
-                     style="display:none">
+                <div t-if="this.multi_currency.showOptions"
+                     class="mc-panel"
+                     id="multicurrency_container">
                     <!-- Select Currency -->
                     <div class="mc-block">
                         <label class="mc-label">Select Currency</label>
                         <select class="mc-select currency_list"
-                                t-on-change="(ev) => this.compute_currency(ev)">
-                            <option value="selected disabled">
-                            </option>
+                                t-on-change="(ev) => this.onSelectCurrency(ev)">
+                            <option value="none">Select Currency...</option>
                             <t t-foreach="this.multi_currency?.currencies || []"
                                t-as="currency"
                                t-key="currency.id">
-                                <option t-att-id="currency.id">
+                                <option t-att-value="currency.id"
+                                        t-att-id="currency.id"
+                                        t-att-selected="this.multi_currency.selectedCurrencyId == currency.id">
                                     <t t-out="currency.name"/>
                                 </option>
                             </t>
                         </select>
                     </div>
                     <!-- Conversion Panel -->
-                    <div class="mc-block" id="conversion_container"
-                         style="display:none">
+                    <div t-if="this.multi_currency.showConversion"
+                         class="mc-block"
+                         id="conversion_container">
                         <label class="mc-label">Conversion</label>
                         <div class="mc-line">
-                            <span>1 USD =</span>
+                            <span>1 <t t-out="this.pos.currency.name"/> =</span>
                             <span class="mc-value usdamount">
-                                <t t-out="this.multi_currency.usd_val"/>
+                                <t t-out="this.multi_currency.rate_val || this.multi_currency.usd_val"/>
                                 <t t-out="this.multi_currency.name"/>
                             </span>
                         </div>
@@ -54,12 +58,18 @@
                         </div>
                         <!-- Input Amount -->
                         <div class="mc-input-block">
-                            <label class="mc-label">Pay Amount In</label>
-                            <input type="number" id="multicurrency_input"
-                                   class="mc-input multicurrency_input"/>
+                            <label class="mc-label">Foreign Amount</label>
+                            <input type="number"
+                                   step="any"
+                                   id="multicurrency_input"
+                                   class="mc-input multicurrency_input"
+                                   t-att-class="{'mc-input-error': this.multi_currency.hasInputError}"
+                                   t-att-value="this.multi_currency.inputAmount"
+                                   t-on-input="(ev) => this.multi_currency.inputAmount = ev.target.value"
+                                   t-on-change="(ev) => this.multi_currency.inputAmount = ev.target.value"/>
                         </div>
                         <button class="button mc-addpayment"
-                                t-on-click="(ev) => this.multi_currency_payment_line(this.payment_methods_from_config[0])">
+                                t-on-click="() => this.multi_currency_payment_line()">
                             <i class="oi oi-filled me-1" data-icon="payments" role="img" aria-hidden="true"/>
                             Add Cash Payment
                         </button>
@@ -73,8 +83,7 @@
        t-inherit="point_of_sale.PaymentScreenPaymentLines"
        t-inherit-mode="extension">
         <xpath expr="//span[hasclass('payment-name')]" position="after">
-            <div class="payment-currency"
-                 style="margin-left: 10px;margin-right: 10px;padding: 1rem;">
+            <div class="payment-currency">
                 <t t-if="line.converted_currency">
                     (<t t-out="line.converted_currency.amount"/>
                     <t t-out="line.converted_currency.symbol"/>)

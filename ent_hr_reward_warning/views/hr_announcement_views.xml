@@ -32,7 +32,7 @@
                         <div>
                             <label for="is_announcement"
                                    class="oe_inline"
-                                   string="General Announcement "/>
+                                   string="General Announcement"/>
                             <field name="is_announcement"
                                    class="oe_inline oe_input_align"
                                    readonly="name != 'New'"/>
@@ -112,7 +112,7 @@
                 <filter name="general_announcements"
                         string="General Announcements"
                         domain="[('is_announcement', '=', True)]"/>
-                <filter string="Status" name="Status" domain="[]"
+                <filter string="Status" name="status" domain="[]"
                         context="{'group_by':'state'}"/>
             </search>
         </field>
@@ -125,7 +125,7 @@
         <field name="search_view_id" ref="hr_announcement_view_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Click to Create a New Record.
+                Click to create a new record.
             </p>
         </field>
     </record>

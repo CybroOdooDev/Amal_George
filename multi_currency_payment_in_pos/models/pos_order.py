@@ -21,7 +21,6 @@ from odoo import models
 class PosOrder(models.Model):
     """Inherit pos.order to include multicurrency payment data in receipt."""
     _inherit = 'pos.order'
-    _description = 'Point of Sale Order'
 
     def _order_receipt_generate_payment_data(self):
         """Include multi-currency payment data in order receipt payment lines.

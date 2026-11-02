@@ -15,7 +15,7 @@
 Enterprise OpenHRMS Official Announcements
 ==========================================
 
-This module helps you to manage hr official announcements.
+This module helps you to manage HR official announcements.
 
 Key Features
 ------------

@@ -18,5 +18,5 @@
 from . import test_pos_config
 from . import test_pos_order
 from . import test_pos_payment
-from . import test_pos_session
+from . import test_pos_tour
 from . import test_res_config_settings

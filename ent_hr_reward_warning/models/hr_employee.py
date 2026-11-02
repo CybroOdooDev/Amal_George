@@ -35,7 +35,7 @@ class HrEmployee(models.Model):
     def _get_announcement_domain(self, now_date):
         """Returns domain to fetch all relevant announcements for the employee."""
         return [
-            ('state', 'in', ('approved', 'done')),
+            ('state', '=', 'approved'),
             ('date_start', '<=', now_date),
             '|', '|', '|',
             ('is_announcement', '=', True),

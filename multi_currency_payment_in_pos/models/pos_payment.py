@@ -21,7 +21,6 @@ from odoo import api, fields, models
 class PosPayment(models.Model):
     """Inherit pos.payment to store foreign currency details."""
     _inherit = 'pos.payment'
-    _description = 'Point of Sale Payment'
 
     payment_currency = fields.Char(
         copy=False,
@@ -42,6 +41,9 @@ class PosPayment(models.Model):
         :rtype: list[str]
         """
         params = super()._load_pos_data_fields(config_id)
-        if params:
-            params.extend(['payment_currency', 'currency_amount'])
-        return params
+        if not params:
+            return params
+        params = list(params)
+        params.extend(['payment_currency', 'currency_amount'])
+        return list(dict.fromkeys(params))
+

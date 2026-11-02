@@ -33,11 +33,25 @@ class TestPosConfig(TransactionCase):
             self.currency_eur = self.currency_model.create({
                 'name': 'EUR',
                 'symbol': '€',
-                'rate': 1.1,
                 'active': True,
             })
         else:
-            self.currency_eur.write({'active': True, 'rate': 1.1})
+            self.currency_eur.write({'active': True})
+
+        rate_eur = self.env['res.currency.rate'].search([
+            ('currency_id', '=', self.currency_eur.id),
+            ('company_id', '=', self.env.company.id),
+        ], limit=1)
+        if rate_eur:
+            rate_eur.write({'rate': 1.1})
+        else:
+            self.env['res.currency.rate'].create({
+                'currency_id': self.currency_eur.id,
+                'rate': 1.1,
+                'company_id': self.env.company.id,
+            })
+        self.currency_eur.invalidate_recordset(['rate'])
+
 
         self.currency_usd = self.env.ref('base.USD', raise_if_not_found=False)
         if not self.currency_usd:
@@ -105,8 +119,10 @@ class TestPosConfig(TransactionCase):
         self.assertEqual(info['name'], self.currency_eur.name)
         self.assertEqual(info['symbol'], self.currency_eur.symbol)
         self.assertEqual(info['rate'], self.currency_eur.rate)
-        expected_usd_val = round(1 / self.currency_eur.rate, 2)
-        self.assertEqual(info['usd_val'], expected_usd_val)
+        expected_rate_val = round(self.currency_eur.rate, 4)
+        self.assertEqual(info['usd_val'], expected_rate_val)
+        self.assertEqual(info['rate_val'], expected_rate_val)
+
 
     def test_get_selected_currency_invalid_id(self):
         """Test get_selected_currency gracefully returns empty list on invalid or

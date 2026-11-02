@@ -30,7 +30,7 @@ class HrAnnouncement(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(
-        string='Code No:',
+        string='Code No',
         default='New',
         copy=False,
         readonly=True,
@@ -62,7 +62,7 @@ class HrAnnouncement(models.Model):
         comodel_name='ir.attachment',
         relation='doc_warning_rel',
         column1='doc_id',
-        column2='attach_id4',
+        column2='attach_id',
         help="You can attach a copy of your letter",
     )
     company_id = fields.Many2one(
@@ -72,7 +72,7 @@ class HrAnnouncement(models.Model):
         help="Login user Company",
     )
     is_announcement = fields.Boolean(
-        string='Is general Announcement?',
+        string='Is General Announcement?',
         help="To set Announcement as general announcement",
     )
     announcement_type = fields.Selection(

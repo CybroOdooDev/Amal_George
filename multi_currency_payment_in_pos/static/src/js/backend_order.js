@@ -24,27 +24,13 @@ patch(PosPayment.prototype, {
             if (vals.currency_amount) {
                 this.currency_amount = vals.currency_amount;
             }
+            if (vals.payment_currency && vals.currency_amount && !this.converted_currency) {
+                this.converted_currency = {
+                    name: vals.payment_currency,
+                    amount: vals.currency_amount,
+                };
+            }
         }
-    },
-
-    /**
-     * Include converted foreign currency details in printed receipt data.
-     *
-     * @override
-     * @param {string} baseUrl - Base URL.
-     * @param {Object} headerData - Header data.
-     * @returns {Object}
-     */
-    export_for_printing(baseUrl, headerData) {
-        const result = super.export_for_printing ? super.export_for_printing(...arguments) : {};
-        if (this.converted_currency) {
-            result.converted_currency_amount = this.converted_currency.amount;
-            result.converted_currency_name = this.converted_currency.name;
-            result.converted_currency_symbol = this.converted_currency.symbol;
-            this.currency_amount = this.converted_currency.amount;
-            this.payment_currency = this.converted_currency.name;
-        }
-        return result;
     },
 });
 

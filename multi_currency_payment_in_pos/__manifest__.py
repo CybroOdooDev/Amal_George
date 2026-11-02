@@ -30,7 +30,7 @@ in the chosen currency while updating the order totals accurately.
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['point_of_sale', 'account'],
+    'depends': ['point_of_sale'],
     'data': [
         'views/res_config_settings_views.xml',
         'views/pos_order_receipt.xml',
@@ -38,10 +38,15 @@ in the chosen currency while updating the order totals accurately.
     'assets': {
         'point_of_sale._assets_pos': [
             'multi_currency_payment_in_pos/static/xml/multicurrency_templates.xml',
-            'multi_currency_payment_in_pos/static/src/js/pos_models.js',
             'multi_currency_payment_in_pos/static/src/js/pos_multicurrency.js',
             'multi_currency_payment_in_pos/static/src/js/backend_order.js',
             'multi_currency_payment_in_pos/static/src/scss/multicurrency.scss',
+        ],
+        'point_of_sale.assets_debug': [
+            'multi_currency_payment_in_pos/static/tests/tours/pos_multicurrency_tour.js',
+        ],
+        'web.assets_tests': [
+            'multi_currency_payment_in_pos/static/tests/tours/pos_multicurrency_tour.js',
         ],
     },
     'images': ['static/description/banner.jpg'],

@@ -15,14 +15,13 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import fields, models, _
 
 
 class Uom(models.Model):
     """Class inheriting uom model for listing out the products in their
     corresponding unit of measure."""
     _inherit = 'uom.uom'
-    _description = 'Product Unit Of Measure'
 
     products_uom = fields.Integer(compute='_compute_products_uom',
                                   string="Products",
@@ -30,9 +29,10 @@ class Uom(models.Model):
 
     def action_view_products(self):
         """Smart tab for viewing products with corresponding UOM"""
+        self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Products',
+            'name': _('Products'),
             'view_mode': 'kanban,form',
             'res_model': 'product.template',
             'domain': [('uom_id', '=', self.id)],

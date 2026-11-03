@@ -16,10 +16,10 @@
 #
 #############################################################################
 {
-    'name': 'Uom Product List',
+    'name': 'UOM Product List',
     'version': '20.0.1.0.0',
     'category': 'Sales',
-    'summary': 'Uom Product List for listing out the products in its '
+    'summary': 'UOM Product List for listing out the products in its '
                'unit of measure',
     'description': 'A UOM Product List is a comprehensive record that '
                    'displays a list of products with their '
@@ -28,13 +28,10 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['sale_management'],
+    'depends': ['product'],
     'data': [
         'views/uom_uom_views.xml',
     ],
     'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',
-    'installable': True,
-    'auto_install': False,
-    'application': False,
 }

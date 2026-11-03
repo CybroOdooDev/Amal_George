@@ -95,6 +95,10 @@ class TestUomProductList(TransactionCase):
         self.assertEqual(action.get('domain'), [('uom_id', '=', self.uom_primary.id)])
         self.assertEqual(action.get('context'), "{'create': False}")
 
+        # Verify ensure_one() enforcement on multi-record recordset
+        with self.assertRaises(ValueError):
+            (self.uom_primary | self.uom_secondary).action_view_products()
+
     def test_05_product_uom_change_updates_counts(self):
         """Verify updating a product's UOM updates the products_uom count on both UOMs."""
         product = self.product_model.create({

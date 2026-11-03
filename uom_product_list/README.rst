@@ -12,17 +12,17 @@
 
 |license| |odoo| |maintainer|
 
-Uom Product List
+UOM Product List
 ================
 
-This module will help you to view products from it's unit of measure.
+This module will help you to view products from its unit of measure.
 
 Key Features
 ------------
 
 *  Products in UOM
 *  View products using a selected Unit of Measure.
-*  UoM-based filtering makes product navigation easier.
+*  UOM-based filtering makes product navigation easier.
 
 Installation
 ------------
@@ -47,7 +47,7 @@ Contacts
 * Website : https://cybrosys.com
 
 Maintainer
-==========
+----------
 .. image:: https://cybrosys.com/images/logo.png
    :target: https://cybrosys.com
 

@@ -4,4 +4,4 @@
 #### Version 20.0.1.0.0
 #### ADD 
 
-- Initial Commit for Uom Product List.
+- Initial Commit for UOM Product List.

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+<!--    renders the voice assistant UI component for displaying
+        conversation and optional order summary -->
+    <t t-name="ora_ai_base.voice_data" owl="1">
+    <div class="container">
+        <div class="row">
+            <div class="drive_th_wrapper" t-att-class="{'is_test_mode': this.props.isTestMode}">
+                <!-- The Conversation Section starts here -->
+                <div class="drive_th_chat_left">
+                    <t t-if="this.props.isTestMode">
+                        <div class="alert alert-info d-flex align-items-center gap-3 p-3 mb-3 rounded-3 shadow-sm border-0 bg-info-subtle text-info-emphasis">
+                            <i class="oi fs-3 text-info" data-icon="verified_user"/>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold fs-6">Voice Configuration Test Mode</div>
+                                <div class="small opacity-75">
+                                    Speak to verify voice responses, language recognition, and AI accuracy. No customer or order records will be created in this mode.
+                                </div>
+                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                    <span t-if="this.props.configInfo?.language" class="badge bg-primary rounded-pill px-3 py-1">
+                                        Language: <t t-out="this.props.configInfo.language"/>
+                                    </span>
+                                    <span t-if="this.props.configInfo?.provider" class="badge bg-secondary rounded-pill px-3 py-1">
+                                        Provider: <t t-out="this.props.configInfo.provider"/>
+                                    </span>
+                                    <span t-if="this.props.configInfo?.model" class="badge bg-dark rounded-pill px-3 py-1">
+                                        Model: <t t-out="this.props.configInfo.model"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <h4>Conversation</h4>
+                    <t t-if="!this.state.conversation or this.state.conversation.length == 0">
+                        <div class="text-center text-muted py-5">
+                            <i class="oi fs-1 mb-2 d-block text-secondary opacity-50" data-icon="forum"/>
+                            <span>Start speaking with the assistant to see the conversation here...</span>
+                        </div>
+                    </t>
+                    <t t-foreach="this.state.conversation" t-as="message" t-key="message_index">
+                        <t t-if="message.role == 'user'">
+                            <div class="drive_th_chat_head">
+                                <div class="icon d-flex align-items-center justify-content-center">
+                                    <i class="oi text-secondary" data-icon="person"/>
+                                </div>
+                                <div class="drive_th_chat_que">
+                                   <t t-out="message.content"/>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-if="message.role == 'assistant'">
+                            <div class="drive_th_chat_answer">
+                                <div class="icon2 d-flex align-items-center justify-content-center">
+                                    <i class="oi text-white" data-icon="smart_toy"/>
+                                </div>
+                                <div class="drive_th_chat_exp">
+                                   <t t-out="message.content"/>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+                <!-- Order section is hidden in Test Mode -->
+                <t t-if="!this.props.isTestMode">
+                    <div class="drive_th_order">
+                        <h4>Order</h4>
+                        <t t-if="this.state.customer">
+                            <div class="customer">
+                                <div class="customer_img d-flex align-items-center justify-content-center">
+                                    <i class="oi fs-2 text-primary" data-icon="account_circle"/>
+                                </div>
+                                <div class="customer_name">
+                                    <t t-out="this.state.customer"/>
+                                </div>
+                            </div>
+                        </t>
+                        <div class="dr_th_table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Variant</th>
+                                        <th>Quantity</th>
+                                        <th>ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="!this.state.products or this.state.products.length == 0">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-3">
+                                                No order items placed yet.
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-foreach="this.state.products" t-as="product" t-key="product.product_id">
+                                        <tr>
+                                            <td><t t-out="product.product"/></td>
+                                            <td><t t-out="product.variant || '-'"/></td>
+                                            <td><t t-out="product.quantity"/></td>
+                                            <td><t t-out="product.product_id"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </div>
+    </t>
+</templates>

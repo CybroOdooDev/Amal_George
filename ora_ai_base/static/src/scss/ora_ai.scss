@@ -1,0 +1,90 @@
+/* Test assistant button css */
+.message_container_div {
+    background-color: #fff;
+    color: #333;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s;
+    margin-inline: 50px;
+    margin-top: 20px;
+}
+.message_container_div:hover {
+    transform: scale(1.05);
+}
+
+/* VAPI floating phone button must only appear inside the Voice Assistant client action */
+#vapi-support-btn,
+.vapi-btn {
+    display: none !important;
+}
+
+body:has(.message_container_div) #vapi-support-btn,
+body:has(.message_container_div) .vapi-btn,
+body:has(.drive_th_wrapper) #vapi-support-btn,
+body:has(.drive_th_wrapper) .vapi-btn {
+    display: flex !important;
+}
+
+
+/* Systray Dropdown Menu */
+.o_voice_assistant_dropdown {
+    min-width: 280px;
+    max-width: 340px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+    .dropdown-item {
+        transition: background-color 0.15s ease;
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+}
+
+/* Modal Popup Dialog overrides for Voice Assistant */
+.modal-dialog:has(.drive_th_wrapper) {
+    max-width: 1200px;
+    width: 90vw;
+
+    .modal-body {
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 0;
+    }
+
+    .drive_th_wrapper {
+        height: auto;
+        min-height: 480px;
+        padding: 15px;
+    }
+
+    .message_container_div {
+        margin-inline: 20px;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        height: 70px;
+        font-size: 16px;
+    }
+}
+
+
+/* Test Mode single-column layout */
+.drive_th_wrapper.is_test_mode {
+    grid-template-columns: 1fr !important;
+    max-width: 850px;
+    margin: 0 auto;
+
+    .drive_th_chat_left {
+        width: 100%;
+        max-height: 550px;
+    }
+}

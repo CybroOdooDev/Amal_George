@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--This record customizes the general settings form -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.ora.ai.base</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="10"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Voice Assistant" data-string="Voice Assistant" name="ora_ai_base" logo="/ora_ai_base/static/description/icon.png">
+                    <block title="API Keys" name="api_keys_setting_container">
+                        <setting id="vapi_api_keys">
+                            <group>
+                                <field name="vapi_private_api_key" password="True"/>
+                                <field name="vapi_public_api_key" password="True"/>
+                            </group>
+                            <div class="mt8">
+                                <button name="action_open_vapi" type="object" class="btn-link">
+                                    <i class="oi" data-icon="info"/> Open Vapi
+                                </button>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Order &amp; Security Settings" name="order_security_setting_container">
+                        <setting id="voice_order_confirmation_setting" help="When enabled, voice orders will be automatically confirmed into Sale Orders. Otherwise they remain as Quotations.">
+                            <field name="voice_order_auto_confirm"/>
+                        </setting>
+                        <setting id="vapi_webhook_secret_setting" help="Provide a secret token to verify that incoming webhook callbacks originate from Vapi.">
+                            <field name="vapi_webhook_secret" password="True"/>
+                        </setting>
+                        <setting id="vapi_webhook_base_url_setting" help="Public HTTPS URL for Vapi webhooks (e.g. ngrok domain). Overrides web.base.url if specified.">
+                            <field name="vapi_webhook_base_url" placeholder="https://coke-feminist-scraggly.ngrok-free.dev"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <!--Open the settings form with focus on the vapi_management -->
+    <record id="res_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form"/>
+        <field name="view_mode">form</field>
+        <field name="context">{'module' : 'ora_ai_base'}</field>
+    </record>
+</odoo>

@@ -10,6 +10,10 @@
                       name="Settings"
                       sequence="10"
                       action="res_config_settings_action"/>
+            <menuitem id="menu_vapi_language"
+                      name="Languages"
+                      sequence="20"
+                      action="ora_language_action"/>
         </menuitem>
     </menuitem>
 </odoo>

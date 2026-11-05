@@ -9,6 +9,7 @@
                 <field name="name"/>
                 <field name="assistant_id"/>
                 <field name="partner_id"/>
+                <field name="user_id"/>
                 <field name="call_type"/>
                 <field name="duration" widget="integer"/>
                 <field name="status" widget="badge" decoration-success="status == 'completed'" decoration-warning="status == 'started'" decoration-danger="status == 'failed'"/>
@@ -37,6 +38,7 @@
                         <group>
                             <field name="assistant_id" readonly="1"/>
                             <field name="partner_id" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
                             <field name="call_type" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                         </group>

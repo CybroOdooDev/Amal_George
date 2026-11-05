@@ -35,14 +35,6 @@ class ResConfigSettings(models.TransientModel):
         string="Auto-Confirm Voice Orders",
         config_parameter='ora_ai_base.voice_order_auto_confirm',
         help="If checked, voice orders will be automatically confirmed. If unchecked, they will remain as draft Quotations.")
-    vapi_webhook_secret = fields.Char(
-        string="Webhook Secret Token",
-        config_parameter='ora_ai_base.vapi_webhook_secret',
-        help="Optional secret token to authenticate incoming Vapi webhook requests.")
-    vapi_webhook_base_url = fields.Char(
-        string="Public Webhook Base URL",
-        config_parameter='ora_ai_base.vapi_webhook_base_url',
-        help="Public HTTPS URL where Vapi can reach this Odoo server (e.g., https://your-ngrok.ngrok-free.dev). Leave blank to use system web.base.url.")
 
     def action_open_vapi(self):
         """Open the Vapi dashboard in a new browser tab."""

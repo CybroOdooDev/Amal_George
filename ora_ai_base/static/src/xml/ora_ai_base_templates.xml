@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
-<!--    Defines the user interface for the Voice Assistant. -->
+    <!-- Futuristic Glassmorphic Voice Assistant Client Action Template -->
     <t t-name="ora_ai_base.voice_assistant" owl="1">
-        <div class="message_container_div" t-on-click="this.start_vapi"> <b> <t t-out="this.state.msg"/> </b></div>
-        <div class="vapi_content_container">
-            <VoiceData isTestMode="this.isTestMode" configInfo="this.configInfo"/>
+        <div class="ora_voice_assistant_root">
+            <VoiceData 
+                isTestMode="this.isTestMode" 
+                configInfo="this.configInfo" 
+                assistantName="this.state.assistant_name"
+                onToggleCall="() => this.toggle_call()"
+            />
         </div>
     </t>
 </templates>

@@ -1,120 +1,56 @@
-# Ora-Ai Base for Odoo 20
+.. |license| image:: https://img.shields.io/badge/license-LGPL--3-blue.svg
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
 
-[![Odoo](https://img.shields.io/badge/Odoo-%23A24689.svg?style=for-the-badge&logo=Odoo&logoColor=white)](https://www.odoo.com)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+.. |odoo| image:: https://img.shields.io/badge/Odoo-20.0-875A7B.svg
+    :target: https://www.odoo.com
+    :alt: Odoo 20.0
 
-## Overview
+.. |maintainer| image:: https://img.shields.io/badge/maintainer-Cybrosys-875A7B.svg
+    :target: https://cybrosys.com
+    :alt: Maintainer: Cybrosys Techno Solutions
 
-This module facilitates order placement via ora AI voice assistance,
-seamlessly integrating with the sale order system to enhance customer service and streamline operations.
+|license| |odoo| |maintainer|
 
-## Features
+Your Module Name
+================
 
-- ⏱️**Reducing Order Time.**
-- 🎙️**Replacing Employees with Voice Assistance.**
-- 🕒**24/7 Availability.**
-- 🛒**Automated Sale Order Creation.**
-- 🌐**Starts in English, then auto-detects and switches
-  to your default language set in the voice assistant.**
-- 🧅**Addon Product Options and Variants.**
-- 📢**Promotional Content Integration.**
+Modules's Detailed Description
 
-## Screenshots
+Key Features
+------------
 
-Here are some glimpses of ORA AI:
+* List the detailed features one by one
 
-### VAPI AI Interface
+Installation
+------------
+List out if any external dependencies are required for the module to work. If not, write "No external dependencies."
 
-<div>
-  <tr>
-    <td align="center">
-      <img src="static/description/assets/screenshots/aa.png" alt="Feature 1" width="500" style="border: none;"/>
-    </td>
-  </tr>
-</div>
-
-### ORA AI Base Interface
-
-<div>
-  <tr>
-    <td align="center">
-      <img src="static/description/assets/screenshots/ora_1.png" alt="Feature 1" width="500" style="border: none;border-radius: 5px;"/>
-    </td>
-  </tr>
-</div>
-
-### Configure the Assistants.
-<div>
-  <tr>
-    <td align="center">
-      <img src="static/description/assets/screenshots/ora_7.png" alt="Feature 1" width="500" style="border: none;border-radius: 5px;"/>
-    </td>
-  </tr>
-</div>
-
-### Run tests for the assistants.
-<div>
-  <tr>
-    <td align="center">
-      <img src="static/description/assets/screenshots/ora_8.png" alt="Feature 1" width="500" style="border: none;border-radius: 5px;"/>
-    </td>
-  </tr>
-</div>
-
-## Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- An active Odoo Community/Enterprise Edition instance (local or hosted)
-
-## Configuration
-
-- Once installed, users will be able to add the API details for VAPI AI.
-  Company
-
-## Contributing
-
-We welcome contributions! To get started:
-
-1. Fork the repository.
-
-2. Create a new branch:
-   ```  
-   git checkout -b feature/your-feature-name  
-   ```  
-3. Make changes and commit:
-   ```  
-   git commit -m "Add your message here"  
-   ```  
-4. Push your changes:
-   ```  
-   git push origin feature/your-feature-name  
-   ```  
-5. Create a Pull Request on GitHub.
-
----
-
-- Submit a pull request with a clear description of your changes.
-
-## License
-
-This project is licensed under the AGPL-3. Feel free to use, modify, and distribute it as needed.
+Configuration
+-------------
+No additional configuration is required.
+/ Mention if any additional configurations are needed, or remove this line
 
 Company
 -------
-* `Cybrosys Techno Solutions <https://cybrosys.com/>`
+* `Cybrosys Techno Solutions <https://cybrosys.com/>`__
 
-## Contact
+License
+-------
+Lesser General Public License, Version 3 (LGPL v3).
+(http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 
+Contacts
+--------
 * Mail Contact : odoo@cybrosys.com
 * Website : https://cybrosys.com
 
-
 Maintainer
 ==========
-![Cybrosys Logo](https://www.cybrosys.com/images/logo.png)
-https://cybrosys.com
+.. image:: https://cybrosys.com/images/logo.png
+   :target: https://cybrosys.com
 
 
 This module is maintained by Cybrosys Technologies.
-For support and more information, please visit https://www.cybrosys.com
+
+For support and more information, please visit `Our Website <https://cybrosys.com/>`__

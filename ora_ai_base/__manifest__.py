@@ -27,7 +27,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': "https://www.cybrosys.com",
-    'depends': ['mail', 'website_sale'],
+    'depends': ['sale_management', 'mail'],
     'data': [
         'security/voice_assistant_security.xml',
         'security/ir.access.csv',
@@ -38,6 +38,7 @@
         'views/ora_ai_views.xml',
         'views/ora_file_view.xml',
         'views/ora_call_history_views.xml',
+        'views/ora_language_views.xml',
         'wizard/res_config_settings_views.xml',
         'views/vapi_menus.xml',
     ],

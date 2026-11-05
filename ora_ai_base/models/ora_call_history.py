@@ -25,29 +25,106 @@ class OraCallHistory(models.Model):
     _order = "create_date desc"
     _rec_name = "name"
 
-    name = fields.Char(string="Reference", default=lambda self: self.env['ir.sequence'].next_by_code('ora.call.history') or 'Call')
-    vapi_call_id = fields.Char(string="Vapi Call ID", index=True, copy=False, help="Unique identifier of the call assigned by Vapi.")
-    assistant_id = fields.Many2one("ora.ai", string="Assistant", ondelete="set null")
-    partner_id = fields.Many2one("res.partner", string="Customer", ondelete="set null")
-    order_id = fields.Many2one("sale.order", string="Generated Sale Order", ondelete="set null")
+    name = fields.Char(
+        string="Reference",
+        default=lambda self: self.env['ir.sequence'].next_by_code('ora.call.history') or 'Call',
+        readonly=True,
+        help="Sequential reference number for this call log."
+    )
+    vapi_call_id = fields.Char(
+        string="Vapi Call ID",
+        index=True,
+        copy=False,
+        readonly=True,
+        help="Unique identifier of the call assigned by Vapi."
+    )
+    assistant_id = fields.Many2one(
+        "ora.ai",
+        string="Assistant",
+        ondelete="set null",
+        readonly=True,
+        help="The AI voice assistant configuration used for this call session."
+    )
+    partner_id = fields.Many2one(
+        "res.partner",
+        string="Customer",
+        ondelete="set null",
+        readonly=True,
+        help="The customer or contact associated with this call."
+    )
+    user_id = fields.Many2one(
+        "res.users",
+        string="Salesperson",
+        ondelete="set null",
+        readonly=True,
+        help="The salesperson who initiated or was assigned to this voice call."
+    )
+    order_id = fields.Many2one(
+        "sale.order",
+        string="Generated Sale Order",
+        ondelete="set null",
+        readonly=True,
+        help="The sales order created during this voice assistant session."
+    )
     call_type = fields.Selection([
         ('inboundPhoneCall', 'Inbound Phone'),
         ('webCall', 'Web Call'),
         ('outboundPhoneCall', 'Outbound Phone'),
-    ], string="Call Type", default='webCall')
-    start_time = fields.Datetime(string="Start Time")
-    end_time = fields.Datetime(string="End Time")
-    duration = fields.Integer(string="Duration (seconds)", default=0)
+    ], string="Call Type", default='webCall', readonly=True,
+       help="Type of the call (e.g., Web Call, Inbound Phone, Outbound Phone).")
+    start_time = fields.Datetime(
+        string="Start Time",
+        readonly=True,
+        help="Timestamp when the voice call started."
+    )
+    end_time = fields.Datetime(
+        string="End Time",
+        readonly=True,
+        help="Timestamp when the voice call ended."
+    )
+    duration = fields.Integer(
+        string="Duration (seconds)",
+        default=0,
+        readonly=True,
+        help="Total duration of the voice call in seconds."
+    )
     status = fields.Selection([
         ('started', 'Started'),
         ('completed', 'Completed'),
         ('failed', 'Failed'),
-    ], string="Call Status", default='started')
-    transcript = fields.Text(string="Full Transcript")
-    recording_url = fields.Char(string="Recording URL")
-    cost = fields.Float(string="Call Cost", digits=(16, 4), default=0.0)
-    company_id = fields.Many2one("res.company", string="Company", default=lambda self: self.env.company)
-    currency_id = fields.Many2one("res.currency", string="Currency", related="company_id.currency_id", readonly=True)
+    ], string="Call Status", default='started', readonly=True,
+       help="Current execution status of the call (Started, Completed, or Failed).")
+    transcript = fields.Text(
+        string="Full Transcript",
+        readonly=True,
+        help="Full dialogue transcript recorded between the user and AI assistant."
+    )
+    recording_url = fields.Char(
+        string="Recording URL",
+        readonly=True,
+        help="External URL where the recorded audio of this call can be accessed."
+    )
+    cost = fields.Float(
+        string="Call Cost",
+        digits=(16, 4),
+        default=0.0,
+        readonly=True,
+        help="Calculated external provider cost for processing this call."
+    )
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+        default=lambda self: self.env.company,
+        readonly=True,
+        help="Company context under which this call took place."
+    )
+    currency_id = fields.Many2one(
+        "res.currency",
+        string="Currency",
+        related="company_id.currency_id",
+        readonly=True,
+        help="Currency used for reporting the call cost."
+    )
 
     _uniq_vapi_call_id = models.Constraint('UNIQUE(vapi_call_id)', 'A call record with this Vapi Call ID already exists!')
 
@@ -81,18 +158,40 @@ class OraCallHistory(models.Model):
 
         # Calculate duration or costs
         duration = 0
-        costs = message.get('cost') or call.get('cost') or 0.0
-        recording_url = message.get('recordingUrl') or call.get('recordingUrl') or False
+        raw_duration = (
+            message.get('durationSeconds') or
+            call.get('durationSeconds') or
+            data.get('durationSeconds') or
+            message.get('duration') or
+            call.get('duration') or
+            data.get('duration')
+        )
+        if raw_duration:
+            try:
+                duration = int(round(float(raw_duration)))
+            except (ValueError, TypeError):
+                duration = 0
 
-        if call.get('startedAt') and call.get('endedAt'):
-            # In Vapi ISO strings
+        if not duration and (message.get('durationMs') or call.get('durationMs') or data.get('durationMs')):
+            try:
+                ms = message.get('durationMs') or call.get('durationMs') or data.get('durationMs')
+                duration = int(round(float(ms) / 1000.0))
+            except (ValueError, TypeError):
+                duration = 0
+
+        started_at = message.get('startedAt') or call.get('startedAt') or data.get('startedAt')
+        ended_at = message.get('endedAt') or call.get('endedAt') or data.get('endedAt')
+        if not duration and started_at and ended_at:
             try:
                 import dateutil.parser
-                s_dt = dateutil.parser.isoparse(call['startedAt'])
-                e_dt = dateutil.parser.isoparse(call['endedAt'])
-                duration = int((e_dt - s_dt).total_seconds())
+                s_dt = dateutil.parser.isoparse(started_at)
+                e_dt = dateutil.parser.isoparse(ended_at)
+                duration = int(round((e_dt - s_dt).total_seconds()))
             except Exception:
-                duration = int(call.get('duration') or 0)
+                duration = 0
+
+        costs = message.get('cost') or call.get('cost') or data.get('cost') or 0.0
+        recording_url = message.get('recordingUrl') or call.get('recordingUrl') or data.get('recordingUrl') or False
 
         vals = {
             'call_type': call_type,
@@ -101,6 +200,24 @@ class OraCallHistory(models.Model):
         }
         if assistant:
             vals['assistant_id'] = assistant.id
+
+        # Resolve salesperson
+        assistant_overrides = call.get('assistantOverrides') or {}
+        var_values = assistant_overrides.get('variableValues') or call.get('variableValues') or {}
+        metadata = call.get('metadata') or data.get('metadata') or {}
+        salesperson_id = (
+            var_values.get('salesperson_id') or
+            var_values.get('user_id') or
+            metadata.get('salesperson_id') or
+            metadata.get('user_id')
+        )
+        if salesperson_id:
+            try:
+                u = self.env['res.users'].sudo().browse(int(salesperson_id))
+                if u.exists():
+                    vals['user_id'] = u.id
+            except (ValueError, TypeError):
+                pass
         if raw_transcript:
             vals['transcript'] = raw_transcript
         if recording_url:

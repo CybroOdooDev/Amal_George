@@ -60,8 +60,8 @@ class OraAi(models.Model):
                                                 "external API.")
     first_message = fields.Text(string="First Message",
                                 compute="_compute_first_message",
-                                help="The first message that the assistant"
-                                     " will say.", )
+                                readonly=True,
+                                help="The default initial greeting spoken by the assistant when the voice session starts.")
     provider = fields.Selection(string="Provider", selection=PROVIDER,
                                 default="openai", required=True,
                                 help="Select the LLM provider for generating"
@@ -75,6 +75,7 @@ class OraAi(models.Model):
                                              "offered by the chosen provider.")
     provider_model_ids = fields.Many2many('provider.model',
                                           compute='_compute_provider_models',
+                                          readonly=True,
                                           help="Filtered list of models "
                                                "available based on the "
                                                "selected provider.")
@@ -93,6 +94,7 @@ class OraAi(models.Model):
                                                 "conversation context.")
     transcriber_model_ids = fields.Many2many('transcriber.model',
                                              compute='_compute_transcriber_models',
+                                             readonly=True,
                                              help="List of available "
                                                   "transcription models "
                                                   "filtered  by selected "
@@ -112,9 +114,12 @@ class OraAi(models.Model):
                                          "the  session.")
     state = fields.Selection(selection=STATE, tracking=True,
                              default="draft", copy=False,
-                             help="Current status of the assistant"
-                                  " configuration")
+                             readonly=True,
+                             help="Current lifecycle status of the assistant"
+                                  " configuration.")
     date = fields.Date(string="Date",
+                       default=fields.Date.today,
+                       readonly=True,
                        help="Date when the assistant was created or"
                             " activated.")
     prompt = fields.Text(string="Contents",
@@ -136,10 +141,12 @@ class OraAi(models.Model):
                                      " domains.")
     function_description = fields.Char(string="Function",
                                        compute="_compute_function_description",
-                                       help="Generated JSON-based function")
+                                       readonly=True,
+                                       help="Compact JSON representation of product catalog mappings used by LLM function calls.")
     language_function_description = fields.Char(
         string="language function description",
         compute="_compute_language_function_description",
+        readonly=True,
         help="Generated function spec for language preference "
              "handling used by the assistant.")
 
@@ -225,6 +232,7 @@ class OraAi(models.Model):
             else:
                 rec.language_function_description = ""
 
+    @api.depends('company_id', 'file_ids', 'file_ids.name', 'file_ids.state', 'file_ids.id_file', 'is_lang_switch', 'language_ids', 'language_id')
     def _compute_prompt(self):
         """Computes a detailed prompt for the voice assistant based on
          the current product catalog and availability."""
@@ -232,22 +240,48 @@ class OraAi(models.Model):
             company_name = rec.company_id.name or self.env.company.name or 'Our Store'
             currency_symbol = rec.company_id.currency_id.symbol or self.env.company.currency_id.symbol or '$'
             prompt = (
-                f"You are the voice assistant of '{company_name}', responsible for taking customer orders. "
-                f"Your primary task is to carefully listen to and process the customer's order details.\n"
-                f"Must ask for Customer Name.\n"
-                f"If a customer asks for product details, first explain all "
+                f"You are the internal sales voice assistant of '{company_name}'. "
+                f"You are speaking with a salesperson (the user in Odoo), NOT directly with the customer.\n\n"
+                f"### CORE PERSPECTIVE & IDENTITY:\n"
+                f"- The person talking to you is the SALESPERSON.\n"
+                f"- The customer is the client or organization for whom the salesperson is creating the order.\n"
+                f"- Always refer to the customer in the third person (e.g., 'the customer', 'their order', 'customer [Customer Name]').\n"
+                f"- NEVER address the salesperson as if they were the customer.\n"
+                f"- When an order is confirmed, NEVER say 'Thank you for ordering, [Customer Name]'. Instead, confirm to the salesperson: 'The sales order for customer [Customer Name] has been successfully created. Goodbye!'\n\n"
+                f"### MANDATORY CUSTOMER SELECTION BEFORE SALE ORDER CREATION:\n"
+                f"- STRICT REQUIREMENT: Only support sale order creation AFTER customer selection is completed. You MUST NOT accept product orders, take quantities, or create a sale order before the customer has been identified or selected.\n"
+                f"- If the salesperson mentions products, asks to add items, or asks to create a sale order before identifying the customer, immediately guide them to identify the customer first: 'Before we select products, let's identify the customer. Is this order for an existing customer or a new customer?'\n\n"
+                f"### CUSTOMER SELECTION & VERIFICATION WORKFLOW:\n"
+                f"1. Ask Existing vs. New Customer:\n"
+                f"   - When starting an order, ask the salesperson: 'Is this order for an existing customer or a new customer?'\n"
+                f"2. Existing Customer Path:\n"
+                f"   - If they say existing customer, ask: 'What is the customer's name?'\n"
+                f"   - Once they provide the name, you MUST immediately call the function tool `CheckCustomerExists` with `customer_name`.\n"
+                f"   - When the tool returns that the customer EXISTS: Confirm with the salesperson ('Found [Customer Name]. Let's proceed with their order.') and proceed to product and quantity selection.\n"
+                f"   - When the tool returns that the customer was NOT FOUND: Say 'I couldn't find an existing customer under [Customer Name]. Would you like me to create a new customer account for them, or would you like to search with another name?'\n"
+                f"     * If they want to create a new account: Say 'Understood, I will register [Customer Name] as a new customer upon order confirmation.' and proceed to order items.\n"
+                f"     * If they provide another name: Call `CheckCustomerExists` again for the new name.\n"
+                f"3. New Customer Path:\n"
+                f"   - If they say new customer, ask: 'What is the customer's name for the new account?'\n"
+                f"   - Once provided, confirm: 'Understood, I will register [Customer Name] as a new customer upon order confirmation.' and proceed to order items.\n"
+                f"4. Critical Rules:\n"
+                f"   - ONLY support sale order creation AFTER the customer selection is completed.\n"
+                f"   - NEVER ask 'What is your name?' — always ask for the CUSTOMER's name.\n"
+                f"   - NEVER place or confirm an order without knowing the customer name and whether they are existing or new.\n"
+                f"   - When confirming the order with the salesperson, state: 'The order will be for customer [Customer Name] for [Quantity] [Product]. May I confirm this order?'.\n\n"
+                f"If the salesperson asks for product details, first explain all "
                 f"the details by category. Then, mention the product name, "
                 f"followed by its price, in that order.\n")
             out_of_stock_prompt = "."
             out_of_stock_prompt_2 = "."
-            cate_ids = self.env['product.public.category'].search([], limit=20)
+            cate_ids = self.env['product.public.category'].search([], limit=100)
             for cate in cate_ids:
                 prompt += f"\n{cate.display_name}\n"
                 products = self.env['product.template'].search(
                     [('public_categ_ids', 'in', cate.id),
                      ('sale_ok', '=', True),
                      ('active', '=', True)],
-                    limit=20)
+                     limit=20)
                 for record in products:
                     prompt += f"  • {record.name}, {currency_symbol}{record.list_price:.2f}\n"
                     optional_products = record.optional_product_ids.mapped('name')
@@ -285,23 +319,23 @@ class OraAi(models.Model):
                 for p_rec in none_categ_products:
                     prompt += f"  • {p_rec.name}, {currency_symbol}{p_rec.list_price:.2f} \n"
             prompt += (
-                f"\n When a customer interacts with you through a voice command"
+                f"\n When the salesperson gives voice commands"
                 f" to place an order, \n you should proceed by listing out all "
                 f"product options available without excluding any mentioned"
                 f" products {out_of_stock_prompt}\n"
-                f"if the product has variants ask for which variant do you need.\n"
-                f"After customer select a product the ask for How many Quantity"
-                f" do you need{out_of_stock_prompt_2}\n"
-                f"if the product has optional products ask do you want to add ? \n"
-                f"Before confirming the order, ask Would you like to add anything"
-                f" else to your order before confirming? \n"
-                f"Once the customer finalizes their order and informs you of their"
-                f" selection, ask, 'May I confirm the order?' If they respond "
+                f"if the product has variants ask for which variant do they need.\n"
+                f"After the product is selected, ask for How many quantity"
+                f" do they need{out_of_stock_prompt_2}\n"
+                f"if the product has optional products ask would they like to add them? \n"
+                f"Before confirming the order, ask 'Would you like to add anything"
+                f" else to this order before confirming?' \n"
+                f"Once the order details are finalized, confirm: 'The order will be for customer [Customer Name], may I confirm the order?' If the salesperson responds "
                 f"affirmatively, kindly repeat back the order details "
                 f"for confirmation.\n Keep all your responses short and simple."
                 f" Use casual language, phrases like Umm..., Well..., and I "
-                f"mean are preferred.\n If customer order confirmed. say thankyou"
-                f" for ordering and goodbye.\n This is a voice conversation, "
+                f"mean are preferred.\n"
+                f"CRITICAL CLOSING INSTRUCTION: Once the order is confirmed and created, remember you are talking to the salesperson, NOT the customer. Do NOT say 'Thank you for ordering, [Customer Name]'. Instead, confirm to the salesperson: 'The sales order for customer [Customer Name] has been successfully created. Goodbye!'\n"
+                f" This is a voice conversation, "
                 f"so keep your responses short, like in a real conversation. "
                 f"Don't ramble for too long")
 
@@ -310,7 +344,7 @@ class OraAi(models.Model):
                 lang_instruction = (
                     f"\n\n### MULTI-LANGUAGE INSTRUCTIONS:\n"
                     f"- You support multiple languages: {', '.join(languages)}.\n"
-                    f"- At the start of the call, greet the customer and ask which language they prefer.\n"
+                    f"- At the start of the call, greet the salesperson and ask which language they prefer.\n"
                     f"- Once a language is chosen, conduct the entire conversation in that language.\n"
                 )
             elif rec.language_id and rec.language_id.code != 'en':
@@ -322,10 +356,34 @@ class OraAi(models.Model):
                     f"- You MUST always speak, reply, take orders, describe products, and answer questions in {lang_name}.\n"
                     f"- All greetings, questions, recommendations, and order confirmations MUST be spoken in {lang_name}.\n"
                     f"- Never say you do not know or do not speak {lang_name}. You are completely fluent in {lang_name}.\n"
-                    f"- If the customer speaks to you in {lang_name} or English, always reply politely in {lang_name} (unless the customer explicitly requests another language).\n"
+                    f"- If the salesperson speaks to you in {lang_name} or English, always reply politely in {lang_name} (unless they explicitly request another language).\n"
                 )
             else:
                 lang_instruction = ""
+            if rec.file_ids:
+                file_names = ", ".join(rec.file_ids.mapped('name') or [f.filename for f in rec.file_ids if f.filename])
+                kb_instruction = (
+                    f"\n\n### KNOWLEDGE BASE & SCOPE INSTRUCTIONS:\n"
+                    f"- You are exclusively assigned the following Knowledge Base topic(s): {file_names}.\n"
+                    f"- You MUST use your attached Knowledge Base to answer user questions regarding {file_names}.\n"
+                    f"- STRICT DOMAIN BOUNDARY: Your expertise is strictly confined to company products/orders and {file_names}.\n"
+                    f"- If a user asks questions about topics outside of '{file_names}' and outside of company products/orders "
+                    f"(for example, asking about unrelated sports, other software, or general trivia not covered in '{file_names}'): "
+                    f"you MUST politely decline to answer, stating that you only specialize in {file_names} and company product orders.\n"
+                    f"- Do NOT use general internet knowledge to answer questions outside your assigned topic ({file_names}).\n"
+                    f"- Keep all responses conversational, concise, and helpful within your domain.\n"
+                )
+                prompt += kb_instruction
+            else:
+                kb_instruction = (
+                    f"\n\n### DOMAIN SCOPE INSTRUCTIONS:\n"
+                    f"- You do not have any external knowledge base assigned.\n"
+                    f"- Your expertise is strictly limited to assisting with company product orders and questions about our product catalog.\n"
+                    f"- If asked about general knowledge, sports, software, or topics unrelated to our product catalog or orders, "
+                    f"politely explain that you only assist with company products and orders.\n"
+                )
+                prompt += kb_instruction
+
             rec.prompt = prompt + lang_instruction
 
     def _compute_function_description(self):
@@ -424,6 +482,139 @@ class OraAi(models.Model):
             return 'multi'
         return language_code or 'en'
 
+    def _get_assistant_tools(self, base_url, db_query, secret):
+        """Constructs the tools specification for Vapi assistant."""
+        db_name = self.env.cr.dbname or ''
+        headers = {"X-Odoo-Database": db_name} if db_name else {}
+
+        order_server = {
+            "url": f"{base_url}/vapi_voice_assistant/details{db_query}",
+            "headers": headers,
+        }
+        if secret:
+            order_server["secret"] = secret
+
+        check_customer_server = {
+            "url": f"{base_url}/vapi_voice_assistant/check_customer{db_query}",
+            "headers": headers,
+        }
+        if secret:
+            check_customer_server["secret"] = secret
+
+        lang_server = {
+            "url": f"{base_url}/vapi_voice_assistant/language_details{db_query}",
+            "headers": headers,
+        }
+        if secret:
+            lang_server["secret"] = secret
+
+        return [
+            {
+                "type": "function",
+                "async": True,
+                "function": {
+                    "name": "GetFinalOrderDetails",
+                    "description": (
+                        "This function is designed to retrieve order details from a voice assistant, "
+                        "with order confirmation being a prerequisite for providing the details. "
+                        "The function will be triggered after confirming the order. "
+                        "Upon asking a confirmation question and receiving a 'yes' response, "
+                        "this function must be activated."
+                    ),
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "OrderDetails": {
+                                "type": "object",
+                                "properties": {
+                                    "Products": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "Quantity": {
+                                                    "type": "number",
+                                                    "description": "Product quantity ordered by customer."
+                                                },
+                                                "Customer": {
+                                                    "type": "string",
+                                                    "description": "Customer name."
+                                                },
+                                                "Product": {
+                                                    "type": "string",
+                                                    "description": "Product name."
+                                                },
+                                                "Variant": {
+                                                    "type": "string",
+                                                    "description": "Product variant details or '-'."
+                                                },
+                                                "productId": {
+                                                    "type": "number",
+                                                    "description": f"Product ID based on mapping: {self.function_description}"
+                                                }
+                                            },
+                                            "required": ["Quantity", "Customer", "Product", "Variant", "productId"]
+                                        }
+                                    }
+                                },
+                                "required": ["Products"]
+                            }
+                        },
+                        "required": ["OrderDetails"]
+                    }
+                },
+                "server": order_server
+            },
+            {
+                "type": "function",
+                "async": False,
+                "function": {
+                    "name": "CheckCustomerExists",
+                    "description": (
+                        "Check if a customer name exists in Odoo's customer database. "
+                        "Call this function immediately when an existing customer name is mentioned "
+                        "to verify if their account exists before placing an order."
+                    ),
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "customer_name": {
+                                "type": "string",
+                                "description": "The full or partial name of the existing customer to search in the database."
+                            }
+                        },
+                        "required": ["customer_name"]
+                    }
+                },
+                "server": check_customer_server
+            },
+            {
+                "type": "function",
+                "async": True,
+                "function": {
+                    "name": "SetUserLanguagePreference",
+                    "description": "Retrieves the chosen language at the beginning of a voice assistance session.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "LanguagePreference": {
+                                "type": "object",
+                                "properties": {
+                                    "LanguageCode": {
+                                        "type": "string",
+                                        "description": f"Language code chosen by user. Languages: {self.language_function_description}"
+                                    }
+                                },
+                                "required": ["LanguageCode"]
+                            }
+                        },
+                        "required": ["LanguagePreference"]
+                    }
+                },
+                "server": lang_server
+            }
+        ]
+
     def action_create_assistant(self):
         """Creates a voice assistant instance using the Vapi.ai API based
          on the assistant configuration."""
@@ -447,14 +638,25 @@ class OraAi(models.Model):
                 first_message = f"നമസ്കാരം, ഞാൻ {self.name} ആണ്. {self.language_id.first_msg or 'ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?'}"
             else:
                 first_message = self._translate_text(self.first_message, language)
-        order_server = {"url": f"{base_url}/vapi_voice_assistant/details{db_query}"}
-        if secret:
-            order_server["secret"] = secret
-        lang_server = {"url": f"{base_url}/vapi_voice_assistant/language_details{db_query}"}
-        if secret:
-            lang_server["secret"] = secret
 
         transcriber_lang = self._get_transcriber_language(language)
+        valid_file_ids = [f.id_file for f in self.file_ids if f.id_file and f.state == 'uploaded']
+        model_payload = {
+            "provider": self.provider,
+            "model": self.provider_model_id.key,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": self.prompt
+                }
+            ],
+            "tools": self._get_assistant_tools(base_url, db_query, secret),
+        }
+        if valid_file_ids:
+            model_payload["knowledgeBase"] = {
+                "provider": "canonical",
+                "fileIds": valid_file_ids
+            }
         payload = {
             "transcriber": {
                 "provider": self.transcriber_provider,
@@ -466,115 +668,7 @@ class OraAi(models.Model):
                 "voiceId": voice,
                 "provider": "11labs",
             },
-            "model": {
-                "provider": self.provider,
-                "model": self.provider_model_id.key,
-                "knowledgeBase": {
-                    "provider": "canonical",
-                    "fileIds": self.file_ids.mapped('id_file')
-                },
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": self.prompt
-                    }
-                ],
-                "tools": [
-                    {
-                        "type": "function",
-                        "async": True,
-                        "function": {
-                            "name": "GetFinalOrderDetails",
-                            "description": f"This function is designed to"
-                                           f"retrieve order details from "
-                                           f"a voice assistant, with order"
-                                           f" confirmation being a "
-                                           f"prerequisite for providing "
-                                           f"the details. The function "
-                                           f"will be triggered after "
-                                           f"confirming the order. "
-                                           f"Upon asking a confirmation "
-                                           f"question and receiving a "
-                                           f"'yes' response, this function"
-                                           f" must be activated.",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {
-                                    "OrderDetails": {
-                                        "type": "object",
-                                        "properties": {
-                                            "Products": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "Quantity": {
-                                                            "type": "number",
-                                                            'description': f"This parameter is used to retrieve the product quantity. {{ quantities: customer ordered quantity }}"
-                                                        },
-                                                        "Customer": {
-                                                            "type": "string",
-                                                            'description': f"This parameter is used to retrieve the customer name. {{ customer: customer name }}"
-                                                        },
-                                                        "Product": {
-                                                            "type": "string",
-                                                            'description': f"This parameter is used to retrieve the Product name. {{ product: product name }}",
-                                                        },
-                                                        "Variant": {
-                                                            "type": "string",
-                                                            "description": f"This parameter is used to retrieve the Product variant details. For example, if a customer order is confirmed, then retrieve {{ Variant: product Variant }}",
-                                                        },
-                                                        "productId": {
-                                                            "type": "number",
-                                                            "description": f'Determine the Product ID of the product in the confirmed order. Fetch the correct ID based on the following product and ID mapping: , {self.function_description}',
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "Quantity",
-                                                        "Customer",
-                                                        "Product",
-                                                        "Variant",
-                                                        "productId"]
-                                                }
-                                            }
-                                        },
-                                        "required": ["products"]
-                                    }
-                                },
-                                "required": ["OrderDetails"]
-                            }
-                        },
-                        "server": order_server
-                    },
-                    {
-                        "type": "function",
-                        "async": True,
-                        "function": {
-                            "name": "SetUserLanguagePreference",
-                            "description": "This custom function retrieves the selected languages at the beginning of a voice assistance session if the user chooses the languages at the start of the session. This function must achieve the LanguageCode",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {
-                                    "LanguagePreference": {
-                                        "type": "object",
-                                        "properties": {
-                                            "LanguageCode": {
-                                                "type": "string",
-                                                "description": f"The code of the language chosen by the user. For example: en-IN for English (India), en-US for English (United States), es-LA for Spanish (Latin America).,our  lanagues and its code  is {self.language_function_description}"
-                                            },
-                                        },
-                                        "required": [
-                                            "LanguageCode",
-                                        ]
-                                    }
-                                },
-                                "required": ["LanguagePreference"]
-                            }
-                        },
-                        "server": lang_server
-                    },
-                ],
-            },
+            "model": model_payload,
             "clientMessages": ["conversation-update", "function-call",
                                "hang", "model-output", "speech-update",
                                "status-update", "transcript", "tool-calls",
@@ -600,6 +694,10 @@ class OraAi(models.Model):
             "name": self.name,
             "firstMessage": first_message,
             "serverUrl": f"{base_url}/vapi_voice_assistant/status{db_query}",
+            "server": {
+                "url": f"{base_url}/vapi_voice_assistant/status{db_query}",
+                "headers": {"X-Odoo-Database": self.env.cr.dbname} if self.env.cr.dbname else {},
+            },
             "endCallPhrases": [
                 self.end_call_phrases
             ],
@@ -651,13 +749,23 @@ class OraAi(models.Model):
                     first_message = self._translate_text(self.first_message, language)
                 end_message = self._translate_text(self.end_call_phrases,
                                                    language)
-            order_server = {"url": f"{base_url}/vapi_voice_assistant/details{db_query}"}
-            if secret:
-                order_server["secret"] = secret
-            lang_server = {"url": f"{base_url}/vapi_voice_assistant/language_details{db_query}"}
-            if secret:
-                lang_server["secret"] = secret
             transcriber_lang = self._get_transcriber_language(language)
+            valid_file_ids = [f.id_file for f in self.file_ids if f.id_file and f.state == 'uploaded']
+            model_payload = {
+                "provider": self.provider,
+                "model": self.provider_model_id.key,
+                "messages": [{
+                    "role": "system",
+                    "content": self.prompt}],
+                "tools": self._get_assistant_tools(base_url, db_query, secret),
+            }
+            if valid_file_ids:
+                model_payload["knowledgeBase"] = {
+                    "provider": "canonical",
+                    "fileIds": valid_file_ids
+                }
+            else:
+                model_payload["knowledgeBase"] = None
             payload = {
                 "transcriber": {
                     "provider": self.transcriber_provider,
@@ -667,89 +775,7 @@ class OraAi(models.Model):
                 "voice": {
                     "voiceId": voice,
                     "provider": "11labs"},
-                "model": {
-                    "provider": self.provider,
-                    "model": self.provider_model_id.key,
-                    "knowledgeBase": {
-                        "provider": "canonical",
-                        "fileIds": self.file_ids.mapped('id_file')},
-                    "messages": [{
-                        "role": "system",
-                        "content": self.prompt}],
-                    "tools": [{
-                        "type": "function",
-                        "async": True,
-                        "function": {
-                            "name": "GetFinalOrderDetails",
-                            "description": f"This function is designed to"
-                                           f" retrieve order details from"
-                                           f" a voice assistant, with "
-                                           f"order confirmation being a "
-                                           f"prerequisite for providing "
-                                           f"the details. The function "
-                                           f"will be triggered after "
-                                           f"confirming the order. Upon"
-                                           f" asking a confirmation "
-                                           f"question and receiving a "
-                                           f"'yes' response, this function"
-                                           f" must be activated.",
-                            "parameters": {"type": "object", "properties": {
-                                "OrderDetails":
-                                    {"type": "object", "properties":
-                                        {"Products": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "Quantity": {
-                                                        "type": "number",
-                                                        'description': f"This parameter is used to retrieve the product quantity. {{ quantities: customer ordered quantity }}"},
-                                                    "Customer": {
-                                                        "type": "string",
-                                                        'description': f"This parameter is used to retrieve the customer name. {{ customer: customer name }}"},
-                                                    "Product": {
-                                                        "type": "string",
-                                                        'description': f"This parameter is used to retrieve the Product name. {{ product: product name }}"},
-                                                    "Variant": {
-                                                        "type": "string",
-                                                        "description": f"This parameter is used to retrieve the Product variant details. For example, if a customer order is confirmed, then retrieve {{ Variant: product Variant }}"},
-                                                    "productId": {
-                                                        "type": "number",
-                                                        "description": f'Determine the Product ID of the product in the confirmed order. Fetch the correct ID based on the following product and ID mapping: , {self.function_description}'}},
-                                                "required": [
-                                                    "Quantity",
-                                                    "Customer",
-                                                    "Product",
-                                                    "Variant",
-                                                    "productId"]}}},
-                                     "required": ["products"]}},
-                                           "required": ["OrderDetails"]}},
-                        "server": order_server},
-                        {"type": "function",
-                         "async": True,
-                         "function": {
-                             "name": "SetUserLanguagePreference",
-                             "description": "This custom function retrieves"
-                                            "the selected languages at the "
-                                            "beginning of a voice "
-                                            "assistance session if the user"
-                                            " chooses the languages at the "
-                                            "start of the session. This "
-                                            "function must achieve the "
-                                            "LanguageCode",
-                             "parameters": {
-                                 "type": "object",
-                                 "properties": {
-                                     "LanguagePreference": {
-                                         "type": "object",
-                                         "properties": {
-                                             "LanguageCode": {
-                                                 "type": "string",
-                                                 "description": f"The code of the language chosen by the user. For example: en-IN for English (India), en-US for English (United States), es-LA for Spanish (Latin America).,our  lanagues and its code  is {self.language_function_description}"}, },
-                                         "required": [
-                                             "LanguageCode", ]}},
-                                 "required": ["LanguagePreference"]}},
-                         "server": lang_server}, ], },
+                "model": model_payload,
                 "clientMessages": ["conversation-update", "function-call",
                                    "hang", "model-output", "speech-update",
                                    "status-update", "transcript", "tool-calls",
@@ -775,6 +801,10 @@ class OraAi(models.Model):
                 "name": self.name,
                 "firstMessage": first_message,
                 "serverUrl": f"{base_url}/vapi_voice_assistant/status{db_query}",
+                "server": {
+                    "url": f"{base_url}/vapi_voice_assistant/status{db_query}",
+                    "headers": {"X-Odoo-Database": self.env.cr.dbname} if self.env.cr.dbname else {},
+                },
                 "endCallPhrases": [
                     end_message], }
             if secret:

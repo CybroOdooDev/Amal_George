@@ -38,6 +38,12 @@ class VoiceAssistantSystray extends Component {
         if (!assistant) {
             return;
         }
+        const currentUserId =
+            (typeof odoo !== "undefined" && odoo.session_info?.uid) ||
+            window.odoo?.session_info?.uid ||
+            this.env?.services?.user?.userId ||
+            this.env?.services?.user?.id ||
+            null;
         await this.action.doAction({
             type: "ir.actions.client",
             tag: "action_voice_assistant",
@@ -48,6 +54,7 @@ class VoiceAssistantSystray extends Component {
                 assistant_id: assistant.assistant_id,
                 api_key: assistant.api_key,
                 assistant_name: assistant.name,
+                user_id: currentUserId,
             },
         });
     }

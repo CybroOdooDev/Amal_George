@@ -24,7 +24,7 @@ class TranscriberModel(models.Model):
     _name = "transcriber.model"
     _description = "Transcriber Model"
 
-    name = fields.Char(string="Model Name", help="The display name .")
+    name = fields.Char(string="Model Name", help="The display name of the transcription model (e.g., Nova-2, Whisper).")
     key = fields.Char(string="Model Key",
                       help="Unique key used to identify the model when"
                            " integrating with transcription APIs.")

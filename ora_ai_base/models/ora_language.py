@@ -66,10 +66,16 @@ class OraLanguage(models.Model):
             rec = self.search([('code', '=', language)])
             assistant = self.env['ora.ai'].search(
                 [('is_lang_switch', '=', True)], limit=1)
-            prompt = assistant.prompt.replace(
-                "say thankyou for ordering and goodbye",
-                self._translate_text("say thankyou for "
-                                     "ordering and goodbye", language))
+            prompt = assistant.prompt or ""
+            target_str = "The sales order for customer [Customer Name] has been successfully created. Goodbye!"
+            if target_str in prompt:
+                prompt = prompt.replace(
+                    target_str,
+                    self._translate_text("The sales order has been created. Goodbye!", language))
+            elif "say thankyou for ordering and goodbye" in prompt:
+                prompt = prompt.replace(
+                    "say thankyou for ordering and goodbye",
+                    self._translate_text("The sales order has been created. Goodbye!", language))
             return {"first_msg": rec.first_msg,
                     "voice": rec.voice,
                     "assistant_prompt": prompt,

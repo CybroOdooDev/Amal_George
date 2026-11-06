@@ -19,6 +19,7 @@ import asyncio
 import concurrent.futures
 import inspect
 import json
+import logging
 import urllib.parse
 import urllib.request
 from googletrans import Translator
@@ -26,19 +27,20 @@ from odoo import api, fields, models, _
 import requests
 from odoo.exceptions import AccessError, ValidationError, UserError
 
+_logger = logging.getLogger(__name__)
+
 PROVIDER = [
-    ('openai', 'openai'),
-    ('together-ai', 'Together-AI'),
-    ('anyscale', 'AnyScale'),
-    ('openrouter', 'OpenRouter'),
-    ('perplexity-ai', 'Perplexity-AI'),
-    ('deepinfra', 'DeepInfra'),
     ('groq', 'Groq'),
-    ('anthropic', 'Anthropic')
+    ('google', 'Google (Gemini)'),
+    ('openai', 'OpenAI'),
+    ('anthropic', 'Anthropic'),
 ]
-TRANSCRIBER_PROVIDER = [('deepgram', 'Deepgram'),
-                        ('talkscriber', 'Talkscriber'),
-                        ('gladia', 'Gladiya')]
+TRANSCRIBER_PROVIDER = [
+    ('deepgram', 'Deepgram'),
+    ('gladia', 'Gladia'),
+    ('talkscriber', 'Talkscriber'),
+    ('speechmatics', 'Speechmatics'),
+]
 STATE = [('draft', 'Draft'),
          ('done', 'Done')]
 
@@ -150,6 +152,20 @@ class OraAi(models.Model):
         help="Generated function spec for language preference "
              "handling used by the assistant.")
 
+    # Capabilities & Creation Operations
+    is_sale_order_creation = fields.Boolean(
+        string="Sale Order Creation", default=True,
+        help="Enable the voice assistant to create sales orders.")
+    is_invoice_creation = fields.Boolean(
+        string="Invoice Creation", default=False,
+        help="Enable the voice assistant to create invoices.")
+    is_product_creation = fields.Boolean(
+        string="Product Creation", default=False,
+        help="Enable the voice assistant to create products.")
+    is_customer_creation = fields.Boolean(
+        string="Customer Creation", default=True,
+        help="Enable the voice assistant to register and create new customers.")
+
     def _translate_text(self, text, target_lang):
         """Translates the given text into the specified language."""
         if not text or not target_lang or target_lang == 'en':
@@ -190,32 +206,46 @@ class OraAi(models.Model):
         """Populate the list of available provider models based on the
          selected provider."""
         for rec in self:
-            provider_model = rec.provider_model_id.search([])
-            for provider in PROVIDER:
-                if rec.provider == provider[0]:
-                    filtered_model = provider_model.filtered(
-                        lambda l: l.provider == provider[0])
-                    rec.provider_model_ids = [fields.Command.link(res.id)
-                                              for res in filtered_model]
-                if not rec.provider:
-                    rec.provider_model_ids = [fields.Command.link(res.id)
-                                              for res in provider_model]
+            if rec.provider:
+                rec.provider_model_ids = self.env['provider.model'].search([
+                    ('provider', '=', rec.provider)
+                ])
+            else:
+                rec.provider_model_ids = self.env['provider.model'].search([])
 
     @api.depends('transcriber_provider')
     def _compute_transcriber_models(self):
         """Assign available transcriber models based on the selected
          transcriber provider"""
         for rec in self:
-            provider_model = rec.transcriber_model_id.search([])
-            for provider in TRANSCRIBER_PROVIDER:
-                if rec.transcriber_provider == provider[0]:
-                    filtered_model = provider_model.filtered(
-                        lambda l: l.provider == provider[0])
-                    rec.transcriber_model_ids = [fields.Command.link(res.id)
-                                                 for res in filtered_model]
-                if not rec.transcriber_provider:
-                    rec.transcriber_model_ids = [fields.Command.link(res.id)
-                                                 for res in provider_model]
+            if rec.transcriber_provider:
+                rec.transcriber_model_ids = self.env['transcriber.model'].search([
+                    ('provider', '=', rec.transcriber_provider)
+                ])
+            else:
+                rec.transcriber_model_ids = self.env['transcriber.model'].search([])
+
+    @api.onchange('provider')
+    def _onchange_provider(self):
+        """Auto-select the first valid model when provider changes."""
+        for rec in self:
+            if rec.provider:
+                first_model = self.env['provider.model'].search([
+                    ('provider', '=', rec.provider)
+                ], limit=1)
+                if not rec.provider_model_id or rec.provider_model_id.provider != rec.provider:
+                    rec.provider_model_id = first_model
+
+    @api.onchange('transcriber_provider')
+    def _onchange_transcriber_provider(self):
+        """Auto-select the first valid transcriber model when provider changes."""
+        for rec in self:
+            if rec.transcriber_provider:
+                first_model = self.env['transcriber.model'].search([
+                    ('provider', '=', rec.transcriber_provider)
+                ], limit=1)
+                if not rec.transcriber_model_id or rec.transcriber_model_id.provider != rec.transcriber_provider:
+                    rec.transcriber_model_id = first_model
 
     @api.depends('language_ids')
     def _compute_language_function_description(self):
@@ -232,13 +262,144 @@ class OraAi(models.Model):
             else:
                 rec.language_function_description = ""
 
-    @api.depends('company_id', 'file_ids', 'file_ids.name', 'file_ids.state', 'file_ids.id_file', 'is_lang_switch', 'language_ids', 'language_id')
+    @api.depends('company_id', 'file_ids', 'file_ids.name', 'file_ids.state', 'file_ids.id_file',
+                 'is_lang_switch', 'language_ids', 'language_id',
+                 'is_sale_order_creation', 'is_invoice_creation',
+                 'is_product_creation', 'is_customer_creation')
     def _compute_prompt(self):
         """Computes a detailed prompt for the voice assistant based on
-         the current product catalog and availability."""
+         the current product catalog, capabilities, and availability."""
         for rec in self:
             company_name = rec.company_id.name or self.env.company.name or 'Our Store'
             currency_symbol = rec.company_id.currency_id.symbol or self.env.company.currency_id.symbol or '$'
+
+            # Capability Rules
+            allowed_ops = []
+            disallowed_ops = []
+            if rec.is_sale_order_creation:
+                allowed_ops.append("Sale Order Creation (Allowed to place and confirm sales orders with GetFinalOrderDetails)")
+            else:
+                disallowed_ops.append("Sale Order Creation (Strictly prohibited: decline placing or confirming sale orders)")
+
+            if rec.is_customer_creation:
+                allowed_ops.append("Customer Creation (Allowed to create new customers/contacts with CreateCustomer)")
+            else:
+                disallowed_ops.append("Customer Creation (Strictly prohibited: customer creation is disabled)")
+
+            if rec.is_invoice_creation:
+                allowed_ops.append("Invoice Creation (Allowed to create draft customer invoices with CreateInvoice)")
+            else:
+                disallowed_ops.append("Invoice Creation (Strictly prohibited: invoice creation is disabled)")
+
+            if rec.is_product_creation:
+                allowed_ops.append("Product Creation (Allowed to create new products with CreateProduct)")
+            else:
+                disallowed_ops.append("Product Creation (Strictly prohibited: product creation is disabled)")
+
+            ops_summary = "\n### CAPABILITIES & AUTHORIZED OPERATIONS:\n"
+            if allowed_ops:
+                ops_summary += "Authorized Operations:\n" + "\n".join(f"- {op}" for op in allowed_ops) + "\n"
+            if disallowed_ops:
+                ops_summary += "Prohibited Operations:\n" + "\n".join(f"- {op}" for op in disallowed_ops) + "\n"
+
+            # Operation-specific workflows and instructions
+            op_instructions = ""
+
+            # 1. Customer Creation Workflow
+            if rec.is_customer_creation:
+                op_instructions += (
+                    "\n### CUSTOMER CREATION WORKFLOW (Tool: CreateCustomer):\n"
+                    "- When the user asks to create or register a customer/contact (e.g., 'Create a customer named Amal George with phone 9876543210 and email amal@gmail.com'):\n"
+                    "  1. Collect the customer's Name (required), and any mentioned Phone, Email, Company Name, Street, City, State, Country, and Type (Company or Individual).\n"
+                    "  2. First call `CheckCustomerExists` to check if a customer with that name already exists.\n"
+                    "     * If they exist: inform the user that an account with that name already exists, and ask if they wish to create a duplicate or use the existing one.\n"
+                    "     * If not found: call the `CreateCustomer` tool with the collected details.\n"
+                    "  3. Confirm the created customer's name and details back to the user.\n"
+                )
+            else:
+                op_instructions += (
+                    "\n### CUSTOMER CREATION RESTRICTION:\n"
+                    "- Customer creation is DISABLED. If the user asks to create a customer, politely inform them that customer creation is disabled.\n"
+                )
+
+            # 2. Product Creation Workflow
+            if rec.is_product_creation:
+                op_instructions += (
+                    "\n### PRODUCT CREATION WORKFLOW (Tool: CreateProduct):\n"
+                    "- When the user asks to create a product (e.g., 'Create a product named Samsung Galaxy S25 with a sales price of 50000'):\n"
+                    "  1. Collect Product Name (required), Sales Price, Cost, Product Type (Goods/Service), Internal Reference/SKU, and Category.\n"
+                    "  2. Ask for any missing key details if appropriate, then call `CreateProduct`.\n"
+                    "  3. Once created, confirm the product name and price back to the user.\n"
+                )
+            else:
+                op_instructions += (
+                    "\n### PRODUCT CREATION RESTRICTION:\n"
+                    "- Product creation is DISABLED. Decline any requests to create new products.\n"
+                )
+
+            # 3. Invoice Creation Workflow
+            if rec.is_invoice_creation:
+                op_instructions += (
+                    "\n### INVOICE CREATION WORKFLOW (Tool: CreateInvoice):\n"
+                    "- When the user asks to create an invoice (e.g., 'Create an invoice for Amal George for two Samsung phones'):\n"
+                    "  1. Identify the Customer name, invoiced products, quantities, unit prices, and applicable taxes.\n"
+                    "  2. Confirm the invoice lines and total with the user.\n"
+                    "  3. Upon confirmation, call `CreateInvoice` with Customer name and the InvoiceLines array.\n"
+                    "  4. Confirm the created draft invoice reference to the user.\n"
+                )
+            else:
+                op_instructions += (
+                    "\n### INVOICE CREATION RESTRICTION:\n"
+                    "- Invoice creation is DISABLED. Decline any requests to create customer invoices.\n"
+                )
+
+            if rec.is_customer_creation:
+                cust_not_found_prompt = (
+                    "Say 'I couldn't find an existing customer under [Customer Name]. Would you like me to create a new customer account for them, or would you like to search with another name?'\n"
+                    "     * If they want to create a new account: Say 'Understood, I will register [Customer Name] as a new customer upon order confirmation.' and proceed to order items.\n"
+                    "     * If they provide another name: Call `CheckCustomerExists` again for the new name.\n"
+                )
+                new_cust_prompt = (
+                    "If they say new customer, ask: 'What is the customer's name for the new account?'\n"
+                    "   - Once provided, confirm: 'Understood, I will register [Customer Name] as a new customer upon order confirmation.' and proceed to order items.\n"
+                )
+            else:
+                cust_not_found_prompt = (
+                    "Say 'I couldn't find an existing customer under [Customer Name]. Customer creation is currently disabled, so please provide the name of an existing customer.'\n"
+                    "     * Call `CheckCustomerExists` again for the new name provided.\n"
+                )
+                new_cust_prompt = (
+                    "If they say new customer, state: 'Creating new customer accounts is disabled. Please specify an existing registered customer.'\n"
+                )
+
+            so_rules = ""
+            if rec.is_sale_order_creation:
+                so_rules = (
+                    f"### MANDATORY CUSTOMER SELECTION BEFORE SALE ORDER CREATION:\n"
+                    f"- STRICT REQUIREMENT: Only support sale order creation AFTER customer selection is completed. You MUST NOT accept product orders, take quantities, or create a sale order before the customer has been identified or selected.\n"
+                    f"- If the salesperson mentions products, asks to add items, or asks to create a sale order before identifying the customer, immediately guide them to identify the customer first: 'Before we select products, let's identify the customer. Is this order for an existing customer or a new customer?'\n\n"
+                    f"### CUSTOMER SELECTION & VERIFICATION WORKFLOW:\n"
+                    f"1. Ask Existing vs. New Customer:\n"
+                    f"   - When starting an order, ask the salesperson: 'Is this order for an existing customer or a new customer?'\n"
+                    f"2. Existing Customer Path:\n"
+                    f"   - If they say existing customer, ask: 'What is the customer's name?'\n"
+                    f"   - Once they provide the name, you MUST immediately call the function tool `CheckCustomerExists` with `customer_name`.\n"
+                    f"   - When the tool returns that the customer EXISTS: Confirm with the salesperson ('Found [Customer Name]. Let's proceed with their order.') and proceed to product and quantity selection.\n"
+                    f"   - When the tool returns that the customer was NOT FOUND: {cust_not_found_prompt}"
+                    f"3. New Customer Path:\n"
+                    f"   - {new_cust_prompt}"
+                    f"4. Critical Rules:\n"
+                    f"   - ONLY support sale order creation AFTER the customer selection is completed.\n"
+                    f"   - NEVER ask 'What is your name?' — always ask for the CUSTOMER's name.\n"
+                    f"   - NEVER place or confirm an order without knowing the customer name and whether they are existing or new.\n"
+                    f"   - When confirming the order with the salesperson, state: 'The order will be for customer [Customer Name] for [Quantity] [Product]. May I confirm this order?'.\n\n"
+                )
+            else:
+                so_rules = (
+                    f"### SALE ORDER CREATION RESTRICTION:\n"
+                    f"- Sale order creation is DISABLED. You must not create, place, or confirm sale orders. If asked to place an order, inform the salesperson that order creation is not enabled.\n\n"
+                )
+
             prompt = (
                 f"You are the internal sales voice assistant of '{company_name}'. "
                 f"You are speaking with a salesperson (the user in Odoo), NOT directly with the customer.\n\n"
@@ -248,71 +409,71 @@ class OraAi(models.Model):
                 f"- Always refer to the customer in the third person (e.g., 'the customer', 'their order', 'customer [Customer Name]').\n"
                 f"- NEVER address the salesperson as if they were the customer.\n"
                 f"- When an order is confirmed, NEVER say 'Thank you for ordering, [Customer Name]'. Instead, confirm to the salesperson: 'The sales order for customer [Customer Name] has been successfully created. Goodbye!'\n\n"
-                f"### MANDATORY CUSTOMER SELECTION BEFORE SALE ORDER CREATION:\n"
-                f"- STRICT REQUIREMENT: Only support sale order creation AFTER customer selection is completed. You MUST NOT accept product orders, take quantities, or create a sale order before the customer has been identified or selected.\n"
-                f"- If the salesperson mentions products, asks to add items, or asks to create a sale order before identifying the customer, immediately guide them to identify the customer first: 'Before we select products, let's identify the customer. Is this order for an existing customer or a new customer?'\n\n"
-                f"### CUSTOMER SELECTION & VERIFICATION WORKFLOW:\n"
-                f"1. Ask Existing vs. New Customer:\n"
-                f"   - When starting an order, ask the salesperson: 'Is this order for an existing customer or a new customer?'\n"
-                f"2. Existing Customer Path:\n"
-                f"   - If they say existing customer, ask: 'What is the customer's name?'\n"
-                f"   - Once they provide the name, you MUST immediately call the function tool `CheckCustomerExists` with `customer_name`.\n"
-                f"   - When the tool returns that the customer EXISTS: Confirm with the salesperson ('Found [Customer Name]. Let's proceed with their order.') and proceed to product and quantity selection.\n"
-                f"   - When the tool returns that the customer was NOT FOUND: Say 'I couldn't find an existing customer under [Customer Name]. Would you like me to create a new customer account for them, or would you like to search with another name?'\n"
-                f"     * If they want to create a new account: Say 'Understood, I will register [Customer Name] as a new customer upon order confirmation.' and proceed to order items.\n"
-                f"     * If they provide another name: Call `CheckCustomerExists` again for the new name.\n"
-                f"3. New Customer Path:\n"
-                f"   - If they say new customer, ask: 'What is the customer's name for the new account?'\n"
-                f"   - Once provided, confirm: 'Understood, I will register [Customer Name] as a new customer upon order confirmation.' and proceed to order items.\n"
-                f"4. Critical Rules:\n"
-                f"   - ONLY support sale order creation AFTER the customer selection is completed.\n"
-                f"   - NEVER ask 'What is your name?' — always ask for the CUSTOMER's name.\n"
-                f"   - NEVER place or confirm an order without knowing the customer name and whether they are existing or new.\n"
-                f"   - When confirming the order with the salesperson, state: 'The order will be for customer [Customer Name] for [Quantity] [Product]. May I confirm this order?'.\n\n"
+                f"{ops_summary}\n"
+                f"{op_instructions}\n"
+                f"{so_rules}"
                 f"If the salesperson asks for product details, first explain all "
                 f"the details by category. Then, mention the product name, "
                 f"followed by its price, in that order.\n")
             out_of_stock_prompt = "."
             out_of_stock_prompt_2 = "."
-            cate_ids = self.env['product.public.category'].search([], limit=100)
+            has_public_categ = (
+                'product.public.category' in self.env
+                and 'public_categ_ids' in self.env['product.template']._fields
+            )
+            if has_public_categ:
+                cate_ids = self.env['product.public.category'].search([], limit=100)
+                category_field = 'public_categ_ids'
+                category_operator = 'in'
+            else:
+                cate_ids = self.env['product.category'].search([], limit=100)
+                category_field = 'categ_id'
+                category_operator = '='
+
+            def _append_product_info(record):
+                nonlocal out_of_stock_prompt, out_of_stock_prompt_2
+                p_text = f"  • {record.name}, {currency_symbol}{record.list_price:.2f}\n"
+                optional_products = getattr(record, 'optional_product_ids', self.env['product.template']).mapped('name')
+                variants = record.product_variant_ids
+                allow_out_of_stock = getattr(record, 'allow_out_of_stock_order', True)
+                if getattr(record, 'type', '') == 'product' and not allow_out_of_stock:
+                    p_text += f" -quantity available:{int(getattr(record, 'qty_available', 0))}\n"
+                    out_of_stock_prompt = (", don't say the available quantity"
+                                           " even if it is out of stock, say "
+                                           "only when it asked.")
+                    out_of_stock_prompt_2 = (" ,if the quantity is greater than"
+                                             " available quantity just say the"
+                                             " available quantity in the stock."
+                                             " ")
+                if len(variants) > 1:
+                    p_text += f"    - {len(variants)} variants\n"
+                    for variant in variants:
+                        attribute_values = (
+                            variant.product_template_variant_value_ids.mapped(
+                                'name'))
+                        variant_details = ", ".join(attribute_values)
+                        p_text += (f"        * {variant_details}, "
+                                   f"{currency_symbol}{variant.lst_price:.2f}\n")
+                if len(optional_products) > 0:
+                    p_text += (f"    - {len(optional_products)} "
+                               f"Optional Products\n")
+                    for opt_product in optional_products:
+                        p_text += f"     • {opt_product} \n"
+                return p_text
+
             for cate in cate_ids:
-                prompt += f"\n{cate.display_name}\n"
                 products = self.env['product.template'].search(
-                    [('public_categ_ids', 'in', cate.id),
+                    [(category_field, category_operator, cate.id),
                      ('sale_ok', '=', True),
                      ('active', '=', True)],
                      limit=20)
-                for record in products:
-                    prompt += f"  • {record.name}, {currency_symbol}{record.list_price:.2f}\n"
-                    optional_products = record.optional_product_ids.mapped('name')
-                    variants = record.product_variant_ids
-                    if (record.type == 'product' and
-                            not record.allow_out_of_stock_order):
-                        prompt += (f" -quantity available:"
-                                   f"{int(record.qty_available)}\n")
-                        out_of_stock_prompt = (", don't say the available quantity"
-                                               " even if it is out of stock, say "
-                                               "only when it asked.")
-                        out_of_stock_prompt_2 = (" ,if the quantity is greater than"
-                                                 " available quantity just say the"
-                                                 " available quantity in the stock."
-                                                 " ")
-                    if len(variants) > 1:
-                        prompt += f"    - {len(variants)} variants\n"
-                        for variant in variants:
-                            attribute_values = (
-                                variant.product_template_variant_value_ids.mapped(
-                                    'name'))
-                            variant_details = ", ".join(attribute_values)
-                            prompt += (f"        * {variant_details}, "
-                                       f"{currency_symbol}{variant.lst_price:.2f}\n")
-                    if len(optional_products) > 0:
-                        prompt += (f"    - {len(optional_products)} "
-                                   f"Optional Products\n")
-                        for opt_product in optional_products:
-                            prompt += f"     • {opt_product} \n"
+                if products:
+                    prompt += f"\n{cate.display_name}\n"
+                    for record in products:
+                        prompt += _append_product_info(record)
+
             none_categ_products = self.env['product.template'].search(
-                [("public_categ_ids", "=", False), ('sale_ok', '=', True), ('active', '=', True)],
+                [(category_field, "=", False), ('sale_ok', '=', True), ('active', '=', True)],
                 limit=20)
             if none_categ_products:
                 prompt += f"\n None category \n"
@@ -501,6 +662,27 @@ class OraAi(models.Model):
         if secret:
             check_customer_server["secret"] = secret
 
+        invoice_server = {
+            "url": f"{base_url}/vapi_voice_assistant/create_invoice{db_query}",
+            "headers": headers,
+        }
+        if secret:
+            invoice_server["secret"] = secret
+
+        customer_server = {
+            "url": f"{base_url}/vapi_voice_assistant/create_customer{db_query}",
+            "headers": headers,
+        }
+        if secret:
+            customer_server["secret"] = secret
+
+        product_server = {
+            "url": f"{base_url}/vapi_voice_assistant/create_product{db_query}",
+            "headers": headers,
+        }
+        if secret:
+            product_server["secret"] = secret
+
         lang_server = {
             "url": f"{base_url}/vapi_voice_assistant/language_details{db_query}",
             "headers": headers,
@@ -508,8 +690,9 @@ class OraAi(models.Model):
         if secret:
             lang_server["secret"] = secret
 
-        return [
-            {
+        tools = []
+        if self.is_sale_order_creation:
+            tools.append({
                 "type": "function",
                 "async": True,
                 "function": {
@@ -564,8 +747,105 @@ class OraAi(models.Model):
                     }
                 },
                 "server": order_server
-            },
-            {
+            })
+
+        if self.is_customer_creation:
+            tools.append({
+                "type": "function",
+                "async": False,
+                "function": {
+                    "name": "CreateCustomer",
+                    "description": (
+                        "Registers and creates a new customer or contact in Odoo. "
+                        "Call this when the user asks to create or register a customer with their details."
+                    ),
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string", "description": "Full name of the customer or contact."},
+                            "phone": {"type": "string", "description": "Phone or mobile number."},
+                            "email": {"type": "string", "description": "Email address."},
+                            "company_name": {"type": "string", "description": "Associated company or employer name."},
+                            "street": {"type": "string", "description": "Street address."},
+                            "city": {"type": "string", "description": "City."},
+                            "state": {"type": "string", "description": "State or province."},
+                            "country": {"type": "string", "description": "Country."},
+                            "is_company": {"type": "boolean", "description": "True if customer is a Company, False for Individual."}
+                        },
+                        "required": ["name"]
+                    }
+                },
+                "server": customer_server
+            })
+
+        if self.is_product_creation:
+            tools.append({
+                "type": "function",
+                "async": False,
+                "function": {
+                    "name": "CreateProduct",
+                    "description": (
+                        "Creates a new product in the Odoo product catalog. "
+                        "Call this when the user asks to create a product with its details (e.g. name, price, category)."
+                    ),
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string", "description": "Product name."},
+                            "default_code": {"type": "string", "description": "Internal Reference or SKU."},
+                            "type": {"type": "string", "description": "Product type: 'consu' for Goods, 'service' for Service."},
+                            "list_price": {"type": "number", "description": "Sales price."},
+                            "standard_price": {"type": "number", "description": "Cost price."},
+                            "categ_name": {"type": "string", "description": "Product category name."},
+                            "uom_name": {"type": "string", "description": "Unit of Measure (e.g. Units)."},
+                            "barcode": {"type": "string", "description": "Barcode or UPC."},
+                            "sale_ok": {"type": "boolean", "description": "Can be Sold (default True)."},
+                            "purchase_ok": {"type": "boolean", "description": "Can be Purchased (default True)."}
+                        },
+                        "required": ["name"]
+                    }
+                },
+                "server": product_server
+            })
+
+
+        if self.is_invoice_creation:
+            tools.append({
+                "type": "function",
+                "async": False,
+                "function": {
+                    "name": "CreateInvoice",
+                    "description": (
+                        "Creates a customer invoice in Odoo in draft state. "
+                        "Call this after confirming customer name, invoice lines, quantities, and prices."
+                    ),
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "Customer": {"type": "string", "description": "Customer name."},
+                            "InvoiceLines": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Product": {"type": "string", "description": "Product name."},
+                                        "Quantity": {"type": "number", "description": "Quantity invoiced."},
+                                        "UnitPrice": {"type": "number", "description": "Unit price."},
+                                        "Tax": {"type": "number", "description": "Tax percentage (e.g. 15 or 0)."},
+                                        "productId": {"type": "number", "description": "Product ID if available."}
+                                    },
+                                    "required": ["Product", "Quantity"]
+                                }
+                            }
+                        },
+                        "required": ["Customer", "InvoiceLines"]
+                    }
+                },
+                "server": invoice_server
+            })
+
+        if self.is_sale_order_creation or self.is_customer_creation or self.is_invoice_creation:
+            tools.append({
                 "type": "function",
                 "async": False,
                 "function": {
@@ -587,8 +867,10 @@ class OraAi(models.Model):
                     }
                 },
                 "server": check_customer_server
-            },
-            {
+            })
+
+        if self.is_lang_switch:
+            tools.append({
                 "type": "function",
                 "async": True,
                 "function": {
@@ -612,8 +894,9 @@ class OraAi(models.Model):
                     }
                 },
                 "server": lang_server
-            }
-        ]
+            })
+
+        return tools
 
     def action_create_assistant(self):
         """Creates a voice assistant instance using the Vapi.ai API based
@@ -673,11 +956,7 @@ class OraAi(models.Model):
                                "hang", "model-output", "speech-update",
                                "status-update", "transcript", "tool-calls",
                                "user-interrupted", "voice-input"],
-            "serverMessages": ["conversation-update", "end-of-call-report",
-                               "function-call", "hang", "speech-update",
-                               "status-update", "tool-calls",
-                               "transfer-destination-request",
-                               "user-interrupted"],
+            "serverMessages": ["end-of-call-report", "status-update", "tool-calls", "hang"],
             "messagePlan": {
                 "idleMessages": ["Feel free to ask whenever you're ready.",
                                  "I'm still here if you need assistance.",
@@ -715,8 +994,32 @@ class OraAi(models.Model):
         except Exception:
             json_response = {}
         if not response.ok:
-            error_msg = json_response.get('message') or json_response.get('error') or response.text
-            raise UserError(f"Vapi error: {error_msg}")
+            error_raw = json_response.get('message') or json_response.get('error') or response.text
+            if isinstance(error_raw, list):
+                error_msg = "\n".join(str(m) for m in error_raw)
+            else:
+                error_msg = str(error_raw)
+            if "transcriber" in error_msg.lower():
+                raise UserError(
+                    _("Transcriber Model Unavailable / Unsupported:\n\n"
+                      "The selected Transcriber model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
+                      "Details:\n%(details)s\n\n"
+                      "Please choose an active Transcriber model (e.g. Nova-2 or Nova-3).",
+                      model=self.transcriber_model_id.name or self.transcriber_model_id.key,
+                      provider=self.transcriber_provider,
+                      details=error_msg)
+                )
+            if "model" in error_msg.lower():
+                raise UserError(
+                    _("AI Model Unavailable / Unsupported:\n\n"
+                      "The selected model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
+                      "Details:\n%(details)s\n\n"
+                      "Please choose an active, working model from the list.",
+                      model=self.provider_model_id.name or self.provider_model_id.key,
+                      provider=self.provider,
+                      details=error_msg)
+                )
+            raise UserError(_("Vapi error: %s", error_msg))
         self.write({'date': json_response.get('createdAt'),
                     'state': 'done',
                     'id_assistant': json_response.get('id')
@@ -726,38 +1029,52 @@ class OraAi(models.Model):
         """Update the external Vapi.ai assistant configuration when
          the record is modified."""
         res = super().write(vals)
-        if self.id_assistant:
-            base_url = self._get_vapi_base_url()
+        if self.env.context.get('skip_vapi_sync'):
+            return res
+        vapi_fields = {
+            'name', 'prompt', 'first_message', 'end_call_phrases',
+            'provider', 'provider_model_id', 'transcriber_provider',
+            'transcriber_model_id', 'language_id', 'is_lang_switch',
+            'language_ids', 'file_ids',
+            'is_sale_order_creation', 'is_invoice_creation',
+            'is_product_creation', 'is_customer_creation',
+        }
+        if not any(f in vals for f in vapi_fields):
+            return res
+        for rec in self:
+            if not rec.id_assistant:
+                continue
+            base_url = rec._get_vapi_base_url()
             bearer = self.env['ir.config_parameter'].sudo().get_str(
                 'ora_ai_base.vapi_private_api_key')
             secret = self.env['ir.config_parameter'].sudo().get_str(
                 'ora_ai_base.vapi_webhook_secret') or ''
             db_name = self.env.cr.dbname
             db_query = f"?db={db_name}" if db_name else ""
-            url = f"https://api.vapi.ai/assistant/{self.id_assistant}"
-            if self.is_lang_switch and self.language_ids:
+            url = f"https://api.vapi.ai/assistant/{rec.id_assistant}"
+            if rec.is_lang_switch and rec.language_ids:
                 language = "en"
                 voice = "qgj3VahzWaAK300v6H27"
-                first_message = self.first_message
-                end_message = self.end_call_phrases
+                first_message = rec.first_message
+                end_message = rec.end_call_phrases
             else:
-                language = (self.language_id.code if (self.language_id and self.language_id.code) else "en") or "en"
-                voice = (self.language_id.voice if (self.language_id and self.language_id.voice) else "vj2Y0u1NaT1ayH6VYkYu") or "vj2Y0u1NaT1ayH6VYkYu"
-                if language == 'ml' and (not self.first_message or self.first_message.startswith("Hey")):
-                    first_message = f"നമസ്കാരം, ഞാൻ {self.name} ആണ്. {self.language_id.first_msg or 'ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?'}"
+                language = (rec.language_id.code if (rec.language_id and rec.language_id.code) else "en") or "en"
+                voice = (rec.language_id.voice if (rec.language_id and rec.language_id.voice) else "vj2Y0u1NaT1ayH6VYkYu") or "vj2Y0u1NaT1ayH6VYkYu"
+                if language == 'ml' and (not rec.first_message or rec.first_message.startswith("Hey")):
+                    first_message = f"നമസ്കാരം, ഞാൻ {rec.name} ആണ്. {rec.language_id.first_msg or 'ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?'}"
                 else:
-                    first_message = self._translate_text(self.first_message, language)
-                end_message = self._translate_text(self.end_call_phrases,
+                    first_message = rec._translate_text(rec.first_message, language)
+                end_message = rec._translate_text(rec.end_call_phrases,
                                                    language)
-            transcriber_lang = self._get_transcriber_language(language)
-            valid_file_ids = [f.id_file for f in self.file_ids if f.id_file and f.state == 'uploaded']
+            transcriber_lang = rec._get_transcriber_language(language)
+            valid_file_ids = [f.id_file for f in rec.file_ids if f.id_file and f.state == 'uploaded']
             model_payload = {
-                "provider": self.provider,
-                "model": self.provider_model_id.key,
+                "provider": rec.provider,
+                "model": rec.provider_model_id.key,
                 "messages": [{
                     "role": "system",
-                    "content": self.prompt}],
-                "tools": self._get_assistant_tools(base_url, db_query, secret),
+                    "content": rec.prompt}],
+                "tools": rec._get_assistant_tools(base_url, db_query, secret),
             }
             if valid_file_ids:
                 model_payload["knowledgeBase"] = {
@@ -768,8 +1085,8 @@ class OraAi(models.Model):
                 model_payload["knowledgeBase"] = None
             payload = {
                 "transcriber": {
-                    "provider": self.transcriber_provider,
-                    "model": self.transcriber_model_id.key,
+                    "provider": rec.transcriber_provider,
+                    "model": rec.transcriber_model_id.key,
                     "language": transcriber_lang,
                     "smartFormat": True},
                 "voice": {
@@ -780,11 +1097,7 @@ class OraAi(models.Model):
                                    "hang", "model-output", "speech-update",
                                    "status-update", "transcript", "tool-calls",
                                    "user-interrupted", "voice-input"],
-                "serverMessages": ["conversation-update", "end-of-call-report",
-                                   "function-call", "hang", "speech-update",
-                                   "status-update", "tool-calls",
-                                   "transfer-destination-request",
-                                   "user-interrupted"],
+                "serverMessages": ["end-of-call-report", "status-update", "tool-calls", "hang"],
                 "messagePlan": {
                     "idleMessages": ["Feel free to ask whenever you're ready.",
                                      "I'm still here if you need assistance.",
@@ -798,7 +1111,7 @@ class OraAi(models.Model):
                                      " your shopping."],
                     "idleTimeoutSeconds": 5,
                     "idleMessageMaxSpokenCount": 10},
-                "name": self.name,
+                "name": rec.name,
                 "firstMessage": first_message,
                 "serverUrl": f"{base_url}/vapi_voice_assistant/status{db_query}",
                 "server": {
@@ -814,9 +1127,41 @@ class OraAi(models.Model):
                 "Content-Type": "application/json"}
             response = requests.request("PATCH", url, json=payload,
                                         headers=headers)
-            if response.status_code != 200:
+            if response.status_code == 404:
+                _logger.warning("Assistant %s (%s) not found on Vapi. Resetting state.", rec.name, rec.id_assistant)
+                rec.with_context(skip_vapi_sync=True).write({'state': 'draft', 'id_assistant': False})
+            elif response.status_code != 200:
+                try:
+                    err_json = response.json()
+                    error_raw = err_json.get('message') or err_json.get('error') or response.text
+                except Exception:
+                    error_raw = response.text
+                if isinstance(error_raw, list):
+                    error_msg = "\n".join(str(m) for m in error_raw)
+                else:
+                    error_msg = str(error_raw)
+                if "transcriber" in error_msg.lower():
+                    raise UserError(
+                        _("Transcriber Model Unavailable / Unsupported:\n\n"
+                          "The selected Transcriber model '%(model)s' under provider '%(provider)s' is unavailable on Vapi.\n\n"
+                          "Details:\n%(details)s\n\n"
+                          "Please select an active Transcriber model (e.g. Nova-2 or Nova-3).",
+                          model=rec.transcriber_model_id.name or rec.transcriber_model_id.key,
+                          provider=rec.transcriber_provider,
+                          details=error_msg)
+                    )
+                if "model" in error_msg.lower():
+                    raise UserError(
+                        _("AI Model Unavailable / Unsupported:\n\n"
+                          "The selected model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
+                          "Details:\n%(details)s\n\n"
+                          "Please choose an active, working model.",
+                          model=rec.provider_model_id.name or rec.provider_model_id.key,
+                          provider=rec.provider,
+                          details=error_msg)
+                    )
                 raise ValidationError(
-                    "Assistant Update Failed: %s" % response.text)
+                    _("Assistant Update Failed: %s", error_msg))
         return res
 
     def unlink(self):
@@ -836,6 +1181,10 @@ class OraAi(models.Model):
         self.ensure_one()
         if not self.id_assistant:
             raise UserError(_("Please click 'Create Assistant' first before testing."))
+        if not self.provider_model_id:
+            raise UserError(_("Please select an AI Model before testing the assistant."))
+        if not self.transcriber_model_id:
+            raise UserError(_("Please select a Transcriber Model before testing the assistant."))
 
         bearer = self.env['ir.config_parameter'].sudo().get_str(
             'ora_ai_base.vapi_public_api_key')
@@ -914,4 +1263,6 @@ class OraAi(models.Model):
             'api_key': bearer,
             'language': ast.language_id.name if ast.language_id else '',
             'provider': ast.provider or '',
+            'provider_model': ast.provider_model_id.name if ast.provider_model_id else '',
+            'transcriber': ast.transcriber_model_id.name if ast.transcriber_model_id else '',
         } for ast in assistants]

@@ -20,9 +20,55 @@ export class VoiceData extends Component {
         this.animId = null;
 
         this.state = proxy({
+            // Dynamic Operation Switcher: 'sale' | 'invoice' | 'customer' | 'product'
+            currentOperation: "sale",
+            operationState: "initial", // 'initial' | 'collecting' | 'review' | 'creating' | 'success' | 'error'
+            createdRecordRef: "",
+            operationError: "",
+
+            // 1. Sales Order (Existing - preserved)
             customer: "",
             selectedPartnerId: "",
             products: [],
+
+            // 2. Invoice
+            invoiceData: {
+                customer: "",
+                selectedPartnerId: "",
+                lines: [],
+                untaxed: 0,
+                tax: 0,
+                total: 0
+            },
+
+            // 4. Customer Creation
+            customerData: {
+                name: "",
+                phone: "",
+                email: "",
+                company: "",
+                street: "",
+                city: "",
+                state: "",
+                country: "",
+                type: "Individual"
+            },
+
+            // 5. Product Creation
+            productData: {
+                name: "",
+                default_code: "",
+                type: "Goods",
+                list_price: 0,
+                standard_price: 0,
+                categ: "All",
+                uom: "Units",
+                barcode: "",
+                sale_ok: true,
+                purchase_ok: true
+            },
+
+
             conversation: [],
             callState: "idle", // 'idle' | 'connecting' | 'active' | 'ended' | 'error'
             statusMsg: "Click microphone to start",
@@ -30,6 +76,7 @@ export class VoiceData extends Component {
             activeRole: "",
             volume: 0,
             isSpeaking: false,
+            errorModal: null, // { title: string, message: string }
         });
 
         // 1. Listen to real-time client events from VAPI SDK
@@ -38,8 +85,29 @@ export class VoiceData extends Component {
         };
         const onVapiStatus = (ev) => {
             if (ev.detail) {
-                if (ev.detail.callState) this.state.callState = ev.detail.callState;
+                if (ev.detail.callState) {
+                    this.state.callState = ev.detail.callState;
+                    if (ev.detail.callState === 'ended' || ev.detail.callState === 'active') {
+                        this.state.errorModal = null;
+                    }
+                }
                 if (ev.detail.msg) this.state.statusMsg = ev.detail.msg;
+                if (ev.detail.showErrorPopup && ev.detail.callState !== 'ended' && this.state.callState !== 'ended') {
+                    let msg = ev.detail.errorMessage || ev.detail.msg || "Something went wrong. Please try again.";
+                    if (typeof msg !== 'string' || msg === '[object Object]') {
+                        msg = "Something went wrong. Please try again.";
+                    }
+                    const lowerMsg = String(msg).toLowerCase();
+                    if (lowerMsg.includes("meeting has ended") || lowerMsg.includes("ejected") || lowerMsg.includes("ejection") || lowerMsg.includes("left-meeting")) {
+                        this.state.callState = 'ended';
+                        this.state.errorModal = null;
+                        return;
+                    }
+                    this.state.errorModal = {
+                        title: ev.detail.errorTitle || "Voice Assistant Error",
+                        message: msg
+                    };
+                }
             }
         };
         const onVapiVolume = (ev) => {
@@ -103,6 +171,10 @@ export class VoiceData extends Component {
         } else {
             window.dispatchEvent(new CustomEvent("ora_toggle_call"));
         }
+    }
+
+    closeErrorModal() {
+        this.state.errorModal = null;
     }
 
     drawWave() {
@@ -204,25 +276,25 @@ export class VoiceData extends Component {
             }
         }
 
-        // Tool calls / Function calls for order details
+        // Tool calls / Function calls for all operations
         const toolCalls = data.toolCalls || data.message?.toolCalls;
         if (Array.isArray(toolCalls)) {
             for (const tc of toolCalls) {
-                if (tc?.function?.arguments) {
-                    let args = tc.function.arguments;
-                    if (typeof args === "string") {
-                        try {
-                            args = JSON.parse(args);
-                        } catch {
-                            args = {};
-                        }
+                const funcName = tc?.function?.name || "";
+                let args = tc?.function?.arguments || {};
+                if (typeof args === "string") {
+                    try {
+                        args = JSON.parse(args);
+                    } catch {
+                        args = {};
                     }
-                    this.applyOrderDetails(args?.OrderDetails);
                 }
+                this.dispatchToolCall(funcName, args);
             }
         }
         if (data.functionCall) {
-            let params = data.functionCall.parameters;
+            const funcName = data.functionCall.name || "";
+            let params = data.functionCall.parameters || {};
             if (typeof params === "string") {
                 try {
                     params = JSON.parse(params);
@@ -230,7 +302,39 @@ export class VoiceData extends Component {
                     params = {};
                 }
             }
-            this.applyOrderDetails(params?.OrderDetails);
+            this.dispatchToolCall(funcName, params);
+        }
+    }
+
+    setOperation(op) {
+        if (this.state.currentOperation !== op) {
+            this.state.currentOperation = op;
+            this.state.operationState = "initial";
+            this.state.createdRecordRef = "";
+            this.state.operationError = "";
+        }
+    }
+
+    dispatchToolCall(funcName, args) {
+        if (!args || this.props?.isTestMode) return;
+        const lowerName = funcName.toLowerCase();
+
+        if (lowerName.includes("sale") || lowerName.includes("finalorder") || args.OrderDetails) {
+            this.state.currentOperation = "sale";
+            this.state.operationState = "collecting";
+            this.applyOrderDetails(args?.OrderDetails || args);
+        } else if (lowerName.includes("invoice")) {
+            this.state.currentOperation = "invoice";
+            this.state.operationState = "collecting";
+            this.applyInvoiceDetails(args);
+        } else if (lowerName.includes("customer")) {
+            this.state.currentOperation = "customer";
+            this.state.operationState = "collecting";
+            this.applyCustomerDetails(args);
+        } else if (lowerName.includes("product")) {
+            this.state.currentOperation = "product";
+            this.state.operationState = "collecting";
+            this.applyProductDetails(args);
         }
     }
 
@@ -252,6 +356,70 @@ export class VoiceData extends Component {
         }
     }
 
+    applyInvoiceDetails(args) {
+        if (!args || this.props?.isTestMode) return;
+        if (args.Customer || args.customer) {
+            this.state.invoiceData.customer = args.Customer || args.customer;
+        }
+        const lines = args.InvoiceLines || args.lines;
+        if (Array.isArray(lines) && lines.length > 0) {
+            let untaxed = 0;
+            let taxTotal = 0;
+            const lineList = lines.map(item => {
+                const qty = item.Quantity || item.qty || 1;
+                const price = item.UnitPrice || item.price || 0;
+                const taxRate = item.Tax || item.tax || 0;
+                const subtotal = qty * price;
+                const tax = subtotal * (taxRate / 100);
+                untaxed += subtotal;
+                taxTotal += tax;
+                return {
+                    quantity: qty,
+                    product: item.Product || item.product || "",
+                    price_unit: price,
+                    tax: taxRate,
+                    subtotal: subtotal,
+                    product_id: item.productId || item.id || ""
+                };
+            });
+            this.state.invoiceData.lines = lineList;
+            this.state.invoiceData.untaxed = untaxed;
+            this.state.invoiceData.tax = taxTotal;
+            this.state.invoiceData.total = untaxed + taxTotal;
+        }
+    }
+
+    applyCustomerDetails(args) {
+        if (!args || this.props?.isTestMode) return;
+        this.state.customerData = Object.assign(this.state.customerData, {
+            name: args.name || args.customer_name || this.state.customerData.name,
+            phone: args.phone || this.state.customerData.phone,
+            email: args.email || this.state.customerData.email,
+            company: args.company_name || args.company || this.state.customerData.company,
+            street: args.street || this.state.customerData.street,
+            city: args.city || this.state.customerData.city,
+            state: args.state || this.state.customerData.state,
+            country: args.country || this.state.customerData.country,
+            type: args.is_company ? "Company" : "Individual",
+        });
+    }
+
+    applyProductDetails(args) {
+        if (!args || this.props?.isTestMode) return;
+        this.state.productData = Object.assign(this.state.productData, {
+            name: args.name || args.product_name || this.state.productData.name,
+            default_code: args.default_code || args.internal_reference || this.state.productData.default_code,
+            type: (args.type === 'service') ? "Service" : "Goods",
+            list_price: args.list_price || args.price || this.state.productData.list_price,
+            standard_price: args.standard_price || args.cost || this.state.productData.standard_price,
+            categ: args.categ_name || args.category || this.state.productData.categ,
+            uom: args.uom_name || this.state.productData.uom,
+            barcode: args.barcode || this.state.productData.barcode,
+            sale_ok: (args.sale_ok !== undefined) ? Boolean(args.sale_ok) : this.state.productData.sale_ok,
+            purchase_ok: (args.purchase_ok !== undefined) ? Boolean(args.purchase_ok) : this.state.productData.purchase_ok,
+        });
+    }
+
     onMessage(notifications) {
         if (!notifications) return;
 
@@ -266,6 +434,42 @@ export class VoiceData extends Component {
             return;
         }
 
+        // Handle multi-operation notifications from backend bus
+        const notif = notifications.value || notifications;
+        const op = notif.operation || notif.type;
+        if (op) {
+            if (op === "customer" || op === "res.partner") {
+                this.state.currentOperation = "customer";
+                this.state.operationState = notif.state || "success";
+                this.state.createdRecordRef = notif.record_name || "";
+                if (notif.data) {
+                    this.state.customerData = Object.assign(this.state.customerData, notif.data);
+                }
+                return;
+            } else if (op === "product" || op === "product.template") {
+                this.state.currentOperation = "product";
+                this.state.operationState = notif.state || "success";
+                this.state.createdRecordRef = notif.record_name || "";
+                if (notif.data) {
+                    this.state.productData = Object.assign(this.state.productData, notif.data);
+                }
+                return;
+
+            } else if (op === "invoice" || op === "account.move") {
+                this.state.currentOperation = "invoice";
+                this.state.operationState = notif.state || "success";
+                this.state.createdRecordRef = notif.record_name || "";
+                if (notif.data) {
+                    this.state.invoiceData = Object.assign(this.state.invoiceData, notif.data);
+                }
+                return;
+            } else if (op === "sale" || op === "sale.order") {
+                this.state.currentOperation = "sale";
+                this.state.operationState = notif.state || "success";
+                this.state.createdRecordRef = notif.order_name || "";
+            }
+        }
+
         // If bus notification has a full message with conversation
         if (notifications.value?.message?.conversation) {
             const conversation = notifications.value.message.conversation;
@@ -274,9 +478,10 @@ export class VoiceData extends Component {
             this.handlePayload(notifications.value);
         }
 
-        // If value is a product list array from backend (skip in test mode)
-        if (Array.isArray(notifications.value) && !this.props?.isTestMode) {
-            const products = notifications.value.map(item => ({
+        // If value is a product list array from backend (sales order)
+        const prVal = notif.value || notifications.value;
+        if (Array.isArray(prVal) && !this.props?.isTestMode) {
+            const products = prVal.map(item => ({
                 quantity: item.qty || item.Quantity || 1,
                 customer: item.customer || item.Customer || "",
                 product: item.product || item.Product || "",

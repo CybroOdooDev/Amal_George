@@ -21,3 +21,4 @@ from . import ora_language
 from . import provider_model
 from . import transcriber_model
 from . import ora_call_history
+from . import res_config_settings

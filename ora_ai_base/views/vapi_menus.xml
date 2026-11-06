@@ -14,6 +14,14 @@
                       name="Languages"
                       sequence="20"
                       action="ora_language_action"/>
+            <menuitem id="menu_vapi_provider_model"
+                      name="AI Models"
+                      sequence="30"
+                      action="provider_model_action"/>
+            <menuitem id="menu_vapi_transcriber_model"
+                      name="Transcriber Models"
+                      sequence="40"
+                      action="transcriber_model_action"/>
         </menuitem>
     </menuitem>
 </odoo>

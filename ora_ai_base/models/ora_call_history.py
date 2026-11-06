@@ -66,6 +66,27 @@ class OraCallHistory(models.Model):
         readonly=True,
         help="The sales order created during this voice assistant session."
     )
+    invoice_id = fields.Many2one(
+        "account.move",
+        string="Generated Invoice",
+        ondelete="set null",
+        readonly=True,
+        help="The customer invoice created during this voice assistant session."
+    )
+    created_partner_id = fields.Many2one(
+        "res.partner",
+        string="Created Customer",
+        ondelete="set null",
+        readonly=True,
+        help="The customer or contact created during this voice assistant session."
+    )
+    product_tmpl_id = fields.Many2one(
+        "product.template",
+        string="Created Product",
+        ondelete="set null",
+        readonly=True,
+        help="The product template created during this voice assistant session."
+    )
     call_type = fields.Selection([
         ('inboundPhoneCall', 'Inbound Phone'),
         ('webCall', 'Web Call'),
@@ -128,6 +149,62 @@ class OraCallHistory(models.Model):
 
     _uniq_vapi_call_id = models.Constraint('UNIQUE(vapi_call_id)', 'A call record with this Vapi Call ID already exists!')
 
+    def action_view_sale_order(self):
+        """Navigates to the linked Sale Order."""
+        self.ensure_one()
+        if not self.order_id:
+            return False
+        return {
+            'name': 'Sale Order',
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'res_id': self.order_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_view_invoice(self):
+        """Navigates to the linked Customer Invoice."""
+        self.ensure_one()
+        if not self.invoice_id:
+            return False
+        return {
+            'name': 'Customer Invoice',
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'res_id': self.invoice_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_view_created_partner(self):
+        """Navigates to the linked Created Customer."""
+        self.ensure_one()
+        if not self.created_partner_id:
+            return False
+        return {
+            'name': 'Customer',
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'res_id': self.created_partner_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_view_product(self):
+        """Navigates to the linked Created Product."""
+        self.ensure_one()
+        if not self.product_tmpl_id:
+            return False
+        return {
+            'name': 'Product',
+            'type': 'ir.actions.act_window',
+            'res_model': 'product.template',
+            'res_id': self.product_tmpl_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
     @api.model
     def log_call_status(self, data):
         """Processes incoming Vapi status updates or end-of-call reports idempotently."""
@@ -136,12 +213,18 @@ class OraCallHistory(models.Model):
 
         message = data.get('message', {}) if isinstance(data, dict) else {}
         msg_type = message.get('type')
+        if msg_type not in ('status-update', 'end-of-call-report'):
+            # Ignore high-frequency speech/interim events to avoid lock contention
+            return False
+
         call = message.get('call', {}) or {}
         call_id = call.get('id') or data.get('call_id') or message.get('call_id')
         if not call_id:
             return False
 
         record = self.sudo().search([('vapi_call_id', '=', call_id)], limit=1)
+        if msg_type == 'status-update' and message.get('status') == 'in-progress' and record:
+            return record
 
         call_type = call.get('type') or 'webCall'
         assistant_vapi_id = call.get('assistantId')
@@ -224,6 +307,33 @@ class OraCallHistory(models.Model):
             vals['recording_url'] = recording_url
         if msg_type == 'end-of-call-report' or message.get('endedReason'):
             vals['status'] = 'completed'
+
+        # Auto-link sale order if not yet linked
+        if not (record and record.order_id) and call_id:
+            linked_so = self.env['sale.order'].sudo().search([
+                '|',
+                ('origin', '=', f"Voice Assistant ({call_id[:8]})"),
+                ('origin', 'ilike', call_id[:8])
+            ], limit=1)
+            if linked_so:
+                vals['order_id'] = linked_so.id
+                if not vals.get('partner_id') and linked_so.partner_id:
+                    vals['partner_id'] = linked_so.partner_id.id
+                if not vals.get('user_id') and linked_so.user_id:
+                    vals['user_id'] = linked_so.user_id.id
+
+        # Auto-link invoice if not yet linked
+        if not (record and record.invoice_id) and call_id:
+            linked_inv = self.env['account.move'].sudo().search([
+                ('move_type', '=', 'out_invoice'),
+                '|',
+                ('invoice_origin', '=', f"Voice Assistant ({call_id[:8]})"),
+                ('invoice_origin', 'ilike', call_id[:8])
+            ], limit=1)
+            if linked_inv:
+                vals['invoice_id'] = linked_inv.id
+                if not vals.get('partner_id') and linked_inv.partner_id:
+                    vals['partner_id'] = linked_inv.partner_id.id
 
         if record:
             record.write(vals)

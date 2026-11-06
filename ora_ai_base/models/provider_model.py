@@ -15,7 +15,8 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class ProviderModel(models.Model):
@@ -30,3 +31,19 @@ class ProviderModel(models.Model):
                            " the AI provider's API ")
     provider = fields.Char(string="Provider",
                            help="The name of the AI service provider")
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        if not self.env.is_superuser() and not self.env.context.get('install_mode'):
+            raise UserError(_("AI Provider Models cannot be created manually."))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if not self.env.is_superuser() and not self.env.context.get('install_mode'):
+            raise UserError(_("AI Provider Models cannot be edited."))
+        return super().write(vals)
+
+    def unlink(self):
+        if not self.env.is_superuser() and not self.env.context.get('install_mode'):
+            raise UserError(_("AI Provider Models cannot be deleted."))
+        return super().unlink()

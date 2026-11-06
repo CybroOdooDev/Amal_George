@@ -18,7 +18,7 @@
 import json
 import logging
 import re
-from odoo import http
+from odoo import http, tools
 from odoo.fields import Command
 from odoo.http import request, Response
 
@@ -91,6 +91,32 @@ class VapiAssistant(http.Controller):
             return parsed['params']
         return parsed or request.params or {}
 
+    def _link_call_history(self, vapi_call_id, values, assistant=False, call_type='webCall'):
+        """Safely links or updates created records (sale order, invoice, customer, product)
+        in the matching ora.call.history record."""
+        if not vapi_call_id:
+            return False
+        try:
+            call_record = request.env['ora.call.history'].sudo().search(
+                [('vapi_call_id', '=', vapi_call_id)], limit=1)
+            history_vals = dict(values)
+            if assistant:
+                history_vals.setdefault('assistant_id', assistant.id)
+            if call_record:
+                call_record.write(history_vals)
+                return call_record
+            else:
+                history_vals.update({
+                    'name': f"Call-{vapi_call_id[:8]}" if vapi_call_id else "Call",
+                    'vapi_call_id': vapi_call_id,
+                    'call_type': call_type or 'webCall',
+                    'status': 'started',
+                })
+                return request.env['ora.call.history'].sudo().create(history_vals)
+        except Exception as e:
+            _logger.warning("Could not link record to ora.call.history (%s): %s", vapi_call_id, e)
+            return False
+
     @http.route('/vapi_voice_assistant/details', type='http',
                 auth='public', csrf=False, methods=['POST'])
     def final_details(self, **kwargs):
@@ -115,6 +141,12 @@ class VapiAssistant(http.Controller):
             tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
             tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_order"
 
+            if assistant and not assistant.is_sale_order_creation:
+                return self._make_tool_response(
+                    tool_call_id,
+                    "Sale Order Creation is currently disabled for this assistant."
+                )
+
             pr_list = []
             customer_name = ""
             if tool_calls:
@@ -136,10 +168,12 @@ class VapiAssistant(http.Controller):
                     })
                     if rec.get('Customer'):
                         customer_name = rec.get('Customer')
+                if not customer_name:
+                    customer_name = order_details.get('Customer') or arguments.get('Customer') or ''
 
             # Broadcast live order details to Owl component
             channel = "vapi_voice_channel"
-            message = {"value": pr_list, "channel": channel}
+            message = {"operation": "sale", "value": pr_list, "channel": channel}
             try:
                 request.env["bus.bus"]._sendone(channel, "notification", message)
             except Exception:
@@ -330,6 +364,7 @@ class VapiAssistant(http.Controller):
                 order_vals = {
                     'partner_id': partner.id,
                     'order_line': valid_lines,
+                    'origin': f"Voice Assistant ({vapi_call_id[:8]})" if vapi_call_id else "Voice Assistant",
                 }
                 if salesperson:
                     order_vals['user_id'] = salesperson.id
@@ -346,37 +381,40 @@ class VapiAssistant(http.Controller):
                 if auto_confirm:
                     sales.action_confirm()
 
-                # Link order to call history
+                # Explicitly commit the sale order so it cannot be rolled back by call history contention
+                if not tools.config.get('test_enable'):
+                    try:
+                        request.env.cr.commit()
+                    except Exception:
+                        pass
+
+                # Link order to call history safely
                 if vapi_call_id:
-                    call_record = request.env['ora.call.history'].sudo().search(
-                        [('vapi_call_id', '=', vapi_call_id)], limit=1)
-                    if call_record:
-                        history_vals = {
-                            'order_id': sales.id,
-                            'partner_id': partner.id,
-                            'assistant_id': assistant.id if assistant else call_record.assistant_id.id,
-                        }
-                        if salesperson:
-                            history_vals['user_id'] = salesperson.id
-                        call_record.write(history_vals)
-                    else:
-                        history_vals = {
-                            'vapi_call_id': vapi_call_id,
-                            'name': f"Call-{vapi_call_id[:8]}",
-                            'order_id': sales.id,
-                            'partner_id': partner.id,
-                            'call_type': call_type,
-                            'assistant_id': assistant.id if assistant else False,
-                            'company_id': sales.company_id.id,
-                        }
-                        if salesperson:
-                            history_vals['user_id'] = salesperson.id
-                        request.env['ora.call.history'].sudo().create(history_vals)
+                    link_vals = {
+                        'order_id': sales.id,
+                        'partner_id': partner.id,
+                        'company_id': sales.company_id.id,
+                    }
+                    if salesperson:
+                        link_vals['user_id'] = salesperson.id
+                    self._link_call_history(
+                        vapi_call_id,
+                        link_vals,
+                        assistant=assistant,
+                        call_type=call_type
+                    )
 
                 # Broadcast confirmation notification
                 request.env["bus.bus"]._sendone(
                     channel, "notification",
-                    {"value": pr_list, "channel": channel, "order_id": sales.id, "order_name": sales.name}
+                    {
+                        "operation": "sale",
+                        "state": "success",
+                        "value": pr_list,
+                        "channel": channel,
+                        "order_id": sales.id,
+                        "order_name": sales.name
+                    }
                 )
 
                 return self._make_tool_response(
@@ -405,13 +443,20 @@ class VapiAssistant(http.Controller):
 
         try:
             data = self._parse_request_data()
-            # Log call history and transcript
-            request.env['ora.call.history'].sudo().log_call_status(data)
+            message = data.get('message', {}) if isinstance(data, dict) else {}
+            msg_type = message.get('type')
+
+            # Only persist call status on status-update and end-of-call-report
+            if msg_type in ('status-update', 'end-of-call-report'):
+                request.env['ora.call.history'].sudo().log_call_status(data)
 
             # Broadcast status to Owl component
             channel = "vapi_voice_channel"
-            message = {"value": data, "channel": channel}
-            request.env["bus.bus"]._sendone(channel, "notification", message)
+            message_payload = {"value": data, "channel": channel}
+            try:
+                request.env["bus.bus"]._sendone(channel, "notification", message_payload)
+            except Exception:
+                pass
             return self._make_json_response({"status": "ok"})
         except Exception as e:
             _logger.exception("Error processing Vapi status: %s", e)
@@ -567,3 +612,403 @@ class VapiAssistant(http.Controller):
                 f"Could not verify customer due to an internal error: {str(e)}",
                 status=500
             )
+
+    @http.route('/vapi_voice_assistant/create_customer', type='http',
+                auth='public', csrf=False, methods=['POST'])
+    def create_customer(self, **kwargs):
+        """Creates a new customer / contact in Odoo res.partner via voice assistant."""
+        if not self._verify_webhook_secret():
+            return self._make_json_response({"error": "Unauthorized"}, status=401)
+        try:
+            data = self._parse_request_data()
+            message_data = data.get('message', {})
+            call = message_data.get('call', {}) or data.get('call', {})
+            assistant_vapi_id = call.get('assistantId')
+            assistant = False
+            if assistant_vapi_id:
+                assistant = request.env['ora.ai'].sudo().search(
+                    [('id_assistant', '=', assistant_vapi_id)], limit=1)
+
+            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
+            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_customer"
+
+            if assistant and not assistant.is_customer_creation:
+                return self._make_tool_response(tool_call_id, "Customer Creation is currently disabled for this assistant.")
+
+            arguments = {}
+            if tool_calls:
+                raw_args = tool_calls[0].get('function', {}).get('arguments', {})
+                if isinstance(raw_args, str):
+                    try:
+                        arguments = json.loads(raw_args)
+                    except Exception:
+                        arguments = {}
+                elif isinstance(raw_args, dict):
+                    arguments = raw_args
+
+            name = (arguments.get('name') or arguments.get('customer_name') or '').strip()
+            if not name:
+                return self._make_tool_response(tool_call_id, "Customer name is required to create an account.")
+
+            phone = arguments.get('phone') or ''
+            email = arguments.get('email') or ''
+            company_name = arguments.get('company_name') or ''
+            street = arguments.get('street') or ''
+            city = arguments.get('city') or ''
+            state_name = arguments.get('state') or ''
+            country_name = arguments.get('country') or ''
+            is_company = bool(arguments.get('is_company'))
+
+            Partner = request.env['res.partner'].sudo()
+            existing = Partner.search([
+                ('type', '!=', 'private'),
+                '|', ('name', '=ilike', name),
+                '|', ('email', '=ilike', email) if email else ('id', '=', 0),
+                ('phone', '=', phone) if phone else ('id', '=', 0)
+            ], limit=1)
+
+            state_id = False
+            country_id = False
+            if country_name:
+                country = request.env['res.country'].sudo().search([('name', '=ilike', country_name)], limit=1)
+                if country:
+                    country_id = country.id
+            if state_name:
+                state_domain = [('name', '=ilike', state_name)]
+                if country_id:
+                    state_domain.append(('country_id', '=', country_id))
+                state = request.env['res.country.state'].sudo().search(state_domain, limit=1)
+                if state:
+                    state_id = state.id
+                    if not country_id:
+                        country_id = state.country_id.id
+
+            vals = {
+                'name': name,
+                'is_company': is_company,
+                'phone': phone or False,
+                'email': email or False,
+                'street': street or False,
+                'city': city or False,
+                'state_id': state_id or False,
+                'country_id': country_id or False,
+                'customer_rank': 1,
+            }
+            if assistant and assistant.company_id:
+                vals['company_id'] = assistant.company_id.id
+
+            partner = Partner.create(vals)
+            if not tools.config.get('test_enable'):
+                try:
+                    request.env.cr.commit()
+                except Exception:
+                    pass
+
+            # Link created customer to call history
+            vapi_call_id = call.get('id') or data.get('call_id')
+            if vapi_call_id:
+                self._link_call_history(
+                    vapi_call_id,
+                    {'created_partner_id': partner.id, 'partner_id': partner.id},
+                    assistant=assistant,
+                    call_type=call.get('type') or 'webCall'
+                )
+
+            channel = "vapi_voice_channel"
+            notification = {
+                "channel": channel,
+                "operation": "customer",
+                "state": "success",
+                "data": {
+                    "name": partner.name,
+                    "phone": partner.phone or "",
+                    "email": partner.email or "",
+                    "company": company_name or "",
+                    "street": partner.street or "",
+                    "city": partner.city or "",
+                    "state": partner.state_id.name if partner.state_id else "",
+                    "country": partner.country_id.name if partner.country_id else "",
+                    "type": "Company" if partner.is_company else "Individual",
+                },
+                "record_id": partner.id,
+                "record_name": partner.name,
+            }
+            try:
+                request.env["bus.bus"]._sendone(channel, "notification", notification)
+            except Exception:
+                pass
+
+            return self._make_tool_response(
+                tool_call_id,
+                f"Customer '{partner.name}' successfully created in Odoo (ID: {partner.id}). Phone: {partner.phone or 'N/A'}, Email: {partner.email or 'N/A'}."
+            )
+        except Exception as e:
+            _logger.exception("Error in create_customer webhook: %s", e)
+            return self._make_tool_response(tool_call_id if 'tool_call_id' in locals() else "tool_call_customer", f"Error creating customer: {str(e)}", status=500)
+
+    @http.route('/vapi_voice_assistant/create_product', type='http',
+                auth='public', csrf=False, methods=['POST'])
+    def create_product(self, **kwargs):
+        """Creates a new product in product.template via voice assistant."""
+        if not self._verify_webhook_secret():
+            return self._make_json_response({"error": "Unauthorized"}, status=401)
+        try:
+            data = self._parse_request_data()
+            message_data = data.get('message', {})
+            call = message_data.get('call', {}) or data.get('call', {})
+            assistant_vapi_id = call.get('assistantId')
+            assistant = False
+            if assistant_vapi_id:
+                assistant = request.env['ora.ai'].sudo().search(
+                    [('id_assistant', '=', assistant_vapi_id)], limit=1)
+
+            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
+            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_product"
+
+            if assistant and not assistant.is_product_creation:
+                return self._make_tool_response(tool_call_id, "Product Creation is currently disabled for this assistant.")
+
+            arguments = {}
+            if tool_calls:
+                raw_args = tool_calls[0].get('function', {}).get('arguments', {})
+                if isinstance(raw_args, str):
+                    try:
+                        arguments = json.loads(raw_args)
+                    except Exception:
+                        arguments = {}
+                elif isinstance(raw_args, dict):
+                    arguments = raw_args
+
+            name = (arguments.get('name') or arguments.get('product_name') or '').strip()
+            if not name:
+                return self._make_tool_response(tool_call_id, "Product name is required.")
+
+            default_code = arguments.get('default_code') or arguments.get('internal_reference') or ''
+            p_type = arguments.get('type') or 'consu'
+            list_price = float(arguments.get('list_price') or arguments.get('price') or 0.0)
+            standard_price = float(arguments.get('standard_price') or arguments.get('cost') or 0.0)
+            categ_name = arguments.get('categ_name') or arguments.get('category') or ''
+            barcode = arguments.get('barcode') or ''
+            sale_ok = arguments.get('sale_ok', True)
+            purchase_ok = arguments.get('purchase_ok', True)
+
+            categ = False
+            if categ_name:
+                categ = request.env['product.category'].sudo().search([('name', '=ilike', categ_name)], limit=1)
+            if not categ:
+                categ = request.env['product.category'].sudo().search([], limit=1)
+
+            vals = {
+                'name': name,
+                'default_code': default_code or False,
+                'type': p_type if p_type in ('consu', 'service', 'product') else 'consu',
+                'list_price': list_price,
+                'standard_price': standard_price,
+                'categ_id': categ.id if categ else False,
+                'barcode': barcode or False,
+                'sale_ok': bool(sale_ok),
+                'purchase_ok': bool(purchase_ok),
+            }
+            if assistant and assistant.company_id:
+                vals['company_id'] = assistant.company_id.id
+
+            product_template = request.env['product.template'].sudo().create(vals)
+            if not tools.config.get('test_enable'):
+                try:
+                    request.env.cr.commit()
+                except Exception:
+                    pass
+
+            # Link created product to call history
+            vapi_call_id = call.get('id') or data.get('call_id')
+            if vapi_call_id:
+                self._link_call_history(
+                    vapi_call_id,
+                    {'product_tmpl_id': product_template.id},
+                    assistant=assistant,
+                    call_type=call.get('type') or 'webCall'
+                )
+
+            channel = "vapi_voice_channel"
+            notification = {
+                "channel": channel,
+                "operation": "product",
+                "state": "success",
+                "data": {
+                    "name": product_template.name,
+                    "default_code": product_template.default_code or "-",
+                    "type": "Goods" if product_template.type == 'consu' else "Service",
+                    "list_price": product_template.list_price,
+                    "standard_price": product_template.standard_price,
+                    "categ": product_template.categ_id.name if product_template.categ_id else "All",
+                    "uom": product_template.uom_id.name if hasattr(product_template, 'uom_id') and product_template.uom_id else "Units",
+                    "barcode": product_template.barcode or "-",
+                    "sale_ok": product_template.sale_ok,
+                    "purchase_ok": product_template.purchase_ok,
+                },
+                "record_id": product_template.id,
+                "record_name": product_template.name,
+            }
+            try:
+                request.env["bus.bus"]._sendone(channel, "notification", notification)
+            except Exception:
+                pass
+
+            return self._make_tool_response(
+                tool_call_id,
+                f"Product '{product_template.name}' successfully created in Odoo (ID: {product_template.id}). Sales Price: {product_template.list_price}."
+            )
+        except Exception as e:
+            _logger.exception("Error in create_product webhook: %s", e)
+            return self._make_tool_response(tool_call_id if 'tool_call_id' in locals() else "tool_call_product", f"Error creating product: {str(e)}", status=500)
+
+    @http.route('/vapi_voice_assistant/create_invoice', type='http',
+                auth='public', csrf=False, methods=['POST'])
+    def create_invoice(self, **kwargs):
+        """Creates a customer invoice in account.move via voice assistant."""
+        if not self._verify_webhook_secret():
+            return self._make_json_response({"error": "Unauthorized"}, status=401)
+        try:
+            data = self._parse_request_data()
+            message_data = data.get('message', {})
+            call = message_data.get('call', {}) or data.get('call', {})
+            assistant_vapi_id = call.get('assistantId')
+            assistant = False
+            if assistant_vapi_id:
+                assistant = request.env['ora.ai'].sudo().search(
+                    [('id_assistant', '=', assistant_vapi_id)], limit=1)
+
+            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
+            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_invoice"
+
+            if assistant and not assistant.is_invoice_creation:
+                return self._make_tool_response(tool_call_id, "Invoice Creation is currently disabled for this assistant.")
+
+            if 'account.move' not in request.env:
+                return self._make_tool_response(tool_call_id, "Accounting module is not installed in Odoo.")
+
+            arguments = {}
+            if tool_calls:
+                raw_args = tool_calls[0].get('function', {}).get('arguments', {})
+                if isinstance(raw_args, str):
+                    try:
+                        arguments = json.loads(raw_args)
+                    except Exception:
+                        arguments = {}
+                elif isinstance(raw_args, dict):
+                    arguments = raw_args
+
+            customer_name = (arguments.get('Customer') or arguments.get('customer') or arguments.get('customer_name') or '').strip()
+            invoice_lines_data = arguments.get('InvoiceLines') or arguments.get('invoice_lines') or arguments.get('lines') or []
+
+            if not customer_name:
+                return self._make_tool_response(tool_call_id, "Customer name is required to create an invoice.")
+
+            if not invoice_lines_data:
+                return self._make_tool_response(tool_call_id, "At least one invoice line is required to create an invoice.")
+
+            Partner = request.env['res.partner'].sudo()
+            customer = Partner.search([
+                ('type', '!=', 'private'),
+                '|', ('name', '=ilike', customer_name), ('display_name', '=ilike', customer_name)
+            ], limit=1)
+            if not customer:
+                customer = Partner.create({
+                    'name': customer_name,
+                    'customer_rank': 1,
+                    'company_id': assistant.company_id.id if assistant and assistant.company_id else False
+                })
+
+            invoice_lines = []
+            preview_lines = []
+            for item in invoice_lines_data:
+                p_name = item.get('Product') or item.get('product') or item.get('product_name') or ''
+                p_id = item.get('productId') or item.get('product_id') or item.get('id')
+                qty = float(item.get('Quantity') or item.get('quantity') or item.get('qty') or 1.0)
+                price_unit = float(item.get('UnitPrice') or item.get('price_unit') or item.get('price') or 0.0)
+
+                product = False
+                if p_id:
+                    try:
+                        product = request.env['product.product'].sudo().browse(int(p_id))
+                    except Exception:
+                        product = False
+                if not product or not product.exists():
+                    product = request.env['product.product'].sudo().search([
+                        '|', ('name', '=ilike', p_name), ('default_code', '=ilike', p_name)
+                    ], limit=1)
+
+                if product and product.exists():
+                    if price_unit <= 0:
+                        price_unit = product.list_price
+                    subtotal = qty * price_unit
+                    invoice_lines.append(Command.create({
+                        'product_id': product.id,
+                        'name': product.display_name or product.name,
+                        'quantity': qty,
+                        'price_unit': price_unit,
+                    }))
+                    preview_lines.append({
+                        'product': product.name,
+                        'quantity': qty,
+                        'price_unit': price_unit,
+                        'tax': item.get('Tax') or 0,
+                        'subtotal': subtotal,
+                        'product_id': product.id
+                    })
+
+            if not invoice_lines:
+                return self._make_tool_response(tool_call_id, "No valid products could be matched for this invoice.")
+
+            move_vals = {
+                'move_type': 'out_invoice',
+                'partner_id': customer.id,
+                'invoice_line_ids': invoice_lines,
+            }
+            if assistant and assistant.company_id:
+                move_vals['company_id'] = assistant.company_id.id
+
+            invoice = request.env['account.move'].sudo().create(move_vals)
+            if not tools.config.get('test_enable'):
+                try:
+                    request.env.cr.commit()
+                except Exception:
+                    pass
+
+            # Link created invoice to call history
+            vapi_call_id = call.get('id') or data.get('call_id')
+            if vapi_call_id:
+                self._link_call_history(
+                    vapi_call_id,
+                    {'invoice_id': invoice.id, 'partner_id': customer.id},
+                    assistant=assistant,
+                    call_type=call.get('type') or 'webCall'
+                )
+
+            channel = "vapi_voice_channel"
+            notification = {
+                "channel": channel,
+                "operation": "invoice",
+                "state": "success",
+                "data": {
+                    "customer": customer.name,
+                    "lines": preview_lines,
+                    "untaxed": invoice.amount_untaxed,
+                    "tax": invoice.amount_tax,
+                    "total": invoice.amount_total,
+                },
+                "record_id": invoice.id,
+                "record_name": invoice.name or f"Draft #{invoice.id}",
+            }
+            try:
+                request.env["bus.bus"]._sendone(channel, "notification", notification)
+            except Exception:
+                pass
+
+            return self._make_tool_response(
+                tool_call_id,
+                f"Customer Invoice '{invoice.name or f'Draft #{invoice.id}'}' successfully created in draft state for {customer.name}. Total: {invoice.amount_total}."
+            )
+        except Exception as e:
+            _logger.exception("Error in create_invoice webhook: %s", e)
+            return self._make_tool_response(tool_call_id if 'tool_call_id' in locals() else "tool_call_invoice", f"Error creating invoice: {str(e)}", status=500)

@@ -490,6 +490,127 @@
     padding: 3px 9px;
 }
 
+.ora_badge_success {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #34d399;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 3px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ora_badge_collecting {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 3px 9px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    animation: ora-pulse 1.8s infinite;
+}
+
+@keyframes ora-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Operation Tabs Bar */
+.ora_op_tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.ora_op_tab {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f1f5f9;
+    }
+
+    &.active {
+        background: rgba(56, 189, 248, 0.2);
+        border-color: rgba(56, 189, 248, 0.5);
+        color: #38bdf8;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+}
+
+.ora_kv_table {
+    tbody tr td:first-child {
+        color: #94a3b8;
+        font-weight: 500;
+        font-size: 12px;
+    }
+}
+
+.ora_total_bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    color: #94a3b8;
+
+    strong {
+        color: #38bdf8;
+        font-size: 15px;
+    }
+}
+
+.ora_invoice_totals {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #94a3b8;
+
+    .ora_tot_row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .ora_grand_total {
+        margin-top: 4px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 14px;
+        color: #f1f5f9;
+
+        strong {
+            color: #34d399;
+            font-size: 15px;
+        }
+    }
+}
+
 /* Customer Box */
 .ora_customer_box {
     display: flex;
@@ -627,5 +748,93 @@
         color: #475569;
         display: block;
         margin-bottom: 6px;
+    }
+}
+
+/* Error / Model Unavailable Pop-up Modal */
+.ora_error_popup_backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 8, 18, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    animation: oraFadeIn 0.25s ease-out;
+}
+
+.ora_error_popup_card {
+    background: linear-gradient(145deg, rgba(26, 32, 53, 0.98), rgba(15, 23, 42, 0.98));
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(239, 68, 68, 0.25);
+    border-radius: 20px;
+    padding: 28px 24px 22px 24px;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    color: #f1f5f9;
+}
+
+.ora_error_popup_icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px auto;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+    font-size: 26px;
+}
+
+.ora_error_popup_title {
+    font-size: 1.22rem;
+    font-weight: 700;
+    color: #f87171;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+}
+
+.ora_error_popup_msg {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #cbd5e1;
+    margin-bottom: 24px;
+    word-break: break-word;
+    white-space: pre-line;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.ora_error_popup_actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.ora_error_popup_btn {
+    padding: 9px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: linear-gradient(135deg, #f87171, #ef4444);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+        transform: translateY(-1px);
     }
 }

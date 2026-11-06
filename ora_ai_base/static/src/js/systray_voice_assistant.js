@@ -54,6 +54,10 @@ class VoiceAssistantSystray extends Component {
                 assistant_id: assistant.assistant_id,
                 api_key: assistant.api_key,
                 assistant_name: assistant.name,
+                provider: assistant.provider,
+                provider_model: assistant.provider_model,
+                language: assistant.language,
+                transcriber: assistant.transcriber,
                 user_id: currentUserId,
             },
         });

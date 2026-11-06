@@ -101,81 +101,248 @@
                     </div>
                 </div>
 
-                <!-- Live Order Companion Card (Only shown in regular sales/order mode) -->
+                <!-- Dynamic Live Operation Companion Card -->
                 <t t-if="!this.props?.isTestMode">
                     <div class="ora_order_card">
+                        <!-- Header with dynamic title and operation pills -->
                         <div class="ora_order_header">
                             <div class="ora_order_title">
-                                <i class="oi" data-icon="shopping_bag"/> Live Order
+                                <t t-if="this.state.currentOperation == 'sale'">
+                                    <i class="oi" data-icon="shopping_bag"/> Live Order
+                                </t>
+                                <t t-elif="this.state.currentOperation == 'invoice'">
+                                    <i class="oi" data-icon="receipt"/> Live Invoice
+                                </t>
+                                <t t-elif="this.state.currentOperation == 'customer'">
+                                    <i class="oi" data-icon="person_add"/> Live Customer
+                                </t>
+                                <t t-elif="this.state.currentOperation == 'product'">
+                                    <i class="oi" data-icon="inventory_2"/> Live Product
+                                </t>
                             </div>
-                            <t t-if="this.state.products.length > 0">
-                                <span class="ora_order_count_badge">
-                                    <t t-out="this.state.products.length"/> item(s)
-                                </span>
-                            </t>
-                        </div>
-
-                        <!-- Customer Profile Card -->
-                        <div class="ora_customer_box">
-                            <div class="ora_customer_avatar">
-                                <i class="oi" data-icon="account_circle"/>
-                            </div>
-                            <div class="ora_customer_info">
-                                <div class="ora_customer_name">
-                                    <t t-out="this.state.customer || 'Guest Customer'"/>
-                                </div>
-                                <div class="ora_customer_status">
-                                    <t t-if="this.state.selectedPartnerId">
-                                        <span class="ora_badge_existing">
-                                            <i class="oi" data-icon="verified"/> Existing Customer
-                                        </span>
-                                    </t>
-                                    <t t-elif="this.state.customer">
-                                        <span class="ora_badge_new">New Customer</span>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="ora_badge_waiting">Identifying customer...</span>
-                                    </t>
-                                </div>
+                            <div class="ora_order_meta">
+                                <t t-if="this.state.operationState == 'success'">
+                                    <span class="ora_badge_success">
+                                        <i class="oi" data-icon="check_circle"/> <t t-out="this.state.createdRecordRef || 'Created'"/>
+                                    </span>
+                                </t>
+                                <t t-elif="this.state.operationState == 'collecting'">
+                                    <span class="ora_badge_collecting">
+                                        <i class="oi" data-icon="sync"/> Live
+                                    </span>
+                                </t>
                             </div>
                         </div>
 
-                        <!-- Order Products Glass Table -->
-                        <div class="ora_table_scroll">
-                            <table class="ora_glass_table">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Variant</th>
-                                        <th>Qty</th>
-                                        <th>ID</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-if="!this.state.products or this.state.products.length == 0">
-                                        <tr>
-                                            <td colspan="4" class="ora_table_empty">
-                                                <i class="oi" data-icon="inventory_2"/>
-                                                <span>No items in order yet. Start speaking with the assistant to place items.</span>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <t t-foreach="this.state.products" t-as="product" t-key="product.product_id">
-                                        <tr>
-                                            <td class="ora_col_prod"><t t-out="product.product"/></td>
-                                            <td class="ora_col_variant"><t t-out="product.variant || '-'"/></td>
-                                            <td class="ora_col_qty">
-                                                <span class="ora_qty_chip"><t t-out="product.quantity"/></span>
-                                            </td>
-                                            <td class="ora_col_id"><t t-out="product.product_id"/></td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
+                        <!-- Operation Quick Switcher Tabs -->
+                        <div class="ora_op_tabs">
+                            <button class="ora_op_tab" t-att-class="{'active': this.state.currentOperation == 'sale'}" t-on-click="() => this.setOperation('sale')">Sale</button>
+                            <button class="ora_op_tab" t-att-class="{'active': this.state.currentOperation == 'invoice'}" t-on-click="() => this.setOperation('invoice')">Invoice</button>
+                            <button class="ora_op_tab" t-att-class="{'active': this.state.currentOperation == 'customer'}" t-on-click="() => this.setOperation('customer')">Customer</button>
+                            <button class="ora_op_tab" t-att-class="{'active': this.state.currentOperation == 'product'}" t-on-click="() => this.setOperation('product')">Product</button>
                         </div>
+
+                        <!-- ================= 1. SALES ORDER PANEL (PRESERVED) ================= -->
+                        <t t-if="this.state.currentOperation == 'sale'">
+                            <!-- Customer Profile Card -->
+                            <div class="ora_customer_box">
+                                <div class="ora_customer_avatar">
+                                    <i class="oi" data-icon="account_circle"/>
+                                </div>
+                                <div class="ora_customer_info">
+                                    <div class="ora_customer_name">
+                                        <t t-out="this.state.customer || 'Guest Customer'"/>
+                                    </div>
+                                    <div class="ora_customer_status">
+                                        <t t-if="this.state.selectedPartnerId">
+                                            <span class="ora_badge_existing">
+                                                <i class="oi" data-icon="verified"/> Existing Customer
+                                            </span>
+                                        </t>
+                                        <t t-elif="this.state.customer">
+                                            <span class="ora_badge_new">New Customer</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="ora_badge_waiting">Identifying customer...</span>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Products Glass Table -->
+                            <div class="ora_table_scroll">
+                                <table class="ora_glass_table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Variant</th>
+                                            <th>Qty</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="!this.state.products or this.state.products.length == 0">
+                                            <tr>
+                                                <td colspan="4" class="ora_table_empty">
+                                                    <i class="oi" data-icon="inventory_2"/>
+                                                    <span>No items in order yet. Start speaking with the assistant to place items.</span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="this.state.products" t-as="product" t-key="product.product_id">
+                                            <tr>
+                                                <td class="ora_col_prod"><t t-out="product.product"/></td>
+                                                <td class="ora_col_variant"><t t-out="product.variant || '-'"/></td>
+                                                <td class="ora_col_qty">
+                                                    <span class="ora_qty_chip"><t t-out="product.quantity"/></span>
+                                                </td>
+                                                <td class="ora_col_id"><t t-out="product.product_id"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+
+                        <!-- ================= 3. INVOICE PANEL ================= -->
+                        <t t-elif="this.state.currentOperation == 'invoice'">
+                            <!-- Customer Profile Card -->
+                            <div class="ora_customer_box">
+                                <div class="ora_customer_avatar">
+                                    <i class="oi" data-icon="receipt_long"/>
+                                </div>
+                                <div class="ora_customer_info">
+                                    <div class="ora_customer_name">
+                                        <t t-out="this.state.invoiceData.customer || 'Customer not selected'"/>
+                                    </div>
+                                    <div class="ora_customer_status">
+                                        <t t-if="this.state.invoiceData.customer">
+                                            <span class="ora_badge_existing"><i class="oi" data-icon="verified"/> Customer Invoiced</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="ora_badge_waiting">Identifying customer for invoice...</span>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Invoice Lines Table -->
+                            <div class="ora_table_scroll">
+                                <table class="ora_glass_table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Tax</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="!this.state.invoiceData.lines or this.state.invoiceData.lines.length == 0">
+                                            <tr>
+                                                <td colspan="5" class="ora_table_empty">
+                                                    <i class="oi" data-icon="description"/>
+                                                    <span>No invoice lines yet. Mention customer and items to create invoice.</span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="this.state.invoiceData.lines" t-as="l" t-key="l_index">
+                                            <tr>
+                                                <td class="ora_col_prod"><t t-out="l.product"/></td>
+                                                <td class="ora_col_qty"><span class="ora_qty_chip"><t t-out="l.quantity"/></span></td>
+                                                <td><t t-out="l.price_unit"/></td>
+                                                <td><t t-out="l.tax"/>%</td>
+                                                <td><strong><t t-out="l.subtotal"/></strong></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="ora_invoice_totals" t-if="this.state.invoiceData.lines.length > 0">
+                                <div class="ora_tot_row"><span>Untaxed:</span> <span><t t-out="this.state.invoiceData.untaxed"/></span></div>
+                                <div class="ora_tot_row"><span>Tax:</span> <span><t t-out="this.state.invoiceData.tax"/></span></div>
+                                <div class="ora_tot_row ora_grand_total"><span>Total:</span> <strong><t t-out="this.state.invoiceData.total"/></strong></div>
+                            </div>
+                        </t>
+
+                        <!-- ================= 4. CUSTOMER CREATION PANEL ================= -->
+                        <t t-elif="this.state.currentOperation == 'customer'">
+                            <div class="ora_table_scroll">
+                                <table class="ora_glass_table ora_kv_table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40%;">Field</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Customer Name</td><td><strong class="ora_col_prod"><t t-out="this.state.customerData.name || '-'"/></strong></td></tr>
+                                        <tr><td>Phone</td><td><t t-out="this.state.customerData.phone || '-'"/></td></tr>
+                                        <tr><td>Email</td><td><t t-out="this.state.customerData.email || '-'"/></td></tr>
+                                        <tr><td>Company</td><td><t t-out="this.state.customerData.company || '-'"/></td></tr>
+                                        <tr><td>Street</td><td><t t-out="this.state.customerData.street || '-'"/></td></tr>
+                                        <tr><td>City</td><td><t t-out="this.state.customerData.city || '-'"/></td></tr>
+                                        <tr><td>State</td><td><t t-out="this.state.customerData.state || '-'"/></td></tr>
+                                        <tr><td>Country</td><td><t t-out="this.state.customerData.country || '-'"/></td></tr>
+                                        <tr><td>Customer Type</td><td><span class="ora_qty_chip"><t t-out="this.state.customerData.type || 'Individual'"/></span></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <!-- ================= 5. PRODUCT CREATION PANEL ================= -->
+                        <t t-elif="this.state.currentOperation == 'product'">
+                            <div class="ora_table_scroll">
+                                <table class="ora_glass_table ora_kv_table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40%;">Field</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Product Name</td><td><strong class="ora_col_prod"><t t-out="this.state.productData.name || '-'"/></strong></td></tr>
+                                        <tr><td>Internal Reference</td><td><t t-out="this.state.productData.default_code || '-'"/></td></tr>
+                                        <tr><td>Product Type</td><td><span class="ora_qty_chip"><t t-out="this.state.productData.type || 'Goods'"/></span></td></tr>
+                                        <tr><td>Sales Price</td><td><strong class="text-success"><t t-out="this.state.productData.list_price || 0"/></strong></td></tr>
+                                        <tr><td>Cost</td><td><t t-out="this.state.productData.standard_price || 0"/></td></tr>
+                                        <tr><td>Product Category</td><td><t t-out="this.state.productData.categ || 'All'"/></td></tr>
+                                        <tr><td>Unit of Measure</td><td><t t-out="this.state.productData.uom || 'Units'"/></td></tr>
+                                        <tr><td>Barcode</td><td><t t-out="this.state.productData.barcode || '-'"/></td></tr>
+                                        <tr><td>Sales Available</td><td><t t-out="this.state.productData.sale_ok ? 'Yes' : 'No'"/></td></tr>
+                                        <tr><td>Purchase Available</td><td><t t-out="this.state.productData.purchase_ok ? 'Yes' : 'No'"/></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
                     </div>
                 </t>
             </div>
+
+            <!-- Error / Model Unavailable Pop-up Modal -->
+            <t t-if="this.state.errorModal">
+                <div class="ora_error_popup_backdrop">
+                    <div class="ora_error_popup_card">
+                        <div class="ora_error_popup_icon">
+                            <i class="oi" data-icon="warning"/>
+                        </div>
+                        <div class="ora_error_popup_title">
+                            <t t-out="this.state.errorModal.title || 'AI Model Unavailable'"/>
+                        </div>
+                        <div class="ora_error_popup_msg">
+                            <t t-out="this.state.errorModal.message"/>
+                        </div>
+                        <div class="ora_error_popup_actions">
+                            <button class="btn btn-primary ora_error_popup_btn" t-on-click="() => this.closeErrorModal()">
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </t>
         </div>
     </t>
 </templates>

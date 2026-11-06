@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': "Ora-Ai Base",
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.4',
     'category': 'eCommerce',
     'summary': 'Ora-Ai base module helps to configure the voice assistant.',
     'description': 'Ora-AI base module provides core configurations and '
@@ -27,7 +27,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': "https://www.cybrosys.com",
-    'depends': ['sale_management', 'mail'],
+    'depends': ['sale_management', 'mail', 'account'],
     'data': [
         'security/voice_assistant_security.xml',
         'security/ir.access.csv',
@@ -39,11 +39,12 @@
         'views/ora_file_view.xml',
         'views/ora_call_history_views.xml',
         'views/ora_language_views.xml',
-        'wizard/res_config_settings_views.xml',
+        'views/res_config_settings_views.xml',
         'views/vapi_menus.xml',
     ],
     'assets': {
         'web.assets_backend': [
+            'ora_ai_base/static/src/lib/vapi.min.js',
             'ora_ai_base/static/src/js/ora_voice_data.js',
             'ora_ai_base/static/src/js/ora_ai.js',
             'ora_ai_base/static/src/js/systray_voice_assistant.js',

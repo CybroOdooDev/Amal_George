@@ -1,9 +1,27 @@
 /** @odoo-module **/
-import { Component, onMounted, onWillUnmount, proxy, useProps } from "@odoo/owl";
+import { Component, onMounted, onWillStart, onWillUnmount, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { useService } from "@web/core/utils/hooks";
+import { loadJS } from "@web/core/assets";
 import { VoiceData } from "@ora_ai_base/js/ora_voice_data";
+
+// Prevent Krisp / WebRTC noise-cancellation module loading errors from interrupting Odoo UI
+if (typeof window !== "undefined" && !window.__ora_krisp_handler_installed) {
+    window.__ora_krisp_handler_installed = true;
+    window.addEventListener("unhandledrejection", (event) => {
+        const err = event.reason;
+        const errMsg = String(err?.message || err || '');
+        const errName = String(err?.name || '');
+        if (errName.includes("Krisp") || errMsg.includes("Krisp") || errMsg.includes("Path not found")) {
+            console.warn("Suppressed Krisp noise-cancellation initialization error:", err);
+            event.preventDefault();
+            if (typeof event.stopImmediatePropagation === "function") {
+                event.stopImmediatePropagation();
+            }
+        }
+    });
+}
 
 
 class VoiceAssistant extends Component {
@@ -49,9 +67,14 @@ class VoiceAssistant extends Component {
         // Clean up Vapi floating button and stop call when leaving this view
         onWillUnmount(() => {
             window.removeEventListener("ora_toggle_call", handleToggleCall);
-            if (this.vapiInstance && typeof this.vapiInstance.stop === 'function') {
+            if (this.vapiInstance) {
                 try {
-                    this.vapiInstance.stop();
+                    if (typeof this.vapiInstance.stop === 'function') {
+                        this.vapiInstance.stop();
+                    }
+                    if (typeof this.vapiInstance.destroy === 'function') {
+                        this.vapiInstance.destroy();
+                    }
                 } catch (e) {
                     console.warn("Error stopping VAPI call:", e);
                 }
@@ -63,26 +86,24 @@ class VoiceAssistant extends Component {
             });
         });
 
-        // Dynamically load the VAPI SDK
+        // Ensure VAPI SDK is loaded using Odoo's native asset loader
+        onWillStart(async () => {
+            if (!window.vapiSDK) {
+                try {
+                    await loadJS("/ora_ai_base/static/src/lib/vapi.min.js");
+                } catch (err) {
+                    console.error("Failed to load Vapi library via Odoo loadJS:", err);
+                }
+            }
+            this.vapiReady = Boolean(window.vapiSDK && typeof window.vapiSDK.run === 'function');
+        });
+
         onMounted(() => {
             document.querySelectorAll("#vapi-support-btn, .vapi-btn").forEach((el) => {
                 try { el.remove(); } catch (e) {}
             });
-            const existingScript = document.querySelector('script[src="/ora_ai_base/static/src/lib/vapi.min.js"]');
-            if (!existingScript) {
-                const script = document.createElement("script");
-                script.src = "/ora_ai_base/static/src/lib/vapi.min.js";
-                script.async = true;
-                script.defer = true;
-                script.onload = () => {
-                    this.vapiReady = true;
-                };
-                script.onerror = () => {
-                    console.error("Failed to load Vapi library.");
-                };
-                document.head.appendChild(script);
-            } else {
-                this.vapiReady = true; // already loaded
+            if (window.vapiSDK && typeof window.vapiSDK.run === 'function') {
+                this.vapiReady = true;
             }
         });
     }
@@ -96,9 +117,11 @@ class VoiceAssistant extends Component {
     }
 
     stop_vapi() {
-        if (this.vapiInstance && typeof this.vapiInstance.stop === 'function') {
+        if (this.vapiInstance) {
             try {
-                this.vapiInstance.stop();
+                if (typeof this.vapiInstance.stop === 'function') {
+                    this.vapiInstance.stop();
+                }
             } catch (e) {
                 console.warn("Error stopping VAPI call:", e);
             }
@@ -135,12 +158,18 @@ class VoiceAssistant extends Component {
         document.querySelectorAll("#vapi-support-btn, .vapi-btn").forEach((el) => {
             try { el.remove(); } catch (e) {}
         });
-        if (self.vapiInstance && typeof self.vapiInstance.stop === 'function') {
+        if (self.vapiInstance) {
             try {
-                self.vapiInstance.stop();
+                if (typeof self.vapiInstance.stop === 'function') {
+                    self.vapiInstance.stop();
+                }
+                if (typeof self.vapiInstance.destroy === 'function') {
+                    self.vapiInstance.destroy();
+                }
             } catch (e) {
                 // ignore
             }
+            self.vapiInstance = null;
         }
 
         self.state.callState = 'connecting';
@@ -153,6 +182,24 @@ class VoiceAssistant extends Component {
         const params = action.params || self.props?.params || {};
         const apiKey = params.api_key || self.apiKey || window.apiKey;
         const assistantId = params.assistant_id || self.assistantId || window.assistant;
+
+        if (!apiKey || !assistantId) {
+            const missingMsg = !assistantId
+                ? "No Voice Assistant ID found. Please create or save an assistant first."
+                : "Vapi Public API Key is missing. Please configure it in Voice Assistant Settings.";
+            self.state.callState = 'error';
+            self.state.msg = missingMsg;
+            window.dispatchEvent(new CustomEvent("vapi_status", {
+                detail: {
+                    callState: 'error',
+                    msg: missingMsg,
+                    showErrorPopup: true,
+                    errorTitle: "Configuration Missing",
+                    errorMessage: missingMsg
+                }
+            }));
+            return;
+        }
 
         const VAPI = await window.vapiSDK.run({
             apiKey: apiKey,
@@ -250,31 +297,150 @@ class VoiceAssistant extends Component {
                 if (message.transcriptType === "final") {
                     self.state.msg = `${prefix}: ${message.transcript}`;
                 }
+            } else if (message.type === "status-update" && message.status === "ended") {
+                self.state.callState = 'ended';
+                self.state.msg = "Thank you for using the assistant.";
+                self.state.volume = 0;
+                self.state.isSpeaking = false;
+                window.dispatchEvent(new CustomEvent("vapi_status", {
+                    detail: { callState: 'ended', msg: self.state.msg }
+                }));
+                window.dispatchEvent(new CustomEvent("vapi_speech", {
+                    detail: { isSpeaking: false }
+                }));
+                window.dispatchEvent(new CustomEvent("vapi_volume", {
+                    detail: { volume: 0 }
+                }));
             }
             window.dispatchEvent(new CustomEvent("vapi_message", { detail: message }));
         });
 
         VAPI.on("error", async (e) => {
             console.error("VAPI Error:", e);
+
+            const rawStr = (() => {
+                try {
+                    return JSON.stringify(e).toLowerCase();
+                } catch {
+                    return String(e).toLowerCase();
+                }
+            })();
+
+            // If the call has already ended or is ending due to meeting closure/ejection/hangup, handle normally without an error popup
+            const isCallEndEjection = Boolean(
+                self.state.callState === 'ended' ||
+                rawStr.includes("meeting has ended") ||
+                rawStr.includes("ejected") ||
+                rawStr.includes("ejection") ||
+                rawStr.includes("left-meeting") ||
+                rawStr.includes("customer-ended-call") ||
+                rawStr.includes("assistant-ended-call") ||
+                rawStr.includes("call-ended") ||
+                rawStr.includes("call ended") ||
+                rawStr.includes("ended due to ejection") ||
+                rawStr.includes("meeting finished") ||
+                (e?.type === "daily-error" && (rawStr.includes("ended") || rawStr.includes("eject"))) ||
+                e?.errorMsg === "Meeting has ended" ||
+                e?.error?.errorMsg === "Meeting has ended" ||
+                e?.error?.msg === "Meeting has ended" ||
+                e?.error?.error?.msg === "Meeting has ended" ||
+                e?.error?.message?.msg === "Meeting has ended" ||
+                e?.error?.type === "ejected" ||
+                e?.error?.error?.type === "ejected" ||
+                e?.error?.message?.type === "ejected" ||
+                (typeof e?.message === 'string' && e.message.includes("Meeting has ended")) ||
+                (typeof e?.errorMsg === 'string' && e.errorMsg.includes("Meeting has ended"))
+            );
+
+            if (isCallEndEjection) {
+                console.log("Call ended normally (meeting finished/ejected).");
+                self.state.callState = 'ended';
+                self.state.msg = "Thank you for using the assistant.";
+                self.state.volume = 0;
+                self.state.isSpeaking = false;
+                window.dispatchEvent(new CustomEvent("vapi_status", {
+                    detail: { callState: 'ended', msg: self.state.msg }
+                }));
+                window.dispatchEvent(new CustomEvent("vapi_speech", {
+                    detail: { isSpeaking: false }
+                }));
+                window.dispatchEvent(new CustomEvent("vapi_volume", {
+                    detail: { volume: 0 }
+                }));
+                return;
+            }
+
             let errMsg = "Something went wrong. Please try again.";
-            if (e && typeof e === 'object') {
-                if (e.message) {
+            if (e) {
+                if (typeof e === 'string') {
+                    errMsg = e;
+                } else if (typeof e.message === 'string') {
                     errMsg = e.message;
-                } else if (e.error?.message) {
-                    errMsg = e.error.message;
+                } else if (Array.isArray(e.message)) {
+                    errMsg = e.message.join("\n");
+                } else if (e.message && typeof e.message === 'object') {
+                    errMsg = e.message.msg || e.message.message || e.message.error || "";
+                } else if (typeof e.errorMsg === 'string') {
+                    errMsg = e.errorMsg;
+                } else if (e.error) {
+                    if (typeof e.error === 'string') {
+                        errMsg = e.error;
+                    } else if (typeof e.error.message === 'string') {
+                        errMsg = e.error.message;
+                    } else if (Array.isArray(e.error.message)) {
+                        errMsg = e.error.message.join("\n");
+                    } else if (typeof e.error.errorMsg === 'string') {
+                        errMsg = e.error.errorMsg;
+                    } else if (typeof e.error.msg === 'string') {
+                        errMsg = e.error.msg;
+                    } else if (e.error.error && typeof e.error.error.msg === 'string') {
+                        errMsg = e.error.error.msg;
+                    } else if (e.error.message && typeof e.error.message === 'object') {
+                        errMsg = e.error.message.msg || e.error.message.message || "";
+                    }
                 } else if (typeof e.json === 'function') {
                     try {
                         const jsonErr = await e.json();
-                        if (jsonErr?.message) {
+                        if (typeof jsonErr?.message === 'string') {
                             errMsg = jsonErr.message;
+                        } else if (Array.isArray(jsonErr?.message)) {
+                            errMsg = jsonErr.message.join("\n");
+                        } else if (typeof jsonErr?.msg === 'string') {
+                            errMsg = jsonErr.msg;
                         }
                     } catch {}
                 }
             }
+
+            if (!errMsg || typeof errMsg !== 'string' || errMsg === '[object Object]') {
+                errMsg = "Something went wrong. Please try again.";
+            }
+
+            let title = "Voice Assistant Error";
+            const lowerErr = String(errMsg).toLowerCase();
+            if (lowerErr.includes("transcriber") || lowerErr.includes("transcription")) {
+                title = "Transcriber Model Unavailable";
+                const currentTranscriber = self.configInfo?.transcriber || 'configured transcriber';
+                errMsg = `The Transcriber model '${currentTranscriber}' is currently unavailable or rejected by the service.\n\nDetails: ${errMsg}`;
+            } else if (lowerErr.includes("model") || lowerErr.includes("provider") || lowerErr.includes("must be one of")) {
+                title = "AI Model Unavailable";
+                const currentModel = self.configInfo?.model || 'configured model';
+                const currentProvider = self.configInfo?.provider || 'provider';
+                errMsg = `The AI model '${currentModel}' (${currentProvider}) is currently unavailable or rejected by the service.\n\nDetails: ${errMsg}`;
+            } else if (lowerErr.includes("quota") || lowerErr.includes("credit") || lowerErr.includes("billing") || lowerErr.includes("rate limit")) {
+                title = "Service Limit / Balance Exhausted";
+            }
+
             self.state.callState = 'error';
             self.state.msg = errMsg;
             window.dispatchEvent(new CustomEvent("vapi_status", {
-                detail: { callState: 'error', msg: errMsg }
+                detail: { 
+                    callState: 'error', 
+                    msg: errMsg,
+                    showErrorPopup: true,
+                    errorTitle: title,
+                    errorMessage: errMsg
+                }
             }));
         });
     }

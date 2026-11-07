@@ -117,6 +117,46 @@ class VapiAssistant(http.Controller):
             _logger.warning("Could not link record to ora.call.history (%s): %s", vapi_call_id, e)
             return False
 
+    def _extract_tool_call(self, data, default_id="tool_call"):
+        """Extracts tool_call_id and parsed arguments dict from Vapi webhook payload."""
+        message = data.get('message', {})
+        tool_call_list = message.get('toolCalls') or message.get('toolCallList') or message.get('tool_calls') or data.get('toolCalls') or []
+        tool_call = tool_call_list[0] if tool_call_list else {}
+        tool_call_id = tool_call.get('id', default_id)
+        arguments = tool_call.get('function', {}).get('arguments', {})
+        if isinstance(arguments, str):
+            try:
+                arguments = json.loads(arguments)
+            except Exception:
+                arguments = {}
+        if not arguments and 'parameters' in tool_call.get('function', {}):
+            arguments = tool_call['function']['parameters']
+        if not arguments:
+            arguments = data.get('arguments') or data.get('parameters') or {}
+            if isinstance(arguments, str):
+                try:
+                    arguments = json.loads(arguments)
+                except Exception:
+                    arguments = {}
+        return tool_call_id, arguments or {}
+
+    def _find_customer_by_name(self, clean_name, company_id=False):
+        """Searches for an existing partner by exact or partial name within company scope."""
+        if not clean_name:
+            return request.env['res.partner']
+        Partner = request.env['res.partner'].sudo()
+        domain = [('name', '=ilike', clean_name)]
+        if company_id:
+            domain += ['|', ('company_id', '=', False), ('company_id', '=', company_id)]
+        partner = Partner.search(domain, limit=1)
+        if not partner:
+            domain[0] = ('name', 'ilike', clean_name)
+            partner = Partner.search(domain, limit=1)
+        if not partner and len(clean_name.split()) > 1:
+            domain[0] = ('name', 'ilike', clean_name.split()[0])
+            partner = Partner.search(domain, limit=1)
+        return partner
+
     @http.route('/vapi_voice_assistant/details', type='http',
                 auth='public', csrf=False, methods=['POST'])
     def final_details(self, **kwargs):
@@ -138,8 +178,7 @@ class VapiAssistant(http.Controller):
                 assistant = request.env['ora.ai'].sudo().search(
                     [('id_assistant', '=', assistant_vapi_id)], limit=1)
 
-            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
-            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_order"
+            tool_call_id, arguments = self._extract_tool_call(data, default_id="tool_call_order")
 
             if assistant and not assistant.is_sale_order_creation:
                 return self._make_tool_response(
@@ -149,27 +188,20 @@ class VapiAssistant(http.Controller):
 
             pr_list = []
             customer_name = ""
-            if tool_calls:
-                arguments = tool_calls[0].get('function', {}).get('arguments', {})
-                if isinstance(arguments, str):
-                    try:
-                        arguments = json.loads(arguments)
-                    except Exception:
-                        arguments = {}
-                order_details = arguments.get('OrderDetails', {}) if isinstance(arguments, dict) else {}
-                details = order_details.get('Products', []) if isinstance(order_details, dict) else []
-                for rec in details:
-                    pr_list.append({
-                        "customer": rec.get('Customer', ''),
-                        "product": rec.get('Product', ''),
-                        "id": rec.get('productId'),
-                        "qty": rec.get('Quantity', 1),
-                        "variant": rec.get('Variant', '-')
-                    })
-                    if rec.get('Customer'):
-                        customer_name = rec.get('Customer')
-                if not customer_name:
-                    customer_name = order_details.get('Customer') or arguments.get('Customer') or ''
+            order_details = arguments.get('OrderDetails', {}) if isinstance(arguments, dict) else {}
+            details = order_details.get('Products', []) if isinstance(order_details, dict) else []
+            for rec in details:
+                pr_list.append({
+                    "customer": rec.get('Customer', ''),
+                    "product": rec.get('Product', ''),
+                    "id": rec.get('productId'),
+                    "qty": rec.get('Quantity', 1),
+                    "variant": rec.get('Variant', '-')
+                })
+                if rec.get('Customer'):
+                    customer_name = rec.get('Customer')
+            if not customer_name:
+                customer_name = order_details.get('Customer') or arguments.get('Customer') or ''
 
             # Broadcast live order details to Owl component
             channel = "vapi_voice_channel"
@@ -473,19 +505,9 @@ class VapiAssistant(http.Controller):
         try:
             data = self._parse_request_data()
             message_data = data.get('message', {})
-            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
-            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_lang"
-
-            lang_code = ""
-            if tool_calls:
-                arguments = tool_calls[0].get('function', {}).get('arguments', {})
-                if isinstance(arguments, str):
-                    try:
-                        arguments = json.loads(arguments)
-                    except Exception:
-                        arguments = {}
-                pref = arguments.get('LanguagePreference', {}) if isinstance(arguments, dict) else {}
-                lang_code = pref.get('LanguageCode', '')
+            tool_call_id, arguments = self._extract_tool_call(data, default_id="tool_call_lang")
+            pref = arguments.get('LanguagePreference', {}) if isinstance(arguments, dict) else {}
+            lang_code = pref.get('LanguageCode', '') or arguments.get('LanguageCode', '')
 
             result_msg = f"Language preference received: {lang_code}"
             if lang_code:
@@ -527,20 +549,7 @@ class VapiAssistant(http.Controller):
 
         try:
             data = self._parse_request_data()
-            message_data = data.get('message', {})
-            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
-            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_check_customer"
-
-            arguments = {}
-            if tool_calls:
-                raw_args = tool_calls[0].get('function', {}).get('arguments', {})
-                if isinstance(raw_args, str):
-                    try:
-                        arguments = json.loads(raw_args)
-                    except Exception:
-                        arguments = {}
-                elif isinstance(raw_args, dict):
-                    arguments = raw_args
+            tool_call_id, arguments = self._extract_tool_call(data, default_id="tool_call_check_customer")
 
             raw_name = (
                 arguments.get('customer_name') or
@@ -629,22 +638,10 @@ class VapiAssistant(http.Controller):
                 assistant = request.env['ora.ai'].sudo().search(
                     [('id_assistant', '=', assistant_vapi_id)], limit=1)
 
-            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
-            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_customer"
+            tool_call_id, arguments = self._extract_tool_call(data, default_id="tool_call_customer")
 
             if assistant and not assistant.is_customer_creation:
                 return self._make_tool_response(tool_call_id, "Customer Creation is currently disabled for this assistant.")
-
-            arguments = {}
-            if tool_calls:
-                raw_args = tool_calls[0].get('function', {}).get('arguments', {})
-                if isinstance(raw_args, str):
-                    try:
-                        arguments = json.loads(raw_args)
-                    except Exception:
-                        arguments = {}
-                elif isinstance(raw_args, dict):
-                    arguments = raw_args
 
             name = (arguments.get('name') or arguments.get('customer_name') or '').strip()
             if not name:
@@ -660,12 +657,6 @@ class VapiAssistant(http.Controller):
             is_company = bool(arguments.get('is_company'))
 
             Partner = request.env['res.partner'].sudo()
-            existing = Partner.search([
-                ('type', '!=', 'private'),
-                '|', ('name', '=ilike', name),
-                '|', ('email', '=ilike', email) if email else ('id', '=', 0),
-                ('phone', '=', phone) if phone else ('id', '=', 0)
-            ], limit=1)
 
             state_id = False
             country_id = False
@@ -762,22 +753,10 @@ class VapiAssistant(http.Controller):
                 assistant = request.env['ora.ai'].sudo().search(
                     [('id_assistant', '=', assistant_vapi_id)], limit=1)
 
-            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
-            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_product"
+            tool_call_id, arguments = self._extract_tool_call(data, default_id="tool_call_product")
 
             if assistant and not assistant.is_product_creation:
                 return self._make_tool_response(tool_call_id, "Product Creation is currently disabled for this assistant.")
-
-            arguments = {}
-            if tool_calls:
-                raw_args = tool_calls[0].get('function', {}).get('arguments', {})
-                if isinstance(raw_args, str):
-                    try:
-                        arguments = json.loads(raw_args)
-                    except Exception:
-                        arguments = {}
-                elif isinstance(raw_args, dict):
-                    arguments = raw_args
 
             name = (arguments.get('name') or arguments.get('product_name') or '').strip()
             if not name:
@@ -878,25 +857,13 @@ class VapiAssistant(http.Controller):
                 assistant = request.env['ora.ai'].sudo().search(
                     [('id_assistant', '=', assistant_vapi_id)], limit=1)
 
-            tool_calls = message_data.get('toolCalls') or message_data.get('tool_calls') or data.get('toolCalls') or []
-            tool_call_id = tool_calls[0].get('id') if tool_calls else "tool_call_invoice"
+            tool_call_id, arguments = self._extract_tool_call(data, default_id="tool_call_invoice")
 
             if assistant and not assistant.is_invoice_creation:
                 return self._make_tool_response(tool_call_id, "Invoice Creation is currently disabled for this assistant.")
 
             if 'account.move' not in request.env:
                 return self._make_tool_response(tool_call_id, "Accounting module is not installed in Odoo.")
-
-            arguments = {}
-            if tool_calls:
-                raw_args = tool_calls[0].get('function', {}).get('arguments', {})
-                if isinstance(raw_args, str):
-                    try:
-                        arguments = json.loads(raw_args)
-                    except Exception:
-                        arguments = {}
-                elif isinstance(raw_args, dict):
-                    arguments = raw_args
 
             customer_name = (arguments.get('Customer') or arguments.get('customer') or arguments.get('customer_name') or '').strip()
             invoice_lines_data = arguments.get('InvoiceLines') or arguments.get('invoice_lines') or arguments.get('lines') or []

@@ -44,6 +44,30 @@ TRANSCRIBER_PROVIDER = [
 STATE = [('draft', 'Draft'),
          ('done', 'Done')]
 
+DEFAULT_CLIENT_MESSAGES = [
+    "conversation-update", "function-call", "hang", "model-output",
+    "speech-update", "status-update", "transcript", "tool-calls",
+    "user-interrupted", "voice-input"
+]
+
+DEFAULT_SERVER_MESSAGES = [
+    "end-of-call-report", "status-update", "tool-calls", "hang"
+]
+
+DEFAULT_MESSAGE_PLAN = {
+    "idleMessages": [
+        "Feel free to ask whenever you're ready.",
+        "I'm still here if you need assistance.",
+        "How can I assist you further?",
+        "Are you still there?",
+        "Looking for something specific? I can assist with that!",
+        "Need help choosing a product? I'm here to assist.",
+        "I'm here if you need any assistance with your shopping."
+    ],
+    "idleTimeoutSeconds": 5,
+    "idleMessageMaxSpokenCount": 10
+}
+
 
 class OraAi(models.Model):
     """Model for the order assistant."""
@@ -76,6 +100,7 @@ class OraAi(models.Model):
                                         help="Select the specific AI model"
                                              "offered by the chosen provider.")
     provider_model_ids = fields.Many2many('provider.model',
+                                          string="Available Models",
                                           compute='_compute_provider_models',
                                           readonly=True,
                                           help="Filtered list of models "
@@ -95,11 +120,12 @@ class OraAi(models.Model):
                                                 "model best suited for the "
                                                 "conversation context.")
     transcriber_model_ids = fields.Many2many('transcriber.model',
+                                             string="Available Transcriber Models",
                                              compute='_compute_transcriber_models',
                                              readonly=True,
                                              help="List of available "
                                                   "transcription models "
-                                                  "filtered  by selected "
+                                                  "filtered by selected "
                                                   "provider.")
     language_id = fields.Many2one('ora.language',
                                   string="Language",
@@ -648,47 +674,21 @@ class OraAi(models.Model):
         db_name = self.env.cr.dbname or ''
         headers = {"X-Odoo-Database": db_name} if db_name else {}
 
-        order_server = {
-            "url": f"{base_url}/vapi_voice_assistant/details{db_query}",
-            "headers": headers,
-        }
-        if secret:
-            order_server["secret"] = secret
+        def _make_server_dict(endpoint):
+            srv = {
+                "url": f"{base_url}/vapi_voice_assistant/{endpoint}{db_query}",
+                "headers": headers,
+            }
+            if secret:
+                srv["secret"] = secret
+            return srv
 
-        check_customer_server = {
-            "url": f"{base_url}/vapi_voice_assistant/check_customer{db_query}",
-            "headers": headers,
-        }
-        if secret:
-            check_customer_server["secret"] = secret
-
-        invoice_server = {
-            "url": f"{base_url}/vapi_voice_assistant/create_invoice{db_query}",
-            "headers": headers,
-        }
-        if secret:
-            invoice_server["secret"] = secret
-
-        customer_server = {
-            "url": f"{base_url}/vapi_voice_assistant/create_customer{db_query}",
-            "headers": headers,
-        }
-        if secret:
-            customer_server["secret"] = secret
-
-        product_server = {
-            "url": f"{base_url}/vapi_voice_assistant/create_product{db_query}",
-            "headers": headers,
-        }
-        if secret:
-            product_server["secret"] = secret
-
-        lang_server = {
-            "url": f"{base_url}/vapi_voice_assistant/language_details{db_query}",
-            "headers": headers,
-        }
-        if secret:
-            lang_server["secret"] = secret
+        order_server = _make_server_dict("details")
+        check_customer_server = _make_server_dict("check_customer")
+        invoice_server = _make_server_dict("create_invoice")
+        customer_server = _make_server_dict("create_customer")
+        product_server = _make_server_dict("create_product")
+        lang_server = _make_server_dict("language_details")
 
         tools = []
         if self.is_sale_order_creation:
@@ -898,6 +898,57 @@ class OraAi(models.Model):
 
         return tools
 
+    def _get_assistant_runtime_config(self):
+        """Computes runtime config (language, voice, first_message, end_message)."""
+        self.ensure_one()
+        if self.is_lang_switch and self.language_ids:
+            return "en", "qgj3VahzWaAK300v6H27", self.first_message, self.end_call_phrases
+
+        language = (self.language_id.code if (self.language_id and self.language_id.code) else "en") or "en"
+        voice = (self.language_id.voice if (self.language_id and self.language_id.voice) else "vj2Y0u1NaT1ayH6VYkYu") or "vj2Y0u1NaT1ayH6VYkYu"
+        if language == 'ml' and (not self.first_message or self.first_message.startswith("Hey")):
+            first_message = f"നമസ്കാരം, ഞാൻ {self.name} ആണ്. {self.language_id.first_msg or 'ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?'}"
+        else:
+            first_message = self._translate_text(self.first_message, language)
+        end_message = self._translate_text(self.end_call_phrases, language)
+        return language, voice, first_message, end_message
+
+    def _handle_vapi_error(self, response, is_update=False):
+        """Formats and raises descriptive UserError for failed Vapi API calls."""
+        try:
+            err_json = response.json()
+            error_raw = err_json.get('message') or err_json.get('error') or response.text
+        except Exception:
+            error_raw = response.text
+        if isinstance(error_raw, list):
+            error_msg = "\n".join(str(m) for m in error_raw)
+        else:
+            error_msg = str(error_raw)
+
+        lower_err = error_msg.lower()
+        if "transcriber" in lower_err:
+            raise UserError(
+                _("Transcriber Model Unavailable / Unsupported:\n\n"
+                  "The selected Transcriber model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
+                  "Details:\n%(details)s\n\n"
+                  "Please choose an active Transcriber model (e.g. Nova-2 or Nova-3).",
+                  model=self.transcriber_model_id.name or self.transcriber_model_id.key,
+                  provider=self.transcriber_provider,
+                  details=error_msg)
+            )
+        if "model" in lower_err:
+            raise UserError(
+                _("AI Model Unavailable / Unsupported:\n\n"
+                  "The selected model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
+                  "Details:\n%(details)s\n\n"
+                  "Please choose an active, working model from the list.",
+                  model=self.provider_model_id.name or self.provider_model_id.key,
+                  provider=self.provider,
+                  details=error_msg)
+            )
+        action_name = "updating" if is_update else "creating"
+        raise UserError(_("Vapi error while %s assistant: %s", action_name, error_msg))
+
     def action_create_assistant(self):
         """Creates a voice assistant instance using the Vapi.ai API based
          on the assistant configuration."""
@@ -910,17 +961,7 @@ class OraAi(models.Model):
         url = "https://api.vapi.ai/assistant"
         db_name = self.env.cr.dbname
         db_query = f"?db={db_name}" if db_name else ""
-        if self.is_lang_switch and self.language_ids:
-            language = "en"
-            voice = "qgj3VahzWaAK300v6H27"
-            first_message = self.first_message
-        else:
-            language = (self.language_id.code if (self.language_id and self.language_id.code) else "en") or "en"
-            voice = (self.language_id.voice if (self.language_id and self.language_id.voice) else "vj2Y0u1NaT1ayH6VYkYu") or "vj2Y0u1NaT1ayH6VYkYu"
-            if language == 'ml' and (not self.first_message or self.first_message.startswith("Hey")):
-                first_message = f"നമസ്കാരം, ഞാൻ {self.name} ആണ്. {self.language_id.first_msg or 'ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?'}"
-            else:
-                first_message = self._translate_text(self.first_message, language)
+        language, voice, first_message, end_message = self._get_assistant_runtime_config()
 
         transcriber_lang = self._get_transcriber_language(language)
         valid_file_ids = [f.id_file for f in self.file_ids if f.id_file and f.state == 'uploaded']
@@ -952,24 +993,9 @@ class OraAi(models.Model):
                 "provider": "11labs",
             },
             "model": model_payload,
-            "clientMessages": ["conversation-update", "function-call",
-                               "hang", "model-output", "speech-update",
-                               "status-update", "transcript", "tool-calls",
-                               "user-interrupted", "voice-input"],
-            "serverMessages": ["end-of-call-report", "status-update", "tool-calls", "hang"],
-            "messagePlan": {
-                "idleMessages": ["Feel free to ask whenever you're ready.",
-                                 "I'm still here if you need assistance.",
-                                 "How can I assist you further?",
-                                 "Are you still there?",
-                                 "Looking for something specific? I can "
-                                 "assist with that!",
-                                 "Need help choosing a product? I'm here "
-                                 "to assist.",
-                                 "I'm here if you need any assistance with"
-                                 "your shopping."],
-                "idleTimeoutSeconds": 5,
-                "idleMessageMaxSpokenCount": 10},
+            "clientMessages": DEFAULT_CLIENT_MESSAGES,
+            "serverMessages": DEFAULT_SERVER_MESSAGES,
+            "messagePlan": DEFAULT_MESSAGE_PLAN,
             "name": self.name,
             "firstMessage": first_message,
             "serverUrl": f"{base_url}/vapi_voice_assistant/status{db_query}",
@@ -978,7 +1004,7 @@ class OraAi(models.Model):
                 "headers": {"X-Odoo-Database": self.env.cr.dbname} if self.env.cr.dbname else {},
             },
             "endCallPhrases": [
-                self.end_call_phrases
+                end_message
             ],
         }
         if secret:
@@ -989,37 +1015,12 @@ class OraAi(models.Model):
         }
         response = requests.request("POST", url, json=payload,
                                     headers=headers)
+        if not response.ok:
+            self._handle_vapi_error(response, is_update=False)
         try:
             json_response = response.json()
         except Exception:
             json_response = {}
-        if not response.ok:
-            error_raw = json_response.get('message') or json_response.get('error') or response.text
-            if isinstance(error_raw, list):
-                error_msg = "\n".join(str(m) for m in error_raw)
-            else:
-                error_msg = str(error_raw)
-            if "transcriber" in error_msg.lower():
-                raise UserError(
-                    _("Transcriber Model Unavailable / Unsupported:\n\n"
-                      "The selected Transcriber model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
-                      "Details:\n%(details)s\n\n"
-                      "Please choose an active Transcriber model (e.g. Nova-2 or Nova-3).",
-                      model=self.transcriber_model_id.name or self.transcriber_model_id.key,
-                      provider=self.transcriber_provider,
-                      details=error_msg)
-                )
-            if "model" in error_msg.lower():
-                raise UserError(
-                    _("AI Model Unavailable / Unsupported:\n\n"
-                      "The selected model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
-                      "Details:\n%(details)s\n\n"
-                      "Please choose an active, working model from the list.",
-                      model=self.provider_model_id.name or self.provider_model_id.key,
-                      provider=self.provider,
-                      details=error_msg)
-                )
-            raise UserError(_("Vapi error: %s", error_msg))
         self.write({'date': json_response.get('createdAt'),
                     'state': 'done',
                     'id_assistant': json_response.get('id')
@@ -1052,20 +1053,7 @@ class OraAi(models.Model):
             db_name = self.env.cr.dbname
             db_query = f"?db={db_name}" if db_name else ""
             url = f"https://api.vapi.ai/assistant/{rec.id_assistant}"
-            if rec.is_lang_switch and rec.language_ids:
-                language = "en"
-                voice = "qgj3VahzWaAK300v6H27"
-                first_message = rec.first_message
-                end_message = rec.end_call_phrases
-            else:
-                language = (rec.language_id.code if (rec.language_id and rec.language_id.code) else "en") or "en"
-                voice = (rec.language_id.voice if (rec.language_id and rec.language_id.voice) else "vj2Y0u1NaT1ayH6VYkYu") or "vj2Y0u1NaT1ayH6VYkYu"
-                if language == 'ml' and (not rec.first_message or rec.first_message.startswith("Hey")):
-                    first_message = f"നമസ്കാരം, ഞാൻ {rec.name} ആണ്. {rec.language_id.first_msg or 'ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?'}"
-                else:
-                    first_message = rec._translate_text(rec.first_message, language)
-                end_message = rec._translate_text(rec.end_call_phrases,
-                                                   language)
+            language, voice, first_message, end_message = rec._get_assistant_runtime_config()
             transcriber_lang = rec._get_transcriber_language(language)
             valid_file_ids = [f.id_file for f in rec.file_ids if f.id_file and f.state == 'uploaded']
             model_payload = {
@@ -1093,24 +1081,9 @@ class OraAi(models.Model):
                     "voiceId": voice,
                     "provider": "11labs"},
                 "model": model_payload,
-                "clientMessages": ["conversation-update", "function-call",
-                                   "hang", "model-output", "speech-update",
-                                   "status-update", "transcript", "tool-calls",
-                                   "user-interrupted", "voice-input"],
-                "serverMessages": ["end-of-call-report", "status-update", "tool-calls", "hang"],
-                "messagePlan": {
-                    "idleMessages": ["Feel free to ask whenever you're ready.",
-                                     "I'm still here if you need assistance.",
-                                     "How can I assist you further?",
-                                     "Are you still there?",
-                                     "Looking for something specific? I can "
-                                     "assist with that!",
-                                     "Need help choosing a product? I'm here"
-                                     " to assist.",
-                                     "I'm here if you need any assistance with"
-                                     " your shopping."],
-                    "idleTimeoutSeconds": 5,
-                    "idleMessageMaxSpokenCount": 10},
+                "clientMessages": DEFAULT_CLIENT_MESSAGES,
+                "serverMessages": DEFAULT_SERVER_MESSAGES,
+                "messagePlan": DEFAULT_MESSAGE_PLAN,
                 "name": rec.name,
                 "firstMessage": first_message,
                 "serverUrl": f"{base_url}/vapi_voice_assistant/status{db_query}",
@@ -1118,8 +1091,8 @@ class OraAi(models.Model):
                     "url": f"{base_url}/vapi_voice_assistant/status{db_query}",
                     "headers": {"X-Odoo-Database": self.env.cr.dbname} if self.env.cr.dbname else {},
                 },
-                "endCallPhrases": [
-                    end_message], }
+                "endCallPhrases": [end_message],
+            }
             if secret:
                 payload["serverUrlSecret"] = secret
             headers = {
@@ -1130,38 +1103,8 @@ class OraAi(models.Model):
             if response.status_code == 404:
                 _logger.warning("Assistant %s (%s) not found on Vapi. Resetting state.", rec.name, rec.id_assistant)
                 rec.with_context(skip_vapi_sync=True).write({'state': 'draft', 'id_assistant': False})
-            elif response.status_code != 200:
-                try:
-                    err_json = response.json()
-                    error_raw = err_json.get('message') or err_json.get('error') or response.text
-                except Exception:
-                    error_raw = response.text
-                if isinstance(error_raw, list):
-                    error_msg = "\n".join(str(m) for m in error_raw)
-                else:
-                    error_msg = str(error_raw)
-                if "transcriber" in error_msg.lower():
-                    raise UserError(
-                        _("Transcriber Model Unavailable / Unsupported:\n\n"
-                          "The selected Transcriber model '%(model)s' under provider '%(provider)s' is unavailable on Vapi.\n\n"
-                          "Details:\n%(details)s\n\n"
-                          "Please select an active Transcriber model (e.g. Nova-2 or Nova-3).",
-                          model=rec.transcriber_model_id.name or rec.transcriber_model_id.key,
-                          provider=rec.transcriber_provider,
-                          details=error_msg)
-                    )
-                if "model" in error_msg.lower():
-                    raise UserError(
-                        _("AI Model Unavailable / Unsupported:\n\n"
-                          "The selected model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
-                          "Details:\n%(details)s\n\n"
-                          "Please choose an active, working model.",
-                          model=rec.provider_model_id.name or rec.provider_model_id.key,
-                          provider=rec.provider,
-                          details=error_msg)
-                    )
-                raise ValidationError(
-                    _("Assistant Update Failed: %s", error_msg))
+            elif not response.ok:
+                rec._handle_vapi_error(response, is_update=True)
         return res
 
     def unlink(self):

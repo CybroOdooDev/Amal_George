@@ -15,7 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import fields,models
+from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):

@@ -142,7 +142,7 @@
                             <button class="ora_op_tab" t-att-class="{'active': this.state.currentOperation == 'product'}" t-on-click="() => this.setOperation('product')">Product</button>
                         </div>
 
-                        <!-- ================= 1. SALES ORDER PANEL (PRESERVED) ================= -->
+                        <!-- ================= 1. SALES ORDER PANEL ================= -->
                         <t t-if="this.state.currentOperation == 'sale'">
                             <!-- Customer Profile Card -->
                             <div class="ora_customer_box">
@@ -205,7 +205,7 @@
                         </t>
 
 
-                        <!-- ================= 3. INVOICE PANEL ================= -->
+                        <!-- ================= 2. INVOICE PANEL ================= -->
                         <t t-elif="this.state.currentOperation == 'invoice'">
                             <!-- Customer Profile Card -->
                             <div class="ora_customer_box">
@@ -267,7 +267,7 @@
                             </div>
                         </t>
 
-                        <!-- ================= 4. CUSTOMER CREATION PANEL ================= -->
+                        <!-- ================= 3. CUSTOMER CREATION PANEL ================= -->
                         <t t-elif="this.state.currentOperation == 'customer'">
                             <div class="ora_table_scroll">
                                 <table class="ora_glass_table ora_kv_table">
@@ -292,7 +292,7 @@
                             </div>
                         </t>
 
-                        <!-- ================= 5. PRODUCT CREATION PANEL ================= -->
+                        <!-- ================= 4. PRODUCT CREATION PANEL ================= -->
                         <t t-elif="this.state.currentOperation == 'product'">
                             <div class="ora_table_scroll">
                                 <table class="ora_glass_table ora_kv_table">

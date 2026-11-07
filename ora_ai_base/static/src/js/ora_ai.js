@@ -339,6 +339,8 @@ class VoiceAssistant extends Component {
                 rawStr.includes("call ended") ||
                 rawStr.includes("ended due to ejection") ||
                 rawStr.includes("meeting finished") ||
+                rawStr.includes("call has ended") ||
+                rawStr.includes("hangup") ||
                 (e?.type === "daily-error" && (rawStr.includes("ended") || rawStr.includes("eject"))) ||
                 e?.errorMsg === "Meeting has ended" ||
                 e?.error?.errorMsg === "Meeting has ended" ||
@@ -348,8 +350,8 @@ class VoiceAssistant extends Component {
                 e?.error?.type === "ejected" ||
                 e?.error?.error?.type === "ejected" ||
                 e?.error?.message?.type === "ejected" ||
-                (typeof e?.message === 'string' && e.message.includes("Meeting has ended")) ||
-                (typeof e?.errorMsg === 'string' && e.errorMsg.includes("Meeting has ended"))
+                (typeof e?.message === 'string' && (e.message.toLowerCase().includes("meeting has ended") || e.message.toLowerCase().includes("ejected"))) ||
+                (typeof e?.errorMsg === 'string' && (e.errorMsg.toLowerCase().includes("meeting has ended") || e.errorMsg.toLowerCase().includes("ejected")))
             );
 
             if (isCallEndEjection) {

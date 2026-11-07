@@ -17,7 +17,7 @@
 #############################################################################
 {
     'name': "Ora-Ai Base",
-    'version': '20.0.1.0.4',
+    'version': '20.0.1.0.0',
     'category': 'eCommerce',
     'summary': 'Ora-Ai base module helps to configure the voice assistant.',
     'description': 'Ora-AI base module provides core configurations and '
@@ -52,7 +52,6 @@
             'ora_ai_base/static/src/xml/ora_ai_base_voice_data_templates.xml',
             'ora_ai_base/static/src/xml/systray_voice_assistant.xml',
             'ora_ai_base/static/src/scss/ora_ai.scss',
-            'ora_ai_base/static/src/scss/style.scss',
         ],
     },
     'external_dependencies': {"python": ["googletrans"]},

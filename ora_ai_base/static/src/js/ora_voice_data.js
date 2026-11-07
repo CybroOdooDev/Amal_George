@@ -91,21 +91,32 @@ export class VoiceData extends Component {
                         this.state.errorModal = null;
                     }
                 }
-                if (ev.detail.msg) this.state.statusMsg = ev.detail.msg;
+                if (ev.detail.msg) {
+                    this.state.statusMsg = typeof ev.detail.msg === 'string' ? ev.detail.msg : "Speaking with assistant...";
+                }
                 if (ev.detail.showErrorPopup && ev.detail.callState !== 'ended' && this.state.callState !== 'ended') {
-                    let msg = ev.detail.errorMessage || ev.detail.msg || "Something went wrong. Please try again.";
-                    if (typeof msg !== 'string' || msg === '[object Object]') {
+                    let rawMsg = ev.detail.errorMessage || ev.detail.msg || "Something went wrong. Please try again.";
+                    let msg = "";
+                    if (typeof rawMsg === 'string') {
+                        msg = rawMsg;
+                    } else if (rawMsg && typeof rawMsg === 'object') {
+                        msg = rawMsg.message || rawMsg.msg || rawMsg.error || "";
+                        if (typeof msg !== 'string') {
+                            msg = "";
+                        }
+                    }
+                    if (!msg || msg === '[object Object]' || !msg.trim()) {
                         msg = "Something went wrong. Please try again.";
                     }
                     const lowerMsg = String(msg).toLowerCase();
-                    if (lowerMsg.includes("meeting has ended") || lowerMsg.includes("ejected") || lowerMsg.includes("ejection") || lowerMsg.includes("left-meeting")) {
+                    if (lowerMsg.includes("meeting has ended") || lowerMsg.includes("ejected") || lowerMsg.includes("ejection") || lowerMsg.includes("left-meeting") || lowerMsg.includes("call-ended") || lowerMsg.includes("call ended") || lowerMsg.includes("customer-ended-call") || lowerMsg.includes("assistant-ended-call")) {
                         this.state.callState = 'ended';
                         this.state.errorModal = null;
                         return;
                     }
                     this.state.errorModal = {
                         title: ev.detail.errorTitle || "Voice Assistant Error",
-                        message: msg
+                        message: String(msg)
                     };
                 }
             }

@@ -16,6 +16,7 @@
 #
 #############################################################################
 from odoo import api, fields, models
+import dateutil.parser
 
 
 class OraCallHistory(models.Model):
@@ -266,7 +267,6 @@ class OraCallHistory(models.Model):
         ended_at = message.get('endedAt') or call.get('endedAt') or data.get('endedAt')
         if not duration and started_at and ended_at:
             try:
-                import dateutil.parser
                 s_dt = dateutil.parser.isoparse(started_at)
                 e_dt = dateutil.parser.isoparse(ended_at)
                 duration = int(round((e_dt - s_dt).total_seconds()))

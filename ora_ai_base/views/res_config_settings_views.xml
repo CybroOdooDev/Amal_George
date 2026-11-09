@@ -25,19 +25,19 @@
                     <block title="Order &amp; Multi-Language Settings" name="order_language_setting_container">
                         <group>
                             <group>
-                            <setting id="voice_order_confirmation_setting" string="Order Confirmation" help="When enabled, voice orders will be automatically confirmed into Sale Orders. Otherwise they remain as Quotations.">
-                            <field name="voice_order_auto_confirm"/>
-                        </setting>
-                        </group>
-                        <group>
-                        <setting id="language_configuration_setting" string="Multi-Language Support" help="Manage supported languages, voices, and greetings for multi-language voice sessions.">
-                            <div class="mt8">
-                                <button name="%(ora_language_action)d" type="action" class="btn-link">
-                                    <i class="oi" data-icon="smart_toy"/> Configure Languages
-                                </button>
-                            </div>
-                        </setting>
-                        </group>
+                                <setting id="voice_order_confirmation_setting" string="Order Confirmation" help="When enabled, voice orders will be automatically confirmed into Sale Orders. Otherwise they remain as Quotations.">
+                                    <field name="voice_order_auto_confirm"/>
+                                </setting>
+                            </group>
+                            <group>
+                                <setting id="language_configuration_setting" string="Multi-Language Support" help="Manage supported languages, voices, and greetings for multi-language voice sessions.">
+                                    <div class="mt8">
+                                        <button name="%(ora_language_action)d" type="action" class="btn-link">
+                                            <i class="oi" data-icon="smart_toy"/> Configure Languages
+                                        </button>
+                                    </div>
+                                </setting>
+                            </group>
                         </group>
                     </block>
                 </app>

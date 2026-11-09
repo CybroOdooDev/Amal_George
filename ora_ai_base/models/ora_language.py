@@ -27,17 +27,14 @@ class OraLanguage(models.Model):
     _name = "ora.language"
     _description = "Ora Language"
 
-    name = fields.Char(string='Name',
-                       help="The display name of the language"
+    name = fields.Char(help="The display name of the language"
                             " (e.g., English, Spanish).")
-    code = fields.Char(string='Code',
-                       help="The ISO language code used for "
+    code = fields.Char(help="The ISO language code used for "
                             "translation (e.g., 'en', 'es').")
     first_msg = fields.Char(string='First Message',
                             help="The default welcome message that"
                                  " the assistant will say in this language.")
-    voice = fields.Char(string='Voice',
-                        help="The identifier of the voice profile used "
+    voice = fields.Char(help="The identifier of the voice profile used "
                              "for text-to-speech in this language.")
 
     def _translate_text(self, text, target_lang):

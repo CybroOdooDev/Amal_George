@@ -34,7 +34,7 @@
         'data/client_action.xml',
         'data/provider_model_data.xml',
         'data/transcriber_model_data.xml',
-        'data/ora_langauage_data.xml',
+        'data/ora_language_data.xml',
         'views/ora_ai_views.xml',
         'views/ora_file_view.xml',
         'views/ora_call_history_views.xml',

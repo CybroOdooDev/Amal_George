@@ -355,7 +355,6 @@ class VoiceAssistant extends Component {
             );
 
             if (isCallEndEjection) {
-                console.log("Call ended normally (meeting finished/ejected).");
                 self.state.callState = 'ended';
                 self.state.msg = "Thank you for using the assistant.";
                 self.state.volume = 0;

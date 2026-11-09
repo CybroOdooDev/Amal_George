@@ -20,7 +20,7 @@ import logging
 import mimetypes
 import os
 import requests
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError, UserError
 
 _logger = logging.getLogger(__name__)
@@ -32,9 +32,9 @@ class OraFile(models.Model):
     _name = "ora.file"
     _description = "Ora File"
 
-    name = fields.Char(string="Name", required=True,
+    name = fields.Char(required=True,
                        help="A descriptive name for the file.")
-    file = fields.Binary(string="File", required=True,
+    file = fields.Binary(required=True,
                          help="The actual binary file to be stored.")
     filename = fields.Char(string="File Name",
                            help="Original uploaded file name with extension.")
@@ -53,7 +53,6 @@ class OraFile(models.Model):
     )
     company_id = fields.Many2one(
         'res.company',
-        string="Company",
         default=lambda self: self.env.company,
         help="Company associated with this knowledge base document."
     )
@@ -64,7 +63,7 @@ class OraFile(models.Model):
             if rec.file:
                 raw_data = self._extract_raw_bytes(rec.file)
                 if len(raw_data) > MAX_FILE_SIZE:
-                    raise ValidationError(_("File size exceeds maximum allowed size (25MB)."))
+                    raise ValidationError(self.env._("File size exceeds maximum allowed size (25MB)."))
 
     @staticmethod
     def _extract_raw_bytes(file_val):
@@ -93,8 +92,8 @@ class OraFile(models.Model):
         raw_name = self.filename or rec_file_filename or self.name or 'document'
         mime_type = rec_file_mimetype or mimetypes.guess_type(raw_name)[0]
 
-        # Magic bytes sniffing if extension guessing failed or octet-stream
-        if not mime_type or mime_type == 'application/octet-stream':
+        # Magic bytes sniffing if extension guessing failed or octet-stream/empty
+        if not mime_type or mime_type in ('application/octet-stream', 'application/x-empty'):
             if decoded_data.startswith(b'%PDF'):
                 mime_type = 'application/pdf'
                 if not raw_name.lower().endswith('.pdf'):
@@ -137,17 +136,17 @@ class OraFile(models.Model):
         bearer = self.env['ir.config_parameter'].sudo().get_str(
             'ora_ai_base.vapi_private_api_key')
         if not bearer:
-            raise UserError(_("Vapi Private API Key is not configured. Please set it in Settings."))
+            raise UserError(self.env._("Vapi Private API Key is not configured. Please set it in Settings."))
 
         for rec in self:
             if not rec.file:
                 continue
             raw_data = self._extract_raw_bytes(rec.file)
             if not raw_data:
-                rec.write({'state': 'error', 'error_message': _("File is empty.")})
+                rec.write({'state': 'error', 'error_message': self.env._("File is empty.")})
                 continue
             if len(raw_data) > MAX_FILE_SIZE:
-                rec.write({'state': 'error', 'error_message': _("File size exceeds maximum allowed size (25MB).")})
+                rec.write({'state': 'error', 'error_message': self.env._("File size exceeds maximum allowed size (25MB).")})
                 continue
 
             upload_name, mime_type = rec._detect_mime_type_and_filename(raw_data)
@@ -158,8 +157,8 @@ class OraFile(models.Model):
                     requests.delete(f"https://api.vapi.ai/file/{rec.id_file}",
                                     headers={"Authorization": f"Bearer {bearer}"},
                                     timeout=10)
-                except Exception:
-                    pass
+                except Exception as err:
+                    _logger.debug("Failed to delete superseded remote Vapi file: %s", err)
 
             url = "https://api.vapi.ai/file"
             files = {

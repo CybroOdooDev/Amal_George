@@ -140,11 +140,13 @@ class VapiAssistant(http.Controller):
                     arguments = {}
         return tool_call_id, arguments or {}
 
-    def _find_customer_by_name(self, clean_name, company_id=False):
+    def _find_customer_by_name(self, clean_name, company_id=False, env=None):
         """Searches for an existing partner by exact or partial name within company scope."""
+        if env is None:
+            env = request.env
         if not clean_name:
-            return request.env['res.partner']
-        Partner = request.env['res.partner'].sudo()
+            return env['res.partner']
+        Partner = env['res.partner'].sudo()
         domain = [('name', '=ilike', clean_name)]
         if company_id:
             domain += ['|', ('company_id', '=', False), ('company_id', '=', company_id)]
@@ -208,8 +210,8 @@ class VapiAssistant(http.Controller):
             message = {"operation": "sale", "value": pr_list, "channel": channel}
             try:
                 request.env["bus.bus"]._sendone(channel, "notification", message)
-            except Exception:
-                pass
+            except Exception as err:
+                _logger.debug("Failed sending sale bus notification: %s", err)
 
             # Check for Test Mode (Skip order and customer creation in test mode)
             assistant_overrides = call.get('assistantOverrides') or {}
@@ -417,8 +419,8 @@ class VapiAssistant(http.Controller):
                 if not tools.config.get('test_enable'):
                     try:
                         request.env.cr.commit()
-                    except Exception:
-                        pass
+                    except Exception as err:
+                        _logger.debug("Failed committing order transaction: %s", err)
 
                 # Link order to call history safely
                 if vapi_call_id:
@@ -487,8 +489,8 @@ class VapiAssistant(http.Controller):
             message_payload = {"value": data, "channel": channel}
             try:
                 request.env["bus.bus"]._sendone(channel, "notification", message_payload)
-            except Exception:
-                pass
+            except Exception as err:
+                _logger.debug("Failed sending status bus notification: %s", err)
             return self._make_json_response({"status": "ok"})
         except Exception as e:
             _logger.exception("Error processing Vapi status: %s", e)
@@ -598,8 +600,8 @@ class VapiAssistant(http.Controller):
                             "partner_name": partner.display_name or partner.name,
                         }
                     )
-                except Exception:
-                    pass
+                except Exception as err:
+                    _logger.debug("Failed sending customer selected bus notification: %s", err)
 
                 return self._make_tool_response(
                     tool_call_id,
@@ -692,8 +694,8 @@ class VapiAssistant(http.Controller):
             if not tools.config.get('test_enable'):
                 try:
                     request.env.cr.commit()
-                except Exception:
-                    pass
+                except Exception as err:
+                    _logger.debug("Failed committing customer creation: %s", err)
 
             # Link created customer to call history
             vapi_call_id = call.get('id') or data.get('call_id')
@@ -726,8 +728,8 @@ class VapiAssistant(http.Controller):
             }
             try:
                 request.env["bus.bus"]._sendone(channel, "notification", notification)
-            except Exception:
-                pass
+            except Exception as err:
+                _logger.debug("Failed sending creation bus notification: %s", err)
 
             return self._make_tool_response(
                 tool_call_id,
@@ -795,8 +797,8 @@ class VapiAssistant(http.Controller):
             if not tools.config.get('test_enable'):
                 try:
                     request.env.cr.commit()
-                except Exception:
-                    pass
+                except Exception as err:
+                    _logger.debug("Failed committing customer creation: %s", err)
 
             # Link created product to call history
             vapi_call_id = call.get('id') or data.get('call_id')
@@ -830,8 +832,8 @@ class VapiAssistant(http.Controller):
             }
             try:
                 request.env["bus.bus"]._sendone(channel, "notification", notification)
-            except Exception:
-                pass
+            except Exception as err:
+                _logger.debug("Failed sending creation bus notification: %s", err)
 
             return self._make_tool_response(
                 tool_call_id,
@@ -939,8 +941,8 @@ class VapiAssistant(http.Controller):
             if not tools.config.get('test_enable'):
                 try:
                     request.env.cr.commit()
-                except Exception:
-                    pass
+                except Exception as err:
+                    _logger.debug("Failed committing customer creation: %s", err)
 
             # Link created invoice to call history
             vapi_call_id = call.get('id') or data.get('call_id')
@@ -969,8 +971,8 @@ class VapiAssistant(http.Controller):
             }
             try:
                 request.env["bus.bus"]._sendone(channel, "notification", notification)
-            except Exception:
-                pass
+            except Exception as err:
+                _logger.debug("Failed sending creation bus notification: %s", err)
 
             return self._make_tool_response(
                 tool_call_id,

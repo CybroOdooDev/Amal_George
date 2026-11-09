@@ -23,9 +23,9 @@ import logging
 import urllib.parse
 import urllib.request
 from googletrans import Translator
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 import requests
-from odoo.exceptions import AccessError, ValidationError, UserError
+from odoo.exceptions import AccessError, UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -75,20 +75,19 @@ class OraAi(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Order Assistant"
 
-    name = fields.Char(string="Name", required=True,
+    name = fields.Char(required=True,
                        help="Name of the AI assistant configuration.")
-    company_id = fields.Many2one('res.company', string="Company",
+    company_id = fields.Many2one('res.company',
                                  default=lambda self: self.env.company, required=True,
                                  help="Company associated with this AI assistant.")
     id_assistant = fields.Char(string="Assistant id", readonly=True,
                                copy=False, help="Unique identifier of the"
                                                 "assistant created via "
                                                 "external API.")
-    first_message = fields.Text(string="First Message",
-                                compute="_compute_first_message",
+    first_message = fields.Text(compute="_compute_first_message",
                                 readonly=True,
                                 help="The default initial greeting spoken by the assistant when the voice session starts.")
-    provider = fields.Selection(string="Provider", selection=PROVIDER,
+    provider = fields.Selection(selection=PROVIDER,
                                 default="openai", required=True,
                                 help="Select the LLM provider for generating"
                                      " responses (e.g., OpenAI, Anthropic, "
@@ -107,13 +106,11 @@ class OraAi(models.Model):
                                                "available based on the "
                                                "selected provider.")
     transcriber_provider = fields.Selection(selection=TRANSCRIBER_PROVIDER,
-                                            string="Transcriber Provider",
                                             default='deepgram', required=True,
                                             help="Speech-to-text service "
                                                  "provider for transcribing "
                                                  "voice input.")
     transcriber_model_id = fields.Many2one('transcriber.model',
-                                           string="Transcriber Model",
                                            required=True,
                                            domain="[('id', 'in', transcriber_model_ids)]",
                                            help="Choose the transcription "
@@ -128,7 +125,6 @@ class OraAi(models.Model):
                                                   "filtered by selected "
                                                   "provider.")
     language_id = fields.Many2one('ora.language',
-                                  string="Language",
                                   help="Select the default language "
                                        "used by the assistant.")
     is_lang_switch = fields.Boolean(string="Multi-Language",
@@ -145,8 +141,7 @@ class OraAi(models.Model):
                              readonly=True,
                              help="Current lifecycle status of the assistant"
                                   " configuration.")
-    date = fields.Date(string="Date",
-                       default=fields.Date.today,
+    date = fields.Date(default=fields.Date.today,
                        readonly=True,
                        help="Date when the assistant was created or"
                             " activated.")
@@ -156,8 +151,7 @@ class OraAi(models.Model):
                          help="The Contents can be used to configure the"
                               " context, role, personality, instructions "
                               "and so on for the assistant.", )
-    end_call_phrases = fields.Text(string="End Call Phrases",
-                                   default="goodbye",
+    end_call_phrases = fields.Text(default="goodbye",
                                    help="Enter phrases, separated by commas, "
                                         "that will trigger the Assistant to "
                                         "end the call when spoken.")
@@ -206,8 +200,8 @@ class OraAi(models.Model):
                 translated = ''.join([item[0] for item in data[0] if item and item[0]])
                 if translated:
                     return translated
-        except Exception:
-            pass
+        except Exception as err:
+            _logger.debug("Google translate endpoint error, falling back: %s", err)
 
         # 2. Try googletrans library
         try:
@@ -237,7 +231,7 @@ class OraAi(models.Model):
                     ('provider', '=', rec.provider)
                 ])
             else:
-                rec.provider_model_ids = self.env['provider.model'].search([])
+                rec.provider_model_ids = self.env['provider.model'].search([], limit=100)
 
     @api.depends('transcriber_provider')
     def _compute_transcriber_models(self):
@@ -249,7 +243,7 @@ class OraAi(models.Model):
                     ('provider', '=', rec.transcriber_provider)
                 ])
             else:
-                rec.transcriber_model_ids = self.env['transcriber.model'].search([])
+                rec.transcriber_model_ids = self.env['transcriber.model'].search([], limit=100)
 
     @api.onchange('provider')
     def _onchange_provider(self):
@@ -422,8 +416,8 @@ class OraAi(models.Model):
                 )
             else:
                 so_rules = (
-                    f"### SALE ORDER CREATION RESTRICTION:\n"
-                    f"- Sale order creation is DISABLED. You must not create, place, or confirm sale orders. If asked to place an order, inform the salesperson that order creation is not enabled.\n\n"
+                    "### SALE ORDER CREATION RESTRICTION:\n"
+                    "- Sale order creation is DISABLED. You must not create, place, or confirm sale orders. If asked to place an order, inform the salesperson that order creation is not enabled.\n\n"
                 )
 
             prompt = (
@@ -502,16 +496,16 @@ class OraAi(models.Model):
                 [(category_field, "=", False), ('sale_ok', '=', True), ('active', '=', True)],
                 limit=20)
             if none_categ_products:
-                prompt += f"\n None category \n"
+                prompt += "\n None category \n"
                 for p_rec in none_categ_products:
                     prompt += f"  • {p_rec.name}, {currency_symbol}{p_rec.list_price:.2f} \n"
             prompt += (
-                f"\n When the salesperson gives voice commands"
-                f" to place an order, \n you should proceed by listing out all "
-                f"product options available without excluding any mentioned"
+                "\n When the salesperson gives voice commands"
+                " to place an order, \n you should proceed by listing out all "
+                "product options available without excluding any mentioned"
                 f" products {out_of_stock_prompt}\n"
-                f"if the product has variants ask for which variant do they need.\n"
-                f"After the product is selected, ask for How many quantity"
+                "if the product has variants ask for which variant do they need.\n"
+                "After the product is selected, ask for How many quantity"
                 f" do they need{out_of_stock_prompt_2}\n"
                 f"if the product has optional products ask would they like to add them? \n"
                 f"Before confirming the order, ask 'Would you like to add anything"
@@ -563,11 +557,11 @@ class OraAi(models.Model):
                 prompt += kb_instruction
             else:
                 kb_instruction = (
-                    f"\n\n### DOMAIN SCOPE INSTRUCTIONS:\n"
-                    f"- You do not have any external knowledge base assigned.\n"
-                    f"- Your expertise is strictly limited to assisting with company product orders and questions about our product catalog.\n"
-                    f"- If asked about general knowledge, sports, software, or topics unrelated to our product catalog or orders, "
-                    f"politely explain that you only assist with company products and orders.\n"
+                    "\n\n### DOMAIN SCOPE INSTRUCTIONS:\n"
+                    "- You do not have any external knowledge base assigned.\n"
+                    "- Your expertise is strictly limited to assisting with company product orders and questions about our product catalog.\n"
+                    "- If asked about general knowledge, sports, software, or topics unrelated to our product catalog or orders, "
+                    "politely explain that you only assist with company products and orders.\n"
                 )
                 prompt += kb_instruction
 
@@ -630,26 +624,28 @@ class OraAi(models.Model):
                             ICP.set_str('web.base.url', base_url)
                             ICP.set_str('web.base.url.freeze', 'True')
                             break
-            except Exception:
-                pass
+            except Exception as err:
+                _logger.debug("Failed checking ngrok tunnels: %s", err)
 
         if base_url.startswith('http://'):
             base_url = 'https://' + base_url[7:]
             try:
                 ICP.set_str('web.base.url', base_url)
                 ICP.set_str('web.base.url.freeze', 'True')
-            except Exception:
-                pass
+            except Exception as err:
+                _logger.debug("Failed setting secure web.base.url: %s", err)
 
         if 'localhost' in base_url or '127.0.0.1' in base_url:
             raise UserError(
-                "Vapi cloud servers require a public HTTPS URL (localhost/127.0.0.1 is not reachable from the internet). "
-                "Please configure a public HTTPS domain (such as your ngrok tunnel) in Settings > Voice Assistant > "
-                "Public Webhook Base URL, or access Odoo through your public domain."
+                self.env._(
+                    "Vapi cloud servers require a public HTTPS URL (localhost/127.0.0.1 is not reachable from the internet). "
+                    "Please configure a public HTTPS domain (such as your ngrok tunnel) in Settings > Voice Assistant > "
+                    "Public Webhook Base URL, or access Odoo through your public domain."
+                )
             )
 
         if not base_url.startswith('https://'):
-            raise AccessError("Vapi requires the webhook URL to use HTTPS protocol.")
+            raise AccessError(self.env._("Vapi requires the webhook URL to use HTTPS protocol."))
 
         return base_url
 
@@ -928,26 +924,28 @@ class OraAi(models.Model):
         lower_err = error_msg.lower()
         if "transcriber" in lower_err:
             raise UserError(
-                _("Transcriber Model Unavailable / Unsupported:\n\n"
-                  "The selected Transcriber model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
-                  "Details:\n%(details)s\n\n"
-                  "Please choose an active Transcriber model (e.g. Nova-2 or Nova-3).",
-                  model=self.transcriber_model_id.name or self.transcriber_model_id.key,
-                  provider=self.transcriber_provider,
-                  details=error_msg)
+                self.env._(
+                    "Transcriber Model Unavailable / Unsupported:\n\n"
+                    "The selected Transcriber model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
+                    "Details:\n%(details)s\n\n"
+                    "Please choose an active Transcriber model (e.g. Nova-2 or Nova-3).",
+                    model=self.transcriber_model_id.name or self.transcriber_model_id.key,
+                    provider=self.transcriber_provider,
+                    details=error_msg)
             )
         if "model" in lower_err:
             raise UserError(
-                _("AI Model Unavailable / Unsupported:\n\n"
-                  "The selected model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
-                  "Details:\n%(details)s\n\n"
-                  "Please choose an active, working model from the list.",
-                  model=self.provider_model_id.name or self.provider_model_id.key,
-                  provider=self.provider,
-                  details=error_msg)
+                self.env._(
+                    "AI Model Unavailable / Unsupported:\n\n"
+                    "The selected model '%(model)s' under provider '%(provider)s' is unavailable or rejected by Vapi.\n\n"
+                    "Details:\n%(details)s\n\n"
+                    "Please choose an active, working model from the list.",
+                    model=self.provider_model_id.name or self.provider_model_id.key,
+                    provider=self.provider,
+                    details=error_msg)
             )
         action_name = "updating" if is_update else "creating"
-        raise UserError(_("Vapi error while %s assistant: %s", action_name, error_msg))
+        raise UserError(self.env._("Vapi error while %(action)s assistant: %(error)s", action=action_name, error=error_msg))
 
     def action_create_assistant(self):
         """Creates a voice assistant instance using the Vapi.ai API based
@@ -1014,7 +1012,7 @@ class OraAi(models.Model):
             "Content-Type": "application/json"
         }
         response = requests.request("POST", url, json=payload,
-                                    headers=headers)
+                                    headers=headers, timeout=15)
         if not response.ok:
             self._handle_vapi_error(response, is_update=False)
         try:
@@ -1099,7 +1097,7 @@ class OraAi(models.Model):
                 "Authorization": f"Bearer {bearer}",
                 "Content-Type": "application/json"}
             response = requests.request("PATCH", url, json=payload,
-                                        headers=headers)
+                                        headers=headers, timeout=15)
             if response.status_code == 404:
                 _logger.warning("Assistant %s (%s) not found on Vapi. Resetting state.", rec.name, rec.id_assistant)
                 rec.with_context(skip_vapi_sync=True).write({'state': 'draft', 'id_assistant': False})
@@ -1113,32 +1111,33 @@ class OraAi(models.Model):
         bearer = self.env['ir.config_parameter'].sudo().get_str(
             'ora_ai_base.vapi_private_api_key')
         for rec in self:
-            url = f"https://api.vapi.ai/assistant/{rec.id_assistant}"
-            headers = {
-                "Authorization": f"Bearer {bearer}"}
-            requests.request("DELETE", url, headers=headers)
+            if rec.id_assistant and bearer:
+                url = f"https://api.vapi.ai/assistant/{rec.id_assistant}"
+                headers = {
+                    "Authorization": f"Bearer {bearer}"}
+                requests.request("DELETE", url, headers=headers, timeout=15)
         return super().unlink()
 
     def action_assistant_testing(self):
         """Validates configuration and opens Test Assistant modal dialog in test mode."""
         self.ensure_one()
         if not self.id_assistant:
-            raise UserError(_("Please click 'Create Assistant' first before testing."))
+            raise UserError(self.env._("Please click 'Create Assistant' first before testing."))
         if not self.provider_model_id:
-            raise UserError(_("Please select an AI Model before testing the assistant."))
+            raise UserError(self.env._("Please select an AI Model before testing the assistant."))
         if not self.transcriber_model_id:
-            raise UserError(_("Please select a Transcriber Model before testing the assistant."))
+            raise UserError(self.env._("Please select a Transcriber Model before testing the assistant."))
 
         bearer = self.env['ir.config_parameter'].sudo().get_str(
             'ora_ai_base.vapi_public_api_key')
         if not bearer:
-            raise UserError(_("Vapi Public API Key is missing. Please configure it in Voice Assistant Settings."))
+            raise UserError(self.env._("Vapi Public API Key is missing. Please configure it in Voice Assistant Settings."))
 
         return {
             'type': 'ir.actions.client',
             'tag': 'action_voice_assistant',
             'target': 'new',
-            'name': _("Test Assistant: %s") % self.name,
+            'name': self.env._("Test Assistant: %(name)s", name=self.name),
             'context': {'dialog_size': 'large'},
             'params': {
                 'assistant_id': self.id_assistant,
@@ -1175,8 +1174,8 @@ class OraAi(models.Model):
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _("No Voice Assistant Active"),
-                    'message': _("No active voice assistant found. Please create and configure an assistant first."),
+                    'title': self.env._("No Voice Assistant Active"),
+                    'message': self.env._("No active voice assistant found. Please create and configure an assistant first."),
                     'type': 'warning',
                     'sticky': False,
                 }

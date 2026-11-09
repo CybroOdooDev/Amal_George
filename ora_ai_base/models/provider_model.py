@@ -9,13 +9,13 @@
 #    You can modify it under the terms of the GNU LESSER
 #    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
 #
-#    This program is distributed in the hope that it will be useful,
+#    This program is distributed in the hope it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -29,21 +29,15 @@ class ProviderModel(models.Model):
     key = fields.Char(string="Model Key",
                       help="Technical identifier used when calling"
                            " the AI provider's API ")
-    provider = fields.Char(string="Provider",
-                           help="The name of the AI service provider")
+    provider = fields.Char(help="The name of the AI service provider")
 
     @api.model_create_multi
     def create(self, vals_list):
         if not self.env.is_superuser() and not self.env.context.get('install_mode'):
-            raise UserError(_("AI Provider Models cannot be created manually."))
+            raise UserError(self.env._("AI Provider Models cannot be created manually."))
         return super().create(vals_list)
 
     def write(self, vals):
         if not self.env.is_superuser() and not self.env.context.get('install_mode'):
-            raise UserError(_("AI Provider Models cannot be edited."))
+            raise UserError(self.env._("AI Provider Models cannot be edited."))
         return super().write(vals)
-
-    def unlink(self):
-        if not self.env.is_superuser() and not self.env.context.get('install_mode'):
-            raise UserError(_("AI Provider Models cannot be deleted."))
-        return super().unlink()

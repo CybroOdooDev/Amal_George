@@ -15,8 +15,11 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
+import logging
 from odoo import api, fields, models
 import dateutil.parser
+
+_logger = logging.getLogger(__name__)
 
 
 class OraCallHistory(models.Model):
@@ -41,7 +44,6 @@ class OraCallHistory(models.Model):
     )
     assistant_id = fields.Many2one(
         "ora.ai",
-        string="Assistant",
         ondelete="set null",
         readonly=True,
         help="The AI voice assistant configuration used for this call session."
@@ -92,15 +94,13 @@ class OraCallHistory(models.Model):
         ('inboundPhoneCall', 'Inbound Phone'),
         ('webCall', 'Web Call'),
         ('outboundPhoneCall', 'Outbound Phone'),
-    ], string="Call Type", default='webCall', readonly=True,
+    ], default='webCall', readonly=True,
        help="Type of the call (e.g., Web Call, Inbound Phone, Outbound Phone).")
     start_time = fields.Datetime(
-        string="Start Time",
         readonly=True,
         help="Timestamp when the voice call started."
     )
     end_time = fields.Datetime(
-        string="End Time",
         readonly=True,
         help="Timestamp when the voice call ended."
     )
@@ -135,14 +135,12 @@ class OraCallHistory(models.Model):
     )
     company_id = fields.Many2one(
         "res.company",
-        string="Company",
         default=lambda self: self.env.company,
         readonly=True,
         help="Company context under which this call took place."
     )
     currency_id = fields.Many2one(
         "res.currency",
-        string="Currency",
         related="company_id.currency_id",
         readonly=True,
         help="Currency used for reporting the call cost."
@@ -213,7 +211,7 @@ class OraCallHistory(models.Model):
             return False
 
         message = data.get('message', {}) if isinstance(data, dict) else {}
-        msg_type = message.get('type')
+        msg_type = message.get('type') or data.get('type')
         if msg_type not in ('status-update', 'end-of-call-report'):
             # Ignore high-frequency speech/interim events to avoid lock contention
             return False
@@ -236,7 +234,7 @@ class OraCallHistory(models.Model):
         # Extract transcript if available
         raw_transcript = message.get('transcript') or call.get('transcript')
         if not raw_transcript:
-            conv = message.get('conversation') or []
+            conv = message.get('conversation') or call.get('conversation') or []
             if isinstance(conv, list):
                 raw_transcript = "\n".join([f"{m.get('role', 'speaker')}: {m.get('content', '')}" for m in conv if isinstance(m, dict) and m.get('role') != 'system'])
 
@@ -299,8 +297,8 @@ class OraCallHistory(models.Model):
                 u = self.env['res.users'].sudo().browse(int(salesperson_id))
                 if u.exists():
                     vals['user_id'] = u.id
-            except (ValueError, TypeError):
-                pass
+            except (ValueError, TypeError) as err:
+                _logger.debug("Failed to resolve salesperson from call metadata: %s", err)
         if raw_transcript:
             vals['transcript'] = raw_transcript
         if recording_url:

@@ -15,6 +15,7 @@
 #    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
 #
 #############################################################################
+import hmac
 import json
 import logging
 import re
@@ -65,16 +66,19 @@ class VapiAssistant(http.Controller):
         """Verifies whether the incoming request matches the configured webhook secret."""
         expected_secret = request.env['ir.config_parameter'].sudo().get_str(
             'ora_ai_base.vapi_webhook_secret')
-        if not expected_secret:
-            return True
+        if not expected_secret or not expected_secret.strip():
+            return False
         headers = request.httprequest.headers
         incoming_secret = (
             headers.get('x-vapi-secret') or
             headers.get('X-Vapi-Secret') or
             headers.get('Authorization', '').replace('Bearer ', '').strip() or
-            request.httprequest.args.get('token')
-        )
-        return incoming_secret == expected_secret
+            request.httprequest.args.get('token') or
+            ''
+        ).strip()
+        if not incoming_secret:
+            return False
+        return hmac.compare_digest(incoming_secret, expected_secret.strip())
 
     def _parse_request_data(self):
         """Safely parses JSON payload from http request."""

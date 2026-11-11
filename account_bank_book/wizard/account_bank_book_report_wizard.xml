@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--        Extended form view of account_bank_book-->
+        <record id="account_bank_book_form_view" model="ir.ui.view">
+            <field name="name">account.bank.book.view.form.inherit.account.bank.book</field>
+            <field name="model">account.bank.book.report</field>
+            <field name="inherit_id" ref="base_accounting_kit.account_bank_book_report_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='check_report']" position="before">
+                    <button name="report_xlsx" string="Export to Excel" type="object" class="oe_highlight"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -33,25 +33,25 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not order_id">
+                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="shopping_cart" invisible="not order_id">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Sale Order</span>
                                 <span class="o_stat_value"><field name="order_id" readonly="1"/></span>
                             </div>
                         </button>
-                        <button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not invoice_id">
+                        <button name="action_view_invoice" type="object" class="oe_stat_button" icon="edit_square" invisible="not invoice_id">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Invoice</span>
                                 <span class="o_stat_value"><field name="invoice_id" readonly="1"/></span>
                             </div>
                         </button>
-                        <button name="action_view_created_partner" type="object" class="oe_stat_button" icon="fa-user-plus" invisible="not created_partner_id">
+                        <button name="action_view_created_partner" type="object" class="oe_stat_button" icon="person_add" invisible="not created_partner_id">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Customer</span>
                                 <span class="o_stat_value"><field name="created_partner_id" readonly="1"/></span>
                             </div>
                         </button>
-                        <button name="action_view_product" type="object" class="oe_stat_button" icon="fa-cube" invisible="not product_tmpl_id">
+                        <button name="action_view_product" type="object" class="oe_stat_button" icon="inventory_2" invisible="not product_tmpl_id">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Product</span>
                                 <span class="o_stat_value"><field name="product_tmpl_id" readonly="1"/></span>

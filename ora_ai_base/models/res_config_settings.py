@@ -31,6 +31,10 @@ class ResConfigSettings(models.TransientModel):
         string="Public Key",
         config_parameter='ora_ai_base.vapi_public_api_key',
         help=" Vapi Voice Assistant's public API key. ")
+    vapi_webhook_secret = fields.Char(
+        string="Webhook Secret",
+        config_parameter='ora_ai_base.vapi_webhook_secret',
+        help="Shared secret token used to authenticate incoming Vapi webhook requests.")
     voice_order_auto_confirm = fields.Boolean(
         string="Auto-Confirm Voice Orders",
         config_parameter='ora_ai_base.voice_order_auto_confirm',

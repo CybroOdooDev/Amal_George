@@ -14,6 +14,7 @@
                             <group>
                                 <field name="vapi_private_api_key" password="True"/>
                                 <field name="vapi_public_api_key" password="True"/>
+                                <field name="vapi_webhook_secret" password="True"/>
                             </group>
                             <div class="mt8">
                                 <button name="action_open_vapi" type="object" class="btn-link">

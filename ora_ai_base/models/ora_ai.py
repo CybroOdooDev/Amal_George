@@ -649,6 +649,16 @@ class OraAi(models.Model):
 
         return base_url
 
+    def _get_or_create_webhook_secret(self):
+        """Retrieves the shared Vapi webhook secret, generating a secure one if missing."""
+        icp = self.env['ir.config_parameter'].sudo()
+        secret = icp.get_str('ora_ai_base.vapi_webhook_secret')
+        if not secret:
+            import secrets
+            secret = secrets.token_hex(24)
+            icp.set_str('ora_ai_base.vapi_webhook_secret', secret)
+        return secret
+
     def _get_transcriber_language(self, language_code):
         """Maps an ISO language code to a valid language supported by the selected transcriber."""
         deepgram_languages = {
@@ -953,8 +963,7 @@ class OraAi(models.Model):
         base_url = self._get_vapi_base_url()
         bearer = self.env['ir.config_parameter'].sudo().get_str(
             'ora_ai_base.vapi_private_api_key')
-        secret = self.env['ir.config_parameter'].sudo().get_str(
-            'ora_ai_base.vapi_webhook_secret') or ''
+        secret = self._get_or_create_webhook_secret()
 
         url = "https://api.vapi.ai/assistant"
         db_name = self.env.cr.dbname
@@ -1046,8 +1055,7 @@ class OraAi(models.Model):
             base_url = rec._get_vapi_base_url()
             bearer = self.env['ir.config_parameter'].sudo().get_str(
                 'ora_ai_base.vapi_private_api_key')
-            secret = self.env['ir.config_parameter'].sudo().get_str(
-                'ora_ai_base.vapi_webhook_secret') or ''
+            secret = rec._get_or_create_webhook_secret()
             db_name = self.env.cr.dbname
             db_query = f"?db={db_name}" if db_name else ""
             url = f"https://api.vapi.ai/assistant/{rec.id_assistant}"

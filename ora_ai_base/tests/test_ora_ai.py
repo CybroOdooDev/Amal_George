@@ -18,7 +18,7 @@
 import base64
 from unittest.mock import patch, MagicMock
 from odoo.tests.common import TransactionCase, tagged
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, AccessError
 
 
 @tagged('post_install', '-at_install')
@@ -403,4 +403,178 @@ class TestOraAi(TransactionCase):
         self.assistant.transcriber_provider = 'deepgram'
         self.assistant._compute_transcriber_models()
         self.assertTrue(len(self.assistant.transcriber_model_ids) > 0)
+
+    def test_16_translate_text_branches(self):
+        """Test translation fallbacks and handlers in _translate_text."""
+        # Empty text and english pass through
+        self.assertEqual(self.assistant._translate_text("", "es"), "")
+        self.assertEqual(self.assistant._translate_text("Hello", "en"), "Hello")
+
+        # Mock urllib success
+        mock_resp = MagicMock()
+        mock_resp.__enter__.return_value = mock_resp
+        mock_resp.read.return_value = b'[[["Hola", "Hello"]]]'
+        with patch('urllib.request.urlopen', return_value=mock_resp):
+            res = self.assistant._translate_text("Hello", "es")
+            self.assertEqual(res, "Hola")
+
+        # Mock urllib failure with fallback
+        with patch('urllib.request.urlopen', side_effect=Exception("Net error")):
+            with patch('odoo.addons.ora_ai_base.models.ora_ai.Translator') as mock_t_cls:
+                mock_translator = MagicMock()
+                mock_res = MagicMock()
+                mock_res.text = "Hola Amigo"
+                mock_translator.translate.return_value = mock_res
+                mock_t_cls.return_value = mock_translator
+                res = self.assistant._translate_text("Hello friend", "es")
+                self.assertEqual(res, "Hola Amigo")
+
+        # Mock total failure returns original text
+        with patch('urllib.request.urlopen', side_effect=Exception("Net error")):
+            with patch('odoo.addons.ora_ai_base.models.ora_ai.Translator', side_effect=Exception("Lib missing")):
+                res = self.assistant._translate_text("Untranslated", "fr")
+                self.assertEqual(res, "Untranslated")
+
+    def test_17_language_description_and_onchanges(self):
+        """Test dynamic language function descriptions and onchange model pickers."""
+        # Onchange provider
+        self.assistant.provider = 'groq'
+        self.assistant.provider_model_id = False
+        self.assistant._onchange_provider()
+        if self.assistant.provider_model_id:
+            self.assertEqual(self.assistant.provider_model_id.provider, 'groq')
+
+        # Onchange transcriber provider
+        self.assistant.transcriber_provider = 'talkscriber'
+        self.assistant.transcriber_model_id = False
+        self.assistant._onchange_transcriber_provider()
+        if self.assistant.transcriber_model_id:
+            self.assertEqual(self.assistant.transcriber_model_id.provider, 'talkscriber')
+
+        # Language function description
+        self.assistant.is_lang_switch = True
+        self.assistant.language_ids = [(6, 0, [self.language.id])]
+        self.assistant._compute_language_function_description()
+        self.assertIn("English", self.assistant.language_function_description)
+        self.assertIn("en", self.assistant.language_function_description)
+
+        self.assistant.is_lang_switch = False
+        self.assistant._compute_language_function_description()
+        self.assertEqual(self.assistant.language_function_description, "")
+
+    def test_18_capabilities_prohibited_prompt_branches(self):
+        """Test prompt instructions when capabilities are prohibited."""
+        self.assistant.write({
+            'is_sale_order_creation': False,
+            'is_customer_creation': False,
+            'is_invoice_creation': False,
+            'is_product_creation': False,
+        })
+        self.assistant._compute_prompt()
+        prompt = self.assistant.prompt
+        self.assertIn("Strictly prohibited: decline placing or confirming sale orders", prompt)
+        self.assertIn("Strictly prohibited: customer creation is disabled", prompt)
+        self.assertIn("Strictly prohibited: invoice creation is disabled", prompt)
+        self.assertIn("Strictly prohibited: product creation is disabled", prompt)
+
+        # Restore
+        self.assistant.write({
+            'is_sale_order_creation': True,
+            'is_customer_creation': True,
+            'is_invoice_creation': True,
+            'is_product_creation': True,
+        })
+
+    def test_19_webhook_secret_generation_and_access_error(self):
+        """Test auto-generation of webhook secret and protocol checks."""
+        icp = self.env['ir.config_parameter'].sudo()
+        set_val = getattr(icp, 'set_str', getattr(icp, 'set_param', None))
+        set_val('ora_ai_base.vapi_webhook_secret', '')
+        secret = self.assistant._get_or_create_webhook_secret()
+        self.assertTrue(secret)
+        self.assertGreaterEqual(len(secret), 32)
+
+        # Non-https base url raises AccessError
+        with patch.object(type(icp), 'get_str', return_value='ftp://non-https-url.com'):
+            with self.assertRaises(AccessError):
+                self.assistant._get_vapi_base_url()
+
+    def test_20_runtime_config_and_malayalam(self):
+        """Test runtime configuration computation for English and Malayalam."""
+        self.assistant.is_lang_switch = True
+        self.assistant.language_ids = [(6, 0, [self.language.id])]
+        lang, voice, first_msg, end_msg = self.assistant._get_assistant_runtime_config()
+        self.assertEqual(lang, "en")
+        self.assertEqual(voice, "qgj3VahzWaAK300v6H27")
+
+        # Test Malayalam
+        lang_ml = self.env['ora.language'].search([('code', '=', 'ml')], limit=1)
+        if lang_ml:
+            self.assistant.is_lang_switch = False
+            self.assistant.language_id = lang_ml
+            self.assistant.first_message = False
+            lang, voice, first_msg, end_msg = self.assistant._get_assistant_runtime_config()
+            self.assertEqual(lang, "ml")
+            self.assertIn("നമസ്കാരം", first_msg)
+
+    def test_21_handle_vapi_error_branches(self):
+        """Test error parsing and formatted UserError exceptions from Vapi responses."""
+        mock_err_resp = MagicMock()
+        mock_err_resp.json.side_effect = ValueError("Invalid JSON")
+        mock_err_resp.text = "transcriber model unsupported"
+        with self.assertRaises(UserError) as err:
+            self.assistant._handle_vapi_error(mock_err_resp)
+        self.assertIn("Transcriber Model", str(err.exception))
+
+        # List-based error message
+        mock_err_resp2 = MagicMock()
+        mock_err_resp2.json.return_value = {'message': ['General model validation error', 'Line 2']}
+        with self.assertRaises(UserError) as err2:
+            self.assistant._handle_vapi_error(mock_err_resp2)
+        self.assertIn("AI Model Unavailable", str(err2.exception))
+
+    @patch('requests.request')
+    def test_22_write_sync_404_and_assistant_testing_validations(self, mock_req):
+        """Test 404 response on write resets state, and action_assistant_testing validations."""
+        mock_404 = MagicMock()
+        mock_404.status_code = 404
+        mock_404.ok = False
+        mock_req.return_value = mock_404
+
+        self.assistant.with_context(skip_vapi_sync=True).write({
+            'id_assistant': 'vapi_asst_mock_9999',
+            'state': 'done'
+        })
+        self.assistant.write({'name': 'Updated Assistant 404'})
+        self.assertEqual(self.assistant.state, 'draft')
+        self.assertFalse(self.assistant.id_assistant)
+
+        # Validation errors on action_assistant_testing
+        with self.assertRaises(UserError):
+            self.assistant.action_assistant_testing()
+
+        self.assistant.with_context(skip_vapi_sync=True).write({'id_assistant': 'valid_id'})
+        icp = self.env['ir.config_parameter'].sudo()
+        set_val = getattr(icp, 'set_str', getattr(icp, 'set_param', None))
+        set_val('ora_ai_base.vapi_public_api_key', '')
+        with self.assertRaises(UserError):
+            self.assistant.action_assistant_testing()
+        set_val('ora_ai_base.vapi_public_api_key', 'test_public_key_67890')
+
+    def test_23_action_launch_and_systray_assistants(self):
+        """Test global launcher and systray available assistants dropdown."""
+        # Unset all done assistants
+        done_assistants = self.env['ora.ai'].search([('state', '=', 'done')])
+        done_assistants.write({'state': 'draft'})
+
+        action = self.env['ora.ai'].action_launch_voice_assistant()
+        self.assertEqual(action.get('tag'), 'display_notification')
+        self.assertEqual(action.get('params', {}).get('type'), 'warning')
+
+        # Restore assistant and verify dropdown items
+        self.assistant.state = 'done'
+        self.assistant.id_assistant = 'vapi_test_id_done'
+        assistants_list = self.env['ora.ai'].get_available_assistants()
+        self.assertTrue(any(a['id'] == self.assistant.id for a in assistants_list))
+
 

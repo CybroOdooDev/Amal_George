@@ -18,7 +18,7 @@
 {
     'name': "Ora-Ai Base",
     'version': '20.0.1.0.0',
-    'category': 'eCommerce',
+    'category': 'Productivity',
     'summary': 'Ora-Ai base module helps to configure the voice assistant.',
     'description': 'Ora-AI base module provides core configurations and '
                    'services necessary to integrate and manage a voice '
@@ -41,7 +41,9 @@
         'views/ora_language_views.xml',
         'views/res_config_settings_views.xml',
         'views/vapi_menus.xml',
+        'views/standard_model_views.xml',
     ],
+    'post_init_hook': 'post_init_hook',
     'assets': {
         'web.assets_backend': [
             'ora_ai_base/static/src/lib/vapi.min.js',

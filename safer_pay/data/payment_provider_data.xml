@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- Created the Saferpay payment provider-->
+        <record id="saferpay_payment_gateway" model="payment.provider">
+            <field name="name">Saferpay</field>
+            <field name="code">saferpay</field>
+            <field name="image_128" type="bytes"
+                   file="safer_pay/static/description/icon.png"/>
+            <field name="module_id" ref="base.module_safer_pay"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="redirect_form_view_id" ref="payment.generic_redirect_form"/>
+        </record>
+        <!-- To save the payment journal set in the payment provider.-->
+        <record id="inbound_account_payment_method" model="account.payment.method">
+            <field name="name">Saferpay</field>
+            <field name="code">saferpay</field>
+            <field name="payment_type">inbound</field>
+        </record>
+    </data>
+</odoo>

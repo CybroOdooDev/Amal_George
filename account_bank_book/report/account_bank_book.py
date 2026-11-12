@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
-#############################################################################
+###############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
 #    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(odoo@cybrosys.com)
 #
-#    You can modify it under the terms of the GNU LESSER
-#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#    This program is under the terms of the Odoo Proprietary License v1.0(OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
 #
-#############################################################################
+###############################################################################
 import io
 from datetime import datetime
 from odoo import models
@@ -133,7 +137,7 @@ class ReportBankBook(models.AbstractModel):
         options = options
         if not options['form']:
             raise UserError(
-                _("Form content is missing, this report cannot be printed."))
+                self.env._("Form content is missing, this report cannot be printed."))
         init_balance = options['form'].get('initial_balance', True)
         sortby = options['form'].get('sortby', 'sort_date')
         display_account = options['form']['display_account']
@@ -151,7 +155,7 @@ class ReportBankBook(models.AbstractModel):
             accounts = self.env['account.account'].search(
                 [('id', 'in', accounts)])
         report_obj = self.with_context(
-            options['form'].get('used_context', {}))._get_account_move_entry(
+            **options['form'].get('used_context', {}))._get_account_move_entry(
             accounts,
             init_balance,
             sortby,

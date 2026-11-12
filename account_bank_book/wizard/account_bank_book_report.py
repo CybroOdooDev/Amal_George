@@ -1,29 +1,33 @@
 # -*- coding: utf-8 -*-
-#############################################################################
+###############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
 #    Copyright (C) 2026-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
+#    Author: Cybrosys Techno Solutions(odoo@cybrosys.com)
 #
-#    You can modify it under the terms of the GNU LESSER
-#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
+#    This program is under the terms of the Odoo Proprietary License v1.0(OPL-1)
+#    It is forbidden to publish, distribute, sublicense, or sell copies of the
+#    Software or modified copies of the Software.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
+#    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+#    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING
+#    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#    DEALINGS IN THE SOFTWARE.
 #
-#############################################################################
+###############################################################################
 import json
-from odoo import models, _
+from odoo import models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import json_default
 from datetime import date
 
 
 class BankBookWizard(models.TransientModel):
-    """Inheriting account bank book report model to overirde excel and pdf
+    """Inheriting account bank book report model to override excel and pdf
     reports"""
     _inherit = "account.bank.book.report"
 
@@ -50,20 +54,21 @@ class BankBookWizard(models.TransientModel):
         account_ids = data['form']['account_ids']
         if account_ids == []:
             raise UserError(
-                _("You need to add at least one account to print the bank book report."))
+                self.env._("You need to add at least one account to print the bank book report."))
         accounts = self.env['account.account'].search(
             [('id', 'in', account_ids)])
         if not accounts:
             journals = self.env['account.journal'].search(
                 [('type', '=', 'bank')])
             accounts = []
-            for journal in journals: accounts.append(
-                journal.company_id.account_journal_payment_credit_account_id.id)
+            for journal in journals:
+                accounts.append(
+                    journal.company_id.account_journal_payment_credit_account_id.id)
             accounts = self.env['account.account'].search(
                 [('id', 'in', accounts)])
         report_model = self.env['report.base_accounting_kit.report_bank_book']
         report_obj = report_model.with_context(
-            data['form'].get('used_context', {}))._get_account_move_entry(
+            **data['form'].get('used_context', {}))._get_account_move_entry(
             accounts,
             init_balance,
             sortby,
@@ -80,13 +85,13 @@ class BankBookWizard(models.TransientModel):
                 'report_type': 'bank_book_xlsx'
             }
         else:
-            raise ValidationError("No records found for the given criteria!")
+            raise ValidationError(self.env._("No records found for the given criteria!"))
 
     def check_report(self):
         """Overriding the function to fetch values for printing pdf report"""
         self.ensure_one()
         if self.initial_balance and not self.date_from:
-            raise UserError(_("You must choose a Start Date"))
+            raise UserError(self.env._("You must choose a Start Date"))
         data = {'ids': self.env.context.get('active_ids', []),
                 'model': self.env.context.get('active_model', 'ir.ui.menu'),
                 'form': self.read(
@@ -103,20 +108,21 @@ class BankBookWizard(models.TransientModel):
         account_ids = data['form']['account_ids']
         if account_ids == []:
             raise UserError(
-                _("You need to add at least one account to print the bank book report."))
+                self.env._("You need to add at least one account to print the bank book report."))
         accounts = self.env['account.account'].search(
             [('id', 'in', account_ids)])
         if not accounts:
             journals = self.env['account.journal'].search(
                 [('type', '=', 'bank')])
             accounts = []
-            for journal in journals: accounts.append(
-                journal.company_id.account_journal_payment_credit_account_id.id)
+            for journal in journals:
+                accounts.append(
+                    journal.company_id.account_journal_payment_credit_account_id.id)
             accounts = self.env['account.account'].search(
                 [('id', 'in', accounts)])
         report_model = self.env['report.base_accounting_kit.report_bank_book']
         report_obj = report_model.with_context(
-            data['form'].get('used_context', {}))._get_account_move_entry(
+            **data['form'].get('used_context', {}))._get_account_move_entry(
             accounts,
             init_balance,
             sortby,
@@ -128,4 +134,4 @@ class BankBookWizard(models.TransientModel):
                 self,
                 data=data)
         else:
-            raise ValidationError("No records found for the given criteria!")
+            raise ValidationError(self.env._("No records found for the given criteria!"))

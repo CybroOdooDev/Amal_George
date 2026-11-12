@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+    <record id="payment_method_saferpay" model="payment.method">
+        <field name="name">Saferpay</field>
+        <field name="code">saferpay</field>
+        <field name="provider_id" ref="saferpay_payment_gateway"/>
+        <field name="active">True</field>
+        <field name="image" type="bytes"
+               file="safer_pay/static/description/icon.png"/>
+        <field name="sequence">100</field>
+        <field name="support_tokenization">False</field>
+        <field name="support_express_checkout">False</field>
+        <field name="support_refund">none</field>
+    </record>
+</odoo>

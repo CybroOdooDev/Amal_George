@@ -1,6 +1,6 @@
-.. |license| image:: https://img.shields.io/badge/license-LGPL--3-blue.svg
-    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
-    :alt: License: LGPL-3
+.. |license| image:: https://img.shields.io/badge/license-OPL--1-red.svg
+    :target: http://www.gnu.org/licenses/opl-3.0-standalone.html
+    :alt: License: OPL-1
 
 .. |odoo| image:: https://img.shields.io/badge/Odoo-20.0-875A7B.svg
     :target: https://www.odoo.com
@@ -12,24 +12,32 @@
 
 |license| |odoo| |maintainer|
 
-Your Module Name
+Bank Book Reports
 ================
-
-Modules's Detailed Description
+Generate Bank Book Report in Both PDF and XLSX format
 
 Key Features
 ------------
+* **Comprehensive Bank Book Reporting**: Tracks all bank cash inflows, outflows, and running balances with complete transaction details including dates, partners, entry labels, and move references.
+* **Dual Format Export (Excel & PDF)**: Export reports to formatted Microsoft Excel (.xlsx) spreadsheets or print-ready PDF documents with a single click.
+* **Multi-Bank Journal Selection**: Filter and report on individual or multiple bank journals simultaneously for comprehensive reconciliation.
+* **Custom Date Range Filtering**: Specify custom Start Date and End Date to analyze banking activities across any fiscal timeframe.
+* **Target Move Flexibility**: Generate reports considering only posted entries or include draft entries for preliminary reviews.
+* **Opening & Closing Balance Tracking**: Computes and displays initial balances, periodic debit/credit activity, and final closing balances for complete financial accuracy.
+* **Display Account Filtering**: Filter to show all bank accounts or only those accounts with transaction movements within the selected period.
 
-* List the detailed features one by one
 
 Installation
 ------------
-List out if any external dependencies are required for the module to work. If not, write "No external dependencies."
+* Ensure the required dependency **Base Accounting Kit** (``base_accounting_kit``) is installed or present in your addons path.
+* Python package ``xlsxwriter`` is required for Excel report generation (included in standard Odoo environments).
+* Place the ``account_bank_book`` module into your Odoo custom addons directory.
+* Restart your Odoo server and update the addons list via **Apps -> Update Apps List** (in Developer Mode).
+* Search for ``Bank Book Report`` (technical name: ``account_bank_book``) and click **Install**.
 
 Configuration
 -------------
 No additional configuration is required.
-/ Mention if any additional configurations are needed, or remove this line
 
 Company
 -------
@@ -37,8 +45,8 @@ Company
 
 License
 -------
-Lesser General Public License, Version 3 (LGPL v3).
-(http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
+Odoo Proprietary License v1.0.
+(http://www.gnu.org/licenses/opl-3.0-standalone.html)
 
 Contacts
 --------
@@ -54,59 +62,3 @@ Maintainer
 This module is maintained by Cybrosys Technologies.
 
 For support and more information, please visit `Our Website <https://cybrosys.com/>`__
-
-
-
-
-
-
-.. image:: https://img.shields.io/badge/licence-OPL--1-red.svg
-    :target: https://www.odoo.com/documentation/18.0/legal/licenses.html#odoo-apps
-    :alt: License: OPL-1
-
-Bank Book Reports
-=================
-Generate Bank Book Report in Both PDF and XLSX fromat
-
-Configuration
-=============
-* You need to install base_accounting_kit for using this module.
-
-Company
--------
-* `Cybrosys Techno Solutions <https://cybrosys.com/>`__
-
-License
--------
-Open Public License , Version 1 (OPL-1).
-(https://www.odoo.com/documentation/18.0/legal/licenses.html#odoo-apps)
-
-Credits
-=======
-Developer: Mashood K.U
-           V13 Sreejith S ,
-           V14 Varsha S ,
-           V16 Sahla Sherin ,
-           V17 Anusha C ,
-           V18 Jumana Jabin MP ,
-           V19 Nubla Sherin K,  Contact: odoo@cybrosys.com
-Contacts
---------
-* Mail Contact : odoo@cybrosys.com
-
-Bug Tracker
------------
-Bugs are tracked on GitHub Issues. In case of trouble, please check there if your issue has already been reported.
-
-Maintainer
-==========
-.. image:: https://cybrosys.com/images/logo.png
-   :target: https://cybrosys.com
-
-This module is maintained by Cybrosys Technologies.
-
-For support and more information, please visit https://www.cybrosys.com
-
-Further information
-===================
-HTML Description: `<static/description/index.html>`__

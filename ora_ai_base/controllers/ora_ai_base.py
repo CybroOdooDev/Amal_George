@@ -19,7 +19,7 @@ import hmac
 import json
 import logging
 import re
-from odoo import http, tools
+from odoo import http
 from odoo.fields import Command
 from odoo.http import request, Response
 
@@ -79,6 +79,64 @@ class VapiAssistant(http.Controller):
         if not incoming_secret:
             return False
         return hmac.compare_digest(incoming_secret, expected_secret.strip())
+
+    def _get_target_user(self, call=None, data=None, assistant=None):
+        """Resolves the authorized internal user record that initiated the voice session,
+        preventing broadcast over public or unauthenticated bus channels."""
+        call = call or {}
+        data = data or {}
+        assistant_overrides = call.get('assistantOverrides') or {}
+        var_values = assistant_overrides.get('variableValues') or call.get('variableValues') or {}
+        metadata = call.get('metadata') or data.get('metadata') or {}
+
+        user_id = (
+            var_values.get('user_id') or
+            var_values.get('salesperson_id') or
+            metadata.get('user_id') or
+            metadata.get('salesperson_id') or
+            request.params.get('user_id') or
+            request.params.get('salesperson_id')
+        )
+        if user_id:
+            try:
+                user = request.env['res.users'].sudo().browse(int(user_id))
+                if user.exists() and not user._is_public():
+                    return user
+            except (ValueError, TypeError) as err:
+                _logger.debug("Unable to parse user_id '%s': %s", user_id, err)
+
+        # Fallback 1: User that created or owns the assistant record
+        if assistant and assistant.create_uid and assistant.create_uid.exists() and not assistant.create_uid._is_public():
+            return assistant.create_uid
+
+        # Fallback 2: Authenticated request user (if present in session)
+        if request.env.user and not request.env.user._is_public() and request.env.user.id != 1:
+            return request.env.user
+
+        # Fallback 3: Active system administrator or internal voice assistant user
+        admin = request.env.ref('base.user_admin', raise_if_not_found=False)
+        if admin and admin.exists():
+            return admin
+        company_id = assistant.company_id.id if assistant and assistant.company_id else False
+        return request.env['res.users'].sudo().search([
+            ('share', '=', False),
+            ('company_id', 'in', [False, company_id])
+        ], limit=1)
+
+    def _send_bus_notification(self, target_user, payload):
+        """Safely dispatches a secure bus notification targeted to the specific user record.
+        Anonymous visitors and unauthorized users cannot subscribe to or inspect these notifications."""
+        if not target_user:
+            return
+        try:
+            request.env["bus.bus"]._sendone(
+                target_user,
+                "ora_ai_base/voice_notification",
+                payload
+            )
+        except Exception as err:
+            _logger.debug("Failed sending secure targeted bus notification: %s", err)
+
 
     def _parse_request_data(self):
         """Safely parses JSON payload from http request."""
@@ -209,13 +267,10 @@ class VapiAssistant(http.Controller):
             if not customer_name:
                 customer_name = order_details.get('Customer') or arguments.get('Customer') or ''
 
-            # Broadcast live order details to Owl component
-            channel = "vapi_voice_channel"
-            message = {"operation": "sale", "value": pr_list, "channel": channel}
-            try:
-                request.env["bus.bus"]._sendone(channel, "notification", message)
-            except Exception as err:
-                _logger.debug("Failed sending sale bus notification: %s", err)
+            # Broadcast live order details securely to the initiating user's component
+            target_user = self._get_target_user(call=call, data=data, assistant=assistant)
+            message = {"operation": "sale", "value": pr_list}
+            self._send_bus_notification(target_user, message)
 
             # Check for Test Mode (Skip order and customer creation in test mode)
             assistant_overrides = call.get('assistantOverrides') or {}
@@ -393,11 +448,17 @@ class VapiAssistant(http.Controller):
                 if not salesperson and assistant and assistant.create_uid:
                     salesperson = assistant.create_uid
 
-                # Fallback 4: Active sales administrator (Mitchell Admin ID 2)
+                # Fallback 4: Active sales administrator or internal user
                 if not salesperson:
-                    admin_u = request.env['res.users'].sudo().browse(2)
-                    if admin_u.exists():
+                    admin_u = request.env.ref('base.user_admin', raise_if_not_found=False)
+                    if admin_u and admin_u.exists():
                         salesperson = admin_u
+                    else:
+                        company_id = assistant.company_id.id if assistant and assistant.company_id else False
+                        salesperson = request.env['res.users'].sudo().search([
+                            ('share', '=', False),
+                            ('company_id', 'in', [False, company_id])
+                        ], limit=1)
 
                 order_vals = {
                     'partner_id': partner.id,
@@ -419,12 +480,6 @@ class VapiAssistant(http.Controller):
                 if auto_confirm:
                     sales.action_confirm()
 
-                # Explicitly commit the sale order so it cannot be rolled back by call history contention
-                if not tools.config.get('test_enable'):
-                    try:
-                        request.env.cr.commit()
-                    except Exception as err:
-                        _logger.debug("Failed committing order transaction: %s", err)
 
                 # Link order to call history safely
                 if vapi_call_id:
@@ -443,13 +498,12 @@ class VapiAssistant(http.Controller):
                     )
 
                 # Broadcast confirmation notification
-                request.env["bus.bus"]._sendone(
-                    channel, "notification",
+                self._send_bus_notification(
+                    target_user,
                     {
                         "operation": "sale",
                         "state": "success",
                         "value": pr_list,
-                        "channel": channel,
                         "order_id": sales.id,
                         "order_name": sales.name
                     }
@@ -488,13 +542,11 @@ class VapiAssistant(http.Controller):
             if msg_type in ('status-update', 'end-of-call-report'):
                 request.env['ora.call.history'].sudo().log_call_status(data)
 
-            # Broadcast status to Owl component
-            channel = "vapi_voice_channel"
-            message_payload = {"value": data, "channel": channel}
-            try:
-                request.env["bus.bus"]._sendone(channel, "notification", message_payload)
-            except Exception as err:
-                _logger.debug("Failed sending status bus notification: %s", err)
+            # Broadcast status securely to the initiating user's component
+            call = message.get('call') or data.get('call') or {}
+            target_user = self._get_target_user(call=call, data=data)
+            message_payload = {"value": data}
+            self._send_bus_notification(target_user, message_payload)
             return self._make_json_response({"status": "ok"})
         except Exception as e:
             _logger.exception("Error processing Vapi status: %s", e)
@@ -556,6 +608,11 @@ class VapiAssistant(http.Controller):
         try:
             data = self._parse_request_data()
             tool_call_id, arguments = self._extract_tool_call(data, default_id="tool_call_check_customer")
+            message_data = data.get('message', {})
+            call = message_data.get('call', {}) or data.get('call', {})
+            assistant_id = call.get('assistantId') or message_data.get('assistantId')
+            assistant = request.env['ora.ai'].sudo().search([('id_assistant', '=', assistant_id)], limit=1) if assistant_id else False
+
 
             raw_name = (
                 arguments.get('customer_name') or
@@ -594,18 +651,16 @@ class VapiAssistant(http.Controller):
                     partner = Partner.search(tok_domain, limit=1)
 
             if partner:
-                # Live sync with Owl frontend dropdown
-                try:
-                    request.env["bus.bus"]._sendone(
-                        "vapi_voice_channel", "notification",
-                        {
-                            "type": "customer_selected",
-                            "partner_id": partner.id,
-                            "partner_name": partner.display_name or partner.name,
-                        }
-                    )
-                except Exception as err:
-                    _logger.debug("Failed sending customer selected bus notification: %s", err)
+                # Live sync with Owl frontend dropdown securely
+                target_user = self._get_target_user(call=call, data=data, assistant=assistant)
+                self._send_bus_notification(
+                    target_user,
+                    {
+                        "type": "customer_selected",
+                        "partner_id": partner.id,
+                        "partner_name": partner.display_name or partner.name,
+                    }
+                )
 
                 return self._make_tool_response(
                     tool_call_id,
@@ -695,11 +750,6 @@ class VapiAssistant(http.Controller):
                 vals['company_id'] = assistant.company_id.id
 
             partner = Partner.create(vals)
-            if not tools.config.get('test_enable'):
-                try:
-                    request.env.cr.commit()
-                except Exception as err:
-                    _logger.debug("Failed committing customer creation: %s", err)
 
             # Link created customer to call history
             vapi_call_id = call.get('id') or data.get('call_id')
@@ -711,9 +761,8 @@ class VapiAssistant(http.Controller):
                     call_type=call.get('type') or 'webCall'
                 )
 
-            channel = "vapi_voice_channel"
+            target_user = self._get_target_user(call=call, data=data, assistant=assistant)
             notification = {
-                "channel": channel,
                 "operation": "customer",
                 "state": "success",
                 "data": {
@@ -730,10 +779,7 @@ class VapiAssistant(http.Controller):
                 "record_id": partner.id,
                 "record_name": partner.name,
             }
-            try:
-                request.env["bus.bus"]._sendone(channel, "notification", notification)
-            except Exception as err:
-                _logger.debug("Failed sending creation bus notification: %s", err)
+            self._send_bus_notification(target_user, notification)
 
             return self._make_tool_response(
                 tool_call_id,
@@ -798,11 +844,6 @@ class VapiAssistant(http.Controller):
                 vals['company_id'] = assistant.company_id.id
 
             product_template = request.env['product.template'].sudo().create(vals)
-            if not tools.config.get('test_enable'):
-                try:
-                    request.env.cr.commit()
-                except Exception as err:
-                    _logger.debug("Failed committing customer creation: %s", err)
 
             # Link created product to call history
             vapi_call_id = call.get('id') or data.get('call_id')
@@ -814,9 +855,8 @@ class VapiAssistant(http.Controller):
                     call_type=call.get('type') or 'webCall'
                 )
 
-            channel = "vapi_voice_channel"
+            target_user = self._get_target_user(call=call, data=data, assistant=assistant)
             notification = {
-                "channel": channel,
                 "operation": "product",
                 "state": "success",
                 "data": {
@@ -834,10 +874,7 @@ class VapiAssistant(http.Controller):
                 "record_id": product_template.id,
                 "record_name": product_template.name,
             }
-            try:
-                request.env["bus.bus"]._sendone(channel, "notification", notification)
-            except Exception as err:
-                _logger.debug("Failed sending creation bus notification: %s", err)
+            self._send_bus_notification(target_user, notification)
 
             return self._make_tool_response(
                 tool_call_id,
@@ -942,11 +979,6 @@ class VapiAssistant(http.Controller):
                 move_vals['company_id'] = assistant.company_id.id
 
             invoice = request.env['account.move'].sudo().create(move_vals)
-            if not tools.config.get('test_enable'):
-                try:
-                    request.env.cr.commit()
-                except Exception as err:
-                    _logger.debug("Failed committing customer creation: %s", err)
 
             # Link created invoice to call history
             vapi_call_id = call.get('id') or data.get('call_id')
@@ -958,9 +990,8 @@ class VapiAssistant(http.Controller):
                     call_type=call.get('type') or 'webCall'
                 )
 
-            channel = "vapi_voice_channel"
+            target_user = self._get_target_user(call=call, data=data, assistant=assistant)
             notification = {
-                "channel": channel,
                 "operation": "invoice",
                 "state": "success",
                 "data": {
@@ -973,10 +1004,7 @@ class VapiAssistant(http.Controller):
                 "record_id": invoice.id,
                 "record_name": invoice.name or f"Draft #{invoice.id}",
             }
-            try:
-                request.env["bus.bus"]._sendone(channel, "notification", notification)
-            except Exception as err:
-                _logger.debug("Failed sending creation bus notification: %s", err)
+            self._send_bus_notification(target_user, notification)
 
             return self._make_tool_response(
                 tool_call_id,

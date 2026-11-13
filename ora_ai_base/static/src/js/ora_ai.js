@@ -231,10 +231,22 @@ class VoiceAssistant extends Component {
             variableValues.salesperson_id = String(currentUserId);
             variableValues.user_id = String(currentUserId);
         }
+        const currentPartnerId = params.partner_id ||
+            (typeof odoo !== "undefined" && odoo.session_info?.partner_id) ||
+            window.odoo?.session_info?.partner_id ||
+            self.userService?.partnerId ||
+            self.env?.services?.user?.partnerId ||
+            null;
+        if (currentPartnerId) {
+            variableValues.partner_id = String(currentPartnerId);
+        }
         const metadata = {};
         if (currentUserId) {
             metadata.salesperson_id = String(currentUserId);
             metadata.user_id = String(currentUserId);
+        }
+        if (currentPartnerId) {
+            metadata.partner_id = String(currentPartnerId);
         }
         const assistantOverrides = {
             variableValues,

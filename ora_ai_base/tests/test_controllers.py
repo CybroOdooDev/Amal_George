@@ -377,3 +377,29 @@ class TestOraControllers(TransactionCase):
         self.assertGreaterEqual(self.partner.voice_call_count, 1)
         action_partner = self.partner.action_view_voice_calls()
         self.assertEqual(action_partner.get('res_model'), 'ora.call.history')
+
+    def test_12_targeted_bus_notification_security(self):
+        """Verify that bus notifications are strictly dispatched to the initiating user record,
+        preventing unauthorized public websocket interception."""
+        with patch('odoo.addons.ora_ai_base.controllers.ora_ai_base.request', new=self._mock_request({})):
+            # 1. Target user resolution from variableValues
+            target = self.controller._get_target_user(call={'variableValues': {'user_id': str(self.env.user.id)}})
+            self.assertEqual(target, self.env.user)
+
+            # 2. Target user resolution from assistant creator fallback
+            target_creator = self.controller._get_target_user(assistant=self.assistant)
+            self.assertTrue(target_creator.exists())
+            self.assertFalse(target_creator._is_public())
+
+            # 3. Notification dispatch verification
+            with patch.object(type(self.env['bus.bus']), '_sendone') as mock_send:
+                self.controller._send_bus_notification(self.env.user, {'operation': 'test', 'data': 123})
+                mock_send.assert_called_once()
+                called_target = mock_send.call_args[0][0]
+                called_type = mock_send.call_args[0][1]
+                called_payload = mock_send.call_args[0][2]
+
+                self.assertEqual(called_target, self.env.user)
+                self.assertEqual(called_type, "ora_ai_base/voice_notification")
+                self.assertEqual(called_payload.get('operation'), 'test')
+

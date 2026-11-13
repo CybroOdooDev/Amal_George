@@ -16,10 +16,10 @@
 #
 #############################################################################
 {
-    'name': "Ora-Ai Base",
+    'name': "Ora-AI Base",
     'version': '20.0.1.0.0',
     'category': 'Productivity',
-    'summary': 'Ora-Ai base module helps to configure the voice assistant.',
+    'summary': 'Ora-AI base module helps to configure the voice assistant.',
     'description': 'Ora-AI base module provides core configurations and '
                    'services necessary to integrate and manage a voice '
                    'assistant within the Odoo environment.',
@@ -59,7 +59,5 @@
     'external_dependencies': {"python": ["googletrans"]},
     'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',
-    'auto_install': False,
-    'installable': True,
     'application': True,
 }

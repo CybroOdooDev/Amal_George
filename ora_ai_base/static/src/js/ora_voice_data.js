@@ -155,11 +155,7 @@ export class VoiceData extends Component {
             this.busService = this.env?.services?.bus_service;
         }
         if (this.busService) {
-            this.channel = "vapi_voice_channel";
-            this.inbound_call_channel = "inbound_call_channel";
-            this.busService.addChannel(this.channel);
-            this.busService.addChannel(this.inbound_call_channel);
-            this.busService.subscribe("notification", (payload) => {
+            this.busService.subscribe("ora_ai_base/voice_notification", (payload) => {
                 if (payload) {
                     this.onMessage(payload);
                 }
